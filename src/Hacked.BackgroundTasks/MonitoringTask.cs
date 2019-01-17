@@ -20,10 +20,10 @@ namespace Hacked.BackgroundTasks
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
             var deferral = taskInstance.GetDeferral();
-
-            BeenPwnedService apiService = null;
-
+            
             LogMessage($"BG-MONITORING-TASK: started: {DateTime.Now}");
+
+            var apiService = new BeenPwnedService();
 
             try
             {
@@ -40,47 +40,54 @@ namespace Hacked.BackgroundTasks
                 foreach (var account in savedAccounts)
                 {
                     LogMessage($"Checking {account.Address} for breaches...");
-                    
-                    if (apiService == null)
-                        apiService = new BeenPwnedService();
 
-                    var incomingBreachList = await apiService.CheckForBreachesAsync(account);
-
-                    if (incomingBreachList != null && incomingBreachList.Count > 0)
+                    try
                     {
-                        string alertText = "";
-                        
-                        //NOTE - remember, checking count value wont work because a count total can still be the same
+                        var incomingBreachList = await apiService.CheckForBreachesAsync(account);
 
-                        foreach (var breach in incomingBreachList)
+                        if (incomingBreachList != null && incomingBreachList.Count > 0)
                         {
-                            // use the overriden Equals method on the Breach class
-                            if (account.Breaches.Any(b => b.Equals(breach)))
-                                continue;
+                            string alertText = "";
 
-                            //if there is a breach that was not in the stored list, alert user
-                            breach.IsNew = true;
-                            alertText += $"{breach.Title}:";
+                            //NOTE - remember, checking count value wont work because a count total can still be the same
+
+                            foreach (var breach in incomingBreachList)
+                            {
+                                // use the overriden Equals method on the Breach class
+                                if (account.Breaches.Any(b => b.Equals(breach)))
+                                    continue;
+
+                                //if there is a breach that was not in the stored list, alert user
+                                breach.IsNew = true;
+
+                                alertText += $"{breach.Title}:";
+                            }
+
+                            account.HasNewBreaches = incomingBreachList.Any(b => b.IsNew);
+
+                            if (account.HasNewBreaches)
+                            {
+                                account.Breaches = incomingBreachList;
+
+                                var toastTag = account.Address.Substring(0, 5);
+
+                                ShowNotification(account.Address, alertText, toastTag); //need a unique tag for this account's toast, so I use substring
+                            }
                         }
 
-                        account.HasNewBreaches = incomingBreachList.Any(b => b.IsNew);
-                        
-                        if (account.HasNewBreaches)
+                        // If any of the accounts have new breaches, save them now
+                        if (savedAccounts.Any(a => a.HasNewBreaches))
                         {
-                            account.Breaches = incomingBreachList;
-
-                            var toastTag = account.Address.Substring(0, 5);
-                            ShowNotification(account.Address, alertText, toastTag); //need a unique tag for this account's toast, so I use substring
+                            await SaveAccountsAsync(savedAccounts);
                         }
-                    }
 
-                    // If any of the accounts have new breaches, save them now
-                    if (savedAccounts.Any(a => a.HasNewBreaches))
+                        account.LastUpdated = DateTime.Now;
+                    }
+                    catch (PwnedApiException ex)
                     {
-                        await SaveAccountsAsync(savedAccounts);
+                        LogMessage($"BG-MONITORING-TASK: PwnedApiException: {ex.StatusCode}");
+                        continue;
                     }
-
-                    account.LastUpdated = DateTime.Now;
                 }
                 
                 LogMessage($"BG-MONITORING-TASK: Completed: {DateTime.Now}");
