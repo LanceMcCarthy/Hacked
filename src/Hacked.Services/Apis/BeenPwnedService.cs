@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Hacked.Core.Common;
 using Hacked.Core.Models;
 using Newtonsoft.Json;
 
@@ -11,7 +13,7 @@ namespace Hacked.Services.Apis
 {
     public class BeenPwnedService : IDisposable
     {
-        private HttpClient client = null;
+        private HttpClient client;
         private readonly HttpClientHandler handler;
         private DateTime lastCalled;
 
@@ -39,20 +41,28 @@ namespace Hacked.Services.Apis
             {
                 using (var response = await client.SendAsync(request))
                 {
-                    Debug.WriteLine("Check for breaches - request made");
-                    lastCalled = DateTime.UtcNow;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Debug.WriteLine("Check for breaches - request made");
 
-                    var json = await response.Content.ReadAsStringAsync();
+                        lastCalled = DateTime.UtcNow;
 
-                    Debug.WriteLine($"Check for breaches - json:\r\n\n{json}\r\n\n");
+                        var json = await response.Content.ReadAsStringAsync();
 
-                    var result = JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
+                        Debug.WriteLine($"Check for breaches - json:\r\n\n{json}\r\n\n");
 
-                    account.LastUpdated = DateTime.Now;
+                        var result = JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
 
-                    Debug.WriteLine($"Check for breaches - JSON.NET result:\r\n\n{result}\r\n\n");
+                        account.LastUpdated = DateTime.Now;
 
-                    return result;
+                        Debug.WriteLine($"Check for breaches - JSON.NET result:\r\n\n{result}\r\n\n");
+
+                        return result;
+                    }
+                    else
+                    {
+                        throw new PwnedApiException("HttpException Calling API Service") { StatusCode = response.StatusCode };
+                    }
                 }
             }
         }

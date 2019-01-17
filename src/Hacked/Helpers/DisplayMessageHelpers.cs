@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Net;
 using Windows.UI.Popups;
+using Hacked.Core.Common;
 
 namespace Hacked.Helpers
 {
@@ -9,9 +11,24 @@ namespace Hacked.Helpers
         {
             await DispatcherTaskExtensions.CallOnUiThreadAsync(async () =>
             {
-                await new MessageDialog($"An unexpected error has occured. If this happens again, contact us at awesome.apps@outlook.com and share the error message below" +
-                                        $"\r\n\n{callerName} Error:" +
-                                        $"\r\n {ex.Message}").ShowAsync();
+                if (ex is PwnedApiException pex)
+                {
+                    if (pex.StatusCode == HttpStatusCode.Forbidden)
+                    {
+                        await new MessageDialog($"The server is experiencing a high demand right now and the app was blocked from requesting more checks from your region. \n\n\nPlease contact the developer if this keeps happening so we can request the API service give us more bandwidth in your area. ", "Forbidden").ShowAsync();
+                    }
+
+                    if (pex.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        await new MessageDialog($"The server rejected the request stating that the app is not authorized. Please contact the developer immediately.", "Not Authorized").ShowAsync();
+                    }
+                }
+                else
+                {
+                    await new MessageDialog($"An unexpected error has occured. If this happens again, contact us at awesome.apps@outlook.com and share the error message below" +
+                                            $"\r\n\n{callerName} Error:" +
+                                            $"\r\n {ex.Message}").ShowAsync();
+                }
             });
         }
 
