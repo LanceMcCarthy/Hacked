@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Name="Page"
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:Hacked.Forms.Portable.ViewModels;assembly=Hacked.Forms.Portable"
+             xmlns:input="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input"
+             x:Class="Hacked.Forms.Portable.Views.SettingsPage"
+             Title="Settings"
+             BindingContext="{x:Static viewModels:ViewModelLocator.Main}">
+
+    <ContentPage.Resources>
+        <Style x:Key="ThemeFeatureBoxViewStyle"
+               TargetType="BoxView">
+            <Setter Property="HeightRequest"
+                    Value="{OnPlatform Android='25', iOS='25', UWP='50'}" />
+            <Setter Property="Margin"
+                    Value="{OnPlatform Android='0,5,0,10', iOS='0,5,0,10', UWP='0,5,0,10'}" />
+            <Setter Property="HorizontalOptions"
+                    Value="Fill" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid BackgroundColor="{DynamicResource ThemeBackgroundColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollView>
+            <StackLayout Padding="10,10,10,0">
+                <Label Text="Text (Light)"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeTextLightColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+
+                <Label Text="Text"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeTextColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+
+                <Label Text="Text (Dark)"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeTextDarkColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+
+                <Label Text="Accent (Bright)"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeAccentBrightColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+
+                <Label Text="Accent (Light)"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeAccentLightColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+
+                <Label Text="Accent"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeAccentColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+
+                <Label Text="Accent (Dark)"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeAccentDarkColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+
+            </StackLayout>
+        </ScrollView>
+
+        <input:RadSegmentedControl x:Name="segmentControl"
+                                   SegmentTextColor="{DynamicResource ThemeTextDarkColor}"
+                                   SegmentBackgroundColor="{DynamicResource ThemeBackgroundColor}"
+                                   SelectedSegmentTextColor="{DynamicResource ThemeBackgroundColor}"
+                                   SelectedSegmentBackgroundColor="{DynamicResource ThemeAccentDarkColor}"
+                                   DisabledSegmentTextColor="{DynamicResource ThemeTextLightColor}"
+                                   SelectionChanged="SegmentControl_OnSelectionChanged"
+                                   HeightRequest="60"
+                                   Grid.Row="1" />
+    </Grid>
+</ContentPage>

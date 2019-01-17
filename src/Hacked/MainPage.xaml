@@ -1,0 +1,788 @@
+﻿<Page x:Class="Hacked.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="using:Hacked.Controls"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:primitives="using:Telerik.UI.Xaml.Controls.Primitives"
+      xmlns:ui="using:Microsoft.Advertising.WinRT.UI"
+      xmlns:tkControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+      xmlns:selectors="using:Hacked.Selectors"
+      x:Name="Page"
+      DataContext="{StaticResource ViewModel}"
+      mc:Ignorable="d">
+    
+    <Page.Resources>
+        <DataTemplate x:Key="AdItemTemplate">
+            <Grid>
+                <TextBlock Text="Loading content..."
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center" />
+                
+                <ui:AdControl AutoRefreshIntervalInSeconds="30"
+                              HorizontalAlignment="Left" />
+
+                <Button x:Name="RemoveAdButton"
+                        Content="remove ads"
+                        Command="{Binding ElementName=Page, Path=DataContext.PurchaseAdUnlockCommand}"
+                        Foreground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Stretch" 
+                        Margin="5"/>
+            </Grid>
+        </DataTemplate>
+        
+        <DataTemplate x:Key="BreachItemTemplate">
+            <Grid Margin="0,10,10,0" >
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Name}" 
+                                   FontSize="26"
+                                   FontWeight="Bold"
+                                   Style="{StaticResource TitleTextBlockStyle}"
+                                   VerticalAlignment="Center" />
+
+                        <Button Margin="5,0,0,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Background="{ThemeResource SystemControlPageBackgroundAltMediumBrush}"
+                                Click="BreachInfoButton_Click"
+                                Padding="2">
+                            <FontIcon Glyph="&#xE946;" FontSize="24" />
+                        </Button>
+
+                        <Button Content="NEW! (tap to clear)"
+                                Background="Red"
+                                Foreground="White"
+                                Visibility="{Binding IsNew, Converter={StaticResource BoolToVisibilityConverter}}"
+                                Margin="10,0,0,0" />
+                    </StackPanel>
+
+                    <HyperlinkButton Content="{Binding Domain}"
+                                     Margin="0,-5,0,-5"
+                                     NavigateUri="{Binding Domain, Converter={StaticResource StringToUriConverter}}" />
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Breached on:" Margin="0,0,6,0" />
+                        <TextBlock Text="{Binding BreachDate}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Accounts breached:" Margin="0,0,6,0" />
+                        <TextBlock Text="{Binding PwnCount}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </StackPanel>
+                <tkControls:HeaderedItemsControl ItemsSource="{Binding DataClasses}" 
+                                                 Grid.Row="1"
+                                                 Grid.ColumnSpan="2"
+                                                 Margin="0,5,0,0">
+                    <tkControls:HeaderedItemsControl.Header>
+                        <TextBlock Text="Information taken:" />
+                    </tkControls:HeaderedItemsControl.Header>
+                    <tkControls:HeaderedItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{ThemeResource ContentDialogBackgroundThemeBrush}"
+                                    ToolTipService.ToolTip="{Binding}"
+                                    Padding="10,3">
+                                <TextBlock Text="{Binding}" 
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center" />
+                            </Border>
+                        </DataTemplate>
+                    </tkControls:HeaderedItemsControl.ItemTemplate>
+                    <tkControls:HeaderedItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="0,5,10,10" />
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                        </Style>
+                    </tkControls:HeaderedItemsControl.ItemContainerStyle>
+                    <tkControls:HeaderedItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </tkControls:HeaderedItemsControl.ItemsPanel>
+                </tkControls:HeaderedItemsControl>
+            </Grid>
+        </DataTemplate>
+
+        <selectors:BreachListItemSelector x:Key="BreachListItemSelector"
+                                          BreachItemTemplate="{StaticResource BreachItemTemplate}"
+                                          AdItemTemplate="{StaticResource AdItemTemplate}"/>
+    </Page.Resources>
+
+    <Grid x:Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Grid MinHeight="32" Background="{ThemeResource ContentDialogBackgroundThemeBrush}">
+            <!--<Grid x:Name="AdGrid"
+                  Visibility="{Binding AreAdsRemoved, Converter={StaticResource InvertedBoolToVisibilityConverter}}">
+
+                <TextBlock x:Name="LoadingAdTextBlock"
+                           Visibility="Collapsed"
+                           Text="Loading ad..."
+                           VerticalAlignment="Center"
+                           Margin="10" />
+
+                <ui:AdControl x:Name="MainPageAdControl"
+                              Visibility="Collapsed"
+                              AdRefreshed="MainPageAdControl_OnAdRefreshed"
+                              ErrorOccurred="MainPageAdControl_OnErrorOccurred"
+                              HorizontalAlignment="Left" />
+
+                <Button x:Name="RemoveAdButton"
+                        Visibility="Collapsed"
+                        Content="remove ads"
+                        Command="{Binding PurchaseAdUnlockCommand}"
+                        Foreground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Stretch"
+                        Margin="5"/>
+            </Grid>-->
+        </Grid>
+
+        <SplitView x:Name="RootSplitView"
+                   PaneBackground="{ThemeResource SystemControlChromeHighAcrylicElementMediumBrush}"
+                   Grid.Row="1"
+                   DisplayMode="Inline" 
+                   IsPaneOpen="False">
+            <SplitView.Pane>
+                <Grid x:Name="LeftGrid" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid x:Name="LeftHeaderGrid"
+                          Height="50"
+                          Background="{ThemeResource SystemControlAcrylicElementBrush}">
+
+                        <TextBlock Margin="0,0,0,0"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="21.333"
+                                   Foreground="{ThemeResource ContentDialogContentForegroundBrush}"
+                                   Text="Monitored Accounts" />
+
+                        <Button x:Name="AllAccountsRefreshButton"
+                                Width="50"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Background="#00000000"
+                                Command="{Binding FindAllAccountBreachesCommand}"
+                                IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolConverter}}">
+                            <SymbolIcon Symbol="Refresh" />
+                        </Button>
+                    </Grid>
+
+                    <ListView x:Name="AccountsListView"
+                              Grid.Row="1"
+                              IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolConverter}}"
+                              ItemsSource="{Binding Accounts}"
+                              SelectedItem="{Binding SelectedAccount, Mode=TwoWay}" 
+                              SelectionChanged="AccountsListView_OnSelectionChanged">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Padding" Value="15,10,15,10" />
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ItemsControl.ItemContainerTransitions>
+                            <TransitionCollection>
+                                <EntranceThemeTransition />
+                                <AddDeleteThemeTransition />
+                                <EdgeUIThemeTransition />
+                            </TransitionCollection>
+                        </ItemsControl.ItemContainerTransitions>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.Background>
+                                        <SolidColorBrush Color="Transparent"/>
+                                    </Grid.Background>
+
+                                    <TextBlock Grid.ColumnSpan="2"
+                                               Style="{StaticResource SubtitleTextBlockStyle}"
+                                               Text="{Binding Address}"
+                                               TextTrimming="CharacterEllipsis"
+                                               TextWrapping="NoWrap" />
+
+                                    <ProgressRing Grid.RowSpan="2"
+                                                  Grid.ColumnSpan="2"
+                                                  HorizontalAlignment="Stretch"
+                                                  VerticalAlignment="Stretch"
+                                                  IsActive="{Binding IsUpdating}" Margin="10" />
+
+                                    <StackPanel Grid.Row="1">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Refreshed:" />
+                                            <TextBlock Margin="5,0,0,0"
+                                                       Text="{Binding LastUpdated, Converter={StaticResource DisplayDateConverter}}" 
+                                                       FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Total Breaches:" />
+                                            <TextBlock Text="{Binding Breaches.Count}" 
+                                                       Margin="5,0,0,0" 
+                                                       FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal"
+                                                    Visibility="{Binding HasNewBreaches, Converter={StaticResource BoolToVisibilityConverter}}">
+                                            <TextBlock Text="New Breaches:" />
+                                            <TextBlock Text="{Binding NewBreachCount}" 
+                                                       Margin="5,0,0,0" 
+                                                       FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <Button Grid.Row="1"
+                                            Grid.Column="1"
+                                            Margin="0,5,10,0"
+                                            HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch"
+                                            Command="{Binding DataContext.RemoveAccountCommand, ElementName=Page}"
+                                            CommandParameter="{Binding}"
+                                            IsEnabled="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}">
+                                        <SymbolIcon Foreground="White" Symbol="Delete" />
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <Grid x:Name="LeftBaseGrid"
+                          Grid.Row="2">
+                        <StackPanel>
+                            <Button Margin="5"
+                                    HorizontalAlignment="Stretch"
+                                    Click="AddAccountButton_Click"
+                                    Content="add an account"
+                                    Foreground="White" />
+                            <Button x:Name="BackupRestoreButton"
+                                    Margin="5"
+                                    HorizontalAlignment="Stretch"
+                                    Content="backup and restore"
+                                    Foreground="White">
+                                <Button.Flyout>
+                                    <Flyout x:Name="BackupRestoreButtonFlyout">
+                                        <Grid MaxWidth="325">
+                                            <StackPanel HorizontalAlignment="Left">
+                                                <TextBlock FontWeight="Bold"
+                                                           Style="{StaticResource SubtitleTextBlockStyle}"
+                                                           Text="Backup and Restore" />
+                                                <TextBlock Margin="0,0,0,0"
+                                                           TextWrapping="Wrap">
+                                                    <Run Text="You can sync your list of Monitored Accounts across devices when you have this app installed by using backup and restore." />
+                                                    <LineBreak />
+                                                    <Run />
+                                                    <LineBreak />
+                                                    <Run Text="Click here to backup your current account list" />
+                                                </TextBlock>
+                                                <Button x:Name="BackupAccountsButton"
+                                                        Margin="0,10,0,10"
+                                                        HorizontalAlignment="Stretch"
+                                                        Click="BackupAccountsButton_OnClick"
+                                                        Content="backup monitored accounts" />
+                                                <TextBlock Margin="0,10,0,0"
+                                                           Text="Click here to add accounts from your backup list"
+                                                           TextWrapping="Wrap" />
+                                                <Button x:Name="RestoreAccountsButton"
+                                                        Margin="0,10"
+                                                        HorizontalAlignment="Stretch"
+                                                        Click="RestoreAccountsButton_OnClick"
+                                                        Content="restore monitored accounts" />
+                                                <TextBlock Margin="0,10,0,0"
+                                                           TextWrapping="Wrap">
+                                                    <Run FontWeight="Bold"
+                                                         Text="Important Notes" />
+                                                    <Run Text=": " />
+                                                    <LineBreak />
+                                                    <Run Text="- Using the restore button will add missing accounts" />
+                                                    <LineBreak />
+                                                    <Run Text="- Using the backup button above will replace the last synced file. " />
+                                                    <LineBreak />
+                                                    <Run Text="- It can take a little while before the accounts list is synced to the cloud and available to other devices. Internet connection is required." />
+                                                </TextBlock>
+                                                <HyperlinkButton x:Name="DeleteBackupHyperlinkButton"
+                                                                 Click="DeleteBackupHyperlinkButton_OnClick"
+                                                                 Content="click here to delete the current backup file"
+                                                                 Foreground="Red" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                            <Button x:Name="AboutButton"
+                                    Margin="5"
+                                    HorizontalAlignment="Stretch"
+                                    Content="help | about | contact us | review"
+                                    Foreground="White">
+                                <Button.Flyout>
+                                    <Flyout x:Name="AboutButtonFlyout">
+                                        <Grid>
+                                            <StackPanel x:Name="CreditsPanel"
+                                                        HorizontalAlignment="Left">
+                                                <StackPanel x:Name="TitlePanel"
+                                                            Margin="0,0,0,5">
+                                                    <TextBlock Margin="0"
+                                                               HorizontalAlignment="Left"
+                                                               FontSize="21.333"
+                                                               FontWeight="Bold"
+                                                               Text="Hacked?" />
+                                                    <StackPanel HorizontalAlignment="Left"
+                                                                Orientation="Horizontal">
+                                                        <TextBlock Margin="0,0,0,0"
+                                                                   Text="v" />
+                                                        <TextBlock Margin="0,0,5,0"
+                                                                   Text="{Binding AppVersion}" />
+                                                        <TextBlock Margin="0,0,0,0"
+                                                                   Text="© 2016 Lancelot Software, LLC" />
+                                                    </StackPanel>
+                                                </StackPanel>
+
+                                                <controls:LancelotSoftware Width="180"
+                                                                           Height="180"
+                                                                           Margin="0,10,0,10" />
+
+                                                <TextBlock HorizontalAlignment="Left"
+                                                           FontSize="14"
+                                                           FontWeight="Bold"
+                                                           Text="Credits" />
+                                                <TextBlock HorizontalAlignment="Left"
+                                                           FontSize="12"
+                                                           Text="Json.NET © 2016 Newtonsoft" />
+                                                <TextBlock HorizontalAlignment="Left"
+                                                           FontSize="12"
+                                                           Text="Data from HaveibeenPwned by Troy Hunt" />
+
+                                                <TextBlock MaxWidth="320"
+                                                           Margin="0,10,0,10"
+                                                           FontSize="12"
+                                                           TextWrapping="Wrap">
+                                                    <Run FontWeight="Bold"
+                                                         Foreground="Red"
+                                                         Text="About your privacy" />
+                                                    <Run Text=": We only use your email address with the service &quot;haveibeenpwned&quot;, created by the security industry-trusted expert, Troy Hunt. We do not share your information with anyone else, for any reason, ever." />
+                                                </TextBlock>
+
+                                                <Button x:Name="HelpButton"
+                                                        HorizontalAlignment="Stretch"
+                                                        Click="HelpButton_OnClick"
+                                                        Content="help" />
+
+                                                <Button x:Name="ContactUsButton"
+                                                        HorizontalAlignment="Stretch"
+                                                        Click="ContactUsButton_OnClick"
+                                                        Margin="0,10,0,0"
+                                                        Content="contact us" />
+
+                                                <Button x:Name="ReviewButton"
+                                                        Margin="0,10,0,0"
+                                                        HorizontalAlignment="Stretch"
+                                                        Click="ReviewButton_OnClickButton_OnClick"
+                                                        Content="rate this app" />
+
+                                                <Button x:Name="FeedbackHubButton"
+                                                        Content="Leave feedback in FeedbackHub"
+                                                        Visibility="Visible"
+                                                        HorizontalAlignment="Stretch"
+                                                        Click="FeedbackHubButton_OnClick"
+                                                        Margin="0,10,0,0" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </SplitView.Pane>
+            <SplitView.Content>
+                <Grid x:Name="RightContentGrid"
+                      Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <Grid x:Name="HeaderGrid"
+                          Grid.Row="0"
+                          Height="50"
+                          Background="{ThemeResource SystemControlForegroundBaseMediumBrush}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="FilterTextBox"
+                                 Visibility="{x:Bind FilterToggleButton.IsChecked, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                 AcceptsReturn="True"
+                                 Grid.Column="1"
+                                 TextChanged="FilterTextBox_OnTextChanged"
+                                 InputScope="EmailNameOrAddress"
+                                 VerticalAlignment="Center" />
+
+                        <ToggleButton x:Name="FilterToggleButton"
+                                      Grid.Column="2"
+                                      IsChecked="False"
+                                      Foreground="White"
+                                      Margin="10,0,10,0"
+                                      Visibility="{Binding SelectedAccount, Converter={StaticResource NullToVisibilityConverter}}"
+                                      Click="ClearFilterToggleButton_OnClick">
+                            <SymbolIcon Symbol="Filter" />
+                        </ToggleButton>
+
+                        <Button x:Name="MonitorFlyoutButton"
+                                Grid.Column="3"
+                                Margin="0,0,10,0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Background="Red">
+                            <Button.Content>
+                                <SymbolIcon Foreground="White"
+                                            Symbol="Admin" />
+                            </Button.Content>
+                            <Button.Flyout>
+                                <Flyout Opened="MonitorFlyout_OnOpened">
+                                    <StackPanel MaxWidth="400">
+                                        <Border x:Name="CurrentStatusBorder"
+                                                Background="Red"
+                                                Padding="5">
+                                            <TextBlock x:Name="CurrentStatusTextBlock"
+                                                       Foreground="White"
+                                                       Text="Monitoring is not active"
+                                                       TextWrapping="Wrap" />
+                                        </Border>
+                                        <ToggleSwitch x:Name="BackgroundMonitoringSwitch"
+                                                      Margin="0,10,0,0"
+                                                      OffContent="enable"
+                                                      OnContent="disable"
+                                                      Toggled="BackgroundMonitoringSwitch_OnToggled">
+                                            <ToggleSwitch.Header>
+                                                <StackPanel>
+                                                    <TextBlock Text="Account Monitoring" />
+                                                    <TextBlock FontSize="13.333"
+                                                               Foreground="{StaticResource SystemControlForegroundBaseMediumBrush}"
+                                                               Text="Check every 12 hours to see if your account has had a new breach" />
+                                                </StackPanel>
+                                            </ToggleSwitch.Header>
+                                        </ToggleSwitch>
+                                        <TextBlock Margin="0,10,0,0"
+                                                   Text="Last Task Status:" />
+                                        <TextBlock x:Name="LastTaskStatusTextBlock"
+                                                   Text="nothing to report" />
+                                    </StackPanel>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                    </Grid>
+
+                    <Grid x:Name="AdGrid"
+                          Grid.Row="1">
+
+                        <!--Visibility="{Binding AreAdsRemoved, Converter={StaticResource InvertedBoolToVisibilityConverter}}"-->
+
+                        <!--<TextBlock x:Name="LoadingAdTextBlock"
+                                   Visibility="Collapsed"
+                                   Text="Loading ad..."
+                                   VerticalAlignment="Center"
+                                   Margin="10" />-->
+
+                        <primitives:RadBusyIndicator x:Name="AdBusyIndicator"
+                                                     AnimationStyle="AnimationStyle5"
+                                                     Content="Loading ad..."
+                                                     ContentPosition="Right"
+                                                     Padding="10"
+                                                     IsActive="True" />
+
+                        <ui:AdControl x:Name="MainPageAdControl"
+                                      AdRefreshed="MainPageAdControl_OnAdRefreshed"
+                                      ErrorOccurred="MainPageAdControl_OnErrorOccurred"
+                                      AutoRefreshIntervalInSeconds="30"
+                                      HorizontalAlignment="Left"  />
+
+                        <Button x:Name="RemoveAdButton"
+                                Content="remove ads"
+                                Command="{Binding PurchaseAdUnlockCommand}"
+                                Foreground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Stretch"
+                                Margin="5"/>
+                    </Grid>
+
+                    <Grid x:Name="NoKnownBreachesGrid"
+                          Grid.Row="2"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Background="{ThemeResource SystemControlBackgroundAccentBrush}"
+                          Padding="5"
+                          Visibility="Collapsed">
+                        <StackPanel Margin="5">
+                            <SymbolIcon Margin="0,0,0,10"
+                                        Foreground="White"
+                                        Symbol="Emoji2" />
+                            <TextBlock Foreground="White"
+                                       Text="No Known Breaches" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid x:Name="NoAccountsGrid"
+                          Grid.Row="2"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Background="{ThemeResource SystemControlBackgroundAccentBrush}"
+                          Padding="5"
+                          Visibility="{Binding HasAccounts, Converter={StaticResource InvertedBoolToVisibilityConverter}}">
+                        <StackPanel Margin="5"
+                                    HorizontalAlignment="Center">
+                            <FontIcon Margin="0,0,0,10"
+                                      Foreground="White"
+                                      Glyph="&#xE730;" />
+                            <TextBlock Margin="0,0,0,5"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Bottom"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       Text="No Accounts!"
+                                       TextWrapping="Wrap" />
+                            <TextBlock HorizontalAlignment="Center"
+                                       Foreground="White"
+                                       Text="To add an account, open the pane and select 'add account'."
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid x:Name="BreachesGrid"
+                          Grid.Row="2">
+                        <ListView x:Name="BreachesListView"
+                                  ItemsSource="{Binding SelectedAccount.Breaches}"
+                                  ItemTemplateSelector="{StaticResource BreachListItemSelector}"
+                                  SelectedItem="{Binding SelectedBreach, Mode=TwoWay}"
+                                  SelectionChanged="BreachesListView_OnSelectionChanged"
+                                  Visibility="{Binding SelectedAccount, Converter={StaticResource NullToVisibilityConverter}}">
+                            <ListView.Header>
+                                <tkControls:ScrollHeader Mode="QuickReturn">
+                                    <Grid Background="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Style="{StaticResource TitleTextBlockStyle}"
+                                                   FontSize="32"
+                                                   FontWeight="Bold"
+                                                   Text="{Binding SelectedAccount.Address}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="NoWrap"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}" 
+                                                   Grid.Row="1"/>
+
+                                        <StackPanel Grid.Row="2"
+                                                    Margin="0,0,0,10">
+
+                                            <StackPanel Orientation="Horizontal"
+                                                        HorizontalAlignment="Center">
+                                                <TextBlock Text="Total Breaches:"
+                                                           Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}" />
+                                                <TextBlock Margin="5,0,0,0"
+                                                           Text="{Binding SelectedAccount.Breaches.Count}"
+                                                           Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
+                                                           FontWeight="SemiBold" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal"
+                                                        HorizontalAlignment="Center">
+                                                <TextBlock Text="New Breaches:"
+                                                           Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}" />
+                                                <TextBlock Margin="5,0,0,0"
+                                                           Foreground="{Binding SelectedAccount.HasNewBreaches, Converter={StaticResource BoolToBrushConverter}}"
+                                                           Text="{Binding SelectedAccount.NewBreachCount}"
+                                                           FontWeight="SemiBold" />
+                                                <HyperlinkButton x:Name="ClearNewHyperlinkButton"
+                                                                 Margin="10,-6,0,-6"
+                                                                 Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
+                                                                 Content="Mark all seen"
+                                                                 Visibility="{Binding SelectedAccount.HasNewBreaches, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                                 Click="ClearNewHyperlinkButton_OnClick" />
+                                            </StackPanel>
+                                            <Button x:Name="SelectedAccountRefresh"
+                                                    HorizontalAlignment="Center"
+                                                    Command="{Binding FindSelectedAccountBreachCommand}"
+                                                    IsEnabled="{Binding SelectedAccount.IsUpdating, Converter={StaticResource InvertBoolConverter}}"
+                                                    Visibility="{Binding SelectedAccount, Converter={StaticResource NullToVisibilityConverter}}"
+                                                    Margin="0,5,0,0">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="Last Refreshed:"
+                                                               Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}" />
+                                                    <TextBlock Margin="5,0,0,0"
+                                                               Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
+                                                               Text="{Binding SelectedAccount.LastUpdated, Converter={StaticResource DisplayDateConverter}}"
+                                                               FontWeight="SemiBold" />
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </tkControls:ScrollHeader>
+                            </ListView.Header>
+                            <ItemsControl.ItemContainerTransitions>
+                                <TransitionCollection>
+                                    <EntranceThemeTransition IsStaggeringEnabled="True" />
+                                    <EdgeUIThemeTransition Edge="Left" />
+                                </TransitionCollection>
+                            </ItemsControl.ItemContainerTransitions>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment"
+                                            Value="Stretch" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                        </ListView>
+                    </Grid>
+                </Grid>
+            </SplitView.Content>
+        </SplitView>
+
+        <ToggleButton x:Name="TogglePaneButton"
+                      Grid.Row="1"
+                      Foreground="{Binding IsPaneOpen,
+                                           ElementName=RootSplitView,
+                                           Converter={StaticResource ToggleButtonForegroundConverter}}"
+                      IsChecked="{Binding IsPaneOpen,
+                                          ElementName=RootSplitView,
+                                          Mode=TwoWay}"
+                      Style="{StaticResource SplitViewTogglePaneButtonStyle}"
+                      TabIndex="1"
+                      ToolTipService.ToolTip="Accounts"
+                      Unchecked="TogglePaneButton_Checked" />
+
+        <controls:AddAccount x:Name="AddAccountOverlay"
+                             DataContext="{Binding}"
+                             Visibility="Collapsed"
+                             Grid.Row="1" />
+        
+        <controls:Help x:Name="HelpOverlay"
+                       Visibility="Collapsed"
+                       Grid.Row="1" />
+
+        <Grid x:Name="NoticeOverlay"
+              Grid.Row="1"
+              Background="{ThemeResource SystemControlChromeHighAcrylicElementMediumBrush}"
+              Visibility="Collapsed">
+            <Grid Width="325"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Grid Background="{ThemeResource SystemControlBackgroundAccentBrush}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="NoticeTitle"
+                               Margin="0,0,0,0"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Foreground="White"
+                               Style="{StaticResource TitleTextBlockStyle}"
+                               Text="Updated!" />
+                    <Button x:Name="CloseNoticeButton2"
+                            Grid.Column="1"
+                            Width="48"
+                            Height="48"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Stretch"
+                            Background="#7F000000"
+                            Click="CloseNoticeButton2_OnClick"
+                            Content="X"
+                            FontWeight="Bold"
+                            Foreground="White" />
+                </Grid>
+
+                <ScrollViewer Grid.Row="1">
+                    <StackPanel Margin="10">
+                        <TextBlock x:Name="NoticeContentLineTwo"
+                                   TextWrapping="Wrap">
+                            <Run FontWeight="Bold"
+                                 Text="New: Updated for October 2018 Update!" />
+                            <LineBreak />
+                            <Run Text="- Fluent Design elements throughout the app; shadow, light and blur effects" />
+                            <LineBreak />
+                            <Run Text="- Moved advertising out of title bar and into list to be less intrusive" />
+                            <LineBreak />
+                            <Run FontWeight="Bold"
+                                 Text="Fixes:" />
+                            <LineBreak />
+                            <Run Text="- Optimized data loading and saving methods" />
+                            <LineBreak />
+                            <Run Text="- Faster UI loading times" />
+                            <LineBreak />
+                            <Run Text="- Numerous general improvements and fixes" />
+                            <LineBreak />
+                            <Run Text="- Fixed jerky list header movement" />
+                            <LineBreak />
+                            <Run Text="- Far too many other tweaks to list, enjoy the awesomeness" />
+                            <LineBreak />
+                            <Run Text="Psst... Android and iOS apps coming soon =]" />
+                        </TextBlock>
+                        <TextBlock Margin="0,10,0,0"
+                                   Text="Contact us if you have any questions or concerns."
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="WindowStates">
+                <VisualState x:Name="MediumState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="640" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="RootSplitView.DisplayMode"
+                                Value="Inline" />
+                        <Setter Target="RootSplitView.IsPaneOpen"
+                                Value="True" />
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="NarrowState">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="RootSplitView.DisplayMode"
+                                Value="Overlay" />
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+    </Grid>
+</Page>
