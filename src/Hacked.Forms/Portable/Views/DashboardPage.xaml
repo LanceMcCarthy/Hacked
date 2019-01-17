@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Hacked.Forms.Portable.Views.DashboardPage"
+             xmlns:telerikChart="clr-namespace:Telerik.XamarinForms.Chart;assembly=Telerik.XamarinForms.Chart"
+             xmlns:dataControls="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls"
+             xmlns:listView="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.XamarinForms.DataControls"
+             xmlns:viewModels="clr-namespace:Hacked.Forms.Portable.ViewModels;assembly=Hacked.Forms.Portable"
+             BindingContext="{x:Static viewModels:ViewModelLocator.Main}">
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <Grid x:Name="TopGrid">
+      <StackLayout Margin="10">
+        <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+          <Label Text="Total Accounts: "/>
+          <Label Text="{Binding Accounts.Count}" TextColor="Blue"/>
+          <Label Text=" - Total New Breaches:  "/>
+          <Label Text="{Binding NewBreachesTotal}" TextColor="Blue"/>
+        </StackLayout>
+      </StackLayout>
+    </Grid>
+
+    <Grid x:Name="ChartsGrid" Grid.Row="1">
+      <telerikChart:RadCartesianChart x:Name="TopChart" MinimumHeightRequest="100" >
+        <telerikChart:RadCartesianChart.HorizontalAxis>
+          <telerikChart:CategoricalAxis LabelFitMode="MultiLine"/>
+        </telerikChart:RadCartesianChart.HorizontalAxis>
+        <telerikChart:RadCartesianChart.VerticalAxis>
+          <telerikChart:NumericalAxis LabelFormat="N0"/>
+        </telerikChart:RadCartesianChart.VerticalAxis>
+        <telerikChart:RadCartesianChart.Series>
+          <telerikChart:BarSeries x:Name="TopBarSeries" ItemsSource="{Binding AccountTotalsChartData}" >
+            <telerikChart:BarSeries.ValueBinding>
+              <telerikChart:PropertyNameDataPointBinding PropertyName="Value"/>
+            </telerikChart:BarSeries.ValueBinding>
+            <telerikChart:BarSeries.CategoryBinding>
+              <telerikChart:PropertyNameDataPointBinding PropertyName="Category"/>
+            </telerikChart:BarSeries.CategoryBinding>
+          </telerikChart:BarSeries>
+        </telerikChart:RadCartesianChart.Series>
+        <telerikChart:RadCartesianChart.Behaviors>
+          <telerikChart:ChartSelectionBehavior x:Name="SelectionBehavior" 
+                                               DataPointSelectionMode="Single" 
+                                               SeriesSelectionMode="None" 
+                                               SelectionChanged="ChartSelectionBehavior_OnSelectionChanged" />
+        </telerikChart:RadCartesianChart.Behaviors>
+      </telerikChart:RadCartesianChart>
+    </Grid>
+
+    <Grid x:Name="SelectedAccountGrid" 
+          IsVisible="{Binding SelectedAccount, Converter={StaticResource NullToBoolConverter}}" 
+          Grid.Row="2">
+      <StackLayout Margin="10">
+        <StackLayout Orientation="Horizontal" >
+          <Label Text="Monitored Account: "/>
+          <Label Text="{Binding SelectedAccount.Address}" />
+        </StackLayout>
+        <StackLayout Orientation="Horizontal" >
+          <Label Text="Total Breaches: "/>
+          <Label Text="{Binding SelectedAccount.Breaches.Count}" />
+        </StackLayout>
+        <StackLayout Orientation="Horizontal" >
+          <Label Text="New Breaches: "/>
+          <Label Text="{Binding SelectedAccount.NewBreachCount}" />
+        </StackLayout>
+        <StackLayout Orientation="Horizontal" >
+          <Label Text="Last Updated: "/>
+          <Label Text="{Binding SelectedAccount.LastUpdated}" />
+        </StackLayout>
+        <Button Text="see breach details" Clicked="SelectedAccountBreachDetailsButton_clicked"/>
+      </StackLayout>
+    </Grid>
+  </Grid>
+</ContentPage>

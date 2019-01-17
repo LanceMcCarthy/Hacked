@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Hacked.Forms.Portable.Views.AccountDetailsPage"
+             xmlns:listView="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.XamarinForms.DataControls"
+             xmlns:telerik="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.XamarinForms.DataControls"
+             xmlns:viewModels="clr-namespace:Hacked.Forms.Portable.ViewModels;assembly=Hacked.Forms.Portable"
+             xmlns:input="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input"
+             BindingContext="{x:Static viewModels:ViewModelLocator.Main}"
+             Title="{Binding SelectedAccount.Address}">
+
+    <Grid  BackgroundColor="{DynamicResource ThemeBackgroundColor}">
+        <!--<Grid x:Name="ListGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <input:RadAutoComplete x:Name="autoCompleteView"
+                                   ItemsSource="{Binding SelectedAccount.Breaches}"
+                                   Watermark="Filter here..." />-->
+
+            <!--ItemsSource="{Binding FilteredItems, Source={x:Reference autoCompleteView}}"
+
+            <telerik:RadListView x:Name="BreachesListView"
+                                 IsPullToRefreshEnabled="True"
+                                 ItemsSource="{Binding SelectedAccount.Breaches}"
+                                 RefreshRequested="BreachesListView_OnRefreshRequested"
+                                 SelectionMode="Single"
+                                 ItemTemplate="{StaticResource BreachItemTemplate}"
+                                 ItemStyle="{StaticResource NormalListItemStyle}"
+                                 SelectionChanged="BreachesListView_OnSelectionChanged"
+                                 Grid.Row="1"/>
+        </Grid>-->
+
+        <telerik:RadListView x:Name="BreachesListView"
+                             IsPullToRefreshEnabled="True"
+                             ItemsSource="{Binding SelectedAccount.Breaches}"
+                             RefreshRequested="BreachesListView_OnRefreshRequested"
+                             SelectionMode="Single"
+                             ItemTemplate="{StaticResource BreachItemTemplate}"
+                             ItemStyle="{StaticResource NormalListItemStyle}"
+                             SelectionChanged="BreachesListView_OnSelectionChanged"/>
+    </Grid>
+</ContentPage>

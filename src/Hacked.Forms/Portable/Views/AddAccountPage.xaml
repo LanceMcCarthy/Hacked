@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="Hacked.Forms.Portable.Views.AddAccountPage"
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:Hacked.Forms.Portable.ViewModels;assembly=Hacked.Forms.Portable"
+             xmlns:primitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.XamarinForms.Primitives"
+             BindingContext="{x:Static viewModels:ViewModelLocator.Main}"
+             Title="Add Account">
+
+    <Grid  BackgroundColor="{DynamicResource ThemeBackgroundColor}">
+        <StackLayout Margin="20"
+                     VerticalOptions="Center">
+            <Label HorizontalOptions="Start"
+                   Text="Enter an account to monitor" 
+                   TextColor="{DynamicResource ThemeAccentLightColor}"/>
+            <Entry x:Name="EmailEntry"
+                   Completed="EmailEntry_OnCompleted"
+                   Keyboard="Email"
+                   Placeholder="enter email address or username"
+                   PlaceholderColor="{DynamicResource ThemeTextLightColor}"
+                   TextColor="{DynamicResource ThemeTextColor}"
+                   TextChanged="EmailEntry_OnTextChanged" />
+            <Button x:Name="AddAccountButton"
+                    IsEnabled="False"
+                    Text="add account"
+                    TextColor="{DynamicResource ThemeTextColor}"
+                    BackgroundColor="{DynamicResource ThemeTextLightColor}"
+                    Clicked="AddAccount_OnClicked" />
+            <Button x:Name="CancelButton"
+                    Clicked="CancelButton_OnClicked"
+                    Text="cancel"
+                    TextColor="{DynamicResource ThemeTextColor}"
+                    BackgroundColor="Transparent"/>
+        </StackLayout>
+
+        <primitives:RadBusyIndicator IsVisible="{Binding IsBusy}"
+                                     IsBusy="{Binding IsBusy}"
+                                     AnimationType="Animation3"
+                                     BackgroundColor="{DynamicResource ThemeBackgroundColor}"
+                                     AnimationContentColor="{DynamicResource ThemeAccentColor}"
+                                     AnimationContentHeightRequest="100"
+                                     AnimationContentWidthRequest="100"
+                                     HorizontalOptions="Fill"
+                                     VerticalOptions="Fill"/>
+    </Grid>
+</ContentPage>
