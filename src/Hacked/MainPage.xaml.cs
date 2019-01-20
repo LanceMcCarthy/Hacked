@@ -341,8 +341,8 @@ namespace Hacked
                 switch (accessStatus)
                 {
                     case BackgroundAccessStatus.AlwaysAllowed:
-                    case BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity:
-                    case BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity:
+                    //case BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity:
+                    //case BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity:
                     case BackgroundAccessStatus.AllowedSubjectToSystemPolicy:
                         await BackgroundTaskHelpers.RegisterTaskAsync(Constants.MonitorTaskName, typeof(MonitoringTask).FullName, (uint) updateFrequency);
                         UpdateStatus($"Monitoring Task is running every {updateFrequency} minutes");
@@ -355,11 +355,11 @@ namespace Hacked
                         UpdateStatus($"Monitoring Task was DENIED access", false);
                         await new MessageDialog("You have previously denied the app from adding a background task." + "r\n\nGo to Phone Settings > Background Apps \r\n\nFind this app in the list and re-enable background tasks.").ShowAsync();
                         break;
-                    case BackgroundAccessStatus.Denied:
-                        UpdateStatus($"Monitoring Task was DENIED access", false);
-                        await new MessageDialog("You've denied the app from updating your Band in the background or you have too many background tasks already. " +
-                                              "r\n\nGo to Phone Settings > Background Apps \r\n\nFind this app in the list and re-enable background tasks.").ShowAsync();
-                        break;
+                    //case BackgroundAccessStatus.Denied:
+                    //    UpdateStatus($"Monitoring Task was DENIED access", false);
+                    //    await new MessageDialog("You've denied the app from updating your Band in the background or you have too many background tasks already. " +
+                    //                          "r\n\nGo to Phone Settings > Background Apps \r\n\nFind this app in the list and re-enable background tasks.").ShowAsync();
+                    //    break;
                     case BackgroundAccessStatus.Unspecified:
                         UpdateStatus($"Monitoring Task is currently NOT running", false);
                         await new MessageDialog(content: "You did not make a choice. If you want to update your Band in the background, please try again.").ShowAsync();
@@ -385,7 +385,7 @@ namespace Hacked
             try
             {
                 vm.IsBusy = true;
-                vm.IsBusyMessage = "unregistering background task...";
+                vm.IsBusyMessage = "removing background task...";
 
                 //unregister the task and confirm to user it was successful
                 if (await BackgroundTaskHelpers.UnregisterTaskAsync(Constants.MonitorTaskName))

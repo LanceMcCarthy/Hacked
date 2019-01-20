@@ -214,6 +214,8 @@ namespace Hacked.ViewModels
             IsBusyMessage = $"Checking {account.Address} for breaches...";
             account.IsUpdating = true;
 
+            var result = new ObservableCollection<Breach>();
+
             try
             {
                 if (apiService == null)
@@ -221,8 +223,7 @@ namespace Hacked.ViewModels
                     apiService = new BeenPwnedService();
                 }
 
-                return await apiService.CheckForBreachesAsync(account);
-
+                result = await apiService.CheckForBreachesAsync(account);
             }
             catch (PwnedApiException ex)
             {
@@ -240,15 +241,11 @@ namespace Hacked.ViewModels
                     // The result was a 403 or 404
                     DisplayMessageHelpers.ShowExceptionMessageOnUiThread("CheckForBreachesAsync", ex);
                 }
-
-                return new ObservableCollection<Breach>();
             }
             catch (Exception ex)
             {
                 // Any other kind of exception
                 DisplayMessageHelpers.ShowExceptionMessageOnUiThread("CheckForBreachesAsync", ex);
-
-                return new ObservableCollection<Breach>();
             }
             finally
             {
@@ -256,6 +253,8 @@ namespace Hacked.ViewModels
                 IsBusyMessage = "";
                 account.IsUpdating = false;
             }
+
+            return result;
         }
 
         public async Task FindAllAccountsBreachesAsync()
