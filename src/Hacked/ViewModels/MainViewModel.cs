@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -19,6 +20,7 @@ using Hacked.Core.Models;
 using Hacked.Helpers;
 using Hacked.Services.Apis;
 using Microsoft.HockeyApp;
+using Microsoft.Services.Store.Engagement;
 using Newtonsoft.Json;
 
 #if DEBUG
@@ -39,7 +41,7 @@ namespace Hacked.ViewModels
         private readonly ApplicationDataContainer roamingSettings;
         private readonly StorageFolder localFolder;
         private readonly StorageFolder roamingFolder;
-        
+
         private BeenPwnedService apiService;
         private bool hasAccounts;
         private bool areAccountsLoaded;
@@ -54,7 +56,7 @@ namespace Hacked.ViewModels
         private DelegateCommand findSelectedAccountBreacheCommand;
         private DelegateCommand<MonitoredAccount> removeAccountCommand;
         private DelegateCommand purchaseAdUnlockCommand;
-        
+
         #endregion
 
         public MainViewModel()
@@ -105,13 +107,13 @@ namespace Hacked.ViewModels
             get => selectedAccount;
             set => SetProperty(ref selectedAccount, value);
         }
-        
+
         public bool AreAccountsLoaded
         {
             get => areAccountsLoaded;
             set => SetProperty(ref areAccountsLoaded, value);
         }
-        
+
         public string AppVersion
         {
             get
@@ -151,7 +153,7 @@ namespace Hacked.ViewModels
             }
         }
 
-#endregion
+        #endregion
 
         #region Commands
 
@@ -174,7 +176,7 @@ namespace Hacked.ViewModels
 
             await md.ShowAsync();
         }));
-        
+
         public DelegateCommand FindAllAccountBreachesCommand => findAllAccountBreachesCommand ?? (findAllAccountBreachesCommand = new DelegateCommand(async () =>
         {
             await FindAllAccountsBreachesAsync();
@@ -197,7 +199,9 @@ namespace Hacked.ViewModels
             Accounts = await LoadAccountsAsync();
 
             if (Accounts.Any())
+            {
                 SelectedAccount = Accounts.FirstOrDefault();
+            }
 
             isAppInitialized = true;
         }
@@ -210,29 +214,38 @@ namespace Hacked.ViewModels
             IsBusyMessage = $"Checking {account.Address} for breaches...";
             account.IsUpdating = true;
 
+            var result = new ObservableCollection<Breach>();
+
             try
             {
                 if (apiService == null)
-                    apiService = new BeenPwnedService();
-
-                return await apiService.CheckForBreachesAsync(account);
-
-            }
-            catch (HttpRequestException ex)
-            {
-                if (ex.Message.Contains("404") || ex.Message.Contains("net_http_message_not_success_statuscode"))
                 {
-                    if(showSuccessMessage)
-                        await new MessageDialog($"No known breaches found for this email address.", "Good news!").ShowAsync();
+                    apiService = new BeenPwnedService();
                 }
 
-                return new ObservableCollection<Breach>();
+                result = await apiService.CheckForBreachesAsync(account);
+            }
+            catch (PwnedApiException ex)
+            {
+                if (ex.StatusCode == HttpStatusCode.NotFound && showSuccessMessage)
+                {
+                    await new MessageDialog($"No known breaches found for this email address.", "Good news!").ShowAsync();
+                }
+                else if (ex.StatusCode == HttpStatusCode.Forbidden)
+                {
+                    if (ApiInformation.IsTypePresent("Microsoft.Services.Store.Engagement.StoreServicesCustomEventLogger"))
+                    {
+                        StoreServicesCustomEventLogger.GetDefault().Log("HIBP API Forbidden");
+                    }
+
+                    // The result was a 403 or 404
+                    DisplayMessageHelpers.ShowExceptionMessageOnUiThread("CheckForBreachesAsync", ex);
+                }
             }
             catch (Exception ex)
             {
+                // Any other kind of exception
                 DisplayMessageHelpers.ShowExceptionMessageOnUiThread("CheckForBreachesAsync", ex);
-                
-                return new ObservableCollection<Breach>();
             }
             finally
             {
@@ -240,6 +253,8 @@ namespace Hacked.ViewModels
                 IsBusyMessage = "";
                 account.IsUpdating = false;
             }
+
+            return result;
         }
 
         public async Task FindAllAccountsBreachesAsync()
@@ -252,7 +267,7 @@ namespace Hacked.ViewModels
 
             await SaveAccountsAsync();
         }
-        
+
         // account management
 
         public async Task AddAccount(string address)
@@ -325,11 +340,11 @@ namespace Hacked.ViewModels
             try
             {
                 var file = await localFolder.CreateFileAsync(Constants.LocalAccountsFileName, CreationCollisionOption.ReplaceExisting);
-                
+
                 var json = JsonConvert.SerializeObject(Accounts);
-                
+
                 using (var fileStream = await file.OpenStreamForWriteAsync())
-                using(var streamWriter = new StreamWriter(fileStream))
+                using (var streamWriter = new StreamWriter(fileStream))
                 {
                     await streamWriter.WriteAsync(json);
                 }
@@ -345,14 +360,14 @@ namespace Hacked.ViewModels
                 IsBusyMessage = "";
             }
         }
-        
+
         public async Task<ObservableCollection<MonitoredAccount>> LoadAccountsAsync()
         {
             try
             {
                 IsBusy = true;
                 IsBusyMessage = "loading accounts from file...";
-                
+
                 var file = await localFolder.TryGetItemAsync(Constants.LocalAccountsFileName);
 
                 if (file == null)
@@ -364,12 +379,12 @@ namespace Hacked.ViewModels
                 if (file is StorageFile jsonFile)
                 {
                     using (var fs = await jsonFile.OpenStreamForReadAsync())
-                    using(var streamReader = new StreamReader(fs))
+                    using (var streamReader = new StreamReader(fs))
                     {
                         var json = await streamReader.ReadToEndAsync();
 
                         var savedAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
-                        
+
                         AreAccountsLoaded = true;
 
                         Debug.WriteLine($"--- {savedAccounts?.Count} accounts loaded from json file ---");
@@ -408,7 +423,7 @@ namespace Hacked.ViewModels
 
                 if (!(localAccountsStorageItem is StorageFile localAccountsFile))
                     return false;
-                
+
                 await localAccountsFile.CopyAsync(roamingFolder, Constants.RoamingAccountsBackupFileName, NameCollisionOption.ReplaceExisting);
 
                 HockeyClient.Current.TrackEvent("Accounts Backedup");
@@ -521,7 +536,7 @@ namespace Hacked.ViewModels
                 return false;
             }
         }
-        
+
         #endregion
 
         #region IAP
