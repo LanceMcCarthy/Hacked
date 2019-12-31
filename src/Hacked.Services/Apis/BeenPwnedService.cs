@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Hacked.Core.Common;
@@ -30,14 +29,15 @@ namespace Hacked.Services.Apis
         /// The account is not case sensitive and will be trimmed of leading or trailing white spaces. The account should always be URL encoded
         /// </summary>
         /// <param name="account">Email address, should always be URL encoded</param>
-        /// <returns></returns>
-        public async Task<ObservableCollection<Breach>> CheckForBreachesAsync(MonitoredAccount account)
+        /// <param name="truncateResponse">Determine whether only the name of the breach is returned rather than the complete breach data</param>
+        /// <returns>A collection of breaches</returns>
+        public async Task<ObservableCollection<Breach>> CheckForBreachesAsync(MonitoredAccount account, bool truncateResponse = false)
         {
             ValidateClient();
 
             await ValidateRequestDelayAsync();
 
-            using (var request = new HttpRequestMessage(HttpMethod.Get, $"https://haveibeenpwned.com/api/v2/breachedaccount/{account.Address}"))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, $"breachedaccount/{account.Address}?truncateResponse={truncateResponse}"))
             {
                 using (var response = await client.SendAsync(request))
                 {
@@ -70,13 +70,14 @@ namespace Hacked.Services.Apis
         /// <summary>
         ///  Gets all breaches in the system.
         /// </summary>
-        /// <returns></returns>
-        public async Task<ObservableCollection<Breach>> GetAllKnownBreachesAsync()
+        /// <param name="truncateResponse">Determine whether only the name of the breach is returned rather than the complete breach data</param>
+        /// <returns>A collection of breaches</returns>
+        public async Task<ObservableCollection<Breach>> GetAllKnownBreachesAsync(bool truncateResponse = false)
         {
             ValidateClient();
             await ValidateRequestDelayAsync();
 
-            using (var request = new HttpRequestMessage(HttpMethod.Get, "https://haveibeenpwned.com/api/v2/breaches"))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, $"breaches?truncateResponse={truncateResponse}"))
             using (var response = await client.SendAsync(request))
             {
                 lastCalled = DateTime.UtcNow;
@@ -99,7 +100,7 @@ namespace Hacked.Services.Apis
             ValidateClient();
             await ValidateRequestDelayAsync();
 
-            using (var request = new HttpRequestMessage(HttpMethod.Get, "https://haveibeenpwned.com/api/v2/dataclasses"))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, "dataclasses"))
             using (var response = await client.SendAsync(request))
             {
                 lastCalled = DateTime.UtcNow;
@@ -120,13 +121,14 @@ namespace Hacked.Services.Apis
         /// The email is not case sensitive and will be trimmed of leading or trailing white spaces. The email should always be URL encoded.
         /// </summary>
         /// <param name="emailaddress">Email address, should always be URL encoded</param>
-        /// <returns></returns>
-        public async Task<ObservableCollection<Breach>> GetPastesAsync(string emailAddress)
+        /// <param name="truncateResponse">Determine whether only the name of the breach is returned rather than the complete breach data</param>
+        /// <returns>A collection of breaches</returns>
+        public async Task<ObservableCollection<Breach>> GetPastesAsync(string emailAddress, bool truncateResponse = false)
         {
             ValidateClient();
             await ValidateRequestDelayAsync();
 
-            using (var request = new HttpRequestMessage(HttpMethod.Get, $"https://haveibeenpwned.com/api/v2/breachedaccount/{emailAddress}"))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, $"breachedaccount/{emailAddress}?truncateResponse={truncateResponse}"))
             using (var response = await client.SendAsync(request))
             {
                 lastCalled = DateTime.UtcNow;
@@ -140,16 +142,15 @@ namespace Hacked.Services.Apis
 
         private void ValidateClient()
         {
-            if (client == null && handler == null) //default usage
-            {
-                client = new HttpClient();
-            }
-            else if (client == null && handler != null) //usage when an HttpClientHandler is passed
-            {
-                client = new HttpClient(handler);
-            }
+            if (client != null)
+                return;
 
+            // If we're passed a handler, use it to instantiate the client. Otherwise, don't use one.
+            client = handler != null ? new HttpClient(handler) : new HttpClient();
+
+            client.BaseAddress = new Uri("https://haveibeenpwned.com/api/v3/");
             client?.DefaultRequestHeaders.Add("User-Agent", "Hacked-for-Windows-Universal");
+            client?.DefaultRequestHeaders.Add("hibp-api-key", "07a39d98eca749b3b6a535049c2e1434");
         }
 
         /// <summary>

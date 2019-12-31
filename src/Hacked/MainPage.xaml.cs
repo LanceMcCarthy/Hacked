@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -26,7 +25,6 @@ using Hacked.Helpers;
 using Hacked.ViewModels;
 using Microsoft.Advertising.WinRT.UI;
 using Microsoft.Services.Store.Engagement;
-using Microsoft.Toolkit.Uwp.UI.Extensions;
 
 namespace Hacked
 {
@@ -296,6 +294,12 @@ namespace Hacked
             }
 
             NoticeOverlay.Visibility = noticeShown ? Visibility.Collapsed : Visibility.Visible;
+
+            // TODO -REMOVE after 1.6 update. The user needed a forced refresh after updating to v3 API
+            if (!noticeShown)
+            {
+                vm.FindAllAccountBreachesCommand.Execute(null);
+            }
         }
 
         private async Task SendEmail()

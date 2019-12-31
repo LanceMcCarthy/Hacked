@@ -33,7 +33,6 @@ namespace Hacked.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-
         #region fields
 
         private bool isAppInitialized;
