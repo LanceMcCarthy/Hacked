@@ -13,8 +13,8 @@ namespace Hacked.BackgroundTasks
 
             var txtNodes = toastDescriptor.GetElementsByTagName("text");
 
-            txtNodes[0].AppendChild(toastDescriptor.CreateTextNode("Updated!"));
-            txtNodes[1].AppendChild(toastDescriptor.CreateTextNode($"Hacked? has been updated with improvements and fixes. Tap this notification to check it out."));
+            txtNodes[0].AppendChild(toastDescriptor.CreateTextNode("Updated to v3 API!"));
+            txtNodes[1].AppendChild(toastDescriptor.CreateTextNode($"Hacked has been updated with major fixes and uses the new HIBP v3 API."));
 
             var toast = new ToastNotification(toastDescriptor);
 

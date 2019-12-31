@@ -1,34 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonHelpers.Common;
+using Newtonsoft.Json;
 
 namespace Hacked.Core.Models
 {
     public class Breach : BindableBase
     {
         // **** API members ******
-        
-        public string Title { get; set; }
 
+        [JsonProperty("Name")]
         public string Name { get; set; }
 
+        [JsonProperty("Title")]
+        public string Title { get; set; }
+
+        [JsonProperty("Domain")]
         public string Domain { get; set; }
 
-        public string BreachDate { get; set; }
+        [JsonProperty("BreachDate")]
+        public DateTime? BreachDate { get; set; }
 
-        public DateTime AddedDate { get; set; }
+        [JsonProperty("AddedDate")]
+        public string AddedDate { get; set; }
 
-        public int PwnCount { get; set; }
+        [JsonProperty("ModifiedDate")]
+        public string ModifiedDate { get; set; }
 
+        [JsonProperty("PwnCount")]
+        public long PwnCount { get; set; }
+
+        [JsonProperty("Description")]
         public string Description { get; set; }
 
+        [JsonProperty("DataClasses")]
         public List<string> DataClasses { get; set; }
 
+        [JsonProperty("IsVerified")]
         public bool IsVerified { get; set; }
 
+        [JsonProperty("IsFabricated")]
+        public bool IsFabricated { get; set; }
+
+        [JsonProperty("IsSensitive")]
         public bool IsSensitive { get; set; }
 
-        public string LogoType { get; set; }
+        [JsonProperty("IsRetired")]
+        public bool IsRetired { get; set; }
+
+        [JsonProperty("IsSpamList")]
+        public bool IsSpamList { get; set; }
+
+        [JsonProperty("LogoPath")]
+        public Uri LogoPath { get; set; }
 
         // ***** App specific members *****
 
@@ -74,114 +98,39 @@ namespace Hacked.Core.Models
 /* 
 ******************EXAMPLE RESULT*********************
 [
-    {
-        "Title": "000webhost",
-        "Name": "000webhost",
-        "Domain": "000webhost.com",
-        "BreachDate": "2015-3-1",
-        "AddedDate": "2015-10-26T23:35:45Z",
-        "PwnCount": 13545468,
-        "Description": "In approximately March 2015, the free web hosting provider <a href=\"http://www.troyhunt.com/2015/10/breaches-traders-plain-text-passwords.html\" target=\"_blank\">000webhost suffered a major data breach</a> that exposed over 13 million customer records. The data was sold and traded before 000webhost was alerted in October. The breach included names, email addresses and plain text passwords.",
-        "DataClasses": [
-            "Email addresses",
-            "IP addresses",
-            "Names",
-            "Passwords"
-        ],
-        "IsVerified": true,
-        "IsSensitive": false,
-        "LogoType": "png"
-    },
-    {
-        "Title": "Adobe",
-        "Name": "Adobe",
-        "Domain": "adobe.com",
-        "BreachDate": "2013-10-4",
-        "AddedDate": "2013-12-04T00:00:00Z",
-        "PwnCount": 152445165,
-        "Description": "The big one. In October 2013, 153 million Adobe accounts were breached with each containing an internal ID, username, email, <em>encrypted</em> password and a password hint in plain text. The password cryptography was poorly done and <a href=\"http://stricture-group.com/files/adobe-top100.txt\" target=\"_blank\">many were quickly resolved back to plain text</a>. The unencrypted hints also <a href=\"http://www.troyhunt.com/2013/11/adobe-credentials-and-serious.html\" target=\"_blank\">disclosed much about the passwords</a> adding further to the risk that hundreds of millions of Adobe customers already faced.",
-        "DataClasses": [
-            "Email addresses",
-            "Password hints",
-            "Passwords",
-            "Usernames"
-        ],
-        "IsVerified": true,
-        "IsSensitive": false,
-        "LogoType": "svg"
-    },
-    {
-        "Title": "Flashback",
-        "Name": "Flashback",
-        "Domain": "flashback.se",
-        "BreachDate": "2015-2-11",
-        "AddedDate": "2015-02-12T05:42:12Z",
-        "PwnCount": 40256,
-        "Description": "In February 2015, <a href=\"http://www.flashback.se/\" target=\"_blank\">the Swedish forum known as Flashback</a> had sensitive internal data on 40k members published via the tabloid newspaper <a href=\"http://www.aftonbladet.se/\" target=\"_blank\">Aftonbladet</a>. The data was <a href=\"http://swedishsurveyor.com/2015/02/11/the-inquisition/\">allegedly sold to them via Researchgruppen</a> (The Research Group) <a href=\"http://www.technologyreview.com/photoessay/533426/the-troll-hunters/\" target=\"_blank\">who have a history of exposing otherwise anonymous users</a>, primarily those who they believe participate in &quot;troll like&quot; behaviour. The compromised data includes social security numbers, home and email addresses.",
-        "DataClasses": [
-            "Addresses",
-            "Email addresses",
-            "Government issued IDs"
-        ],
-        "IsVerified": true,
-        "IsSensitive": false,
-        "LogoType": "svg"
-    },
-    {
-        "Title": "Gawker",
-        "Name": "Gawker",
-        "Domain": "gawker.com",
-        "BreachDate": "2010-12-11",
-        "AddedDate": "2013-12-04T00:00:00Z",
-        "PwnCount": 1247574,
-        "Description": "In December 2010, Gawker was attacked by the hacker collective &quot;Gnosis&quot; in retaliation for what was reported to be a feud between Gawker and 4Chan. Information about Gawkers 1.3M users was published along with the data from Gawker's other web presences including Gizmodo and Lifehacker. Due to the prevalence of password reuse, many victims of the breach <a href=\"http://www.troyhunt.com/2011/01/why-your-apps-security-design-could.html\" target=\"_blank\">then had their Twitter accounts compromised to send Acai berry spam</a>.",
-        "DataClasses": [
-            "Email addresses",
-            "Passwords",
-            "Usernames"
-        ],
-        "IsVerified": true,
-        "IsSensitive": false,
-        "LogoType": "svg"
-    },
-    {
-        "Title": "MPGH",
-        "Name": "MPGH",
-        "Domain": "mpgh.net",
-        "BreachDate": "2015-10-22",
-        "AddedDate": "2015-10-26T03:20:20Z",
-        "PwnCount": 3122898,
-        "Description": "In October 2015, the multiplayer game hacking website <a href=\"http://www.mpgh.net\">MPGH was hacked</a> and 3.1 million user accounts disclosed. The vBulletin forum breach contained usernames, email addresses, IP addresses and salted hashes of passwords.",
-        "DataClasses": [
-            "Email addresses",
-            "IP addresses",
-            "Passwords",
-            "Usernames"
-        ],
-        "IsVerified": true,
-        "IsSensitive": false,
-        "LogoType": "png"
-    },
-    {
-        "Title": "Stratfor",
-        "Name": "Stratfor",
-        "Domain": "stratfor.com",
-        "BreachDate": "2011-12-24",
-        "AddedDate": "2013-12-04T00:00:00Z",
-        "PwnCount": 859777,
-        "Description": "In December 2011, &quot;Anonymous&quot; <a href=\"http://www.troyhunt.com/2011/12/5-website-security-lessons-courtesy-of.html\" target=\"_blank\">attacked the global intelligence company known as &quot;Stratfor&quot;</a> and consequently disclosed a veritable treasure trove of data including hundreds of gigabytes of email and tens of thousands of credit card details which were promptly used by the attackers to make charitable donations (among other uses). The breach also included 860,000 user accounts complete with email address, time zone, some internal system data and MD5 hashed passwords with no salt.",
-        "DataClasses": [
-            "Addresses",
-            "Credit cards",
-            "Email addresses",
-            "Names",
-            "Passwords",
-            "Phone numbers",
-            "Usernames"
-        ],
-        "IsVerified": true,
-        "IsSensitive": false,
-        "LogoType": "svg"
-    }
-]
+   {
+   "Name":"Adobe",
+   "Title":"Adobe",
+   "Domain":"adobe.com",
+   "BreachDate":"2013-10-04",
+   "AddedDate":"2013-12-04T00:00Z",
+   "ModifiedDate":"2013-12-04T00:00Z",
+   "PwnCount":152445165,
+   "Description":"In October 2013, 153 million Adobe accounts were breached with each containing an internal ID, username, email, <em>encrypted</em> password and a password hint in plain text. The password cryptography was poorly done and <a href=\"http://stricture-group.com/files/adobe-top100.txt\" target=\"_blank\" rel=\"noopener\">many were quickly resolved back to plain text</a>. The unencrypted hints also <a href=\"http://www.troyhunt.com/2013/11/adobe-credentials-and-serious.html\" target=\"_blank\" rel=\"noopener\">disclosed much about the passwords</a> adding further to the risk that hundreds of millions of Adobe customers already faced.",
+   "DataClasses":["Email addresses","Password hints","Passwords","Usernames"],
+   "IsVerified":True,
+   "IsFabricated":False,
+   "IsSensitive":False,
+   "IsRetired":False,
+   "IsSpamList":False,
+   "LogoPath":"https://haveibeenpwned.com/Content/Images/PwnedLogos/Adobe.png"
+   },
+   {
+   "Name":"BattlefieldHeroes",
+   "Title":"Battlefield Heroes",
+   "Domain":"battlefieldheroes.com",
+   "BreachDate":"2011-06-26",
+   "AddedDate":"2014-01-23T13:10Z",
+   "ModifiedDate":"2014-01-23T13:10Z",
+   "PwnCount":530270,
+   "Description":"In June 2011 as part of a final breached data dump, the hacker collective &quot;LulzSec&quot; <a href=\"http://www.rockpapershotgun.com/2011/06/26/lulzsec-over-release-battlefield-heroes-data\" target=\"_blank\" rel=\"noopener\">obtained and released over half a million usernames and passwords from the game Battlefield Heroes</a>. The passwords were stored as MD5 hashes with no salt and many were easily converted back to their plain text versions.",
+   "DataClasses":["Passwords","Usernames"],
+   "IsVerified":True,
+   ""IsFabricated":False,
+   "IsSensitive":False,
+   "IsRetired":False,
+   "IsSpamList":False,
+   "LogoPath":"https://haveibeenpwned.com/Content/Images/PwnedLogos/BattlefieldHeroes.png"
+   }
+   ]
 */
