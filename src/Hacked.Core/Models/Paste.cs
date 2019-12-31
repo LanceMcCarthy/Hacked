@@ -1,18 +1,24 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace Hacked.Core.Models
 {
     public class Paste
     {
+        [JsonProperty("Source")]
         public string Source { get; set; }
 
+        [JsonProperty("Id")]
         public string Id { get; set; }
 
+        [JsonProperty("Title", NullValueHandling = NullValueHandling.Ignore)]
         public string Title { get; set; }
 
-        public DateTime Date { get; set; }
+        [JsonProperty("Date")]
+        public DateTimeOffset Date { get; set; }
 
-        public int EmailCount { get; set; }
+        [JsonProperty("EmailCount")]
+        public long EmailCount { get; set; }
     }
 }
 
