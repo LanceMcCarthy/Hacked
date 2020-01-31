@@ -306,6 +306,9 @@
     <PackageReference Include="Telerik.UI.for.UniversalWindowsPlatform">
       <Version>1.0.1.7</Version>
     </PackageReference>
+    <PackageReference Include="VungleSDK">
+      <Version>6.4.1</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
