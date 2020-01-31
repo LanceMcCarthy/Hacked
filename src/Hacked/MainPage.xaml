@@ -8,17 +8,21 @@
       xmlns:ui="using:Microsoft.Advertising.WinRT.UI"
       xmlns:tkControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
       xmlns:selectors="using:Hacked.Selectors"
+      xmlns:ui1="using:VungleSDK.UI"
       x:Name="Page"
       DataContext="{StaticResource ViewModel}"
       mc:Ignorable="d">
-    
+
     <Page.Resources>
         <DataTemplate x:Key="AdItemTemplate">
             <Grid>
-                <TextBlock Text="Loading content..."
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center" />
-                
+                <primitives:RadBusyIndicator x:Name="AdBusyIndicator"
+                                             AnimationStyle="AnimationStyle5"
+                                             Content="Loading ad..."
+                                             ContentPosition="Right"
+                                             Padding="10"
+                                             IsActive="True" />
+
                 <ui:AdControl AutoRefreshIntervalInSeconds="30"
                               HorizontalAlignment="Left" />
 
@@ -27,24 +31,46 @@
                         Command="{Binding ElementName=Page, Path=DataContext.PurchaseAdUnlockCommand}"
                         Foreground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
                         HorizontalAlignment="Right"
-                        VerticalAlignment="Stretch" 
-                        Margin="5"/>
+                        VerticalAlignment="Stretch"
+                        Margin="5" />
             </Grid>
         </DataTemplate>
-        
+
+        <DataTemplate x:Key="VungleAdTemplate">
+            <Grid>
+                <ui1:VungleAdControl AppID="5e347706c28ba7001748f549"
+                                     Placement="DEFAULT-2363264"
+                                     Placements="DEFAULT-2363264, MAININTERSTITIAL-8569070"
+                                     UserId="DeveloperUser">
+                    <TextBlock x:Name="VungleNativeFlexAd" Text="loading ad"/>
+                </ui1:VungleAdControl>
+
+                <Button x:Name="RemoveAdButton"
+                        Content="remove ads"
+                        Command="{Binding ElementName=Page, Path=DataContext.PurchaseAdUnlockCommand}"
+                        Foreground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Stretch"
+                        Margin="5" />
+            </Grid>
+        </DataTemplate>
+
         <DataTemplate x:Key="BreachItemTemplate">
-            <Grid Margin="0,10,10,0" >
+            <Grid Margin="0,10,10,0">
                 <Grid.RowDefinitions>
                     <RowDefinition />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Border Background="Black" Margin="0,0,5,0" Padding="5">
-                            <Image Source="{Binding LogoPath}" Width="40" />
+                        <Border Background="Black"
+                                Margin="0,0,5,0"
+                                Padding="5">
+                            <Image Source="{Binding LogoPath}"
+                                   Width="40" />
                         </Border>
-                        
-                        <TextBlock Text="{Binding Name}" 
+
+                        <TextBlock Text="{Binding Name}"
                                    FontSize="26"
                                    FontWeight="Bold"
                                    Style="{StaticResource TitleTextBlockStyle}"
@@ -56,7 +82,8 @@
                                 Background="{ThemeResource SystemControlPageBackgroundAltMediumBrush}"
                                 Click="BreachInfoButton_Click"
                                 Padding="2">
-                            <FontIcon Glyph="&#xE946;" FontSize="24" />
+                            <FontIcon Glyph="&#xE946;"
+                                      FontSize="24" />
                         </Button>
 
                         <Button Content="NEW! (tap to clear)"
@@ -71,19 +98,27 @@
                                      NavigateUri="{Binding Domain, Converter={StaticResource StringToUriConverter}}" />
 
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Breached on:" Margin="0,0,6,0" />
-                        <TextBlock Text="{Binding BreachDate}" FontWeight="SemiBold"/>
-                        <TextBlock Text="Added on:" Margin="12,0,6,0" />
-                        <TextBlock Text="{Binding AddedDate}" FontWeight="SemiBold"/>
-                        <TextBlock Text="Modified on:" Margin="12,0,6,0" />
-                        <TextBlock Text="{Binding ModifiedDate}" FontWeight="SemiBold"/>
+                        <TextBlock Text="Breached on:"
+                                   Margin="0,0,6,0" />
+                        <TextBlock Text="{Binding BreachDate}"
+                                   FontWeight="SemiBold" />
+                        <TextBlock Text="Added on:"
+                                   Margin="12,0,6,0" />
+                        <TextBlock Text="{Binding AddedDate}"
+                                   FontWeight="SemiBold" />
+                        <TextBlock Text="Modified on:"
+                                   Margin="12,0,6,0" />
+                        <TextBlock Text="{Binding ModifiedDate}"
+                                   FontWeight="SemiBold" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Accounts breached:" Margin="0,0,6,0" />
-                        <TextBlock Text="{Binding PwnCount}" FontWeight="SemiBold"/>
+                        <TextBlock Text="Accounts breached:"
+                                   Margin="0,0,6,0" />
+                        <TextBlock Text="{Binding PwnCount}"
+                                   FontWeight="SemiBold" />
                     </StackPanel>
                 </StackPanel>
-                <tkControls:HeaderedItemsControl ItemsSource="{Binding DataClasses}" 
+                <tkControls:HeaderedItemsControl ItemsSource="{Binding DataClasses}"
                                                  Grid.Row="1"
                                                  Grid.ColumnSpan="2"
                                                  Margin="0,5,0,0">
@@ -95,7 +130,7 @@
                             <Border Background="{ThemeResource ContentDialogBackgroundThemeBrush}"
                                     ToolTipService.ToolTip="{Binding}"
                                     Padding="10,3">
-                                <TextBlock Text="{Binding}" 
+                                <TextBlock Text="{Binding}"
                                            HorizontalAlignment="Left"
                                            VerticalAlignment="Center" />
                             </Border>
@@ -103,15 +138,19 @@
                     </tkControls:HeaderedItemsControl.ItemTemplate>
                     <tkControls:HeaderedItemsControl.ItemContainerStyle>
                         <Style TargetType="ContentPresenter">
-                            <Setter Property="Padding" Value="0" />
-                            <Setter Property="Margin" Value="0,5,10,10" />
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding"
+                                    Value="0" />
+                            <Setter Property="Margin"
+                                    Value="0,5,10,10" />
+                            <Setter Property="HorizontalContentAlignment"
+                                    Value="Stretch" />
+                            <Setter Property="VerticalContentAlignment"
+                                    Value="Stretch" />
                         </Style>
                     </tkControls:HeaderedItemsControl.ItemContainerStyle>
                     <tkControls:HeaderedItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Horizontal"/>
+                            <VirtualizingStackPanel Orientation="Horizontal" />
                         </ItemsPanelTemplate>
                     </tkControls:HeaderedItemsControl.ItemsPanel>
                 </tkControls:HeaderedItemsControl>
@@ -120,7 +159,8 @@
 
         <selectors:BreachListItemSelector x:Key="BreachListItemSelector"
                                           BreachItemTemplate="{StaticResource BreachItemTemplate}"
-                                          AdItemTemplate="{StaticResource AdItemTemplate}"/>
+                                          MsftAdTemplate="{StaticResource AdItemTemplate}"
+                                          VungleAdTemplate="{StaticResource VungleAdTemplate}" />
     </Page.Resources>
 
     <Grid x:Name="RootGrid">
@@ -129,15 +169,16 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Grid MinHeight="32" Background="{ThemeResource ContentDialogBackgroundThemeBrush}"/>
+        <Grid MinHeight="32"
+              Background="{ThemeResource ContentDialogBackgroundThemeBrush}" />
 
         <SplitView x:Name="RootSplitView"
                    PaneBackground="{ThemeResource SystemControlChromeHighAcrylicElementMediumBrush}"
-                   DisplayMode="Inline" 
+                   DisplayMode="Inline"
                    IsPaneOpen="False"
                    Grid.Row="1">
             <SplitView.Pane>
-                <Grid x:Name="LeftGrid" >
+                <Grid x:Name="LeftGrid">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition />
@@ -172,13 +213,16 @@
                               Grid.Row="1"
                               IsEnabled="{Binding IsBusy, Converter={StaticResource InvertBoolConverter}}"
                               ItemsSource="{Binding Accounts}"
-                              SelectedItem="{Binding SelectedAccount, Mode=TwoWay}" 
+                              SelectedItem="{Binding SelectedAccount, Mode=TwoWay}"
                               SelectionChanged="AccountsListView_OnSelectionChanged">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
-                                <Setter Property="Padding" Value="15,10,15,10" />
-                                <Setter Property="VerticalContentAlignment" Value="Center" />
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding"
+                                        Value="15,10,15,10" />
+                                <Setter Property="VerticalContentAlignment"
+                                        Value="Center" />
+                                <Setter Property="HorizontalContentAlignment"
+                                        Value="Stretch" />
                             </Style>
                         </ListView.ItemContainerStyle>
                         <ItemsControl.ItemContainerTransitions>
@@ -200,7 +244,7 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <Grid.Background>
-                                        <SolidColorBrush Color="Transparent"/>
+                                        <SolidColorBrush Color="Transparent" />
                                     </Grid.Background>
 
                                     <TextBlock Grid.ColumnSpan="2"
@@ -213,27 +257,28 @@
                                                   Grid.ColumnSpan="2"
                                                   HorizontalAlignment="Stretch"
                                                   VerticalAlignment="Stretch"
-                                                  IsActive="{Binding IsUpdating}" Margin="10" />
+                                                  IsActive="{Binding IsUpdating}"
+                                                  Margin="10" />
 
                                     <StackPanel Grid.Row="1">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Refreshed:" />
                                             <TextBlock Margin="5,0,0,0"
-                                                       Text="{Binding LastUpdated, Converter={StaticResource DisplayDateConverter}}" 
-                                                       FontWeight="SemiBold"/>
+                                                       Text="{Binding LastUpdated, Converter={StaticResource DisplayDateConverter}}"
+                                                       FontWeight="SemiBold" />
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Total Breaches:" />
-                                            <TextBlock Text="{Binding Breaches.Count}" 
-                                                       Margin="5,0,0,0" 
-                                                       FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding Breaches.Count}"
+                                                       Margin="5,0,0,0"
+                                                       FontWeight="SemiBold" />
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal"
                                                     Visibility="{Binding HasNewBreaches, Converter={StaticResource BoolToVisibilityConverter}}">
                                             <TextBlock Text="New Breaches:" />
-                                            <TextBlock Text="{Binding NewBreachCount}" 
-                                                       Margin="5,0,0,0" 
-                                                       FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding NewBreachCount}"
+                                                       Margin="5,0,0,0"
+                                                       FontWeight="SemiBold" />
                                         </StackPanel>
                                     </StackPanel>
 
@@ -245,7 +290,8 @@
                                             Command="{Binding DataContext.RemoveAccountCommand, ElementName=Page}"
                                             CommandParameter="{Binding}"
                                             IsEnabled="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}">
-                                        <SymbolIcon Foreground="White" Symbol="Delete" />
+                                        <SymbolIcon Foreground="White"
+                                                    Symbol="Delete" />
                                     </Button>
                                 </Grid>
                             </DataTemplate>
@@ -404,8 +450,8 @@
                       Grid.Column="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
                         <RowDefinition />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <Grid x:Name="HeaderGrid"
@@ -483,7 +529,7 @@
                     </Grid>
 
                     <Grid x:Name="AdGrid"
-                          Grid.Row="1">
+                          Grid.Row="2">
                         <primitives:RadBusyIndicator x:Name="AdBusyIndicator"
                                                      AnimationStyle="AnimationStyle5"
                                                      Content="Loading ad..."
@@ -495,7 +541,7 @@
                                       AdRefreshed="MainPageAdControl_OnAdRefreshed"
                                       ErrorOccurred="MainPageAdControl_OnErrorOccurred"
                                       AutoRefreshIntervalInSeconds="30"
-                                      HorizontalAlignment="Left"  />
+                                      HorizontalAlignment="Left" />
 
                         <Button x:Name="RemoveAdButton"
                                 Content="remove ads"
@@ -503,7 +549,7 @@
                                 Foreground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Stretch"
-                                Margin="5"/>
+                                Margin="5" />
                     </Grid>
 
                     <Grid x:Name="NoKnownBreachesGrid"
@@ -549,7 +595,7 @@
                     </Grid>
 
                     <Grid x:Name="BreachesGrid"
-                          Grid.Row="2">
+                          Grid.Row="1">
                         <ListView x:Name="BreachesListView"
                                   ItemsSource="{Binding SelectedAccount.Breaches}"
                                   ItemTemplateSelector="{StaticResource BreachListItemSelector}"
@@ -573,8 +619,8 @@
                                                    TextWrapping="NoWrap"
                                                    VerticalAlignment="Center"
                                                    HorizontalAlignment="Center"
-                                                   Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}" 
-                                                   Grid.Row="1"/>
+                                                   Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
+                                                   Grid.Row="1" />
 
                                         <StackPanel Grid.Row="2"
                                                     Margin="0,0,0,10">
@@ -646,17 +692,17 @@
                       Style="{StaticResource SplitViewTogglePaneButtonStyle}"
                       TabIndex="1"
                       ToolTipService.ToolTip="Accounts"
-                      Unchecked="TogglePaneButton_Checked" 
-                      Grid.Row="1"/>
+                      Unchecked="TogglePaneButton_Checked"
+                      Grid.Row="1" />
 
         <controls:AddAccount x:Name="AddAccountOverlay"
                              DataContext="{Binding}"
                              Visibility="Collapsed"
-                             Grid.Row="1"/>
-        
+                             Grid.Row="1" />
+
         <controls:Help x:Name="HelpOverlay"
-                       Visibility="Collapsed" 
-                       Grid.Row="1"/>
+                       Visibility="Collapsed"
+                       Grid.Row="1" />
 
         <Grid x:Name="NoticeOverlay"
               Background="{ThemeResource SystemControlChromeHighAcrylicElementMediumBrush}"

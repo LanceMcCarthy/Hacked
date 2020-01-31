@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Background;
+using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.Email;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.System;
 using Windows.System.Profile;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -25,6 +28,7 @@ using Hacked.Helpers;
 using Hacked.ViewModels;
 using Microsoft.Advertising.WinRT.UI;
 using Microsoft.Services.Store.Engagement;
+using VungleSDK;
 
 namespace Hacked
 {
@@ -36,6 +40,10 @@ namespace Hacked
         private int updateFrequency = 720;
         private bool selectionMute;
         private FilterType filterType = FilterType.Name;
+        private VungleAd vungleSdk;
+        private const string VungleAppId = "5e347706c28ba7001748f549";
+        private const string VungleMainFeedPlacementId = "DEFAULT-2363264";
+        private const string VungleMainInterstitialPlacementId = "MAININTERSTITIAL-8569070";
 
         public MainPage()
         {
@@ -47,6 +55,11 @@ namespace Hacked
             {
                 localSettings = ApplicationData.Current.LocalSettings;
             }
+
+            //https://publisher.vungle.com/applications/application/5e347706c28ba7001748f549
+            //https://support.vungle.com/hc/en-us/articles/360003059331-Get-Started-with-Vungle-Windows-SDK-v-6
+            vungleSdk = AdFactory.GetInstance(VungleAppId);
+            vungleSdk.OnAdPlayableChanged += VungleSdkOnAdPlayableChanged;
         }
 
         #region event handlers
@@ -254,7 +267,7 @@ namespace Hacked
 
         #endregion
 
-        #region methods
+        #region Methods
 
         private void ConfigureTaskElements(bool isTaskActive)
         {
@@ -524,7 +537,9 @@ namespace Hacked
             await vm.InitializeApp();
 
             selectionMute = true;
+
             ConfigureTaskElements(await BackgroundTaskHelpers.CheckBackgroundTasksAsync(Constants.MonitorTaskName));
+
             selectionMute = false;
 
             if (vm.Accounts.Count == 0)
@@ -535,58 +550,32 @@ namespace Hacked
                 : Visibility.Collapsed;
 
             NotifyUser();
+
+            //vungleSdk.LoadAd(VungleMainFeedPlacementId);
+            vungleSdk.LoadAd(VungleMainInterstitialPlacementId);
         }
 
         #endregion
 
-        #region Ads
+        #region Vungle Ads
 
-        //private void AdControl_Loading(FrameworkElement sender, object args)
-        //{
-        //    if (sender is AdControl adControl)
-        //    {
-        //        if (AnalyticsInfo.VersionInfo.DeviceFamily == "Windows.Mobile")
-        //        {
-        //            adControl.AdUnitId = "331318";
-        //            adControl.ApplicationId = "dc8ca494-6b18-4502-96c7-61d2cb36967d";
-        //            adControl.Height = 50;
-        //            adControl.Width = 320;
-        //        }
-        //        else
-        //        {
-        //            adControl.AdUnitId = "331317";
-        //            adControl.ApplicationId = "574159d4-36b9-4e6a-97f1-e28c72e03673";
-        //            adControl.Height = 90;
-        //            adControl.Width = 728;
-        //        }
-        //    }
-        //}
+        private async void VungleSdkOnAdPlayableChanged(object sender, AdPlayableEventArgs e)
+        {
+            if (e.AdPlayable)
+            {
+                await CoreApplication.MainView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => PlayableAdChanged(e.Placement));
+            }
+        }
 
-        //private void ListAdControl_OnAdRefreshed(object sender, RoutedEventArgs e)
-        //{
-        //    if (sender is AdControl adControl)
-        //    {
-        //        if(adControl.Visibility == Visibility.Collapsed)
-        //            adControl.Visibility = Visibility.Visible;
-        //    }
-        //}
+        private void PlayableAdChanged(string placementId)
+        {
+            Debug.WriteLine($"Ad Changed : {placementId}");
+        }
 
-        //private void ListAdControl_OnErrorOccurred(object sender, AdErrorEventArgs e)
-        //{
-        //    if (sender is AdControl adControl)
-        //    {
-        //        adControl.Visibility = Visibility.Collapsed;
+        #endregion
 
-        //        // Find the TextBlock sibling to display error message
-        //        if (!(adControl.Parent is Grid grid)) return;
-        //        if (!(grid.FindChild<TextBlock>() is TextBlock tb)) return;
+        #region Msft Ads
 
-        //        if(tb.Visibility == Visibility.Collapsed)
-        //            tb.Visibility = Visibility.Visible;
-
-        //        tb.Text = $"Ad Error: {e.ErrorMessage}";
-        //    }
-        //}
 
         private void InitializeAdControls()
         {
