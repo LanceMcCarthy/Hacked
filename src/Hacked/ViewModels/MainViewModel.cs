@@ -551,7 +551,7 @@ namespace Hacked.ViewModels
                 {
                     StoreContext context = StoreContext.GetDefault();
 
-                    var result = await context.RequestPurchaseAsync(Constants.RemoveAdsStoreId);
+                    var result = await context.RequestPurchaseAsync(Secrets.RemoveAdsStoreId);
 
 #if !DEBUG
                     HockeyClient.Current.TrackEvent(result.Status.ToString("G"));
@@ -573,7 +573,7 @@ namespace Hacked.ViewModels
                 }
                 else
                 {
-                    var result = await CurrentApp.RequestProductPurchaseAsync(Constants.RemoveAdsProductId);
+                    var result = await CurrentApp.RequestProductPurchaseAsync(Secrets.RemoveAdsProductId);
 
 #if !DEBUG
                     HockeyClient.Current.TrackEvent(result.Status.ToString("G"));
@@ -629,7 +629,7 @@ namespace Hacked.ViewModels
                     {
                         var addOnLicense = item.Value;
 
-                        if (addOnLicense.SkuStoreId == Constants.RemoveAdsStoreId)
+                        if (addOnLicense.SkuStoreId == Secrets.RemoveAdsStoreId)
                         {
                             AreAdsRemoved = addOnLicense.IsActive;
                         }
@@ -638,7 +638,7 @@ namespace Hacked.ViewModels
                 }
                 else // prior to 1607
                 {
-                    AreAdsRemoved = CurrentApp.LicenseInformation.ProductLicenses[Constants.RemoveAdsProductId].IsActive;
+                    AreAdsRemoved = CurrentApp.LicenseInformation.ProductLicenses[Secrets.RemoveAdsProductId].IsActive;
                 }
             }
             catch (Exception ex)

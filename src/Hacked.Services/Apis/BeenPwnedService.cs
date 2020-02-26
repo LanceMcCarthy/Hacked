@@ -150,7 +150,7 @@ namespace Hacked.Services.Apis
 
             client.BaseAddress = new Uri("https://haveibeenpwned.com/api/v3/");
             client?.DefaultRequestHeaders.Add("User-Agent", "Hacked-for-Windows-Universal");
-            client?.DefaultRequestHeaders.Add("hibp-api-key", "07a39d98eca749b3b6a535049c2e1434");
+            client?.DefaultRequestHeaders.Add("hibp-api-key", Secrets.HibpApiKey);
         }
 
         /// <summary>
