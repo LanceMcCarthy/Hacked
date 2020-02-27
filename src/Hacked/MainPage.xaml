@@ -395,10 +395,13 @@
                                                 <TextBlock HorizontalAlignment="Left"
                                                            FontSize="14"
                                                            FontWeight="Bold"
-                                                           Text="Credits" />
+                                                           Text="Aknowledgements" />
                                                 <TextBlock HorizontalAlignment="Left"
                                                            FontSize="12"
                                                            Text="Json.NET © 2016 Newtonsoft" />
+                                                <TextBlock HorizontalAlignment="Left"
+                                                           FontSize="12"
+                                                           Text="Telerik UI for UWP © 2016 Progress" />
                                                 <TextBlock HorizontalAlignment="Left"
                                                            FontSize="12"
                                                            Text="Data from HaveibeenPwned by Troy Hunt" />
