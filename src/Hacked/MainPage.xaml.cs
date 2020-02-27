@@ -58,7 +58,13 @@ namespace Hacked
 
             //https://publisher.vungle.com/applications/application/5e347706c28ba7001748f549
             //https://support.vungle.com/hc/en-us/articles/360003059331-Get-Started-with-Vungle-Windows-SDK-v-6
-            vungleSdk = AdFactory.GetInstance(VungleAppId);
+
+            VungleSDKConfig sdkConfig = new VungleSDKConfig();
+            //sdkConfig.DisableAshwidTracking = true; 
+            //sdkConfig.MinimumDiskSpaceForAd = 50 * 1024 * 1024; 
+            //sdkConfig.MinimumDiskSpaceForInit = 50 * 1024 * 1024;
+
+            vungleSdk = AdFactory.GetInstance(VungleAppId, sdkConfig);
             vungleSdk.OnAdPlayableChanged += VungleSdkOnAdPlayableChanged;
         }
 
@@ -91,7 +97,7 @@ namespace Hacked
             }
         }
 
-        private void AccountsListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void AccountsListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             foreach (MonitoredAccount account in e.AddedItems)
             {
@@ -113,6 +119,8 @@ namespace Hacked
 
             if (RootSplitView.DisplayMode == SplitViewDisplayMode.Overlay || RootSplitView.DisplayMode == SplitViewDisplayMode.CompactOverlay)
                 RootSplitView.IsPaneOpen = false;
+
+            await vungleSdk.PlayAdAsync(new AdConfig(), VungleMainInterstitialPlacementId);
         }
 
         private async void BreachInfoButton_Click(object sender, RoutedEventArgs e)
@@ -551,8 +559,10 @@ namespace Hacked
 
             NotifyUser();
 
-            //vungleSdk.LoadAd(VungleMainFeedPlacementId);
+            vungleSdk.LoadAd(VungleMainFeedPlacementId);
             vungleSdk.LoadAd(VungleMainInterstitialPlacementId);
+            //await vungleSdk.PlayAdAsync(new AdConfig(), VungleMainFeedPlacementId);
+            //await vungleSdk.PlayAdAsync(new AdConfig(), VungleMainInterstitialPlacementId);
         }
 
         #endregion
