@@ -9,7 +9,9 @@ namespace Hacked.Selectors
     public class BreachListItemSelector : DataTemplateSelector
     {
         public DataTemplate BreachItemTemplate { get; set; }
+
         public DataTemplate MsftAdTemplate { get; set; }
+
         public DataTemplate VungleAdTemplate { get; set; }
 
         protected override DataTemplate SelectTemplateCore(object item, DependencyObject container)
@@ -18,17 +20,15 @@ namespace Hacked.Selectors
             {
                 if (item is Breach breach)
                 {
-                    if (breach.Id == "AD")
+                    switch (breach.Id)
                     {
-                        return MsftAdTemplate;
+                        case "AD":
+                            return MsftAdTemplate;
+                        case "VUNGLE":
+                            return VungleAdTemplate;
+                        default:
+                            return BreachItemTemplate;
                     }
-
-                    if (breach.Id == "VUNGLE")
-                    {
-                        return VungleAdTemplate;
-                    }
-
-                    return BreachItemTemplate;
                 }
             }
             catch (Exception ex)
