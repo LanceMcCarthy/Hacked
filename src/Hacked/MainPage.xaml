@@ -39,9 +39,8 @@
         <DataTemplate x:Key="VungleAdTemplate">
             <Grid>
                 <ui1:VungleAdControl AppID="5e347706c28ba7001748f549"
-                                     Placement="DEFAULT-2363264"
-                                     Placements="DEFAULT-2363264, MAININTERSTITIAL-8569070"
-                                     UserId="DeveloperUser">
+                                     Placement="MAININTERSTITIAL-8569070"
+                                     ApiEndpoint="https://ads.api.vungle.com">
                     <TextBlock x:Name="VungleNativeFlexAd" Text="loading ad"/>
                 </ui1:VungleAdControl>
 

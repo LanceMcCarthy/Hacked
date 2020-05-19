@@ -20,7 +20,7 @@ using Hacked.Core.Models;
 using Hacked.Helpers;
 using Hacked.Services.Apis;
 using Microsoft.HockeyApp;
-using Microsoft.Services.Store.Engagement;
+//using Microsoft.Services.Store.Engagement;
 using Newtonsoft.Json;
 
 #if DEBUG
@@ -232,11 +232,12 @@ namespace Hacked.ViewModels
                 }
                 else if (ex.StatusCode == HttpStatusCode.Forbidden)
                 {
+#if NOT_USING
                     if (ApiInformation.IsTypePresent("Microsoft.Services.Store.Engagement.StoreServicesCustomEventLogger"))
                     {
                         StoreServicesCustomEventLogger.GetDefault().Log("HIBP API Forbidden");
                     }
-
+#endif
                     // The result was a 403 or 404
                     DisplayMessageHelpers.ShowExceptionMessageOnUiThread("CheckForBreachesAsync", ex);
                 }
@@ -542,9 +543,9 @@ namespace Hacked.ViewModels
             }
         }
 
-        #endregion
+#endregion
 
-        #region IAP
+#region IAP
 
         private async Task PurchaseAdUnlockAsync()
         {
@@ -667,9 +668,9 @@ namespace Hacked.ViewModels
             }
         }
 
-        #endregion
+#endregion
 
-        #region Automatic roaming management
+#region Automatic roaming management
 
         //private async void RoamingStorage_DataChanged(ApplicationData sender, object args)
         //{
@@ -695,7 +696,7 @@ namespace Hacked.ViewModels
         //    }
         //}
 
-        #endregion
+#endregion
 
     }
 }
