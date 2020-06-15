@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Background;
+using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.Email;
 using Windows.Foundation;
 using Windows.Storage;
 using Windows.System;
-using Windows.System.Profile;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -23,8 +25,9 @@ using Hacked.Core.Primitives;
 using Hacked.Dialogs;
 using Hacked.Helpers;
 using Hacked.ViewModels;
-using Microsoft.Advertising.WinRT.UI;
 using Microsoft.Services.Store.Engagement;
+using VungleSDK;
+using VungleSDK.UI;
 
 namespace Hacked
 {
@@ -37,6 +40,12 @@ namespace Hacked
         private bool selectionMute;
         private FilterType filterType = FilterType.Name;
 
+        private readonly VungleAd vungleSdk;
+        private const string VungleAppId = "5e347706c28ba7001748f549";
+        //private const string VungleMainFeedPlacementId = "DEFAULT-2363264"; No longer supported (aka FlexFeed)
+        private const string VungleMainInterstitialPlacementId = "MAININTERSTITIAL-8569070";
+        private const string VungleApiEndpoint = "https://ads.api.vungle.com";
+
         public MainPage()
         {
             InitializeComponent();
@@ -47,6 +56,15 @@ namespace Hacked
             {
                 localSettings = ApplicationData.Current.LocalSettings;
             }
+
+            //https://publisher.vungle.com/applications/application/5e347706c28ba7001748f549
+            //https://support.vungle.com/hc/en-us/articles/360003059331-Get-Started-with-Vungle-Windows-SDK-v-6
+
+            var sdkConfig = new VungleSDKConfig { ApiEndpoint = new Uri(VungleApiEndpoint) };
+            vungleSdk = AdFactory.GetInstance(VungleAppId, sdkConfig);
+            vungleSdk.OnInitCompleted += VungleSdk_OnInitCompleted;
+            vungleSdk.Diagnostic += VungleSdk_Diagnostic;
+            vungleSdk.OnAdPlayableChanged += VungleSdkOnAdPlayableChanged;
         }
 
         #region event handlers
@@ -55,7 +73,7 @@ namespace Hacked
         {
             AddAccountOverlay.Visibility = Visibility.Visible;
 
-            if(RootSplitView.IsPaneOpen && WindowStates.CurrentState?.Name == "NarrowState")
+            if (RootSplitView.IsPaneOpen && WindowStates.CurrentState?.Name == "NarrowState")
                 RootSplitView.IsPaneOpen = false;
         }
 
@@ -63,7 +81,7 @@ namespace Hacked
         {
             foreach (Breach breach in e.AddedItems)
             {
-                if(breach.Id == "AD")
+                if (breach.Id == "AD")
                     return;
 
                 breach.IsSelected = true;
@@ -86,11 +104,6 @@ namespace Hacked
                 {
                     NoKnownBreachesGrid.Visibility = Visibility.Collapsed;
                     vm.SelectedBreach = vm.SelectedAccount.Breaches.FirstOrDefault();
-
-                    //if(vm.AreAdsRemoved)
-
-                    //if(vm.SelectedAccount.Breaches.All(b => b.Id != "AD"))
-                    //    vm.SelectedAccount.Breaches?.Insert(0, new Breach { Id = "AD" });
                 }
                 else
                 {
@@ -100,6 +113,7 @@ namespace Hacked
 
             if (RootSplitView.DisplayMode == SplitViewDisplayMode.Overlay || RootSplitView.DisplayMode == SplitViewDisplayMode.CompactOverlay)
                 RootSplitView.IsPaneOpen = false;
+
         }
 
         private async void BreachInfoButton_Click(object sender, RoutedEventArgs e)
@@ -254,7 +268,7 @@ namespace Hacked
 
         #endregion
 
-        #region methods
+        #region Methods
 
         private void ConfigureTaskElements(bool isTaskActive)
         {
@@ -279,8 +293,8 @@ namespace Hacked
         {
             CurrentStatusTextBlock.Text = status;
 
-            MonitorFlyoutButton.Background = CurrentStatusBorder.Background = isActive 
-                ? new SolidColorBrush(Colors.LimeGreen) 
+            MonitorFlyoutButton.Background = CurrentStatusBorder.Background = isActive
+                ? new SolidColorBrush(Colors.LimeGreen)
                 : new SolidColorBrush(Colors.Red);
         }
 
@@ -290,7 +304,7 @@ namespace Hacked
 
             if (localSettings.Values.TryGetValue($"{vm.AppVersion}NoticeShown", out var hasShownNoticeSetting))
             {
-                noticeShown = (bool) hasShownNoticeSetting;
+                noticeShown = (bool)hasShownNoticeSetting;
             }
 
             NoticeOverlay.Visibility = noticeShown ? Visibility.Collapsed : Visibility.Visible;
@@ -345,10 +359,8 @@ namespace Hacked
                 switch (accessStatus)
                 {
                     case BackgroundAccessStatus.AlwaysAllowed:
-                    //case BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity:
-                    //case BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity:
                     case BackgroundAccessStatus.AllowedSubjectToSystemPolicy:
-                        await BackgroundTaskHelpers.RegisterTaskAsync(Constants.MonitorTaskName, typeof(MonitoringTask).FullName, (uint) updateFrequency);
+                        await BackgroundTaskHelpers.RegisterTaskAsync(Constants.MonitorTaskName, typeof(MonitoringTask).FullName, (uint)updateFrequency);
                         UpdateStatus($"Monitoring Task is running every {updateFrequency} minutes");
                         return true;
                     case BackgroundAccessStatus.DeniedBySystemPolicy:
@@ -359,11 +371,6 @@ namespace Hacked
                         UpdateStatus($"Monitoring Task was DENIED access", false);
                         await new MessageDialog("You have previously denied the app from adding a background task." + "r\n\nGo to Phone Settings > Background Apps \r\n\nFind this app in the list and re-enable background tasks.").ShowAsync();
                         break;
-                    //case BackgroundAccessStatus.Denied:
-                    //    UpdateStatus($"Monitoring Task was DENIED access", false);
-                    //    await new MessageDialog("You've denied the app from updating your Band in the background or you have too many background tasks already. " +
-                    //                          "r\n\nGo to Phone Settings > Background Apps \r\n\nFind this app in the list and re-enable background tasks.").ShowAsync();
-                    //    break;
                     case BackgroundAccessStatus.Unspecified:
                         UpdateStatus($"Monitoring Task is currently NOT running", false);
                         await new MessageDialog(content: "You did not make a choice. If you want to update your Band in the background, please try again.").ShowAsync();
@@ -374,7 +381,10 @@ namespace Hacked
             }
             catch (Exception ex)
             {
+                Trace.WriteLine($"Background Task Config Error: {ex}");
+
                 await new MessageDialog($"Something went wrong configuring the background task. Error: {ex.Message}").ShowAsync();
+
                 return false;
             }
             finally
@@ -391,7 +401,7 @@ namespace Hacked
                 vm.IsBusy = true;
                 vm.IsBusyMessage = "removing background task...";
 
-                //unregister the task and confirm to user it was successful
+                // Unregister the task and confirm to user it was successful
                 if (await BackgroundTaskHelpers.UnregisterTaskAsync(Constants.MonitorTaskName))
                 {
                     UpdateStatus($"Monitoring Task is currently NOT running", false);
@@ -409,7 +419,7 @@ namespace Hacked
         }
 
         #endregion
-        
+
         #region SplitView management
 
         public event TypedEventHandler<MainPage, Rect> TogglePaneButtonRectChanged;
@@ -441,7 +451,7 @@ namespace Hacked
 
         #endregion
 
-        #region filtering
+        #region Filtering
 
         private async void FilterTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
         {
@@ -464,7 +474,7 @@ namespace Hacked
             {
                 var filterText = FilterTextBox.Text;
 
-                var breaches = ((MainViewModel) DataContext)?.SelectedAccount?.Breaches;
+                var breaches = ((MainViewModel)DataContext)?.SelectedAccount?.Breaches;
 
                 if (string.IsNullOrEmpty(filterText))
                 {
@@ -482,11 +492,11 @@ namespace Hacked
             switch (filterType)
             {
                 case FilterType.Name:
-                    var name = ((Breach) arg).Name.ToLowerInvariant();
-                    return name.Contains(FilterTextBox?.Text.ToLowerInvariant());
+                    var name = ((Breach)arg).Name.ToLowerInvariant();
+                    return name.Contains(FilterTextBox?.Text.ToLowerInvariant() ?? string.Empty);
                 case FilterType.DataStolen:
-                    var classesList = ((Breach) arg).DataClasses;
-                    return classesList.Any(dataClass => dataClass.Contains(FilterTextBox?.Text.ToLowerInvariant()));
+                    var classesList = ((Breach)arg).DataClasses;
+                    return classesList.Any(dataClass => dataClass.Contains(FilterTextBox?.Text.ToLowerInvariant() ?? string.Empty));
             }
 
             return false;
@@ -507,141 +517,118 @@ namespace Hacked
             {
                 toggleButton.Content = new SymbolIcon(Symbol.Filter);
                 FilterTextBox.Text = "";
-                BreachesListView.ItemsSource = ((MainViewModel) DataContext)?.SelectedAccount?.Breaches;
+                BreachesListView.ItemsSource = ((MainViewModel)DataContext)?.SelectedAccount?.Breaches;
             }
         }
 
         #endregion
 
         #region navigation
-        
+
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
-            InitializeAdControls();
-            
             await vm.InitializeApp();
 
             selectionMute = true;
+
             ConfigureTaskElements(await BackgroundTaskHelpers.CheckBackgroundTasksAsync(Constants.MonitorTaskName));
+
             selectionMute = false;
 
             if (vm.Accounts.Count == 0)
                 RootSplitView.IsPaneOpen = true;
 
+#if ADD_BACK
             FeedbackHubButton.Visibility = StoreServicesFeedbackLauncher.IsSupported()
                 ? Visibility.Visible
                 : Visibility.Collapsed;
-
+#else
+            FeedbackHubButton.Visibility = Visibility.Collapsed;
+#endif
             NotifyUser();
+
+            // Unfortunately, VungleMainFeedPlacementId is a FlexFeed Ad, which Vungle no longer supports
+            // Also, we don't want to load an Ad until Vungle's initialization has completed
+            // See the OnInitCompleted handler
+            // vungleSdk.LoadAd(VungleMainFeedPlacementId);
+            //await vungleSdk.PlayAdAsync(new AdConfig(), VungleMainFeedPlacementId);
+            //await vungleSdk.PlayAdAsync(new AdConfig(), VungleMainInterstitialPlacementId);
         }
 
         #endregion
 
-        #region Ads
+        #region Vungle Ads - Lifecycle and Event Handlers  
 
-        //private void AdControl_Loading(FrameworkElement sender, object args)
-        //{
-        //    if (sender is AdControl adControl)
-        //    {
-        //        if (AnalyticsInfo.VersionInfo.DeviceFamily == "Windows.Mobile")
-        //        {
-        //            adControl.AdUnitId = "331318";
-        //            adControl.ApplicationId = "dc8ca494-6b18-4502-96c7-61d2cb36967d";
-        //            adControl.Height = 50;
-        //            adControl.Width = 320;
-        //        }
-        //        else
-        //        {
-        //            adControl.AdUnitId = "331317";
-        //            adControl.ApplicationId = "574159d4-36b9-4e6a-97f1-e28c72e03673";
-        //            adControl.Height = 90;
-        //            adControl.Width = 728;
-        //        }
-        //    }
-        //}
-
-        //private void ListAdControl_OnAdRefreshed(object sender, RoutedEventArgs e)
-        //{
-        //    if (sender is AdControl adControl)
-        //    {
-        //        if(adControl.Visibility == Visibility.Collapsed)
-        //            adControl.Visibility = Visibility.Visible;
-        //    }
-        //}
-
-        //private void ListAdControl_OnErrorOccurred(object sender, AdErrorEventArgs e)
-        //{
-        //    if (sender is AdControl adControl)
-        //    {
-        //        adControl.Visibility = Visibility.Collapsed;
-
-        //        // Find the TextBlock sibling to display error message
-        //        if (!(adControl.Parent is Grid grid)) return;
-        //        if (!(grid.FindChild<TextBlock>() is TextBlock tb)) return;
-
-        //        if(tb.Visibility == Visibility.Collapsed)
-        //            tb.Visibility = Visibility.Visible;
-
-        //        tb.Text = $"Ad Error: {e.ErrorMessage}";
-        //    }
-        //}
-
-        private void InitializeAdControls()
+        private async void PlayAdButton_OnClick(object sender, RoutedEventArgs e)
         {
-            if (vm.AreAdsRemoved)
-            {
-                HideAdGrid();
-            }
-            else
-            {
-                ShowAdGrid();
-            }
+            await VungleAd1.PlayAdAsync();
+        }
 
-            if (AnalyticsInfo.VersionInfo.DeviceFamily == "Windows.Mobile")
+        // A better option might be to make this Ad AutoCached
+        private void VungleSdk_OnInitCompleted(object sender, ConfigEventArgs e)
+        {
+            try
             {
-                MainPageAdControl.Width = 320;
-                MainPageAdControl.Height = 50;
-                MainPageAdControl.AdUnitId = "331318";
-                MainPageAdControl.ApplicationId = "dc8ca494-6b18-4502-96c7-61d2cb36967d";
+                vungleSdk.LoadAd(VungleMainInterstitialPlacementId);
             }
-            else
+            catch (Exception ex)
             {
-                MainPageAdControl.Width = 728;
-                MainPageAdControl.Height = 90;
-                MainPageAdControl.AdUnitId = "331317";
-                MainPageAdControl.ApplicationId = "574159d4-36b9-4e6a-97f1-e28c72e03673";
+                Trace.WriteLine(ex.ToString());
             }
         }
 
-        private void MainPageAdControl_OnAdRefreshed(object sender, RoutedEventArgs e)
+        private async void VungleSdkOnAdPlayableChanged(object sender, AdPlayableEventArgs e)
         {
-            if (vm.AreAdsRemoved)
+            Trace.WriteLine($"Ad Changed : {e.Placement}");
+
+            if (VungleMainInterstitialPlacementId.Equals(e.Placement))
             {
-                HideAdGrid();
+                if (e.AdPlayable)
+                {
+                    await CoreApplication.MainView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        try
+                        {
+                            if (vungleSdk.IsAdPlayable(e.Placement))
+                            {
+                                VungleAd1.IsHitTestVisible = PlayAdButton.IsEnabled = true;
+                            }
+                            else
+                            {
+                                // Maybe we got a "sleep" code.  Let's try to Load Ad Again
+                                vungleSdk.LoadAd(e.Placement);
+
+                                VungleAd1.IsHitTestVisible = PlayAdButton.IsEnabled = false;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(ex.ToString());
+                        }
+                    });
+
+                    // Only playing ad via user click in PlayAdButton_OnClick.
+                }
+                else
+                {
+                    vungleSdk.LoadAd(VungleMainInterstitialPlacementId);
+
+                    await CoreApplication.MainView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        VungleAd1.IsHitTestVisible = PlayAdButton.IsEnabled = false;
+                    });
+                }
             }
-            else
+        }
+
+        private void VungleSdk_Diagnostic(object sender, DiagnosticLogEvent e)
+        {
+            if (e.Message != null && (e.Message.ToLower().Contains("exception") || e.Message.ToLower().Contains("error")))
             {
-                ShowAdGrid();
+                Trace.WriteLine(e.Message);
             }
-        }
-
-        private void MainPageAdControl_OnErrorOccurred(object sender, AdErrorEventArgs e)
-        {
-            HideAdGrid();
-        }
-
-        private void HideAdGrid()
-        {
-            if(AdGrid.Visibility == Visibility.Visible)
-                AdGrid.Visibility = Visibility.Collapsed;
-        }
-
-        private void ShowAdGrid()
-        {
-            if (AdGrid.Visibility == Visibility.Collapsed)
-                AdGrid.Visibility = Visibility.Visible;
         }
 
         #endregion

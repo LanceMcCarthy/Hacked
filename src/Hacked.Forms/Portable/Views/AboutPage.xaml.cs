@@ -57,4 +57,7 @@ namespace Hacked.Forms.Portable.Views
         //    Navigation.PopModalAsync();
         //}
     }
+
+
+
 }
