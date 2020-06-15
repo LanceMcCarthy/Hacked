@@ -29,6 +29,7 @@ using Hacked.ViewModels;
 using Microsoft.Advertising.WinRT.UI;
 using Microsoft.Services.Store.Engagement;
 using VungleSDK;
+using VungleSDK.UI;
 
 namespace Hacked
 {
@@ -44,6 +45,7 @@ namespace Hacked
         private const string VungleAppId = "5e347706c28ba7001748f549";
         private const string VungleMainFeedPlacementId = "DEFAULT-2363264";
         private const string VungleMainInterstitialPlacementId = "MAININTERSTITIAL-8569070";
+        private const string VungleApiEndpoint = "https://ads.api.vungle.com";
 
         public MainPage()
         {
@@ -59,13 +61,29 @@ namespace Hacked
             //https://publisher.vungle.com/applications/application/5e347706c28ba7001748f549
             //https://support.vungle.com/hc/en-us/articles/360003059331-Get-Started-with-Vungle-Windows-SDK-v-6
 
-            VungleSDKConfig sdkConfig = new VungleSDKConfig();
+            VungleSDKConfig sdkConfig = new VungleSDKConfig { ApiEndpoint = new Uri(VungleApiEndpoint) };
             //sdkConfig.DisableAshwidTracking = true; 
             //sdkConfig.MinimumDiskSpaceForAd = 50 * 1024 * 1024; 
             //sdkConfig.MinimumDiskSpaceForInit = 50 * 1024 * 1024;
 
             vungleSdk = AdFactory.GetInstance(VungleAppId, sdkConfig);
+            vungleSdk.OnInitCompleted += VungleSdk_OnInitCompleted;
+            vungleSdk.Diagnostic += VungleSdk_Diagnostic;
             vungleSdk.OnAdPlayableChanged += VungleSdkOnAdPlayableChanged;
+        }
+
+        // A better option might be to make this Ad AutoCached
+        private void VungleSdk_OnInitCompleted(object sender, ConfigEventArgs e)
+        {
+            try
+            {
+                // We don't want to load an Ad until the initialization has completed
+                vungleSdk.LoadAd(VungleMainInterstitialPlacementId);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Trace.WriteLine(ex.ToString());
+            }
         }
 
         #region event handlers
@@ -74,7 +92,7 @@ namespace Hacked
         {
             AddAccountOverlay.Visibility = Visibility.Visible;
 
-            if(RootSplitView.IsPaneOpen && WindowStates.CurrentState?.Name == "NarrowState")
+            if (RootSplitView.IsPaneOpen && WindowStates.CurrentState?.Name == "NarrowState")
                 RootSplitView.IsPaneOpen = false;
         }
 
@@ -82,7 +100,7 @@ namespace Hacked
         {
             foreach (Breach breach in e.AddedItems)
             {
-                if(breach.Id == "AD")
+                if (breach.Id == "AD")
                     return;
 
                 breach.IsSelected = true;
@@ -97,7 +115,7 @@ namespace Hacked
             }
         }
 
-        private async void AccountsListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void AccountsListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             foreach (MonitoredAccount account in e.AddedItems)
             {
@@ -120,7 +138,32 @@ namespace Hacked
             if (RootSplitView.DisplayMode == SplitViewDisplayMode.Overlay || RootSplitView.DisplayMode == SplitViewDisplayMode.CompactOverlay)
                 RootSplitView.IsPaneOpen = false;
 
-            await vungleSdk.PlayAdAsync(new AdConfig(), VungleMainInterstitialPlacementId);
+        }
+
+        // TODO: Better ideas on how to do this at https://stackoverflow.com/questions/19379946/how-to-access-a-control-within-data-template-from-code-behind
+        private VungleAdControl FindVungleAdControl(DependencyObject parent)
+        {
+            int numChildren = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < numChildren; i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(parent, i);
+
+                if (child != null && child is VungleAdControl adControl)
+                {
+                    return adControl;
+                }
+                else
+                {
+                    adControl = FindVungleAdControl(child);
+
+                    if (adControl != null)
+                    {
+                        return adControl;
+                    }
+                }
+            }
+
+            return null;
         }
 
         private async void BreachInfoButton_Click(object sender, RoutedEventArgs e)
@@ -300,8 +343,8 @@ namespace Hacked
         {
             CurrentStatusTextBlock.Text = status;
 
-            MonitorFlyoutButton.Background = CurrentStatusBorder.Background = isActive 
-                ? new SolidColorBrush(Colors.LimeGreen) 
+            MonitorFlyoutButton.Background = CurrentStatusBorder.Background = isActive
+                ? new SolidColorBrush(Colors.LimeGreen)
                 : new SolidColorBrush(Colors.Red);
         }
 
@@ -311,7 +354,7 @@ namespace Hacked
 
             if (localSettings.Values.TryGetValue($"{vm.AppVersion}NoticeShown", out var hasShownNoticeSetting))
             {
-                noticeShown = (bool) hasShownNoticeSetting;
+                noticeShown = (bool)hasShownNoticeSetting;
             }
 
             NoticeOverlay.Visibility = noticeShown ? Visibility.Collapsed : Visibility.Visible;
@@ -369,7 +412,7 @@ namespace Hacked
                     //case BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity:
                     //case BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity:
                     case BackgroundAccessStatus.AllowedSubjectToSystemPolicy:
-                        await BackgroundTaskHelpers.RegisterTaskAsync(Constants.MonitorTaskName, typeof(MonitoringTask).FullName, (uint) updateFrequency);
+                        await BackgroundTaskHelpers.RegisterTaskAsync(Constants.MonitorTaskName, typeof(MonitoringTask).FullName, (uint)updateFrequency);
                         UpdateStatus($"Monitoring Task is running every {updateFrequency} minutes");
                         return true;
                     case BackgroundAccessStatus.DeniedBySystemPolicy:
@@ -430,7 +473,7 @@ namespace Hacked
         }
 
         #endregion
-        
+
         #region SplitView management
 
         public event TypedEventHandler<MainPage, Rect> TogglePaneButtonRectChanged;
@@ -485,7 +528,7 @@ namespace Hacked
             {
                 var filterText = FilterTextBox.Text;
 
-                var breaches = ((MainViewModel) DataContext)?.SelectedAccount?.Breaches;
+                var breaches = ((MainViewModel)DataContext)?.SelectedAccount?.Breaches;
 
                 if (string.IsNullOrEmpty(filterText))
                 {
@@ -503,10 +546,10 @@ namespace Hacked
             switch (filterType)
             {
                 case FilterType.Name:
-                    var name = ((Breach) arg).Name.ToLowerInvariant();
+                    var name = ((Breach)arg).Name.ToLowerInvariant();
                     return name.Contains(FilterTextBox?.Text.ToLowerInvariant());
                 case FilterType.DataStolen:
-                    var classesList = ((Breach) arg).DataClasses;
+                    var classesList = ((Breach)arg).DataClasses;
                     return classesList.Any(dataClass => dataClass.Contains(FilterTextBox?.Text.ToLowerInvariant()));
             }
 
@@ -528,20 +571,20 @@ namespace Hacked
             {
                 toggleButton.Content = new SymbolIcon(Symbol.Filter);
                 FilterTextBox.Text = "";
-                BreachesListView.ItemsSource = ((MainViewModel) DataContext)?.SelectedAccount?.Breaches;
+                BreachesListView.ItemsSource = ((MainViewModel)DataContext)?.SelectedAccount?.Breaches;
             }
         }
 
         #endregion
 
         #region navigation
-        
+
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
             InitializeAdControls();
-            
+
             await vm.InitializeApp();
 
             selectionMute = true;
@@ -553,16 +596,29 @@ namespace Hacked
             if (vm.Accounts.Count == 0)
                 RootSplitView.IsPaneOpen = true;
 
+#if ADD_BACK
             FeedbackHubButton.Visibility = StoreServicesFeedbackLauncher.IsSupported()
                 ? Visibility.Visible
                 : Visibility.Collapsed;
-
+#else
+            FeedbackHubButton.Visibility = Visibility.Collapsed;
+#endif
             NotifyUser();
 
-            vungleSdk.LoadAd(VungleMainFeedPlacementId);
-            vungleSdk.LoadAd(VungleMainInterstitialPlacementId);
+            // Unfortunately, VungleMainFeedPlacementId is a FlexFeed Ad, which Vungle no longer supports
+            // Also, we don't want to load an Ad until Vungle's initialization has completed
+            // See the OnInitCompleted handler
+            // vungleSdk.LoadAd(VungleMainFeedPlacementId);
             //await vungleSdk.PlayAdAsync(new AdConfig(), VungleMainFeedPlacementId);
             //await vungleSdk.PlayAdAsync(new AdConfig(), VungleMainInterstitialPlacementId);
+        }
+
+        private void VungleSdk_Diagnostic(object sender, DiagnosticLogEvent e)
+        {
+            if (e.Message != null && (e.Message.ToLower().Contains("exception") || e.Message.ToLower().Contains("error")))
+            {
+                System.Diagnostics.Trace.WriteLine(e.Message);
+            }
         }
 
         #endregion
@@ -571,15 +627,43 @@ namespace Hacked
 
         private async void VungleSdkOnAdPlayableChanged(object sender, AdPlayableEventArgs e)
         {
-            if (e.AdPlayable)
+            if (VungleMainInterstitialPlacementId.Equals(e.Placement))
             {
-                await CoreApplication.MainView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => PlayableAdChanged(e.Placement));
+                if (e.AdPlayable)
+                {
+                    await CoreApplication.MainView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => PlayableAdChanged(e.Placement));
+                }
+                else
+                {
+                    vungleSdk.LoadAd(VungleMainInterstitialPlacementId);
+                }
             }
         }
 
-        private void PlayableAdChanged(string placementId)
+        private async void PlayableAdChanged(string placementId)
         {
             Debug.WriteLine($"Ad Changed : {placementId}");
+            try
+            {
+                if (vungleSdk.IsAdPlayable(placementId))
+                {
+                    VungleAdControl adControl = null;
+                    adControl = FindVungleAdControl(this.BreachesGrid);
+                    if (adControl != null)
+                    {
+                        await adControl.PlayAdAsync();
+                    }
+                }
+                else
+                {
+                    // Maybe we got a "sleep" code.  Let's try to Load Ad Again
+                    vungleSdk.LoadAd(placementId);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+            }
         }
 
         #endregion
@@ -633,7 +717,7 @@ namespace Hacked
 
         private void HideAdGrid()
         {
-            if(AdGrid.Visibility == Visibility.Visible)
+            if (AdGrid.Visibility == Visibility.Visible)
                 AdGrid.Visibility = Visibility.Collapsed;
         }
 
