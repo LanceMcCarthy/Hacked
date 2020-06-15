@@ -253,12 +253,6 @@ namespace Hacked.ViewModels
                 account.IsUpdating = false;
             }
 
-            if (!AreAdsRemoved)
-            {
-                //result.Insert(0, new Breach { Title = "AD" });
-                result.Insert(0, new Breach { Title = "VUNGLE" });
-            }
-
             return result;
         }
 
