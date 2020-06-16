@@ -733,8 +733,10 @@
                              Placement="MAININTERSTITIAL-8569070"
                              Placements="DEFAULT-2363264, MAININTERSTITIAL-8569070"
                              ApiEndpoint="https://ads.api.vungle.com" 
-                             IsHitTestVisible="True"
-                             Grid.Row="1"/>
+                             IsHitTestVisible="False"
+                             Grid.Row="1"
+                             OnAdStart="VungleAd1_Start"
+                             OnAdEnd="VungleAd1_End" />
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="WindowStates">

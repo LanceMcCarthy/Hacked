@@ -593,14 +593,14 @@ namespace Hacked
                         {
                             if (vungleSdk.IsAdPlayable(e.Placement))
                             {
-                                VungleAd1.IsHitTestVisible = PlayAdButton.IsEnabled = true;
+                                PlayAdButton.IsEnabled = true;
                             }
                             else
                             {
                                 // Maybe we got a "sleep" code.  Let's try to Load Ad Again
                                 vungleSdk.LoadAd(e.Placement);
 
-                                VungleAd1.IsHitTestVisible = PlayAdButton.IsEnabled = false;
+                                PlayAdButton.IsEnabled = false;
                             }
                         }
                         catch (Exception ex)
@@ -617,10 +617,26 @@ namespace Hacked
 
                     await CoreApplication.MainView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        VungleAd1.IsHitTestVisible = PlayAdButton.IsEnabled = false;
+                        PlayAdButton.IsEnabled = false;
                     });
                 }
             }
+        }
+
+        private async void VungleAd1_Start(object sender, AdEventArgs e)
+        {
+            await CoreApplication.MainView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                VungleAd1.IsHitTestVisible = true;
+            });
+        }
+
+        private async void VungleAd1_End(object sender, AdEndEventArgs e)
+        {
+            await CoreApplication.MainView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                VungleAd1.IsHitTestVisible = false;
+            });
         }
 
         private void VungleSdk_Diagnostic(object sender, DiagnosticLogEvent e)
