@@ -10,9 +10,6 @@ namespace Hacked.Forms.Portable
     {
         public App()
         {
-#if DEBUG
-            LiveReload.Init();
-#endif
             InitializeComponent();
             
             MainPage = new RootPage();
