@@ -562,6 +562,15 @@ namespace Hacked.ViewModels
                         case StorePurchaseStatus.Succeeded:
                         case StorePurchaseStatus.AlreadyPurchased:
                             AreAdsRemoved = true;
+                            foreach (var account in Accounts)
+                            {
+                                // Removes any existing ads from list
+                                var adItems = account.Breaches.Where(b => b.Title == "VUNGLE" || b.Title == "AD");
+                                foreach (var item in adItems)
+                                {
+                                    account.Breaches.Remove(item);
+                                }
+                            }
                             break;
                         case StorePurchaseStatus.NotPurchased:
                         case StorePurchaseStatus.NetworkError:
