@@ -29,7 +29,7 @@
                     </primitives:AccordionItemHeader>
                 </primitives:AccordionItem.Header>
                 <primitives:AccordionItem.Content>
-                    <Grid Padding="10,10,10,10">
+                    <Grid Padding="10">
                         <ScrollView>
                             <StackLayout>
                                 <Label Text="Title"
@@ -101,7 +101,7 @@
                     </primitives:AccordionItemHeader>
                 </primitives:AccordionItem.Header>
                 <primitives:AccordionItem.Content>
-                    <Grid Padding="10,10,10,10">
+                    <Grid Padding="10">
                         <simpleListView:SimpleListView ItemsSource="{Binding SelectedBreach.DataClasses}"
                                                        ItemTemplate="{StaticResource BreachClassItemTemplate}"
                                                        InputTransparent="True" />
@@ -125,11 +125,10 @@
                     </primitives:AccordionItemHeader>
                 </primitives:AccordionItem.Header>
                 <primitives:AccordionItem.Content>
-                    <Grid Padding="10,10,10,10"
+                    <Grid Padding="10"
                           HeightRequest="100">
-                        <WebView x:Name="LogoWebView"
-                                 VerticalOptions="Fill"
-                                 HorizontalOptions="Fill" />
+                        <Image Source="{Binding SelectedBreach.LogoPath}"
+                               Width="40" />
                     </Grid>
                 </primitives:AccordionItem.Content>
             </primitives:AccordionItem>
