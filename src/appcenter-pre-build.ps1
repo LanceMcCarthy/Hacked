@@ -7,7 +7,13 @@ Write-Host 'Updating UWP Package Manifest'
 $manifestFileName =  $workingDirectory + '/Hacked/Package.appxmanifest'
 
 # Create version number
-$verPrefix = Get-Date -Format "yyyy.Mdd.HHmm"
+$major = Get-Date -Format "yyyy"
+$minorRaw = Get-Date -Format "MMdd"
+$minor = $minorRaw.TrimStart("0")
+$revRaw = Get-Date -Format "HHmm"
+$rev = $revRaw.TrimStart("0")
+
+$verPrefix = $major + "." + $minor + "." + $rev
 
 $content = (Get-Content $manifestFileName) -join "`r`n"
 
