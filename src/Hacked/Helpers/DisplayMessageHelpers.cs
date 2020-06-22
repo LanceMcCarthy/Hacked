@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using Windows.UI.Popups;
 using Hacked.Core.Common;
+using Microsoft.AppCenter.Crashes;
 
 namespace Hacked.Helpers
 {
@@ -9,6 +11,11 @@ namespace Hacked.Helpers
     {
         public static async void ShowExceptionMessageOnUiThread(string callerName, Exception ex)
         {
+            Crashes.TrackError(ex, new Dictionary<string, string>
+            {
+                { "Caller Name", callerName }
+            });
+
             await DispatcherTaskExtensions.CallOnUiThreadAsync(async () =>
             {
                 if (ex is PwnedApiException pex)
