@@ -7,8 +7,10 @@ using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using Microsoft.HockeyApp;
 using Microsoft.Toolkit.Uwp.UI;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 
 namespace Hacked
 {
@@ -16,15 +18,14 @@ namespace Hacked
     {
         public App()
         {
-            HockeyClient.Current.Configure("51893a4909c74564946d2bd263613731");
             this.InitializeComponent();
+            AppCenter.Start("512602fa-5e3c-4e7e-b2ac-7f27af7bf073",
+                typeof(Analytics), typeof(Crashes));
         }
         
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-            Frame rootFrame = Window.Current.Content as Frame;
-
-            if (rootFrame == null)
+            if (!(Window.Current.Content is Frame rootFrame))
             {
                 rootFrame = new Frame();
 
@@ -45,11 +46,10 @@ namespace Hacked
             if (rootFrame.Content == null)
             {
                 rootFrame.Navigate(typeof(MainPage), e.Arguments);
-                //rootFrame.Navigate(typeof(MasterDetailPage), e.Arguments);
             }
 
             CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
-            ApplicationViewTitleBar titleBar = ApplicationView.GetForCurrentView().TitleBar;
+            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
             titleBar.ButtonBackgroundColor = Colors.Transparent;
             titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
 
