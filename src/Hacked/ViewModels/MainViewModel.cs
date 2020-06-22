@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Store;
@@ -19,7 +20,8 @@ using Hacked.Core.Common;
 using Hacked.Core.Models;
 using Hacked.Helpers;
 using Hacked.Services.Apis;
-using Microsoft.HockeyApp;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Microsoft.Services.Store.Engagement;
 using Newtonsoft.Json;
 
@@ -279,13 +281,17 @@ namespace Hacked.ViewModels
                 IsBusy = true;
 
                 var account = new MonitoredAccount { Address = address };
+
                 account.Breaches = await CheckForBreachesAsync(account);
                 account.LastUpdated = DateTime.Now;
 
                 //NOTE we still want to add to monitored accounts even if no results at first
                 Accounts.Add(account);
 
-                HockeyClient.Current.TrackEvent("Account Added");
+                Analytics.TrackEvent("Account Added", new Dictionary<string, string>
+                {
+                    { "Account Type", RegexHelpers.ValidateEmail(address) ? "email" : "username" }
+                });
 
                 await SaveAccountsAsync();
 
@@ -308,7 +314,7 @@ namespace Hacked.ViewModels
                 if (Accounts.Contains(account))
                 {
                     Accounts.Remove(account);
-                    HockeyClient.Current.TrackEvent("Account Removed");
+                    Analytics.TrackEvent("Account Removed");
                 }
 
                 if (Accounts.Any())
@@ -396,9 +402,15 @@ namespace Hacked.ViewModels
 
                 return new ObservableCollection<MonitoredAccount>();
             }
-            catch (FileNotFoundException)
+            catch (FileNotFoundException fnfex)
             {
                 Debug.WriteLine("Accounts json file not found");
+
+                Crashes.TrackError(fnfex, new Dictionary<string, string>
+                {
+                    { "LoadAccountsAsync", $"{Constants.LocalAccountsFileName} not found." }
+                });
+
                 return new ObservableCollection<MonitoredAccount>();
             }
             catch (Exception ex)
@@ -425,7 +437,7 @@ namespace Hacked.ViewModels
 
                 await localAccountsFile.CopyAsync(roamingFolder, Constants.RoamingAccountsBackupFileName, NameCollisionOption.ReplaceExisting);
 
-                HockeyClient.Current.TrackEvent("Accounts Backedup");
+                Analytics.TrackEvent("Accounts Backed Up");
 
                 return true;
             }
@@ -484,7 +496,7 @@ namespace Hacked.ViewModels
                             await SaveAccountsAsync();
                         }
 
-                        HockeyClient.Current.TrackEvent("Accounts Restored from backup");
+                        Analytics.TrackEvent("Accounts Restored from backup");
 
                         return true;
                     }
@@ -525,7 +537,7 @@ namespace Hacked.ViewModels
 
                 await file.DeleteAsync(StorageDeleteOption.PermanentDelete);
 
-                HockeyClient.Current.TrackEvent("Backup file deleted");
+                Analytics.TrackEvent("Backup file deleted");
 
                 return true;
             }
@@ -553,24 +565,16 @@ namespace Hacked.ViewModels
 
                     var result = await context.RequestPurchaseAsync(Secrets.RemoveAdsStoreId);
 
-#if !DEBUG
-                    HockeyClient.Current.TrackEvent(result.Status.ToString("G"));
-#endif
+                    Analytics.TrackEvent("PurchaseAdUnlockAsync", new Dictionary<string, string>()
+                    {
+                        { "Purchase Result", result.Status.ToString("G") }
+                    });
 
                     switch (result.Status)
                     {
                         case StorePurchaseStatus.Succeeded:
                         case StorePurchaseStatus.AlreadyPurchased:
                             AreAdsRemoved = true;
-                            foreach (var account in Accounts)
-                            {
-                                // Removes any existing ads from list
-                                var adItems = account.Breaches.Where(b => b.Title == "VUNGLE" || b.Title == "AD");
-                                foreach (var item in adItems)
-                                {
-                                    account.Breaches.Remove(item);
-                                }
-                            }
                             break;
                         case StorePurchaseStatus.NotPurchased:
                         case StorePurchaseStatus.NetworkError:
@@ -583,10 +587,6 @@ namespace Hacked.ViewModels
                 else
                 {
                     var result = await CurrentApp.RequestProductPurchaseAsync(Secrets.RemoveAdsProductId);
-
-#if !DEBUG
-                    HockeyClient.Current.TrackEvent(result.Status.ToString("G"));
-#endif
 
                     switch (result.Status)
                     {
@@ -605,8 +605,7 @@ namespace Hacked.ViewModels
             }
             catch (Exception ex)
             {
-                DisplayMessageHelpers.ShowExceptionMessageOnUiThread("Windows Store problem", ex);
-                HockeyClient.Current.TrackException(ex);
+                DisplayMessageHelpers.ShowExceptionMessageOnUiThread("PurchaseAdUnlockAsync", ex);
             }
             finally
             {
@@ -652,7 +651,7 @@ namespace Hacked.ViewModels
             }
             catch (Exception ex)
             {
-                HockeyClient.Current.TrackException(ex);
+                DisplayMessageHelpers.ShowExceptionMessageOnUiThread("RefreshPurchasesAsync", ex);
             }
             finally
             {
