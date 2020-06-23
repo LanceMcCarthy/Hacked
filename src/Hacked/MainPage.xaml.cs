@@ -42,7 +42,6 @@ namespace Hacked
 
         private readonly VungleAd vungleSdk;
         private const string VungleAppId = "5e347706c28ba7001748f549";
-        //private const string VungleMainFeedPlacementId = "DEFAULT-2363264"; No longer supported (aka FlexFeed)
         private const string VungleMainInterstitialPlacementId = "MAININTERSTITIAL-8569070";
         private const string VungleApiEndpoint = "https://ads.api.vungle.com";
 

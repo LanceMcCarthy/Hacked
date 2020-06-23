@@ -114,6 +114,11 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="AttachedProperties\DetailsViewProperties.cs" />
+    <Compile Include="Dialogs\KudosDialog.xaml.cs">
+      <DependentUpon>KudosDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Helpers\StoreHelpers.cs" />
     <Compile Include="Helpers\DesignTimeData.cs" />
     <Compile Include="Helpers\DispatcherTaskExtensions.cs" />
     <Compile Include="Helpers\BackgroundTaskHelpers.cs" />
@@ -151,6 +156,7 @@
     </Compile>
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModels\KudosViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -195,19 +201,23 @@
     <Content Include="Assets\Wide310x150Logo.scale-125.png" />
     <Content Include="Assets\Wide310x150Logo.scale-150.png" />
     <Content Include="Assets\Wide310x150Logo.scale-400.png" />
-    <Content Include="Images\000webhost.png" />
-    <Content Include="Images\38148348_s.jpg" />
-    <Content Include="Images\Adobe.png" />
+    <Content Include="Images\4starStar_Colored.png" />
+    <Content Include="Images\4starStar.png" />
+    <Content Include="Images\APIFeeKudo_Colored.png" />
+    <Content Include="Images\CoffeeKudo_Colored.png" />
+    <Content Include="Images\CoffeeKudo.png" />
     <Content Include="Images\Damaged_NormalMap.jpg" />
-    <Content Include="Images\Flashback.png" />
-    <Content Include="Images\Forbes.png" />
-    <Content Include="Images\Gawker.png" />
+    <Content Include="Images\DinnerKudo_Colored.png" />
+    <Content Include="Images\DinnerKudo.png" />
     <Content Include="Images\ListFallBackIcon.jpg" />
     <Content Include="Images\LoadingPlaceholder.jpg" />
-    <Content Include="Images\MangaTraders.png" />
-    <Content Include="Images\MPGH.png" />
-    <Content Include="Images\Stratfor.png" />
+    <Content Include="Images\LunchKudo_Colored.png" />
+    <Content Include="Images\LunchKudo.png" />
+    <Content Include="Images\RecurringKudo_Colored.png" />
+    <Content Include="Images\RemoveAdKudo_Colored.png" />
     <None Include="Package.StoreAssociation.xml" />
+    <Content Include="Images\VideoAd_Colored.png" />
+    <Content Include="Images\VideoAd.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
@@ -233,6 +243,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Dialogs\BreachDetailsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\KudosDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
