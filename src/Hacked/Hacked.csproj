@@ -20,10 +20,10 @@
     <PackageCertificateKeyFile>
     </PackageCertificateKeyFile>
     <ApplicationInsightsResourceId>/subscriptions/48ab4839-62af-4ab3-afe6-043ea4d7c137/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/Hacked</ApplicationInsightsResourceId>
-    <PackageCertificateThumbprint>F59E815B12EB302AFB967D855BDEC315D27DB6B3</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>261EBF50B765169CE9F863414F7BC3035C10AD6C</PackageCertificateThumbprint>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
-    <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
+    <AppxBundlePlatforms>x86|x64|arm|arm64</AppxBundlePlatforms>
     <RuntimeIdentifiers>win10-arm;win10-arm-aot;win10-x86;win10-x86-aot;win10-x64;win10-x64-aot;win10-arm64;win10-arm64-aot</RuntimeIdentifiers>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppInstallerUpdateFrequency>0</AppInstallerUpdateFrequency>
