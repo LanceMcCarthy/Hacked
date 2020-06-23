@@ -273,6 +273,7 @@
                             <Button x:Name="RemoveAdButton"
                                     Content="remove ads button"
                                     Command="{Binding PurchaseAdUnlockCommand}"
+
                                     Foreground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
                                     HorizontalAlignment="Stretch"
                                     Margin="5" />
@@ -731,7 +732,7 @@
         <ui1:VungleAdControl x:Name="VungleAd1"
                              AppID="5e347706c28ba7001748f549"
                              Placement="MAININTERSTITIAL-8569070"
-                             Placements="DEFAULT-2363264, MAININTERSTITIAL-8569070"
+                             Placements="MAININTERSTITIAL-8569070, KUDOSAD-0259168"
                              ApiEndpoint="https://ads.api.vungle.com" 
                              IsHitTestVisible="False"
                              Grid.Row="1"
