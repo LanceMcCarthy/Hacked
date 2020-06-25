@@ -8,7 +8,7 @@ namespace Hacked.Core.Models
         private string storeId;
         private string imageUrl;
         private string price;
-        private bool isBusy;
+        private KudoCategory category;
 
         public string Title
         {
@@ -34,10 +34,10 @@ namespace Hacked.Core.Models
             set => SetProperty(ref price, value);
         }
 
-        public bool IsBusy
+        public KudoCategory Category
         {
-            get => isBusy;
-            set => SetProperty(ref isBusy, value);
+            get => category;
+            set => SetProperty(ref category, value);
         }
     }
 }
