@@ -1,20 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Store;
-using Windows.Foundation.Metadata;
-using Windows.Services.Store;
-using Windows.Storage;
-using Windows.UI.Popups;
-using CommonHelpers.Common;
+﻿using CommonHelpers.Common;
 using CommonHelpers.Mvvm;
 using Hacked.Core.Common;
 using Hacked.Core.Models;
@@ -24,12 +8,19 @@ using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
 using Microsoft.Services.Store.Engagement;
 using Newtonsoft.Json;
-
-#if DEBUG
-using CurrentApp = Windows.ApplicationModel.Store.CurrentAppSimulator;
-#else
-using CurrentApp = Windows.ApplicationModel.Store.CurrentApp;
-#endif
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using Windows.ApplicationModel;
+using Windows.Foundation.Metadata;
+using Windows.Services.Store;
+using Windows.Storage;
+using Windows.UI.Popups;
 
 namespace Hacked.ViewModels
 {
@@ -49,14 +40,15 @@ namespace Hacked.ViewModels
         private bool areAdsRemoved;
         private string appVersion;
 
-
         private ObservableCollection<MonitoredAccount> accounts;
         private MonitoredAccount selectedAccount;
         private Breach selectedBreach;
         private DelegateCommand findAllAccountBreachesCommand;
-        private DelegateCommand findSelectedAccountBreacheCommand;
+        private DelegateCommand findSelectedAccountBreachesCommand;
         private DelegateCommand<MonitoredAccount> removeAccountCommand;
-        private DelegateCommand purchaseAdUnlockCommand;
+        private DelegateCommand showKudosCommand;
+        private bool isIapSubscriber;
+        private bool isKudoSelectorOpen;
 
         #endregion
 
@@ -76,9 +68,6 @@ namespace Hacked.ViewModels
             roamingSettings = ApplicationData.Current.RoamingSettings;
             localFolder = ApplicationData.Current.LocalFolder;
             roamingFolder = ApplicationData.Current.RoamingFolder;
-
-            //TODO think of a better way to manage this automatically, for now, the user will need ot use backup/restore buttons
-            //ApplicationData.Current.DataChanged += RoamingStorage_DataChanged;
         }
 
         #region Properties
@@ -137,7 +126,6 @@ namespace Hacked.ViewModels
             get
             {
                 //return true;
-
                 if (roamingSettings != null && roamingSettings.Values.TryGetValue(Constants.AreAdsRemovedSettingsKey, out object val))
                 {
                     areAdsRemoved = (bool)val;
@@ -154,11 +142,23 @@ namespace Hacked.ViewModels
             }
         }
 
+        public bool IsIapSubscriber
+        {
+            get => isIapSubscriber;
+            set => SetProperty(ref isIapSubscriber, value);
+        }
+
+        public bool IsKudoSelectorOpen
+        {
+            get => isKudoSelectorOpen;
+            set => SetProperty(ref isKudoSelectorOpen, value);
+        }
+
         #endregion
 
         #region Commands
 
-        public DelegateCommand FindSelectedAccountBreachCommand => findSelectedAccountBreacheCommand ?? (findSelectedAccountBreacheCommand = new DelegateCommand(async () =>
+        public DelegateCommand FindSelectedAccountBreachCommand => findSelectedAccountBreachesCommand ?? (findSelectedAccountBreachesCommand = new DelegateCommand(async () =>
         {
             SelectedAccount.Breaches = await CheckForBreachesAsync(SelectedAccount);
             await SaveAccountsAsync();
@@ -183,9 +183,9 @@ namespace Hacked.ViewModels
             await FindAllAccountsBreachesAsync();
         }));
 
-        public DelegateCommand PurchaseAdUnlockCommand => purchaseAdUnlockCommand ?? (purchaseAdUnlockCommand = new DelegateCommand(async () =>
+        public DelegateCommand ShowKudosCommand => showKudosCommand ?? (showKudosCommand = new DelegateCommand(() =>
         {
-            await PurchaseAdUnlockAsync();
+            IsKudoSelectorOpen = !IsKudoSelectorOpen;
         }));
 
         #endregion
@@ -426,7 +426,7 @@ namespace Hacked.ViewModels
             }
         }
 
-        public async Task<bool> BackupAccountsToRoamingStorageAsync()
+        public async Task<bool> ExportAccountsAsync()
         {
             try
             {
@@ -552,67 +552,28 @@ namespace Hacked.ViewModels
 
         #region IAP
 
-        private async Task PurchaseAdUnlockAsync()
-        {
-            try
-            {
-                IsBusy = true;
-                IsBusyMessage = "removing ads...";
+        
 
-                if (ApiInformation.IsTypePresent("Windows.Services.Store.StoreContext"))
-                {
-                    StoreContext context = StoreContext.GetDefault();
+        //private async Task PurchaseAdUnlockAsync()
+        //{
+        //    try
+        //    {
+        //        //await new KudosDialog().ShowAsync();
+        //        IsBusy = true;
+        //        IsBusyMessage = "removing ads...";
 
-                    var result = await context.RequestPurchaseAsync(Secrets.RemoveAdsStoreId);
-
-                    Analytics.TrackEvent("PurchaseAdUnlockAsync", new Dictionary<string, string>()
-                    {
-                        { "Purchase Result", result.Status.ToString("G") }
-                    });
-
-                    switch (result.Status)
-                    {
-                        case StorePurchaseStatus.Succeeded:
-                        case StorePurchaseStatus.AlreadyPurchased:
-                            AreAdsRemoved = true;
-                            break;
-                        case StorePurchaseStatus.NotPurchased:
-                        case StorePurchaseStatus.NetworkError:
-                        case StorePurchaseStatus.ServerError:
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
-                else
-                {
-                    var result = await CurrentApp.RequestProductPurchaseAsync(Secrets.RemoveAdsProductId);
-
-                    switch (result.Status)
-                    {
-                        case ProductPurchaseStatus.Succeeded:
-                        case ProductPurchaseStatus.AlreadyPurchased:
-                            AreAdsRemoved = true;
-                            break;
-                        case ProductPurchaseStatus.NotFulfilled:
-                            // let user know
-                            break;
-                        case ProductPurchaseStatus.NotPurchased:
-                            // let user know
-                            break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                DisplayMessageHelpers.ShowExceptionMessageOnUiThread("PurchaseAdUnlockAsync", ex);
-            }
-            finally
-            {
-                IsBusy = false;
-                IsBusyMessage = "";
-            }
-        }
+        //        //AreAdsRemoved = await StoreHelpers.PurchaseAsync(StoreIds.RemoveAdsStoreId);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        DisplayMessageHelpers.ShowExceptionMessageOnUiThread("PurchaseAdUnlockAsync", ex);
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //        IsBusyMessage = "";
+        //    }
+        //}
 
         public async Task RefreshPurchasesAsync()
         {
@@ -637,16 +598,16 @@ namespace Hacked.ViewModels
                     {
                         var addOnLicense = item.Value;
 
-                        if (addOnLicense.SkuStoreId == Secrets.RemoveAdsStoreId)
+                        switch (addOnLicense.SkuStoreId)
                         {
-                            AreAdsRemoved = addOnLicense.IsActive;
+                            case StoreIds.RemoveAdsStoreId:
+                                AreAdsRemoved = addOnLicense.IsActive;
+                                break;
+                            case StoreIds.RecurringKudos1StoreId:
+                                IsIapSubscriber = addOnLicense.IsActive;
+                                break;
                         }
                     }
-
-                }
-                else // prior to 1607
-                {
-                    AreAdsRemoved = CurrentApp.LicenseInformation.ProductLicenses[Secrets.RemoveAdsProductId].IsActive;
                 }
             }
             catch (Exception ex)
