@@ -6,5 +6,5 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Safety", "UWP001:Platform-specific", Justification = "<Pending>", Scope = "member", Target = "~M:Hacked.Helpers.StoreHelpers.PurchaseAsync(System.String)~System.Threading.Tasks.Task{System.Boolean}")]
-[assembly: SuppressMessage("Safety", "UWP001:Platform-specific", Justification = "<Pending>", Scope = "member", Target = "~M:Hacked.ViewModels.KudosViewModel.ShowRatingReviewDialog~System.Threading.Tasks.Task")]
-[assembly: SuppressMessage("Safety", "UWP001:Platform-specific", Justification = "<Pending>", Scope = "member", Target = "~M:Hacked.ViewModels.KudosViewModel.PurchaseKudosAsync(System.String)~System.Threading.Tasks.Task")]
+[assembly: SuppressMessage("Safety", "UWP001:Platform-specific", Justification = "<Pending>", Scope = "member", Target = "~M:Hacked.Controls.KudosControl.PurchaseKudosAsync(System.String)~System.Threading.Tasks.Task")]
+[assembly: SuppressMessage("Safety", "UWP001:Platform-specific", Justification = "<Pending>", Scope = "member", Target = "~M:Hacked.Controls.KudosControl.ShowRatingReviewDialog~System.Threading.Tasks.Task")]

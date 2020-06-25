@@ -12,14 +12,6 @@
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
 
     <Grid>
-        <!--<Grid.Resources>
-            <converters:LogoConverter x:Key="LogoConverter" />
-        </Grid.Resources>
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <WebView x:Name="IconWebView" Height="150"/>-->
         <WebView x:Name="BreachDetailsWebView"
                  Width="300"
                  Height="300" />

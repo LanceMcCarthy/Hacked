@@ -1,4 +1,14 @@
-﻿using System;
+﻿using CommonHelpers.Common;
+using CommonHelpers.Mvvm;
+using Hacked.Core.Common;
+using Hacked.Core.Models;
+using Hacked.Helpers;
+using Hacked.Services.Apis;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
+using Microsoft.Services.Store.Engagement;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -11,17 +21,6 @@ using Windows.Foundation.Metadata;
 using Windows.Services.Store;
 using Windows.Storage;
 using Windows.UI.Popups;
-using CommonHelpers.Common;
-using CommonHelpers.Mvvm;
-using Hacked.Core.Common;
-using Hacked.Core.Models;
-using Hacked.Dialogs;
-using Hacked.Helpers;
-using Hacked.Services.Apis;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
-using Microsoft.Services.Store.Engagement;
-using Newtonsoft.Json;
 
 namespace Hacked.ViewModels
 {
@@ -41,15 +40,15 @@ namespace Hacked.ViewModels
         private bool areAdsRemoved;
         private string appVersion;
 
-
         private ObservableCollection<MonitoredAccount> accounts;
         private MonitoredAccount selectedAccount;
         private Breach selectedBreach;
         private DelegateCommand findAllAccountBreachesCommand;
-        private DelegateCommand findSelectedAccountBreacheCommand;
+        private DelegateCommand findSelectedAccountBreachesCommand;
         private DelegateCommand<MonitoredAccount> removeAccountCommand;
-        private DelegateCommand purchaseAdUnlockCommand;
+        private DelegateCommand showKudosCommand;
         private bool isIapSubscriber;
+        private bool isKudoSelectorOpen;
 
         #endregion
 
@@ -149,11 +148,17 @@ namespace Hacked.ViewModels
             set => SetProperty(ref isIapSubscriber, value);
         }
 
+        public bool IsKudoSelectorOpen
+        {
+            get => isKudoSelectorOpen;
+            set => SetProperty(ref isKudoSelectorOpen, value);
+        }
+
         #endregion
 
         #region Commands
 
-        public DelegateCommand FindSelectedAccountBreachCommand => findSelectedAccountBreacheCommand ?? (findSelectedAccountBreacheCommand = new DelegateCommand(async () =>
+        public DelegateCommand FindSelectedAccountBreachCommand => findSelectedAccountBreachesCommand ?? (findSelectedAccountBreachesCommand = new DelegateCommand(async () =>
         {
             SelectedAccount.Breaches = await CheckForBreachesAsync(SelectedAccount);
             await SaveAccountsAsync();
@@ -178,9 +183,9 @@ namespace Hacked.ViewModels
             await FindAllAccountsBreachesAsync();
         }));
 
-        public DelegateCommand PurchaseAdUnlockCommand => purchaseAdUnlockCommand ?? (purchaseAdUnlockCommand = new DelegateCommand(async () =>
+        public DelegateCommand ShowKudosCommand => showKudosCommand ?? (showKudosCommand = new DelegateCommand(() =>
         {
-            await PurchaseAdUnlockAsync();
+            IsKudoSelectorOpen = !IsKudoSelectorOpen;
         }));
 
         #endregion
@@ -421,7 +426,7 @@ namespace Hacked.ViewModels
             }
         }
 
-        public async Task<bool> BackupAccountsToRoamingStorageAsync()
+        public async Task<bool> ExportAccountsAsync()
         {
             try
             {
@@ -547,26 +552,28 @@ namespace Hacked.ViewModels
 
         #region IAP
 
-        private async Task PurchaseAdUnlockAsync()
-        {
-            try
-            {
-                await new KudosDialog().ShowAsync();
-                IsBusy = true;
-                IsBusyMessage = "removing ads...";
+        
 
-                //AreAdsRemoved = await StoreHelpers.PurchaseAsync(StoreIds.RemoveAdsStoreId);
-            }
-            catch (Exception ex)
-            {
-                DisplayMessageHelpers.ShowExceptionMessageOnUiThread("PurchaseAdUnlockAsync", ex);
-            }
-            finally
-            {
-                IsBusy = false;
-                IsBusyMessage = "";
-            }
-        }
+        //private async Task PurchaseAdUnlockAsync()
+        //{
+        //    try
+        //    {
+        //        //await new KudosDialog().ShowAsync();
+        //        IsBusy = true;
+        //        IsBusyMessage = "removing ads...";
+
+        //        //AreAdsRemoved = await StoreHelpers.PurchaseAsync(StoreIds.RemoveAdsStoreId);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        DisplayMessageHelpers.ShowExceptionMessageOnUiThread("PurchaseAdUnlockAsync", ex);
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //        IsBusyMessage = "";
+        //    }
+        //}
 
         public async Task RefreshPurchasesAsync()
         {

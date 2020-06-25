@@ -1,8 +1,18 @@
-﻿using System;
+﻿using Hacked.BackgroundTasks;
+using Hacked.Core.Args;
+using Hacked.Core.Common;
+using Hacked.Core.Models;
+using Hacked.Core.Primitives;
+using Hacked.Dialogs;
+using Hacked.Helpers;
+using Hacked.ViewModels;
+using Microsoft.Services.Store.Engagement;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using VungleSDK;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.Core;
@@ -18,16 +28,6 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using Hacked.BackgroundTasks;
-using Hacked.Core.Common;
-using Hacked.Core.Models;
-using Hacked.Core.Primitives;
-using Hacked.Dialogs;
-using Hacked.Helpers;
-using Hacked.ViewModels;
-using Microsoft.Services.Store.Engagement;
-using VungleSDK;
-using VungleSDK.UI;
 
 namespace Hacked
 {
@@ -43,6 +43,7 @@ namespace Hacked
         private readonly VungleAd vungleSdk;
         private const string VungleAppId = "5e347706c28ba7001748f549";
         private const string VungleMainInterstitialPlacementId = "MAININTERSTITIAL-8569070";
+        private const string VungleKudoPlacementId = "KUDOSAD-0259168";
         private const string VungleApiEndpoint = "https://ads.api.vungle.com";
 
         public MainPage()
@@ -190,7 +191,7 @@ namespace Hacked
 
         private async void BackupAccountsButton_OnClick(object sender, RoutedEventArgs e)
         {
-            if (await vm.BackupAccountsToRoamingStorageAsync())
+            if (await vm.ExportAccountsAsync())
             {
                 await
                     new MessageDialog("Your account list has been backed up.\r\n\nPlease note that this change make take several minutes to appear across all your devices.",
@@ -259,11 +260,11 @@ namespace Hacked
             await StoreServicesFeedbackLauncher.GetDefault().LaunchAsync();
         }
 
-        private void HelpButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            HelpOverlay.Visibility = Visibility.Visible;
-            AboutButtonFlyout?.Hide();
-        }
+        //private void HelpButton_OnClick(object sender, RoutedEventArgs e)
+        //{
+        //    HelpOverlay.Visibility = Visibility.Visible;
+        //    AboutButtonFlyout?.Hide();
+        //}
 
         #endregion
 
@@ -580,7 +581,7 @@ namespace Hacked
 
         private async void VungleSdkOnAdPlayableChanged(object sender, AdPlayableEventArgs e)
         {
-            Trace.WriteLine($"Ad Changed : {e.Placement}");
+            Trace.WriteLine($"Ad Changed - Placement: {e.Placement}, IsPlayable: {e.AdPlayable}");
 
             if (VungleMainInterstitialPlacementId.Equals(e.Placement))
             {
@@ -590,16 +591,14 @@ namespace Hacked
                     {
                         try
                         {
-                            if (vungleSdk.IsAdPlayable(e.Placement))
-                            {
-                                PlayAdButton.IsEnabled = true;
-                            }
-                            else
-                            {
-                                // Maybe we got a "sleep" code.  Let's try to Load Ad Again
-                                vungleSdk.LoadAd(e.Placement);
+                            var playable = vungleSdk.IsAdPlayable(e.Placement);
 
-                                PlayAdButton.IsEnabled = false;
+                            PlayAdButton.IsEnabled = playable;
+
+                            if (!playable)
+                            {
+                                // Possible "sleep" code, try to Load Ad Again
+                                vungleSdk.LoadAd(e.Placement);
                             }
                         }
                         catch (Exception ex)
@@ -607,8 +606,6 @@ namespace Hacked
                             Trace.WriteLine(ex.ToString());
                         }
                     });
-
-                    // Only playing ad via user click in PlayAdButton_OnClick.
                 }
                 else
                 {
@@ -618,6 +615,48 @@ namespace Hacked
                     {
                         PlayAdButton.IsEnabled = false;
                     });
+                }
+            }
+
+            if (VungleKudoPlacementId.Equals(e.Placement))
+            {
+                if (e.AdPlayable)
+                {
+                    await CoreApplication.MainView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        try
+                        {
+                            var playable =  vungleSdk.IsAdPlayable(e.Placement);
+
+                            // TODO work on disabling replay-ability too soon
+                            //if (KudosCtrl.Kudoses.FirstOrDefault() is Kudos adKudo)
+                            //{
+                            //    adKudo.IsBusy = playable;
+                            //}
+
+                            if(!playable)
+                            {
+                                vungleSdk.LoadAd(e.Placement);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(ex.ToString());
+                        }
+                    });
+                }
+                else
+                {
+                    vungleSdk.LoadAd(VungleKudoPlacementId);
+
+                    // TODO work on disabling replay-ability too soon
+                    //await CoreApplication.MainView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    //{
+                    //    if (KudosCtrl.Kudoses.FirstOrDefault() is Kudos adKudo)
+                    //    {
+                    //        adKudo.IsBusy = true;
+                    //    }
+                    //});
                 }
             }
         }
@@ -642,10 +681,15 @@ namespace Hacked
         {
             if (e.Message != null && (e.Message.ToLower().Contains("exception") || e.Message.ToLower().Contains("error")))
             {
-                Trace.WriteLine(e.Message);
+                Trace.WriteLine($"VungleAd1: {e.Message}");
             }
         }
 
         #endregion
+
+        private async void KudoAdRequested(object sender, AdRequestedArgs e)
+        {
+            await vungleSdk.PlayAdAsync(new AdConfig {Placement = e.PlacementId}, e.PlacementId);
+        }
     }
 }
