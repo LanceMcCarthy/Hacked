@@ -1,6 +1,6 @@
-﻿using Windows.UI.Xaml;
+﻿using Hacked.Core.Models;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Hacked.Core.Models;
 
 namespace Hacked.Dialogs
 {
@@ -40,8 +40,6 @@ namespace Hacked.Dialogs
                 this.Title = this.SelectedBreach.Title;
 
                 BreachDetailsWebView.NavigateToString(this.SelectedBreach.Description);
-                
-                //IconWebView.Source = new Uri($"https://az594751.vo.msecnd.net/cdn/{SelectedBreach.Name}.{SelectedBreach.LogoType}", UriKind.Absolute);
             }
 
         }
