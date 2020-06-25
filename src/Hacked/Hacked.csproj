@@ -20,10 +20,10 @@
     <PackageCertificateKeyFile>
     </PackageCertificateKeyFile>
     <ApplicationInsightsResourceId>/subscriptions/48ab4839-62af-4ab3-afe6-043ea4d7c137/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/Hacked</ApplicationInsightsResourceId>
-    <PackageCertificateThumbprint>F59E815B12EB302AFB967D855BDEC315D27DB6B3</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>261EBF50B765169CE9F863414F7BC3035C10AD6C</PackageCertificateThumbprint>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
-    <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
+    <AppxBundlePlatforms>x86|x64|arm|arm64</AppxBundlePlatforms>
     <RuntimeIdentifiers>win10-arm;win10-arm-aot;win10-x86;win10-x86-aot;win10-x64;win10-x64-aot;win10-arm64;win10-arm64-aot</RuntimeIdentifiers>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppInstallerUpdateFrequency>0</AppInstallerUpdateFrequency>
@@ -114,14 +114,16 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="AttachedProperties\DetailsViewProperties.cs" />
+    <Compile Include="Controls\KudosControl.xaml.cs">
+      <DependentUpon>KudosControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Helpers\StoreHelpers.cs" />
     <Compile Include="Helpers\DesignTimeData.cs" />
     <Compile Include="Helpers\DispatcherTaskExtensions.cs" />
     <Compile Include="Helpers\BackgroundTaskHelpers.cs" />
     <Compile Include="Controls\AddAccount.xaml.cs">
       <DependentUpon>AddAccount.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\Help.xaml.cs">
-      <DependentUpon>Help.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\LancelotSoftware.xaml.cs">
       <DependentUpon>LancelotSoftware.xaml</DependentUpon>
@@ -195,19 +197,23 @@
     <Content Include="Assets\Wide310x150Logo.scale-125.png" />
     <Content Include="Assets\Wide310x150Logo.scale-150.png" />
     <Content Include="Assets\Wide310x150Logo.scale-400.png" />
-    <Content Include="Images\000webhost.png" />
-    <Content Include="Images\38148348_s.jpg" />
-    <Content Include="Images\Adobe.png" />
+    <Content Include="Images\4starStar_Colored.png" />
+    <Content Include="Images\4starStar.png" />
+    <Content Include="Images\APIFeeKudo_Colored.png" />
+    <Content Include="Images\CoffeeKudo_Colored.png" />
+    <Content Include="Images\CoffeeKudo.png" />
     <Content Include="Images\Damaged_NormalMap.jpg" />
-    <Content Include="Images\Flashback.png" />
-    <Content Include="Images\Forbes.png" />
-    <Content Include="Images\Gawker.png" />
+    <Content Include="Images\DinnerKudo_Colored.png" />
+    <Content Include="Images\DinnerKudo.png" />
     <Content Include="Images\ListFallBackIcon.jpg" />
     <Content Include="Images\LoadingPlaceholder.jpg" />
-    <Content Include="Images\MangaTraders.png" />
-    <Content Include="Images\MPGH.png" />
-    <Content Include="Images\Stratfor.png" />
+    <Content Include="Images\LunchKudo_Colored.png" />
+    <Content Include="Images\LunchKudo.png" />
+    <Content Include="Images\RecurringKudo_Colored.png" />
+    <Content Include="Images\RemoveAdKudo_Colored.png" />
     <None Include="Package.StoreAssociation.xml" />
+    <Content Include="Images\VideoAd_Colored.png" />
+    <Content Include="Images\VideoAd.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\Square150x150Logo.scale-200.png" />
@@ -224,7 +230,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\Help.xaml">
+    <Page Include="Controls\KudosControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -307,7 +313,7 @@
       <Version>1.0.1.9</Version>
     </PackageReference>
     <PackageReference Include="VungleSDK">
-      <Version>6.5.2</Version>
+      <Version>6.7.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />
