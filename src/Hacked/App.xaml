@@ -4,8 +4,8 @@
              xmlns:converters="using:Hacked.Converters"
              xmlns:viewModels="using:Hacked.ViewModels"
              xmlns:animations="using:Microsoft.Toolkit.Uwp.UI.Animations"
-             xmlns:controls="using:Telerik.UI.Xaml.Controls"
              xmlns:primitives="using:Telerik.UI.Xaml.Controls.Primitives"
+             xmlns:tkControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
              RequestedTheme="Light">
 
     <Application.Resources>
@@ -50,6 +50,14 @@
             <!--<Style TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="Nirmala UI" />
             </Style>-->
+
+            <Style x:Key="SubtleSmallStyle"
+                   TargetType="TextBlock">
+                <Setter Property="FontSize"
+                        Value="10" />
+                <Setter Property="Foreground"
+                        Value="WhiteSmoke" />
+            </Style>
 
             <Style x:Key="PageBusyIndicatorStyle"
                    TargetType="primitives:RadBusyIndicator">
