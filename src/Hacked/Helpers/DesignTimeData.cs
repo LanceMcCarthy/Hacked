@@ -17,6 +17,7 @@ namespace Hacked.Helpers
                 {
                     new Breach
                     {
+                        IsNew = true,
                         Title = "000webhost",
                         Name = "000webhost",
                         Domain = "000webhost.com",
@@ -24,9 +25,8 @@ namespace Hacked.Helpers
                         ModifiedDate = DateTime.Now.ToString("d"),
                         AddedDate = DateTime.Now.ToString("d"),
                         PwnCount = 13545468,
-                        Description =
-                            "In approximately March 2015, the free web hosting provider <a href=\"http://www.troyhunt.com/2015/10/breaches-traders-plain-text-passwords.html\" target=\"_blank\">000webhost suffered a major data breach</a> that exposed over 13 million customer records. The data was sold and traded before 000webhost was alerted in October. The breach included names, email addresses and plain text passwords.",
-                        DataClasses = new List<string>() {"Email addresses", "IP addresses", "Names", "Passwords"},
+                        Description = "In approximately March 2015, the free web hosting provider <a href=\"http://www.troyhunt.com/2015/10/breaches-traders-plain-text-passwords.html\" target=\"_blank\">000webhost suffered a major data breach</a> that exposed over 13 million customer records. The data was sold and traded before 000webhost was alerted in October. The breach included names, email addresses and plain text passwords.",
+                        DataClasses = new List<string>() {"Email addresses", "IP addresses", "Names", "Passwords", "IP addresses", "Names", "Passwords", "IP addresses", "Names", "Passwords"},
                         IsVerified = true,
                         IsSensitive = false,
                         LogoPath = new Uri("https://haveibeenpwned.com/Content/Images/PwnedLogos/000webhost.png"),

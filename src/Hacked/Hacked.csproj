@@ -20,7 +20,7 @@
     <PackageCertificateKeyFile>
     </PackageCertificateKeyFile>
     <ApplicationInsightsResourceId>/subscriptions/48ab4839-62af-4ab3-afe6-043ea4d7c137/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/Hacked</ApplicationInsightsResourceId>
-    <PackageCertificateThumbprint>261EBF50B765169CE9F863414F7BC3035C10AD6C</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>F59E815B12EB302AFB967D855BDEC315D27DB6B3</PackageCertificateThumbprint>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86|x64|arm|arm64</AppxBundlePlatforms>
@@ -114,6 +114,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="AttachedProperties\DetailsViewProperties.cs" />
+    <Compile Include="Controls\AdaptiveGridView.cs" />
     <Compile Include="Controls\KudosControl.xaml.cs">
       <DependentUpon>KudosControl.xaml</DependentUpon>
     </Compile>
