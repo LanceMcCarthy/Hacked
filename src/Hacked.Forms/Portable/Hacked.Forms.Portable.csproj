@@ -16,7 +16,7 @@
     <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
     <PackageReference Include="Xamarin.Forms" Version="4.5.0.356" />
     <PackageReference Include="SkiaSharp" Version="2.80.1" />
-    <PackageReference Include="SkiaSharp.Views.Forms " Version="2.80.1" />
+    <PackageReference Include="SkiaSharp.Views.Forms " Version="2.80.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Hacked.Core\Hacked.Core.csproj" />
@@ -28,7 +28,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="SkiaSharp.Views.Forms" Version="2.80.1" />
+    <PackageReference Update="SkiaSharp.Views.Forms" Version="2.80.2" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Styles\CustomStyles.xaml">
