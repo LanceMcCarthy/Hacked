@@ -310,7 +310,7 @@
       <Version>2.0.3</Version>
     </PackageReference>
     <PackageReference Include="Telerik.UI.for.UniversalWindowsPlatform">
-      <Version>1.0.1.9</Version>
+      <Version>1.0.2.1</Version>
     </PackageReference>
     <PackageReference Include="VungleSDK">
       <Version>6.7.0</Version>
