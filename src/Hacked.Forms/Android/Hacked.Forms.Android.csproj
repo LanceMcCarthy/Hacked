@@ -57,7 +57,7 @@
     </PackageReference>
     <PackageReference Include="Xamarin.Forms" Version="4.5.0.356" />
     <PackageReference Include="SkiaSharp" Version="2.80.2" />
-    <PackageReference Include="SkiaSharp.Views " Version="1.68.1.1" />
+    <PackageReference Include="SkiaSharp.Views " Version="2.80.2" />
     <PackageReference Include="SkiaSharp.Views.Forms " Version="2.80.2" />
     <PackageReference Include="Xamarin.Android.Support.v4" Version="28.0.0.3" />
     <PackageReference Include="Xamarin.Android.Support.Design" Version="28.0.0.3" />
