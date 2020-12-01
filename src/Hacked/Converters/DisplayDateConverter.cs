@@ -7,11 +7,35 @@ namespace Hacked.Converters
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            return value;
+            try
+            {
+                if (value is string dateString)
+                {
+                    DateTime.TryParse(dateString, out var outDate);
 
-            //TODO fix DateTime parse
-            //DateTime date;
-            //return DateTime.TryParse((string)value, out date) ? date.ToString("g") : value;
+                    return outDate.ToString("d");
+                }
+
+                if (value is DateTime dDate)
+                {
+                    return dDate.ToString("d");
+                }
+
+                try
+                {
+                    return ((DateTime?)value).Value.ToString("d");
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+
+            return value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
