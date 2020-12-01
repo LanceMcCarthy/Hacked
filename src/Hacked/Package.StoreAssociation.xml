@@ -379,7 +379,6 @@
     <MainPackageIdentityName>61469LanceLotSoftware.BandWallpaper</MainPackageIdentityName>
     <MainPackageIdentityName>61469LanceLotSoftware.BiometricLieDetector</MainPackageIdentityName>
     <MainPackageIdentityName>61469LanceLotSoftware.ConferencedIn</MainPackageIdentityName>
-    <MainPackageIdentityName>61469LanceLotSoftware.DevReachCompanion</MainPackageIdentityName>
     <MainPackageIdentityName>61469LanceLotSoftware.DVLUP</MainPackageIdentityName>
     <MainPackageIdentityName>61469LanceLotSoftware.Fail</MainPackageIdentityName>
     <MainPackageIdentityName>61469LanceLotSoftware.FantasyFootballFeeds</MainPackageIdentityName>
@@ -413,58 +412,5 @@
     <MainPackageIdentityName>61469LanceLotSoftware.VSauceSupreme</MainPackageIdentityName>
     <MainPackageIdentityName>61469LanceLotSoftware.XKCDComicViewer</MainPackageIdentityName>
   </AccountPackageIdentityNames>
-  <PackageInfoList LandingUrl="https://developer.microsoft.com/dashboard/Application?appId=9NBLGGH6850J">
-    <BundleInfo>
-      <PackageInfo>
-        <OsMinVersion>0.0.0.0</OsMinVersion>
-        <PackageArchitecture>X86</PackageArchitecture>
-        <PackageMaxArchitectureVersion>1.6.1.0</PackageMaxArchitectureVersion>
-      </PackageInfo>
-      <PackageInfo>
-        <OsMinVersion>0.0.0.0</OsMinVersion>
-        <PackageArchitecture>X64</PackageArchitecture>
-        <PackageMaxArchitectureVersion>1.6.1.0</PackageMaxArchitectureVersion>
-      </PackageInfo>
-      <PackageInfo>
-        <OsMinVersion>0.0.0.0</OsMinVersion>
-        <PackageArchitecture>Arm</PackageArchitecture>
-        <PackageMaxArchitectureVersion>1.6.1.0</PackageMaxArchitectureVersion>
-      </PackageInfo>
-      <PackageInfo>
-        <OsMinVersion>0.0.0.0</OsMinVersion>
-        <PackageArchitecture>Neutral</PackageArchitecture>
-        <PackageMaxArchitectureVersion>1.6.1.0</PackageMaxArchitectureVersion>
-      </PackageInfo>
-      <PackageInfo>
-        <OsMinVersion>0.0.0.0</OsMinVersion>
-        <PackageArchitecture>Neutral</PackageArchitecture>
-        <PackageMaxArchitectureVersion>1.6.1.0</PackageMaxArchitectureVersion>
-      </PackageInfo>
-      <PackageInfo>
-        <OsMinVersion>0.0.0.0</OsMinVersion>
-        <PackageArchitecture>Neutral</PackageArchitecture>
-        <PackageMaxArchitectureVersion>1.6.1.0</PackageMaxArchitectureVersion>
-      </PackageInfo>
-      <PackageInfo>
-        <OsMinVersion>0.0.0.0</OsMinVersion>
-        <PackageArchitecture>Neutral</PackageArchitecture>
-        <PackageMaxArchitectureVersion>1.6.1.0</PackageMaxArchitectureVersion>
-      </PackageInfo>
-      <PackageInfo>
-        <OsMinVersion>0.0.0.0</OsMinVersion>
-        <PackageArchitecture>Neutral</PackageArchitecture>
-        <PackageMaxArchitectureVersion>1.6.1.0</PackageMaxArchitectureVersion>
-      </PackageInfo>
-      <PackageInfo>
-        <OsMinVersion>0.0.0.0</OsMinVersion>
-        <PackageArchitecture>Neutral</PackageArchitecture>
-        <PackageMaxArchitectureVersion>1.6.1.0</PackageMaxArchitectureVersion>
-      </PackageInfo>
-      <PackageInfo>
-        <OsMinVersion>0.0.0.0</OsMinVersion>
-        <PackageArchitecture>Neutral</PackageArchitecture>
-        <PackageMaxArchitectureVersion>1.6.1.0</PackageMaxArchitectureVersion>
-      </PackageInfo>
-    </BundleInfo>
-  </PackageInfoList>
+  <PackageInfoList LandingUrl="https://developer.microsoft.com/dashboard/Application?appId=9NBLGGH6850J" />
 </StoreAssociation>

@@ -9,6 +9,7 @@ using Hacked.ViewModels;
 using Microsoft.Services.Store.Engagement;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -102,12 +103,12 @@ namespace Hacked
             {
                 if (account.Breaches.Count > 0)
                 {
-                    NoKnownBreachesGrid.Visibility = Visibility.Collapsed;
+                    //NoKnownBreachesGrid.Visibility = Visibility.Collapsed;
                     vm.SelectedBreach = vm.SelectedAccount.Breaches.FirstOrDefault();
                 }
                 else
                 {
-                    NoKnownBreachesGrid.Visibility = Visibility.Visible;
+                    //NoKnownBreachesGrid.Visibility = Visibility.Visible;
                 }
             }
 
@@ -472,18 +473,11 @@ namespace Hacked
         {
             await DispatcherTaskExtensions.CallOnUiThreadAsync(() =>
             {
-                var filterText = FilterTextBox.Text;
-
                 var breaches = ((MainViewModel)DataContext)?.SelectedAccount?.Breaches;
 
-                if (string.IsNullOrEmpty(filterText))
-                {
-                    BreachesListView.ItemsSource = breaches;
-                }
-
-                IEnumerable<Breach> filteredList = breaches?.Where(Filter);
-
-                BreachesListView.ItemsSource = filteredList;
+                BreachesListView.ItemsSource = string.IsNullOrEmpty(FilterTextBox.Text) 
+                    ? breaches 
+                    : breaches?.Where(Filter);
             });
         }
 
@@ -517,6 +511,7 @@ namespace Hacked
             {
                 toggleButton.Content = new SymbolIcon(Symbol.Filter);
                 FilterTextBox.Text = "";
+
                 BreachesListView.ItemsSource = ((MainViewModel)DataContext)?.SelectedAccount?.Breaches;
             }
         }
