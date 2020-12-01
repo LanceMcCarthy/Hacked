@@ -181,7 +181,7 @@
     <PackageReference Include="SkiaSharp" Version="2.80.2" />
     <PackageReference Include="SkiaSharp.Views " Version="2.80.2" />
     <PackageReference Include="SkiaSharp.Views.Forms " Version="2.80.2" />
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.10" />
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.11" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Portable\Hacked.Forms.Portable.csproj">
