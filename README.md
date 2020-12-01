@@ -7,6 +7,7 @@ An application so you can be notified of any data breaches that included your pe
 | Build Pipeline | Status                                   |
 |-----------|------------------------------------------|
 | Master (UWP)  | ![master](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Master) |
+| Beta (UWP) | ![UWP Beta](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Beta) |
 | Release (UWP) | ![release](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Release) |
 
 
