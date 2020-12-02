@@ -1,8 +1,12 @@
 # Hacked
 An application so you can be notified of any data breaches that included your personal information. Available on Desktop (Windows 10 and Mac), Mobile (iOS, Android and Windows Phone) and others (Xbox, Samsung TV).
 
-## DevOps
+### Installation Options
 
+*  [Prelease](https://dvlup.blob.core.windows.net/hacked-app-files/distributions/uwp_drop/index.html) (sideload w/automatic updates)
+* [Microsoft Store](https://www.microsoft.com/store/productId/9NBLGGH6850J)
+
+### Azure DevOps
 
 | Build Pipeline | Status                                   |
 |-----------|------------------------------------------|
@@ -12,7 +16,7 @@ An application so you can be notified of any data breaches that included your pe
 
 
 
-| Release Pipeline        | Status                                   |
+| Release Pipeline | Status |
 |-----------------|------------------------------------------|
-| Prerelease ([install](https://dvlup.blob.core.windows.net/hacked-app-files/distributions/uwp_drop/index.html))  | ![Prerelease badge](https://vsrm.dev.azure.com/lance/_apis/public/Release/badge/162ec65c-f681-4f5b-9aca-227480581bf5/2/2) |
+| Prerelease   | ![Prerelease badge](https://vsrm.dev.azure.com/lance/_apis/public/Release/badge/162ec65c-f681-4f5b-9aca-227480581bf5/2/2) |
 | Microsoft Store | ![Microsoft store badge](https://vsrm.dev.azure.com/lance/_apis/public/Release/badge/162ec65c-f681-4f5b-9aca-227480581bf5/1/1) |
