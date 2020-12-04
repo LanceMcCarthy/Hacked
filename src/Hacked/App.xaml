@@ -14,8 +14,6 @@
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
             </ResourceDictionary.MergedDictionaries>
 
-            <viewModels:MainViewModel x:Key="ViewModel" />
-
             <converters:ToggleButtonForegroundConverter x:Key="ToggleButtonForegroundConverter" />
             <converters:InvertBoolConverter x:Key="InvertBoolConverter" />
             <converters:DisplayDateConverter x:Key="DisplayDateConverter" />
