@@ -23,7 +23,7 @@
       <Extensions>
         <uap:Extension Category="windows.protocol">
           <uap:Protocol Name="hacked">
-            <uap:Logo>Assets\Icon.png</uap:Logo>
+            <uap:Logo>Assets\16x16.png</uap:Logo>
             <uap:DisplayName>Hacked?</uap:DisplayName>
           </uap:Protocol>
         </uap:Extension>
@@ -35,6 +35,14 @@
             <uap:DataFormat>URI</uap:DataFormat>
             <uap:DataFormat>Text</uap:DataFormat>
           </uap:ShareTarget>
+        </uap:Extension>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="hked">
+            <uap:Logo>Assets\48x48.png</uap:Logo>
+            <uap:SupportedFileTypes>
+              <uap:FileType>.hked</uap:FileType>
+            </uap:SupportedFileTypes>
+          </uap:FileTypeAssociation>
         </uap:Extension>
         <Extension Category="windows.updateTask" EntryPoint="Hacked.BackgroundTasks.UpdateTask" />
         <Extension Category="windows.backgroundTasks" EntryPoint="Hacked.BackgroundTasks.MonitoringTask">
