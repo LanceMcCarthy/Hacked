@@ -20,7 +20,10 @@ using Windows.ApplicationModel;
 using Windows.Foundation.Metadata;
 using Windows.Services.Store;
 using Windows.Storage;
+using Windows.Storage.Pickers;
+using Windows.Storage.Provider;
 using Windows.UI.Popups;
+using Hacked.Core.Comparers;
 
 namespace Hacked.ViewModels
 {
@@ -47,7 +50,7 @@ namespace Hacked.ViewModels
         private DelegateCommand findSelectedAccountBreachesCommand;
         private DelegateCommand<MonitoredAccount> removeAccountCommand;
         private DelegateCommand showKudosCommand;
-        private bool isIapSubscriber;
+        private bool isIapSubscriber = true;
         private bool isKudoSelectorOpen;
 
         #endregion
@@ -61,7 +64,7 @@ namespace Hacked.ViewModels
                 SelectedBreach = SelectedAccount?.Breaches?.FirstOrDefault();
                 HasAccounts = true;
                 AreAdsRemoved = true;
-                AppVersion = "1.0.1";
+                AppVersion = "1.0.2";
                 return;
             }
 
@@ -426,95 +429,154 @@ namespace Hacked.ViewModels
             }
         }
 
-        public async Task<bool> ExportAccountsAsync()
+        public async Task<Tuple<bool,string>> ExportAccountsAsync()
         {
             try
             {
-                var localAccountsStorageItem = await localFolder.TryGetItemAsync(Constants.LocalAccountsFileName);
+                Analytics.TrackEvent("Export Accounts");
 
-                if (!(localAccountsStorageItem is StorageFile localAccountsFile))
-                    return false;
+                var savePicker = new FileSavePicker
+                {
+                    SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+                    SuggestedFileName = $"AccountsBackup_{DateTime.Now.ToFileTimeUtc()}"
+                };
 
-                await localAccountsFile.CopyAsync(roamingFolder, Constants.RoamingAccountsBackupFileName, NameCollisionOption.ReplaceExisting);
+                savePicker.FileTypeChoices.Add("Hacked Accounts File", new List<string> { ".hked" });
 
-                Analytics.TrackEvent("Accounts Backed Up");
+                StorageFile file = await savePicker.PickSaveFileAsync();
 
-                return true;
+                if (file != null)
+                {
+                    // In case user is selecting a OneDrive/DropBox/etc location
+                    CachedFileManager.DeferUpdates(file);
+
+                    var json = JsonConvert.SerializeObject(Accounts);
+
+                    // write to file
+                    await FileIO.WriteTextAsync(file, json);
+
+                    // Tell OneDrive/Dropbox/etc we're done
+                    FileUpdateStatus status = await CachedFileManager.CompleteUpdatesAsync(file);
+
+                    if (status == FileUpdateStatus.Complete)
+                    {
+                        return new Tuple<bool, string>(true, $"{Accounts.Count} account(s) were exported to {file.Name}.");
+                    }
+                    else
+                    {
+                        return new Tuple<bool, string>(false, $"{file.Name} couldn't be saved.");
+                    }
+                }
+                else
+                {
+                    return new Tuple<bool, string>(false, "Save cancelled");
+                }
             }
             catch (Exception ex)
             {
+                Crashes.TrackError(ex);
                 DisplayMessageHelpers.ShowExceptionMessageOnUiThread("CopyAccountsToRoamingStorageAsync", ex);
-                return false;
+                return new Tuple<bool, string>(false, $"Error: {ex.Message}");
             }
         }
 
-        public async Task<bool> LoadMissingAccountsFromRoamingStorageAsync()
+        public async Task<Tuple<bool, string>> ImportAccountsAsync(IReadOnlyList<IStorageItem> launchFiles = null)
         {
             try
             {
                 IsBusy = true;
-                IsBusyMessage = "syncing data from backup...";
+                IsBusyMessage = "Importing accounts...";
 
-                var file = await roamingFolder.TryGetItemAsync(Constants.RoamingAccountsBackupFileName);
+                StorageFile file = null;
 
-                if (file == null)
+                // If the app was launched with file, then we already have the backup file
+                if (launchFiles != null &&
+                    launchFiles.Any() &&
+                    launchFiles[0] is StorageFile sf)
                 {
-                    Debug.WriteLine("Roaming accounts json file not found");
-                    await new MessageDialog("You do not currently have a backup file in your roaming storage. \r\n\nImportant Note: Changes to this file can sometimes take several minutes to become available to all your devices.", "Backup file not present").ShowAsync();
-                    return false;
-                }
-
-                if (file is StorageFile jsonFile)
-                {
-                    using (var fs = await jsonFile.OpenStreamForReadAsync())
-                    using (var streamReader = new StreamReader(fs))
+                    if (sf.FileType.Contains("hked"))
                     {
-                        var json = await streamReader.ReadToEndAsync();
-
-                        var syncedAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
-
-                        Debug.WriteLine($"--- {syncedAccounts?.Count} synced accounts found ---");
-
-                        if (syncedAccounts == null || syncedAccounts.Count == 0)
-                        {
-                            return false;
-                        }
-
-                        var addedAnAccount = false;
-
-                        foreach (var syncedAccount in syncedAccounts)
-                        {
-                            if (Accounts.All(a => a.Address != syncedAccount.Address))
-                            {
-                                Accounts.Add(syncedAccount);
-                                addedAnAccount = true;
-                            }
-                        }
-
-                        if (addedAnAccount)
-                        {
-                            await SaveAccountsAsync();
-                        }
-
-                        Analytics.TrackEvent("Accounts Restored from backup");
-
-                        return true;
+                        file = (StorageFile)launchFiles[0];
+                    }
+                    else
+                    {
+                        return new Tuple<bool, string>(false, $"Import cancelled. {sf.Name} is not a valid Hacked backup file (*.hked).");
                     }
                 }
+                else
+                {
+                    // Otherwise, show the file picker.
 
-                return false;
-            }
-            catch (FileNotFoundException)
-            {
-                Debug.WriteLine("synced accounts file not found");
-                DisplayMessageHelpers.ShowUserMessageOnUiThread("You do not currently have a backup file or it has not been synced yet.", "Backup file not found");
-                return false;
+                    var picker = new FileOpenPicker { ViewMode = PickerViewMode.List, SuggestedStartLocation = PickerLocationId.DocumentsLibrary };
+                    picker.FileTypeFilter.Add(".hked");
+
+                    file = await picker.PickSingleFileAsync();
+                }
+
+                if (file != null)
+                {
+                    ObservableCollection<MonitoredAccount> backupFileAccounts = null;
+
+                    try
+                    {
+                        var json = await FileIO.ReadTextAsync(file);
+
+                        backupFileAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
+                    }
+                    catch(Exception ex)
+                    {
+                        Crashes.TrackError(ex);
+                        Debug.WriteLine($"Import Deserialization failed: {ex.Message}");
+                    }
+
+                    if (backupFileAccounts == null)
+                    {
+                        return new Tuple<bool, string>(false, $"{file.Name} couldn't be loaded. Please make sure you are using a Hacked backup file (*.hked).");
+                    }
+
+                    // Find the exclusions between the list. These ones need to be added to the Accounts 
+                    var accountsToAdd = backupFileAccounts.Except(Accounts, new MonitoredAccountEqualityComparer()).ToList();
+
+                    var backupFileTotal = backupFileAccounts.Count;
+                    var newTotal = accountsToAdd.Count;
+                    var existingTotal = backupFileTotal - newTotal;
+
+                    Debug.WriteLine($"--- IMPORT: {backupFileTotal} accounts found in backup file, {newTotal} new accounts present, {existingTotal} skipped. ---");
+
+                    foreach (var acct in accountsToAdd)
+                    {
+                        Accounts.Add(acct);
+                    }
+
+                    await SaveAccountsAsync();
+
+                    if (Accounts.Any())
+                    {
+                        SelectedAccount = Accounts.FirstOrDefault();
+                        HasAccounts = true;
+                    }
+                    else
+                    {
+                        HasAccounts = false;
+                    }
+
+                    Analytics.TrackEvent("Accounts Restored from backup");
+
+                    return new Tuple<bool, string>(true, $"Import Complete:\r\n\n" +
+                                                         $"Accounts in file: {backupFileTotal}\n" +
+                                                         $"Imported: {newTotal}\n" +
+                                                         $"Skipped: {existingTotal} (already present)");
+                }
+                else
+                {
+                    return new Tuple<bool, string>(false, "Import cancelled");
+                }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"*****Accounts json file not loaded***** Error: {ex.Message}");
-                DisplayMessageHelpers.ShowExceptionMessageOnUiThread("LoadMissingAccountsFromRoamingStorageAsync", ex);
-                return false;
+                Crashes.TrackError(ex);
+                Debug.WriteLine($"ImportAccountsAsync Error: {ex.Message}");
+                return new Tuple<bool, string>(false, $"There was an error during import or file selection. Error: {ex.Message}");
             }
             finally
             {
@@ -523,36 +585,9 @@ namespace Hacked.ViewModels
             }
         }
 
-        public async Task<bool> DeleteBackupFileAsync()
-        {
-            try
-            {
-                var file = await roamingFolder.TryGetItemAsync(Constants.RoamingAccountsBackupFileName);
-
-                if (file == null)
-                {
-                    Debug.WriteLine("Accounts json file not found");
-                    return false;
-                }
-
-                await file.DeleteAsync(StorageDeleteOption.PermanentDelete);
-
-                Analytics.TrackEvent("Backup file deleted");
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                DisplayMessageHelpers.ShowExceptionMessageOnUiThread("DeleteBackupFileAsync", ex);
-                return false;
-            }
-        }
-
         #endregion
 
         #region IAP
-
-        
 
         //private async Task PurchaseAdUnlockAsync()
         //{
@@ -623,33 +658,8 @@ namespace Hacked.ViewModels
 
         #endregion
 
-        #region Automatic roaming management
-
-        //private async void RoamingStorage_DataChanged(ApplicationData sender, object args)
-        //{
-        //    Debug.WriteLine($"ApplicationData.Current.DataChanged fired at: {DateTime.Now}");
-
-        //    await DispatcherTaskExtensions.CallOnUiThreadAsync(async () =>
-        //    {
-        //        await LoadAccountsFromRoamingStorageAsync();
-        //    });
-        //}
-
-        //private async void Accounts_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        //{
-        //    Debug.WriteLine($"Accounts CollectionChanged Fired");
-
-        //    if (sender is ObservableCollection<MonitoredAccount> oc)
-        //    {
-        //        await DispatcherTaskExtensions.CallOnUiThreadAsync(() =>
-        //        {
-        //            Debug.WriteLine($"Accounts CollectionChanged - Current Count :{oc.Count}");
-        //            HasAccounts = oc.Any();
-        //        });
-        //    }
-        //}
-
-        #endregion
 
     }
+
+    
 }
