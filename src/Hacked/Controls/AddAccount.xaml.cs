@@ -1,4 +1,5 @@
-﻿using Hacked.ViewModels;
+﻿using System.Threading.Tasks;
+using Hacked.ViewModels;
 using Windows.ApplicationModel;
 using Windows.System;
 using Windows.UI.Core;
@@ -16,7 +17,15 @@ namespace Hacked.Controls
             InitializeComponent();
 
             if(!DesignMode.DesignModeEnabled)
+            {
                 CoreWindow.GetForCurrentThread().KeyDown += AddAccount_KeyDown;
+            }
+        }
+
+        public async Task FocusTextBoxAsync(FocusState state)
+        {
+            await Task.Delay(300);
+            EmailInput.Focus(state);
         }
 
         private void AddAccount_KeyDown(CoreWindow sender, KeyEventArgs args)
