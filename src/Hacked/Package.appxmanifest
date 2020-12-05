@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="61469LanceLotSoftware.Hacked" Publisher="CN=51B5A8B2-5D86-4826-BBE2-C92E963A4C02" Version="2020.624.2142.0" />
+  <Identity Name="61469LanceLotSoftware.Hacked" Publisher="CN=51B5A8B2-5D86-4826-BBE2-C92E963A4C02" Version="2020.708.857.0" />
   <mp:PhoneIdentity PhoneProductId="3e9d32ae-1a2c-4d51-b857-c93e2abda9c2" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Hacked?</DisplayName>
@@ -23,7 +23,7 @@
       <Extensions>
         <uap:Extension Category="windows.protocol">
           <uap:Protocol Name="hacked">
-            <uap:Logo>Assets\Icon.png</uap:Logo>
+            <uap:Logo>Assets\16x16.png</uap:Logo>
             <uap:DisplayName>Hacked?</uap:DisplayName>
           </uap:Protocol>
         </uap:Extension>
@@ -35,6 +35,14 @@
             <uap:DataFormat>URI</uap:DataFormat>
             <uap:DataFormat>Text</uap:DataFormat>
           </uap:ShareTarget>
+        </uap:Extension>
+        <uap:Extension Category="windows.fileTypeAssociation">
+          <uap:FileTypeAssociation Name="hked">
+            <uap:Logo>Assets\48x48.png</uap:Logo>
+            <uap:SupportedFileTypes>
+              <uap:FileType>.hked</uap:FileType>
+            </uap:SupportedFileTypes>
+          </uap:FileTypeAssociation>
         </uap:Extension>
         <Extension Category="windows.updateTask" EntryPoint="Hacked.BackgroundTasks.UpdateTask" />
         <Extension Category="windows.backgroundTasks" EntryPoint="Hacked.BackgroundTasks.MonitoringTask">

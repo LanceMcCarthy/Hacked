@@ -34,7 +34,6 @@ namespace Hacked
     public sealed partial class MainPage : Page
     {
         private readonly ApplicationDataContainer localSettings;
-        private readonly MainViewModel vm;
 
         private int updateFrequency = 720;
         private bool selectionMute;
@@ -50,8 +49,6 @@ namespace Hacked
         {
             InitializeComponent();
 
-            vm = DataContext as MainViewModel;
-
             if (!DesignMode.DesignMode2Enabled || !DesignMode.DesignModeEnabled)
             {
                 localSettings = ApplicationData.Current.LocalSettings;
@@ -60,8 +57,7 @@ namespace Hacked
             //https://publisher.vungle.com/applications/application/5e347706c28ba7001748f549
             //https://support.vungle.com/hc/en-us/articles/360003059331-Get-Started-with-Vungle-Windows-SDK-v-6
 
-            var sdkConfig = new VungleSDKConfig { ApiEndpoint = new Uri(VungleApiEndpoint) };
-            vungleSdk = AdFactory.GetInstance(VungleAppId, sdkConfig);
+            vungleSdk = AdFactory.GetInstance(VungleAppId, new VungleSDKConfig { ApiEndpoint = new Uri(VungleApiEndpoint) });
             vungleSdk.OnInitCompleted += VungleSdk_OnInitCompleted;
             vungleSdk.Diagnostic += VungleSdk_Diagnostic;
             vungleSdk.OnAdPlayableChanged += VungleSdkOnAdPlayableChanged;
@@ -69,12 +65,16 @@ namespace Hacked
 
         #region event handlers
 
-        private void AddAccountButton_Click(object sender, RoutedEventArgs e)
+        private async void AddAccountButton_Click(object sender, RoutedEventArgs e)
         {
             AddAccountOverlay.Visibility = Visibility.Visible;
 
             if (RootSplitView.IsPaneOpen && WindowStates.CurrentState?.Name == "NarrowState")
+            {
                 RootSplitView.IsPaneOpen = false;
+            }
+
+            await AddAccountOverlay.FocusTextBoxAsync(FocusState.Pointer);
         }
 
         private void BreachesListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -102,18 +102,15 @@ namespace Hacked
             {
                 if (account.Breaches.Count > 0)
                 {
-                    NoKnownBreachesGrid.Visibility = Visibility.Collapsed;
-                    vm.SelectedBreach = vm.SelectedAccount.Breaches.FirstOrDefault();
-                }
-                else
-                {
-                    NoKnownBreachesGrid.Visibility = Visibility.Visible;
+                    ViewModel.SelectedBreach = ViewModel.SelectedAccount.Breaches.FirstOrDefault();
                 }
             }
 
-            if (RootSplitView.DisplayMode == SplitViewDisplayMode.Overlay || RootSplitView.DisplayMode == SplitViewDisplayMode.CompactOverlay)
+            if (RootSplitView.DisplayMode == SplitViewDisplayMode.Overlay || 
+                RootSplitView.DisplayMode == SplitViewDisplayMode.CompactOverlay)
+            {
                 RootSplitView.IsPaneOpen = false;
-
+            }
         }
 
         private async void BreachInfoButton_Click(object sender, RoutedEventArgs e)
@@ -135,7 +132,7 @@ namespace Hacked
             }
             else
             {
-                await DisableTaskAsync();
+                await DisableBackgroundTaskAsync();
             }
         }
 
@@ -152,7 +149,7 @@ namespace Hacked
 
         private void CloseNoticeButton2_OnClick(object sender, RoutedEventArgs e)
         {
-            localSettings.Values[$"{vm.AppVersion}NoticeShown"] = true;
+            localSettings.Values[$"{ViewModel.AppVersion}NoticeShown"] = true;
             NoticeOverlay.Visibility = Visibility.Collapsed;
         }
 
@@ -191,56 +188,41 @@ namespace Hacked
 
         private async void BackupAccountsButton_OnClick(object sender, RoutedEventArgs e)
         {
-            if (await vm.ExportAccountsAsync())
-            {
-                await
-                    new MessageDialog("Your account list has been backed up.\r\n\nPlease note that this change make take several minutes to appear across all your devices.",
-                        "Success").ShowAsync();
-                BackupRestoreButtonFlyout?.Hide();
-            }
-        }
+            var result = await ViewModel.ExportAccountsAsync();
 
-        private async void RestoreAccountsButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (!await vm.LoadMissingAccountsFromRoamingStorageAsync())
-                return;
-
-            if (vm.Accounts.Any())
+            if (result.Item1)
             {
-                vm.SelectedAccount = vm.Accounts.FirstOrDefault();
-                vm.HasAccounts = true;
+                await new MessageDialog(result.Item2,"Success").ShowAsync();
             }
-            else
+            else if (!result.Item1)
             {
-                vm.HasAccounts = false;
+                await new MessageDialog(result.Item2, "Incomplete").ShowAsync();
             }
 
             BackupRestoreButtonFlyout?.Hide();
         }
 
-        private async void DeleteBackupHyperlinkButton_OnClick(object sender, RoutedEventArgs e)
+        private async void RestoreAccountsButton_OnClick(object sender, RoutedEventArgs e)
         {
-            var md = new MessageDialog("Confirm Delete!");
-            var confirmationCommand = new UICommand("delete");
-            md.Commands.Add(confirmationCommand);
-            md.Commands.Add(new UICommand("cancel"));
+            var result = await ViewModel.ImportAccountsAsync();
 
-            var selectedCommand = await md.ShowAsync();
-
-            if (selectedCommand != confirmationCommand) return;
-
-            if (await vm.DeleteBackupFileAsync())
+            if (result.Item1)
             {
-                var message = "You have deleted the backup file.\r\n\nPlease note that this change make take several minutes to appear across all your devices.";
-                await new MessageDialog(message, "Deleted").ShowAsync();
+                await new MessageDialog(result.Item2, "Success").ShowAsync();
             }
+            else if (!result.Item1)
+            {
+                await new MessageDialog(result.Item2, "Incomplete").ShowAsync();
+            }
+
+            BackupRestoreButtonFlyout?.Hide();
         }
 
         private async void ClearNewHyperlinkButton_OnClick(object sender, RoutedEventArgs e)
         {
             var saveNeeded = false;
 
-            foreach (var breach in vm.SelectedAccount.Breaches)
+            foreach (var breach in ViewModel.SelectedAccount.Breaches)
             {
                 if (breach.IsNew)
                 {
@@ -251,7 +233,7 @@ namespace Hacked
 
             if (saveNeeded)
             {
-                await vm.SaveAccountsAsync();
+                await ViewModel.SaveAccountsAsync();
             }
         }
 
@@ -259,12 +241,6 @@ namespace Hacked
         {
             await StoreServicesFeedbackLauncher.GetDefault().LaunchAsync();
         }
-
-        //private void HelpButton_OnClick(object sender, RoutedEventArgs e)
-        //{
-        //    HelpOverlay.Visibility = Visibility.Visible;
-        //    AboutButtonFlyout?.Hide();
-        //}
 
         #endregion
 
@@ -298,21 +274,28 @@ namespace Hacked
                 : new SolidColorBrush(Colors.Red);
         }
 
-        private void NotifyUser()
+        private void NotifyUserOfUpdatesOrChanges()
         {
             var noticeShown = false;
 
-            if (localSettings.Values.TryGetValue($"{vm.AppVersion}NoticeShown", out var hasShownNoticeSetting))
+            if (localSettings.Values.TryGetValue($"{ViewModel.AppVersion}NoticeShown", out var hasShownNoticeSetting))
             {
                 noticeShown = (bool)hasShownNoticeSetting;
             }
 
-            NoticeOverlay.Visibility = noticeShown ? Visibility.Collapsed : Visibility.Visible;
-
-            // TODO -REMOVE after 1.6 update. The user needed a forced refresh after updating to v3 API
             if (!noticeShown)
             {
-                vm.FindAllAccountBreachesCommand.Execute(null);
+                NoticeTitle.Text = $"Updated! v.{ViewModel.AppVersion}";
+
+                NoticeFeaturesTextBlock.Text = "- New Grid view design for easier and faster breach browsing\n" +
+                                               "- Export and Import!  Backup your accounts list to a small file\n" +
+                                               "- Fluent Design elements throughout the app; shadow, light and blur effects\n" +
+                                               "- Migration to v3 API complete, no more restricted regions!\n";
+                NoticeFixesTextBlock.Text = "- Optimized data loading and saving methods\n" +
+                                            "- Faster UI loading times\n" +
+                                            "- Dozens of smaller improvements";
+
+                NoticeOverlay.Visibility = Visibility.Visible;
             }
         }
 
@@ -320,12 +303,12 @@ namespace Hacked
         {
             try
             {
-                vm.IsBusy = true;
-                vm.IsBusyMessage = "opening email...";
+                ViewModel.IsBusy = true;
+                ViewModel.IsBusyMessage = "opening email...";
 
                 var email = new EmailMessage();
                 email.To.Add(new EmailRecipient("awesome.apps@outlook.com", "Lancelot Software"));
-                email.Subject = $"Hacked {vm.AppVersion}";
+                email.Subject = $"Hacked {ViewModel.AppVersion}";
                 email.Body = "[write your message here]\r\n\n";
 
                 await EmailManager.ShowComposeNewEmailAsync(email);
@@ -338,8 +321,8 @@ namespace Hacked
             }
             finally
             {
-                vm.IsBusy = false;
-                vm.IsBusyMessage = "";
+                ViewModel.IsBusy = false;
+                ViewModel.IsBusyMessage = "";
             }
         }
 
@@ -351,8 +334,8 @@ namespace Hacked
         {
             try
             {
-                vm.IsBusy = true;
-                vm.IsBusyMessage = "configuring Background Task";
+                ViewModel.IsBusy = true;
+                ViewModel.IsBusyMessage = "configuring Background Task";
 
                 var accessStatus = await BackgroundExecutionManager.RequestAccessAsync();
 
@@ -389,17 +372,17 @@ namespace Hacked
             }
             finally
             {
-                vm.IsBusy = false;
-                vm.IsBusyMessage = "";
+                ViewModel.IsBusy = false;
+                ViewModel.IsBusyMessage = "";
             }
         }
 
-        private async Task DisableTaskAsync()
+        private async Task DisableBackgroundTaskAsync()
         {
             try
             {
-                vm.IsBusy = true;
-                vm.IsBusyMessage = "removing background task...";
+                ViewModel.IsBusy = true;
+                ViewModel.IsBusyMessage = "removing background task...";
 
                 // Unregister the task and confirm to user it was successful
                 if (await BackgroundTaskHelpers.UnregisterTaskAsync(Constants.MonitorTaskName))
@@ -413,8 +396,8 @@ namespace Hacked
             }
             finally
             {
-                vm.IsBusyMessage = "";
-                vm.IsBusy = false;
+                ViewModel.IsBusyMessage = "";
+                ViewModel.IsBusy = false;
             }
         }
 
@@ -472,18 +455,11 @@ namespace Hacked
         {
             await DispatcherTaskExtensions.CallOnUiThreadAsync(() =>
             {
-                var filterText = FilterTextBox.Text;
-
                 var breaches = ((MainViewModel)DataContext)?.SelectedAccount?.Breaches;
 
-                if (string.IsNullOrEmpty(filterText))
-                {
-                    BreachesListView.ItemsSource = breaches;
-                }
-
-                IEnumerable<Breach> filteredList = breaches?.Where(Filter);
-
-                BreachesListView.ItemsSource = filteredList;
+                BreachesListView.ItemsSource = string.IsNullOrEmpty(FilterTextBox.Text) 
+                    ? breaches 
+                    : breaches?.Where(Filter);
             });
         }
 
@@ -517,6 +493,7 @@ namespace Hacked
             {
                 toggleButton.Content = new SymbolIcon(Symbol.Filter);
                 FilterTextBox.Text = "";
+
                 BreachesListView.ItemsSource = ((MainViewModel)DataContext)?.SelectedAccount?.Breaches;
             }
         }
@@ -529,7 +506,7 @@ namespace Hacked
         {
             base.OnNavigatedTo(e);
 
-            await vm.InitializeApp();
+            await ViewModel.InitializeApp();
 
             selectionMute = true;
 
@@ -537,24 +514,36 @@ namespace Hacked
 
             selectionMute = false;
 
-            if (vm.Accounts.Count == 0)
+            if (ViewModel.Accounts.Count == 0)
+            {
                 RootSplitView.IsPaneOpen = true;
+            }
 
-#if ADD_BACK
+//#if ADD_BACK
+            
+//#else
+//            FeedbackHubButton.Visibility = Visibility.Collapsed;
+//#endif
             FeedbackHubButton.Visibility = StoreServicesFeedbackLauncher.IsSupported()
                 ? Visibility.Visible
                 : Visibility.Collapsed;
-#else
-            FeedbackHubButton.Visibility = Visibility.Collapsed;
-#endif
-            NotifyUser();
 
-            // Unfortunately, VungleMainFeedPlacementId is a FlexFeed Ad, which Vungle no longer supports
-            // Also, we don't want to load an Ad until Vungle's initialization has completed
-            // See the OnInitCompleted handler
-            // vungleSdk.LoadAd(VungleMainFeedPlacementId);
-            //await vungleSdk.PlayAdAsync(new AdConfig(), VungleMainFeedPlacementId);
-            //await vungleSdk.PlayAdAsync(new AdConfig(), VungleMainInterstitialPlacementId);
+            // FILE ACTIVATION
+            if (e.Parameter is IReadOnlyList<IStorageItem> launchFiles)
+            {
+                var result = await ViewModel.ImportAccountsAsync(launchFiles);
+
+                if (result.Item1)
+                {
+                    await new MessageDialog(result.Item2, "Success").ShowAsync();
+                }
+                else if (!result.Item1)
+                {
+                    await new MessageDialog(result.Item2, "Incomplete").ShowAsync();
+                }
+            }
+
+            NotifyUserOfUpdatesOrChanges();
         }
 
         #endregion
@@ -685,11 +674,11 @@ namespace Hacked
             }
         }
 
-        #endregion
-
         private async void KudoAdRequested(object sender, AdRequestedArgs e)
         {
-            await vungleSdk.PlayAdAsync(new AdConfig {Placement = e.PlacementId}, e.PlacementId);
+            await vungleSdk.PlayAdAsync(new AdConfig { Placement = e.PlacementId }, e.PlacementId);
         }
+
+        #endregion
     }
 }
