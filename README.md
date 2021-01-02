@@ -2,6 +2,8 @@
 
 An application so you can be notified of any data breaches that included your personal information. Available on Desktop (Windows 10 and Mac), Mobile (iOS, Android and Windows Phone) and others (Xbox, Samsung TV).
 
+![image](https://user-images.githubusercontent.com/3520532/103462956-e4d8a080-4cf6-11eb-8779-ed3cbf600977.png)
+
 ## Installation Options
 
 * [Prelease download](https://dvlup.blob.core.windows.net/hacked-app-files/distributions/uwp-drop/index.html) (sideload w/automatic updates)
