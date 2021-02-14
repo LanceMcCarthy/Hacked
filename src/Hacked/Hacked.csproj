@@ -313,7 +313,7 @@
       <Version>2.0.3</Version>
     </PackageReference>
     <PackageReference Include="Telerik.UI.for.UniversalWindowsPlatform">
-      <Version>2020.3.902.1</Version>
+      <Version>2021.1.113.1</Version>
     </PackageReference>
     <PackageReference Include="VungleSDK">
       <Version>6.8.0</Version>
