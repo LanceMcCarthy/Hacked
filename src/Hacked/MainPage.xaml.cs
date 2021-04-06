@@ -106,7 +106,7 @@ namespace Hacked
                 }
             }
 
-            if (RootSplitView.DisplayMode == SplitViewDisplayMode.Overlay || 
+            if (RootSplitView.DisplayMode == SplitViewDisplayMode.Overlay ||
                 RootSplitView.DisplayMode == SplitViewDisplayMode.CompactOverlay)
             {
                 RootSplitView.IsPaneOpen = false;
@@ -192,7 +192,7 @@ namespace Hacked
 
             if (result.Item1)
             {
-                await new MessageDialog(result.Item2,"Success").ShowAsync();
+                await new MessageDialog(result.Item2, "Success").ShowAsync();
             }
             else if (!result.Item1)
             {
@@ -287,13 +287,16 @@ namespace Hacked
             {
                 NoticeTitle.Text = $"Updated! v.{ViewModel.AppVersion}";
 
-                NoticeFeaturesTextBlock.Text = "- New Grid view design for easier and faster breach browsing\n" +
-                                               "- Export and Import!  Backup your accounts list to a small file\n" +
-                                               "- Fluent Design elements throughout the app; shadow, light and blur effects\n" +
-                                               "- Migration to v3 API complete, no more restricted regions!\n";
-                NoticeFixesTextBlock.Text = "- Optimized data loading and saving methods\n" +
-                                            "- Faster UI loading times\n" +
-                                            "- Dozens of smaller improvements";
+                NoticeFeaturesTextBlock.Text = 
+                    "- Add support for using a phone number\n" +
+                    "- Upgraded Microsoft Toolkit Controls\n" +
+                    "- Export and Import! Backup your accounts list to a small file\n" +
+                    "- More modernized Fluent Design elements throughout the app; shadow, light and blur effects\n" +
+                    "- Global access, no restricted regions due to API abuse.\n";
+                NoticeFixesTextBlock.Text =
+                    "- Removed spell checking for new account input\n" +
+                    "- Faster UI loading times\n" +
+                    "- Many more smaller improvements";
 
                 NoticeOverlay.Visibility = Visibility.Visible;
             }
@@ -457,8 +460,8 @@ namespace Hacked
             {
                 var breaches = ((MainViewModel)DataContext)?.SelectedAccount?.Breaches;
 
-                BreachesListView.ItemsSource = string.IsNullOrEmpty(FilterTextBox.Text) 
-                    ? breaches 
+                BreachesListView.ItemsSource = string.IsNullOrEmpty(FilterTextBox.Text)
+                    ? breaches
                     : breaches?.Where(Filter);
             });
         }
@@ -519,11 +522,11 @@ namespace Hacked
                 RootSplitView.IsPaneOpen = true;
             }
 
-//#if ADD_BACK
-            
-//#else
-//            FeedbackHubButton.Visibility = Visibility.Collapsed;
-//#endif
+            //#if ADD_BACK
+
+            //#else
+            //            FeedbackHubButton.Visibility = Visibility.Collapsed;
+            //#endif
             FeedbackHubButton.Visibility = StoreServicesFeedbackLauncher.IsSupported()
                 ? Visibility.Visible
                 : Visibility.Collapsed;
@@ -615,7 +618,7 @@ namespace Hacked
                     {
                         try
                         {
-                            var playable =  vungleSdk.IsAdPlayable(e.Placement);
+                            var playable = vungleSdk.IsAdPlayable(e.Placement);
 
                             // TODO work on disabling replay-ability too soon
                             //if (KudosCtrl.Kudoses.FirstOrDefault() is Kudos adKudo)
@@ -623,7 +626,7 @@ namespace Hacked
                             //    adKudo.IsBusy = playable;
                             //}
 
-                            if(!playable)
+                            if (!playable)
                             {
                                 vungleSdk.LoadAd(e.Placement);
                             }

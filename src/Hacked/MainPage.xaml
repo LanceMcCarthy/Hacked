@@ -863,7 +863,7 @@
                         <TextBlock Text="New:"
                                    FontWeight="Bold" />
                         <TextBlock x:Name="NoticeFeaturesTextBlock"
-                                   Text="this release has several new features and improvements" />
+                                   Text="This release has several new features and improvements" />
                         <TextBlock Text="Fixes:"
                                    FontWeight="Bold" />
                         <TextBlock x:Name="NoticeFixesTextBlock"
