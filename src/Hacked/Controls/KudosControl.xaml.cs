@@ -255,7 +255,7 @@ namespace Hacked.Controls
                 },
                 new Kudos
                 {
-                    Title = "1x API Fee",
+                    Title = "1mo API Fee",
                     Category = KudoCategory.Consumable,
                     StoreId = StoreIds.CoverApiFeeKudoStoreId,
                     Price = "$3.99",

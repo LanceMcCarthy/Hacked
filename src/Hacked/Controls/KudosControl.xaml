@@ -8,8 +8,8 @@
              xmlns:tkControls="using:Telerik.UI.Xaml.Controls"
              xmlns:primitives="using:Telerik.UI.Xaml.Controls.Primitives"
              xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-             xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI.Extensions"
              xmlns:animations="using:Microsoft.Toolkit.Uwp.UI.Animations"
+             xmlns:ui="using:Microsoft.Toolkit.Uwp.UI"
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800">
@@ -17,13 +17,13 @@
     <Grid Background="{ThemeResource SystemControlChromeHighAcrylicElementMediumBrush}">
         <controls:DropShadowPanel BlurRadius="20.0"
                                   ShadowOpacity="0.50"
-                                  OffsetX="5.0"
+                                  OffsetX="9.0"
                                   OffsetY="5.0"
                                   Color="Black"
                                   VerticalAlignment="Center"
                                   HorizontalAlignment="Center">
             <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-                  Margin="40">
+                  Margin="20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
@@ -94,7 +94,7 @@
                           ItemClick="KudosGridView_OnItemClick"
                           VerticalAlignment="Top"
                           Grid.Row="1"
-                          extensions:VisualExtensions.NormalizedCenterPoint="0.5,0.5,0"
+                          ui:VisualExtensions.NormalizedCenterPoint="0.5, 0.5"
                           animations:Implicit.ShowAnimations="{StaticResource CommonShowAnimations}"
                           animations:Implicit.HideAnimations="{StaticResource CommonHideAnimations}">
                     <GridView.ItemTemplate>
