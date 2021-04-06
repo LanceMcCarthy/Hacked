@@ -35,6 +35,7 @@
                              Foreground="White"
                              InputScope="EmailNameOrAddress"
                              PlaceholderText="enter email, username or phone number"
+                             IsSpellCheckEnabled="False"
                              TextChanged="TxtChanged"
                              Grid.ColumnSpan="2"
                              TabIndex="1" />
