@@ -10,5 +10,12 @@ namespace Hacked.Helpers
             var matches = Regex.Match(emailAddress, regexPattern);
             return matches.Success;
         }
+
+        public static bool ValidatePhoneNumber(string phoneNumberString)
+        {
+            const string regexPattern = @"^\+?(\d[\d-. ]+)?(\([\d-. ]+\))?[\d-. ]+\d$";
+            var matches = Regex.Match(phoneNumberString, regexPattern);
+            return matches.Success;
+        }
     }
 }
