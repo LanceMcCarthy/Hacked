@@ -1,0 +1,224 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Hacked.Wpf</RootNamespace>
+    <EnableDefaultItems>False</EnableDefaultItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.1.0" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.19041.1" />
+    <PackageReference Include="Telerik.Windows.Controls.Data.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Controls.Docking.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Controls.FileDialogs.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Controls.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Controls.GridView.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Controls.Input.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Controls.Navigation.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Controls.RichTextBox.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Data.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Documents.Core" Version="2021.1.118" />
+    <PackageReference Include="Telerik.Windows.Themes.Crystal.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Themes.Expression_Dark.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Themes.Fluent.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Themes.Green.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Themes.Material.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Themes.Office2013.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Themes.Office2016.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Themes.Summer.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Themes.Transparent.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Themes.Vista.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Themes.VisualStudio2013.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Themes.VisualStudio2019.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Themes.Windows7.for.Wpf" Version="2021.1.119" />
+    <PackageReference Include="Telerik.Windows.Themes.Windows8.for.Wpf" Version="2021.1.119" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
+    <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Compile Remove="Properties\Resources.Designer.cs" />
+    <Compile Remove="Properties\Settings.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="Properties\Resources.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Images\all_categories.png" />
+    <None Remove="Images\blue_category.png" />
+    <None Remove="Images\Categorize.png" />
+    <None Remove="Images\complete.png" />
+    <None Remove="Images\Delete.png" />
+    <None Remove="Images\Discard.png" />
+    <None Remove="Images\email_16x16.png" />
+    <None Remove="Images\FollowUp.png" />
+    <None Remove="Images\Forward.png" />
+    <None Remove="Images\green_category.png" />
+    <None Remove="Images\Icon.ico" />
+    <None Remove="Images\mail_32x32.png" />
+    <None Remove="Images\NewEmail.png" />
+    <None Remove="Images\Popout.png" />
+    <None Remove="Images\ReadUnread.png" />
+    <None Remove="Images\red_category.png" />
+    <None Remove="Images\reminder.png" />
+    <None Remove="Images\Reply.png" />
+    <None Remove="Images\ReplyAll.png" />
+    <None Remove="Images\today.png" />
+    <None Remove="Images\tomorrow.png" />
+    <None Remove="Images\Undo.png" />
+    <None Remove="Images\week.png" />
+    <None Remove="Properties\Settings.settings" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Controls\LancelotSoftware.xaml.cs">
+      <DependentUpon>LancelotSoftware.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\BoolToBrushConverter.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\DisplayDateConverter.cs" />
+    <Compile Include="Converters\InvertBoolConverter.cs" />
+    <Compile Include="Converters\NullToVisibilityConverter.cs" />
+    <Compile Include="Converters\SelectedToVisibilityConverter.cs" />
+    <Compile Include="Converters\StringToUriConverter.cs" />
+    <Compile Include="Converters\ToggleButtonForegroundConverter.cs" />
+    <Compile Include="Data\Email.cs" />
+    <Compile Include="Data\Folder.cs" />
+    <Compile Include="Helpers\DesignTimeData.cs" />
+    <Compile Include="Helpers\DispatcherTaskExtensions.cs" />
+    <Compile Include="Helpers\DisplayMessageHelpers.cs" />
+    <Compile Include="Helpers\EnumToBooleanConverter.cs" />
+    <Compile Include="Helpers\Json.cs" />
+    <Compile Include="Helpers\PersonalizationHelpers.cs" />
+    <Compile Include="Helpers\RegexHelpers.cs" />
+    <Compile Include="Helpers\Singleton.cs" />
+    <Compile Include="Data\OutlookSection.cs" />
+    <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="Views\AddAccountView.xaml.cs" />
+    <Compile Include="Views\KudosView.xaml.cs" />
+    <Compile Include="Views\MonitoredAccountDetailsView.xaml.cs" />
+    <Compile Include="Views\MonitoredAccountsView.xaml.cs" />
+    <Page Include="Controls\LancelotSoftware.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Helpers\ConditionalDockingHelper.cs" />
+    <Compile Include="Helpers\CustomFilterBehavior.cs" />
+    <Compile Include="Helpers\CustomFilterDescriptor.cs" />
+    <Compile Include="Helpers\EmailRowStyleSelector.cs" />
+    <Compile Include="Helpers\Enums.cs" />
+    <Compile Include="Helpers\OutlookBarExtensions.cs" />
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Styles\GeneralStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\AddAccountView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\KudosView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MonitoredAccountDetailsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MonitoredAccountsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Images\4starStar.png" />
+    <Content Include="Images\4starStar_Colored.png" />
+    <Content Include="Images\APIFeeKudo_Colored.png" />
+    <Content Include="Images\CoffeeKudo.png" />
+    <Content Include="Images\CoffeeKudo_Colored.png" />
+    <Content Include="Images\Damaged_NormalMap.jpg" />
+    <Content Include="Images\DinnerKudo.png" />
+    <Content Include="Images\DinnerKudo_Colored.png" />
+    <Content Include="Images\ListFallBackIcon.jpg" />
+    <Content Include="Images\LoadingPlaceholder.jpg" />
+    <Content Include="Images\LunchKudo.png" />
+    <Content Include="Images\LunchKudo_Colored.png" />
+    <Content Include="Images\RecurringKudo_Colored.png" />
+    <Content Include="Images\RemoveAdKudo_Colored.png" />
+    <Content Include="Images\VideoAd.png" />
+    <Content Include="Images\VideoAd_Colored.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\all_categories.png" />
+    <Resource Include="Images\blue_category.png" />
+    <Resource Include="Images\Categorize.png" />
+    <Resource Include="Images\complete.png" />
+    <Resource Include="Images\Delete.png" />
+    <Resource Include="Images\Discard.png" />
+    <Resource Include="Images\email_16x16.png" />
+    <Resource Include="Images\FollowUp.png" />
+    <Resource Include="Images\Forward.png" />
+    <Resource Include="Images\green_category.png" />
+    <Resource Include="Images\Icon.ico" />
+    <Resource Include="Images\mail_32x32.png" />
+    <Resource Include="Images\NewEmail.png" />
+    <Resource Include="Images\Popout.png" />
+    <Resource Include="Images\ReadUnread.png" />
+    <Resource Include="Images\red_category.png" />
+    <Resource Include="Images\reminder.png" />
+    <Resource Include="Images\Reply.png" />
+    <Resource Include="Images\ReplyAll.png" />
+    <Resource Include="Images\today.png" />
+    <Resource Include="Images\tomorrow.png" />
+    <Resource Include="Images\Undo.png" />
+    <Resource Include="Images\week.png" />
+  </ItemGroup>
+
+</Project>

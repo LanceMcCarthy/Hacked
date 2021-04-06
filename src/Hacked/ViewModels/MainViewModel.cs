@@ -233,7 +233,7 @@ namespace Hacked.ViewModels
             {
                 if (ex.StatusCode == HttpStatusCode.NotFound && showSuccessMessage)
                 {
-                    await new MessageDialog($"No known breaches found for this email address.", "Good news!").ShowAsync();
+                    await new MessageDialog($"The breaches database has returned 'no results' for this account.", "Good news!").ShowAsync();
                 }
                 else if (ex.StatusCode == HttpStatusCode.Forbidden)
                 {
@@ -291,9 +291,32 @@ namespace Hacked.ViewModels
                 //NOTE we still want to add to monitored accounts even if no results at first
                 Accounts.Add(account);
 
+                // Just for analytics, see what users need the most help with
+                var accountType = "";
+
+                try
+                {
+                    if (RegexHelpers.ValidateEmail(address))
+                    {
+                        accountType = "email";
+                    }
+                    else if (RegexHelpers.ValidatePhoneNumber(address))
+                    {
+                        accountType = "phonenumber";
+                    }
+                    else
+                    {
+                        accountType = "username";
+                    }
+                }
+                catch
+                {
+                    accountType = "unknown";
+                }
+
                 Analytics.TrackEvent("Account Added", new Dictionary<string, string>
                 {
-                    { "Account Type", RegexHelpers.ValidateEmail(address) ? "email" : "username" }
+                    { "Account Type", accountType }
                 });
 
                 await SaveAccountsAsync();
@@ -657,9 +680,5 @@ namespace Hacked.ViewModels
         }
 
         #endregion
-
-
     }
-
-    
 }
