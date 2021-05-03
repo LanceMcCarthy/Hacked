@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:Hacked.Forms.Portable.ViewModels;assembly=Hacked.Forms.Portable"
+             xmlns:input="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input"
              BindingContext="{x:Static viewModels:ViewModelLocator.Main}"
              x:Class="Hacked.Forms.Portable.Views.AboutPage"
              Title="{Binding Title}">
@@ -20,9 +21,8 @@
         <Grid x:Name="GearsLogo"
               Grid.Row="1"
               Margin="10">
-
-            <StackLayout  HorizontalOptions="Center"
-                          VerticalOptions="Center">
+            <StackLayout HorizontalOptions="Center"
+                         VerticalOptions="Center">
                 <StackLayout Orientation="Horizontal"
                              HorizontalOptions="Center">
                     <Image x:Name="RedGear"
@@ -62,7 +62,7 @@
                 <Label Text="{Binding AppVersion}"
                        TextColor="{DynamicResource ThemeTextLightColor}"
                        FontSize="Small" />
-                <Label Text="© 2016 Lancelot Software"
+                <Label Text="© 2016-2021 Lancelot Software"
                        TextColor="{DynamicResource ThemeTextLightColor}"
                        FontSize="Small" />
             </StackLayout>
@@ -81,12 +81,18 @@
         <StackLayout Grid.Row="3"
                      Margin="10,0,10,10"
                      VerticalOptions="End">
-            <Button x:Name="ContactUsButton"
-                    Clicked="ContactUsButton_OnClick"
-                    Text="contact us" />
-            <Button x:Name="ReviewButton"
-                    Clicked="ReviewButton_OnClickButton_OnClick"
-                    Text="rate this app" />
+            <input:RadButton x:Name="ContactUsButton"
+                             Clicked="ContactUsButton_OnClick"
+                             Text="contact us" 
+                             CornerRadius="5"
+                             BackgroundColor="{StaticResource ThemeTextColor}"
+                             TextColor="{StaticResource ThemeBackgroundColor}"/>
+            <input:RadButton x:Name="ReviewButton"
+                             Clicked="ReviewButton_OnClickButton_OnClick"
+                             Text="rate this app"
+                             CornerRadius="5"
+                             BackgroundColor="{StaticResource ThemeTextColor}"
+                             TextColor="{StaticResource ThemeBackgroundColor}" />
         </StackLayout>
     </Grid>
 </ContentPage>
