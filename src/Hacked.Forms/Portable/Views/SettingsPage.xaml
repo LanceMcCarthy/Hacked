@@ -9,12 +9,32 @@
              BindingContext="{x:Static viewModels:ViewModelLocator.Main}">
 
     <ContentPage.Resources>
+        <OnPlatform x:Key="BoxHeight" 
+                    x:DataType="x:Double">
+            <On Platform="Android"
+                Value="25" />
+            <On Platform="iOS"
+                Value="25" />
+            <On Platform="UWP"
+                Value="25" />
+        </OnPlatform>
+
+        <OnPlatform x:Key="BoxMargin"
+                    x:DataType="x:Double">
+            <On Platform="Android"
+                Value="0,5,0,10" />
+            <On Platform="iOS"
+                Value="0,5,0,10" />
+            <On Platform="UWP"
+                Value="0,5,0,10" />
+        </OnPlatform>
+
         <Style x:Key="ThemeFeatureBoxViewStyle"
                TargetType="BoxView">
             <Setter Property="HeightRequest"
-                    Value="{OnPlatform Android='25', iOS='25', UWP='50'}" />
+                    Value="{StaticResource BoxHeight}"/>
             <Setter Property="Margin"
-                    Value="{OnPlatform Android='0,5,0,10', iOS='0,5,0,10', UWP='0,5,0,10'}" />
+                    Value="{StaticResource BoxMargin}"/>
             <Setter Property="HorizontalOptions"
                     Value="Fill" />
         </Style>
@@ -28,6 +48,8 @@
 
         <ScrollView>
             <StackLayout Padding="10,10,10,0">
+                <Label Text="Theme Preview"
+                       TextColor="{DynamicResource ThemeTextColor}" />
                 <Label Text="Text (Light)"
                        TextColor="{DynamicResource ThemeTextColor}" />
                 <BoxView Color="{DynamicResource ThemeTextLightColor}"
@@ -62,7 +84,6 @@
                        TextColor="{DynamicResource ThemeTextColor}" />
                 <BoxView Color="{DynamicResource ThemeAccentDarkColor}"
                          Style="{StaticResource ThemeFeatureBoxViewStyle}" />
-
             </StackLayout>
         </ScrollView>
 
