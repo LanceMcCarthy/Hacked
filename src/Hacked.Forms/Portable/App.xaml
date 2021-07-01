@@ -133,7 +133,6 @@
                     </Grid>
                 </listView:ListViewTemplateCell>
             </DataTemplate>
-
         </ResourceDictionary>
     </Application.Resources>
 </Application>
