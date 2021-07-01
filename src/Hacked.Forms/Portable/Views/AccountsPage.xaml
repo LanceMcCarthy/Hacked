@@ -9,7 +9,7 @@
              xmlns:input="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.XamarinForms.Input"
              BindingContext="{x:Static viewModels:ViewModelLocator.Main}"
              Title="Monitored Accounts"
-             Icon="ic_accounts.png">
+             IconImageSource="ic_accounts.png">
 
     <Grid BackgroundColor="{DynamicResource ThemeBackgroundColor}">
         <Grid.RowDefinitions>
@@ -90,6 +90,7 @@
                                  TextColor="{DynamicResource ThemeBackgroundColor}"
                                  BackgroundColor="{DynamicResource ThemeAccentColor}" 
                                  Clicked="AddAccountModalButton_OnClicked"
+                                 CornerRadius="5"
                                  Margin="10"/>
             </StackLayout>
         </Grid>
