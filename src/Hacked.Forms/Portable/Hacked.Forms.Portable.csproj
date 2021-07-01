@@ -12,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="CommonHelpers" Version="1.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Telerik.UI.for.Xamarin" Version="2021.1.413.1" />
+    <PackageReference Include="Telerik.UI.for.Xamarin" Version="2021.2.615.1" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
     <PackageReference Include="SkiaSharp" Version="2.80.2" />
