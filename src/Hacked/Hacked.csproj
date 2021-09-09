@@ -307,7 +307,7 @@
       <Version>7.0.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.6.1</Version>
+      <Version>2.6.2</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
@@ -319,7 +319,7 @@
       <Version>2021.2.615.1</Version>
     </PackageReference>
     <PackageReference Include="VungleSDK">
-      <Version>6.8.0</Version>
+      <Version>6.10.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />
