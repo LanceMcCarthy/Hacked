@@ -1,0 +1,218 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net6.0-ios;net6.0-android;net6.0-maccatalyst</TargetFrameworks>
+		 <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows')) and '$(MSBuildRuntimeType)' == 'Full'">$(TargetFrameworks);net6.0-windows10.0.19041</TargetFrameworks> 
+		<OutputType>Exe</OutputType>
+		<RootNamespace>Hacked.Maui</RootNamespace>
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<EnablePreviewMsixTooling>true</EnablePreviewMsixTooling>
+
+		<!-- Display name -->
+		<ApplicationTitle>Hacked.Maui</ApplicationTitle>
+
+		<!-- App Identifier -->
+		<ApplicationId>com.companyname.Hacked.Maui</ApplicationId>
+
+		<!-- Versions -->
+		<ApplicationVersion>1.0</ApplicationVersion>
+		<AndroidVersionCode>1</AndroidVersionCode>
+
+		<!-- Required for C# Hot Reload -->
+		<UseInterpreter Condition="'$(Configuration)' == 'Debug'">True</UseInterpreter>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- App Icon -->
+		<MauiImage Include="Resources\appicon.svg" ForegroundFile="Resources\appiconfg.svg" IsAppIcon="true" Color="#512BD4" />
+
+		<!-- Splash Screen -->
+		<MauiSplashScreen Include="Resources\appiconfg.svg" Color="#512BD4" />
+
+		<!-- Images -->
+		<MauiImage Include="Resources\Images\*" />
+
+		<!-- Custom Fonts -->
+		<MauiFont Include="Resources\Fonts\*" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
+		<!-- Required - WinUI does not yet have buildTransitive for everything -->
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.0-experimental1" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.Foundation" Version="1.0.0-experimental1" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="1.0.0-experimental1" />
+		<PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="1.0.0-experimental1" NoWarn="NU1701" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-ios'">
+	  <PackageReference Include="Telerik.UI.for.Maui">
+	    <Version>2021.2.914.1</Version>
+	  </PackageReference>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-android'">
+	  <PackageReference Include="Telerik.UI.for.Maui">
+	    <Version>2021.2.914.1</Version>
+	  </PackageReference>
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-windows10.0.19041'">
+	  <PackageReference Include="Telerik.UI.for.Maui">
+	    <Version>2021.2.914.1</Version>
+	  </PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Remove="Views\AboutPage.xaml" />
+	  <MauiXaml Remove="Views\HomePage.xaml" />
+	  <MauiXaml Remove="Views\MenuPage.xaml" />
+	  <MauiXaml Remove="Views\RootPage.xaml" />
+	  <MauiXaml Remove="Views\SettingsPage.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Platforms\Windows\Assets\16x16.png" />
+	  <None Remove="Platforms\Windows\Assets\24x24.png" />
+	  <None Remove="Platforms\Windows\Assets\32x32.png" />
+	  <None Remove="Platforms\Windows\Assets\48x48.png" />
+	  <None Remove="Platforms\Windows\Assets\NewStoreLogo.scale-100.png" />
+	  <None Remove="Platforms\Windows\Assets\NewStoreLogo.scale-125.png" />
+	  <None Remove="Platforms\Windows\Assets\NewStoreLogo.scale-150.png" />
+	  <None Remove="Platforms\Windows\Assets\NewStoreLogo.scale-200.png" />
+	  <None Remove="Platforms\Windows\Assets\NewStoreLogo.scale-400.png" />
+	  <None Remove="Platforms\Windows\Assets\ShieldTransSvg_NoPad_400.svg" />
+	  <None Remove="Platforms\Windows\Assets\SplashScreen.scale-100.png" />
+	  <None Remove="Platforms\Windows\Assets\SplashScreen.scale-125.png" />
+	  <None Remove="Platforms\Windows\Assets\SplashScreen.scale-150.png" />
+	  <None Remove="Platforms\Windows\Assets\SplashScreen.scale-200.png" />
+	  <None Remove="Platforms\Windows\Assets\SplashScreen.scale-400.png" />
+	  <None Remove="Platforms\Windows\Assets\Square150x150Logo.scale-100.png" />
+	  <None Remove="Platforms\Windows\Assets\Square150x150Logo.scale-125.png" />
+	  <None Remove="Platforms\Windows\Assets\Square150x150Logo.scale-150.png" />
+	  <None Remove="Platforms\Windows\Assets\Square150x150Logo.scale-200.png" />
+	  <None Remove="Platforms\Windows\Assets\Square150x150Logo.scale-400.png" />
+	  <None Remove="Platforms\Windows\Assets\Square310x310Logo.scale-100.png" />
+	  <None Remove="Platforms\Windows\Assets\Square310x310Logo.scale-125.png" />
+	  <None Remove="Platforms\Windows\Assets\Square310x310Logo.scale-150.png" />
+	  <None Remove="Platforms\Windows\Assets\Square310x310Logo.scale-200.png" />
+	  <None Remove="Platforms\Windows\Assets\Square310x310Logo.scale-400.png" />
+	  <None Remove="Platforms\Windows\Assets\Square44x44Logo.scale-100.png" />
+	  <None Remove="Platforms\Windows\Assets\Square44x44Logo.scale-125.png" />
+	  <None Remove="Platforms\Windows\Assets\Square44x44Logo.scale-150.png" />
+	  <None Remove="Platforms\Windows\Assets\Square44x44Logo.scale-200.png" />
+	  <None Remove="Platforms\Windows\Assets\Square44x44Logo.scale-400.png" />
+	  <None Remove="Platforms\Windows\Assets\Square44x44Logo.targetsize-16_altform-unplated.png" />
+	  <None Remove="Platforms\Windows\Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+	  <None Remove="Platforms\Windows\Assets\Square44x44Logo.targetsize-256_altform-unplated.png" />
+	  <None Remove="Platforms\Windows\Assets\Square44x44Logo.targetsize-48_altform-unplated.png" />
+	  <None Remove="Platforms\Windows\Assets\Square71x71Logo.scale-100.png" />
+	  <None Remove="Platforms\Windows\Assets\Square71x71Logo.scale-125.png" />
+	  <None Remove="Platforms\Windows\Assets\Square71x71Logo.scale-150.png" />
+	  <None Remove="Platforms\Windows\Assets\Square71x71Logo.scale-200.png" />
+	  <None Remove="Platforms\Windows\Assets\Square71x71Logo.scale-400.png" />
+	  <None Remove="Platforms\Windows\Assets\TransSvg_NoPad_400.svg" />
+	  <None Remove="Platforms\Windows\Assets\Wide310x150Logo.scale-100.png" />
+	  <None Remove="Platforms\Windows\Assets\Wide310x150Logo.scale-125.png" />
+	  <None Remove="Platforms\Windows\Assets\Wide310x150Logo.scale-150.png" />
+	  <None Remove="Platforms\Windows\Assets\Wide310x150Logo.scale-200.png" />
+	  <None Remove="Platforms\Windows\Assets\Wide310x150Logo.scale-400.png" />
+	  <None Remove="Resources\Images\4starStar.png" />
+	  <None Remove="Resources\Images\4starStar_Colored.png" />
+	  <None Remove="Resources\Images\APIFeeKudo_Colored.png" />
+	  <None Remove="Resources\Images\CoffeeKudo.png" />
+	  <None Remove="Resources\Images\CoffeeKudo_Colored.png" />
+	  <None Remove="Resources\Images\Damaged_NormalMap.jpg" />
+	  <None Remove="Resources\Images\DinnerKudo.png" />
+	  <None Remove="Resources\Images\DinnerKudo_Colored.png" />
+	  <None Remove="Resources\Images\ListFallBackIcon.jpg" />
+	  <None Remove="Resources\Images\LoadingPlaceholder.jpg" />
+	  <None Remove="Resources\Images\LunchKudo.png" />
+	  <None Remove="Resources\Images\LunchKudo_Colored.png" />
+	  <None Remove="Resources\Images\RecurringKudo_Colored.png" />
+	  <None Remove="Resources\Images\RemoveAdKudo_Colored.png" />
+	  <None Remove="Resources\Images\VideoAd.png" />
+	  <None Remove="Resources\Images\VideoAd_Colored.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="Platforms\Windows\Assets\16x16.png" />
+	  <Content Include="Platforms\Windows\Assets\24x24.png" />
+	  <Content Include="Platforms\Windows\Assets\32x32.png" />
+	  <Content Include="Platforms\Windows\Assets\48x48.png" />
+	  <Content Include="Platforms\Windows\Assets\NewStoreLogo.scale-100.png" />
+	  <Content Include="Platforms\Windows\Assets\NewStoreLogo.scale-125.png" />
+	  <Content Include="Platforms\Windows\Assets\NewStoreLogo.scale-150.png" />
+	  <Content Include="Platforms\Windows\Assets\NewStoreLogo.scale-200.png" />
+	  <Content Include="Platforms\Windows\Assets\NewStoreLogo.scale-400.png" />
+	  <Content Include="Platforms\Windows\Assets\ShieldTransSvg_NoPad_400.svg" />
+	  <Content Include="Platforms\Windows\Assets\SplashScreen.scale-100.png" />
+	  <Content Include="Platforms\Windows\Assets\SplashScreen.scale-125.png" />
+	  <Content Include="Platforms\Windows\Assets\SplashScreen.scale-150.png" />
+	  <Content Include="Platforms\Windows\Assets\SplashScreen.scale-200.png" />
+	  <Content Include="Platforms\Windows\Assets\SplashScreen.scale-400.png" />
+	  <Content Include="Platforms\Windows\Assets\Square150x150Logo.scale-100.png" />
+	  <Content Include="Platforms\Windows\Assets\Square150x150Logo.scale-125.png" />
+	  <Content Include="Platforms\Windows\Assets\Square150x150Logo.scale-150.png" />
+	  <Content Include="Platforms\Windows\Assets\Square150x150Logo.scale-200.png" />
+	  <Content Include="Platforms\Windows\Assets\Square150x150Logo.scale-400.png" />
+	  <Content Include="Platforms\Windows\Assets\Square310x310Logo.scale-100.png" />
+	  <Content Include="Platforms\Windows\Assets\Square310x310Logo.scale-125.png" />
+	  <Content Include="Platforms\Windows\Assets\Square310x310Logo.scale-150.png" />
+	  <Content Include="Platforms\Windows\Assets\Square310x310Logo.scale-200.png" />
+	  <Content Include="Platforms\Windows\Assets\Square310x310Logo.scale-400.png" />
+	  <Content Include="Platforms\Windows\Assets\Square44x44Logo.scale-100.png" />
+	  <Content Include="Platforms\Windows\Assets\Square44x44Logo.scale-125.png" />
+	  <Content Include="Platforms\Windows\Assets\Square44x44Logo.scale-150.png" />
+	  <Content Include="Platforms\Windows\Assets\Square44x44Logo.scale-200.png" />
+	  <Content Include="Platforms\Windows\Assets\Square44x44Logo.scale-400.png" />
+	  <Content Include="Platforms\Windows\Assets\Square44x44Logo.targetsize-16_altform-unplated.png" />
+	  <Content Include="Platforms\Windows\Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+	  <Content Include="Platforms\Windows\Assets\Square44x44Logo.targetsize-256_altform-unplated.png" />
+	  <Content Include="Platforms\Windows\Assets\Square44x44Logo.targetsize-48_altform-unplated.png" />
+	  <Content Include="Platforms\Windows\Assets\Square71x71Logo.scale-100.png" />
+	  <Content Include="Platforms\Windows\Assets\Square71x71Logo.scale-125.png" />
+	  <Content Include="Platforms\Windows\Assets\Square71x71Logo.scale-150.png" />
+	  <Content Include="Platforms\Windows\Assets\Square71x71Logo.scale-200.png" />
+	  <Content Include="Platforms\Windows\Assets\Square71x71Logo.scale-400.png" />
+	  <Content Include="Platforms\Windows\Assets\TransSvg_NoPad_400.svg" />
+	  <Content Include="Platforms\Windows\Assets\Wide310x150Logo.scale-100.png" />
+	  <Content Include="Platforms\Windows\Assets\Wide310x150Logo.scale-125.png" />
+	  <Content Include="Platforms\Windows\Assets\Wide310x150Logo.scale-150.png" />
+	  <Content Include="Platforms\Windows\Assets\Wide310x150Logo.scale-200.png" />
+	  <Content Include="Platforms\Windows\Assets\Wide310x150Logo.scale-400.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Views\AboutPage.xaml">
+	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Views\HomePage.xaml">
+	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Views\MenuPage.xaml">
+	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Views\RootPage.xaml">
+	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Views\SettingsPage.xaml">
+	    <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
+	  <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="CommonHelpers" Version="1.1.2" />
+	</ItemGroup>
+
+	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
+		<OutputType>WinExe</OutputType>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	</PropertyGroup>
+
+</Project>
