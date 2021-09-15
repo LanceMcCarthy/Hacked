@@ -31,15 +31,15 @@
             <Color x:Key="ThemeAccentDarkColor">#002d87</Color>
 
             <!-- Styles -->
-            <Style x:Key="NavPageStyle"
-                   TargetType="NavigationPage">
+            <!--<Style x:Key="NavPageStyle"
+                   TargetType="FlyoutPage">
                 <Setter Property="BarBackgroundColor"
                         Value="{DynamicResource ThemeAccentColor}" />
                 <Setter Property="BarTextColor"
                         Value="{DynamicResource ThemeBackgroundColor}" />
                 <Setter Property="Icon"
                         Value="ic_menu.png" />
-            </Style>
+            </Style>-->
 
             <!--<listView:ListViewItemStyle x:Key="NormalListItemStyle"
                                         BackgroundColor="{DynamicResource ThemeBackgroundColor}"

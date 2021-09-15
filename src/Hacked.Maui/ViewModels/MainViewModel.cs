@@ -9,7 +9,6 @@ using CommonHelpers.Common;
 using Hacked.Core.Models;
 using Hacked.Maui.Helpers;
 using Hacked.Maui.Helpers.Extensions;
-using Hacked.Maui.Views;
 using Hacked.Services.Apis;
 using Microsoft.Maui.Controls;
 using Newtonsoft.Json;
@@ -118,7 +117,7 @@ namespace Hacked.Maui.ViewModels
 
         public Command GoToSettingsCommand => _goToSettingsCommand ?? (_goToSettingsCommand = new Command(() =>
         {
-            ((Application.Current.MainPage as RootPage)?.Detail as NavigationPage)?.Navigation.PushAsync(new SettingsPage());
+            //((Application.Current.MainPage as RootPage)?.Detail as NavigationPage)?.Navigation.PushAsync(new SettingsPage());
         }));
 
         #endregion
