@@ -427,29 +427,28 @@
                         </Grid.Resources>
 
                         <StackPanel>
-                            <Button Margin="5"
+                            <Button Margin="10,5,10,5"
                                     HorizontalAlignment="Stretch"
                                     Click="AddAccountButton_Click"
                                     Background="{ThemeResource SystemControlBackgroundAccentBrush}"
-                                    Content="Add Account"/>
+                                    Content="add account"/>
 
                             <Border Background="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                     Height="2"
-                                    Margin="5" />
+                                    Margin="10,5,10,5" />
 
                             <Button x:Name="KudosButton"
-                                    Content="Kudos (NEW)"
+                                    Content="kudos"
                                     Command="{Binding ShowKudosCommand}"
-                                    Foreground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                                    Foreground="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                     HorizontalAlignment="Stretch"
-                                    Margin="3"/>
+                                    Margin="10,5,10,5"/>
 
                             <Button x:Name="PlayAdButton"
-                                    IsEnabled="False"
+                                    Margin="10,5,10,5"
                                     HorizontalAlignment="Stretch"
                                     Background="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                     BorderBrush="{ThemeResource AppBarBackgroundThemeBrush}"
-                                    Margin="5"
                                     Click="PlayAdButton_OnClick">
                                 <TextBlock HorizontalTextAlignment="Center">
                                     <Run Text="Want to help support this free app?"
@@ -463,19 +462,20 @@
 
                             <Border Background="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                     Height="2"
-                                    Margin="5" />
+                                    Margin="10,5,10,5"/>
 
                             <Button x:Name="BackupRestoreButton"
-                                    Margin="5,5,5,10"
+                                    Margin="10,5,10,5"
                                     HorizontalAlignment="Stretch"
+                                    Foreground="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                     Content="export | import">
                                 <Button.Flyout>
                                     <Flyout x:Name="BackupRestoreButtonFlyout">
                                         <Grid MaxWidth="325">
                                             <StackPanel HorizontalAlignment="Left">
                                                 <TextBlock FontWeight="Bold"
-                                                           Style="{StaticResource SubtitleTextBlockStyle}"
-                                                           Text="Backup and Restore" 
+                                                           Text="Backup and Restore"
+                                                           Foreground="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                                            HorizontalAlignment="Center"
                                                            Margin="0,0,0,10"/>
                                                 <TextBlock Text="Export your Monitored Accounts list to a backup file."
@@ -501,7 +501,8 @@
                             </Button>
 
                             <Button x:Name="AboutButton"
-                                    Margin="5"
+                                    Margin="10,5,10,10"
+                                    Foreground="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                     HorizontalAlignment="Stretch"
                                     Content="about | contact us | review | feedback">
                                 <Button.Flyout>
