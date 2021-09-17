@@ -1,0 +1,38 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Hacked.Maui.Views.MenuPage">
+    
+    <ContentPage.Content>
+        <Grid BackgroundColor="{DynamicResource ThemeAccentLightColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="200" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Grid x:Name="HeaderGrid"
+                  BackgroundColor="{DynamicResource ThemeTextDarkColor}">
+
+                <Image x:Name="UserImage"
+                       Source="user_login.png"
+                       Margin="30,60"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill" />
+            </Grid>
+
+            <ListView x:Name="listView"
+                      VerticalOptions="Fill"
+                      SeparatorVisibility="None"
+                      Grid.Row="1">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Label Text="{Binding Title}"
+                               VerticalOptions="Center"
+                               FontSize="Large"
+                               TextColor="{DynamicResource ThemeBackgroundColor}"
+                               Margin="10" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>
