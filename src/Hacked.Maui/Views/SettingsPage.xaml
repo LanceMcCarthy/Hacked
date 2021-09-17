@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:Hacked.Maui.ViewModels"
+             BindingContext="{x:Static viewModels:ViewModelLocator.Settings}"
+             x:Class="Hacked.Maui.Views.SettingsPage">
+
+    <ContentPage.Resources>
+        <OnPlatform x:Key="BoxHeight"
+                    x:DataType="x:Double">
+            <On Platform="Android"
+                Value="25" />
+            <On Platform="iOS"
+                Value="25" />
+            <On Platform="UWP"
+                Value="25" />
+        </OnPlatform>
+
+        <OnPlatform x:Key="BoxMargin"
+                    x:DataType="x:Double">
+            <On Platform="Android"
+                Value="0,5,0,10" />
+            <On Platform="iOS"
+                Value="0,5,0,10" />
+            <On Platform="UWP"
+                Value="0,5,0,10" />
+        </OnPlatform>
+
+        <Style x:Key="ThemeFeatureBoxViewStyle"
+               TargetType="BoxView">
+            <Setter Property="HeightRequest"
+                    Value="{StaticResource BoxHeight}" />
+            <Setter Property="Margin"
+                    Value="{StaticResource BoxMargin}" />
+            <Setter Property="HorizontalOptions"
+                    Value="Fill" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid BackgroundColor="{DynamicResource ThemeBackgroundColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollView>
+            <VerticalStackLayout Padding="10,10,10,0">
+                <HorizontalStackLayout Spacing="5">
+                <Label Text="Hacked? v"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                    <Label Text="{Binding AppVersion}"
+                           TextColor="{DynamicResource ThemeTextColor}" />
+                </HorizontalStackLayout>
+
+                <Label Text="Theme Preview"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <Label Text="Text (Light)"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeTextLightColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+
+                <Label Text="Text"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeTextColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+
+                <Label Text="Text (Dark)"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeTextDarkColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+
+                <Label Text="Accent (Bright)"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeAccentBrightColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+
+                <Label Text="Accent (Light)"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeAccentLightColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+
+                <Label Text="Accent"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeAccentColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+
+                <Label Text="Accent (Dark)"
+                       TextColor="{DynamicResource ThemeTextColor}" />
+                <BoxView Color="{DynamicResource ThemeAccentDarkColor}"
+                         Style="{StaticResource ThemeFeatureBoxViewStyle}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!--<input:RadSegmentedControl x:Name="segmentControl"
+                                   SegmentTextColor="{DynamicResource ThemeTextDarkColor}"
+                                   SegmentBackgroundColor="{DynamicResource ThemeBackgroundColor}"
+                                   SelectedSegmentTextColor="{DynamicResource ThemeBackgroundColor}"
+                                   SelectedSegmentBackgroundColor="{DynamicResource ThemeAccentDarkColor}"
+                                   DisabledSegmentTextColor="{DynamicResource ThemeTextLightColor}"
+                                   SelectionChanged="SegmentControl_OnSelectionChanged"
+                                   HeightRequest="60"
+                                   Grid.Row="1" />-->
+    </Grid>
+</ContentPage>
