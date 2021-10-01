@@ -3,12 +3,12 @@
              xmlns:views="clr-namespace:Hacked.Maui.Views"
              x:Class="Hacked.Maui.Views.RootPage">
     <FlyoutPage.Flyout>
-        <views:MenuPage x:Name="menuPage" Title="Menu" />
+        <views:MenuPage x:Name="SideMenuPage" Title="Menu" />
     </FlyoutPage.Flyout>
     <FlyoutPage.Detail>
         <NavigationPage Style="{StaticResource NavPageStyle}" Title="Main">
             <x:Arguments>
-                <views:MainPage />
+                <views:AccountsPage Title="Accounts"/>
             </x:Arguments>
         </NavigationPage>
     </FlyoutPage.Detail>

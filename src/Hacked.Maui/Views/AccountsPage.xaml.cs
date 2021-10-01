@@ -4,14 +4,28 @@ using Hacked.Maui.Common;
 using Hacked.Maui.ViewModels;
 using Microsoft.Maui;
 using Microsoft.Maui.Controls;
+using Telerik.XamarinForms.DataControls.ListView;
 
 namespace Hacked.Maui.Views
 {
-    public partial class MainPage : ContentPage
+    public partial class AccountsPage : ContentPage
     {
-        public MainPage()
+        public AccountsPage()
         {
             InitializeComponent();
+        }
+
+        private async void AccountTapped(object? sender, ItemTapEventArgs e)
+        {
+            if (sender == null || AccountsListView.IsSwipingInProgress)
+                return;
+
+            if (e.Item is MonitoredAccount account)
+            {
+                ViewModelLocator.Accounts.SelectedAccount = account;
+
+                await ((Application.Current.MainPage as RootPage)?.Detail as NavigationPage)?.Navigation.PushModalAsync(new AccountDetailPage());
+            }
         }
 
         private async void RefreshSwipeButton_Clicked(object sender, EventArgs e)
@@ -25,11 +39,11 @@ namespace Hacked.Maui.Views
                 {
                     var lastCount = account.Breaches.Count;
 
-                    await ViewModelLocator.Main.UpdateBreachesForAccountAsync(account);
+                    await ViewModelLocator.Accounts.UpdateBreachesForAccountAsync(account);
 
                     if (account.Breaches.Count > lastCount)
                     {
-                        ViewModelLocator.Main.SaveAccounts();
+                        ViewModelLocator.Accounts.SaveAccounts();
                         await this.DisplayAlert("New breaches have been detected", "Alert", "close");
                     }
                 }
@@ -49,7 +63,7 @@ namespace Hacked.Maui.Views
             {
                 if (sender is Button button && button?.BindingContext is MonitoredAccount account)
                 {
-                    ViewModelLocator.Main.RemoveAccount(account);
+                    ViewModelLocator.Accounts.RemoveAccount(account);
                 }
             }
             finally
@@ -127,19 +141,6 @@ namespace Hacked.Maui.Views
         //        await ((Application.Current.MainPage as RootPage)?.Detail as NavigationPage)?.Navigation.PushAsync(new AccountDetailsPage());
         //    }
         //}
-
-        private async void Account_Tapped(object sender, ItemTappedEventArgs e)
-        {
-            //if (sender == null || AccountsListView.IsSwipingInProgress)
-            //    return;
-
-            if (e.Item is MonitoredAccount account)
-            {
-                ViewModelLocator.Main.SelectedAccount = account;
-
-                //await ((Application.Current.MainPage as RootPage)?.Detail as NavigationPage)?.Navigation.PushAsync(new AccountDetailsPage());
-            }
-        }
 
         //private async void RefreshTipCheckBox_OnIsCheckedChanged(object sender, CheckedChangedEventArgs e)
         //{

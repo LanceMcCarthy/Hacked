@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Hacked.Maui.ViewModels;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
+using Telerik.XamarinForms.Input;
 
 namespace Hacked.Maui.Views
 {
@@ -15,24 +16,32 @@ namespace Hacked.Maui.Views
 
         private async void AddAccount_OnClicked(object sender, EventArgs e)
         {
-            await AttemptEmailAddAsync(this.EmailEntry?.Text);
+            await AttemptEmailAddAsync(EmailEntry?.Text);
         }
 
         private async void EmailEntry_OnCompleted(object sender, EventArgs e)
         {
-            await AttemptEmailAddAsync(this.EmailEntry?.Text);
+            await AttemptEmailAddAsync(EmailEntry?.Text);
         }
 
         private void EmailEntry_OnTextChanged(object sender, TextChangedEventArgs e)
         {
-            //var entry = sender as Entry;
-            //var text = entry?.Text;
+            bool isValid = false;
 
-            //var isValid = !string.IsNullOrEmpty(text);
+            if (sender is RadEntry entry)
+            {
+                isValid = !string.IsNullOrEmpty(entry.Text);
+            }
 
-            //AddAccountButton.BackgroundColor = isValid ? (Color)Application.Current.Resources["ThemeAccentDarkColor"] : (Color)Application.Current.Resources["ThemeTextLightColor"];
-            //AddAccountButton.TextColor = isValid ? (Color)Application.Current.Resources["ThemeBackgroundColor"] : (Color)Application.Current.Resources["ThemeTextColor"];
-            //AddAccountButton.IsEnabled = isValid;
+            AddAccountButton.BackgroundColor = isValid 
+                ? (Color)Application.Current.Resources["ThemeAccentDarkColor"]
+                : (Color)Application.Current.Resources["ThemeTextLightColor"];
+
+            AddAccountButton.TextColor = isValid
+                ? (Color)Application.Current.Resources["ThemeBackgroundColor"]
+                : (Color)Application.Current.Resources["ThemeTextColor"];
+
+            AddAccountButton.IsEnabled = isValid;
         }
 
         private async Task AttemptEmailAddAsync(string emailAddress)
@@ -40,7 +49,7 @@ namespace Hacked.Maui.Views
             if (string.IsNullOrEmpty(emailAddress))
                 return;
 
-            var addedAccount = await ViewModelLocator.Main.AddAccount(emailAddress);
+            var addedAccount = await ViewModelLocator.Accounts.AddAccount(emailAddress);
 
             if (addedAccount == null)
             {

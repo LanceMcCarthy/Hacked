@@ -1,6 +1,7 @@
 ﻿using Hacked.Maui.Models;
 using Microsoft.Maui.Controls;
 using System;
+using System.Collections.Specialized;
 
 namespace Hacked.Maui.Views
 {
@@ -9,21 +10,23 @@ namespace Hacked.Maui.Views
         public RootPage()
         {
             InitializeComponent();
-            menuPage.ListView.ItemSelected += OnItemSelected;
+            SideMenuPage.MenuListView.SelectionChanged += ListViewOnSelectionChanged;
         }
 
-        private void OnItemSelected(object sender, SelectedItemChangedEventArgs e)
+        private void ListViewOnSelectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.SelectedItem is NavigationMenuItem masterPageItem)
+            if (e.NewItems is { Count: > 0 } && e.NewItems[0] is NavigationMenuItem menuItem)
             {
-                var page = (ContentPage)Activator.CreateInstance(masterPageItem.TargetType);
+                var page = (ContentPage)Activator.CreateInstance(menuItem.TargetType);
 
                 ((Application.Current.MainPage as RootPage)?.Detail as NavigationPage)?.Navigation.PushAsync(page);
 
-                menuPage.ListView.SelectedItem = null;
+                SideMenuPage.MenuListView.SelectedItem = null;
 
                 if (Device.RuntimePlatform != "UWP")
+                {
                     IsPresented = false;
+                }
             }
         }
     }

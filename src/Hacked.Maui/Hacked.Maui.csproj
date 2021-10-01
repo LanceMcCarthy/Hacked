@@ -77,6 +77,10 @@
 	  <BundleResource Include="Resources\Images\user_login.png" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <PackageReference Include="Telerik.UI.for.Maui" Version="0.0.1" />
+	</ItemGroup>
+
   <ItemGroup>
 	  <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
 	  <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
@@ -86,10 +90,19 @@
     <Compile Update="Views\AddAccountPage.xaml.cs">
       <DependentUpon>AddAccountPage.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\AccountDetailPage.xaml.cs">
+      <DependentUpon>AccountDetailPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AccountsPage.xaml.cs">
+      <DependentUpon>AccountsPage.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <MauiXaml Update="Views\AddAccountPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Views\AccountDetailPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
   </ItemGroup>

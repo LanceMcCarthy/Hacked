@@ -2,22 +2,23 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:Hacked.Maui.ViewModels"
-             BindingContext="{x:Static viewModels:ViewModelLocator.Main}"
+             BindingContext="{x:Static viewModels:ViewModelLocator.Accounts}"
+             xmlns:input="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.Maui.Controls.Compatibility"
              x:Class="Hacked.Maui.Views.AddAccountPage">
 
-    <Grid  BackgroundColor="{DynamicResource ThemeBackgroundColor}">
-        <StackLayout Margin="20"
-                     VerticalOptions="Center">
+    <Grid BackgroundColor="{DynamicResource ThemeBackgroundColor}">
+        <VerticalStackLayout Margin="20"
+                             HorizontalOptions="Center">
             <Label HorizontalOptions="Start"
                    Text="Enter an account to monitor"
                    TextColor="{DynamicResource ThemeAccentLightColor}" />
-            <Entry x:Name="EmailEntry"
-                   Completed="EmailEntry_OnCompleted"
-                   Keyboard="Email"
-                   Placeholder="enter email address or username"
-                   PlaceholderColor="{DynamicResource ThemeTextLightColor}"
-                   TextColor="{DynamicResource ThemeTextColor}"
-                   TextChanged="EmailEntry_OnTextChanged" />
+            <input:RadEntry x:Name="EmailEntry"
+                            Completed="EmailEntry_OnCompleted"
+                            Keyboard="Email"
+                            WatermarkText="enter email address or username"
+                            WatermarkTextColor="{DynamicResource ThemeTextLightColor}"
+                            TextColor="{DynamicResource ThemeTextColor}"
+                            TextChanged="EmailEntry_OnTextChanged" />
             <Button x:Name="AddAccountButton"
                     IsEnabled="True"
                     Text="add account"
@@ -29,7 +30,7 @@
                     Text="cancel"
                     TextColor="{DynamicResource ThemeTextColor}"
                     BackgroundColor="Transparent" />
-        </StackLayout>
+        </VerticalStackLayout>
 
         <ActivityIndicator IsVisible="{Binding IsBusy}"
                            IsRunning="{Binding IsBusy}"
