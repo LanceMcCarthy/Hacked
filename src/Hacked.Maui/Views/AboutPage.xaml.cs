@@ -16,7 +16,7 @@ namespace Hacked.Maui.Views
         {
             base.OnAppearing();
 
-            StartAnimations();
+            //StartAnimations();
         }
 
         private void StartAnimations()

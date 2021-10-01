@@ -2,15 +2,12 @@
 {
     public static class ViewModelLocator
     {
-        private static MainViewModel _main;
+        private static AccountsViewModel _accounts;
         private static AboutViewModel _about;
         private static SettingsViewModel _settings;
 
-        public static MainViewModel Main => _main ??= new MainViewModel();
-
+        public static AccountsViewModel Accounts => _accounts ??= new AccountsViewModel();
         public static AboutViewModel About => _about ??= new AboutViewModel();
-
         public static SettingsViewModel Settings => _settings ??= new SettingsViewModel();
-
     }
 }

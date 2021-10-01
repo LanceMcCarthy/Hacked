@@ -37,11 +37,8 @@
         </Style>
     </ContentPage.Resources>
 
-    <Grid BackgroundColor="{DynamicResource ThemeBackgroundColor}">
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <Grid BackgroundColor="{DynamicResource ThemeBackgroundColor}"
+          RowDefinitions="*,Auto">
 
         <ScrollView>
             <VerticalStackLayout Padding="10,10,10,0">

@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using CommonHelpers.Common;
 using Hacked.Core.Models;
-using Hacked.Maui.Helpers;
 using Hacked.Maui.Helpers.Commands;
 using Hacked.Maui.Helpers.Extensions;
 using Hacked.Maui.Views;
@@ -17,7 +16,7 @@ using Newtonsoft.Json;
 
 namespace Hacked.Maui.ViewModels
 {
-    public class MainViewModel : ViewModelBase
+    public class AccountsViewModel : ViewModelBase
     {
         #region fields
 
@@ -30,14 +29,14 @@ namespace Hacked.Maui.ViewModels
         private bool _hasAccounts;
         private int _newBreachesTotal;
         private AsyncCommand _findSelectedAccountBreachesCommand;
-        private Command<MonitoredAccount> _removeAccountCommand;
+        private AsyncCommand<MonitoredAccount> _removeAccountCommand;
         private AsyncCommand _findAllAccountBreachesCommand;
         private AsyncCommand _goToSettingsCommand;
         private AsyncCommand _goToAddAccountCommand;
         
         #endregion
 
-        public MainViewModel()
+        public AccountsViewModel()
         {
             InitData();
             
@@ -93,9 +92,9 @@ namespace Hacked.Maui.ViewModels
         #region Commands
 
         public AsyncCommand FindSelectedAccountBreachesCommand => _findSelectedAccountBreachesCommand ??= new AsyncCommand(() => UpdateBreachesForAccountAsync(SelectedAccount));
-        
-        public Command<MonitoredAccount> RemoveAccountCommand => _removeAccountCommand ??= new Command<MonitoredAccount>(account => RemoveAccount(account), account => account != null);
-        
+
+        public AsyncCommand<MonitoredAccount> RemoveAccountCommand => _removeAccountCommand ??= new AsyncCommand<MonitoredAccount>(RemoveAccount, account => account != null);
+
         public AsyncCommand FindAllAccountBreachesCommand => _findAllAccountBreachesCommand ??= new AsyncCommand(FindAllAccountsBreachesAsync);
 
         public AsyncCommand GoToSettingsCommand => _goToSettingsCommand ??= new AsyncCommand(GoToSettingsAsync);
@@ -143,7 +142,7 @@ namespace Hacked.Maui.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"*****Accounts json file not saved***** Error: {ex.Message}");
-                ShowExceptionMessage("SaveAccountsAsync", ex);
+                App.ShowExceptionMessage("SaveAccountsAsync", ex);
             }
             finally
             {
@@ -186,7 +185,7 @@ namespace Hacked.Maui.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"*****Accounts json file not loaded***** Error: {ex.Message}");
-                ShowExceptionMessage("LoadAccountsAsync", ex);
+                App.ShowExceptionMessage("LoadAccountsAsync", ex);
                 return new ObservableCollection<MonitoredAccount>();
             }
             finally
@@ -222,7 +221,7 @@ namespace Hacked.Maui.ViewModels
             }
             catch (Exception ex)
             {
-                ShowExceptionMessage("AddAccount", ex);
+                App.ShowExceptionMessage("AddAccount", ex);
                 return null;
             }
             finally
@@ -232,10 +231,10 @@ namespace Hacked.Maui.ViewModels
             }
         }
 
-        public bool RemoveAccount(MonitoredAccount account)
+        public Task<bool> RemoveAccount(MonitoredAccount account)
         {
             if (!RemoveAccountCommand.CanExecute(account))
-                return false;
+                return Task.FromResult(false);
 
             try
             {
@@ -262,12 +261,12 @@ namespace Hacked.Maui.ViewModels
 
                 HasAccounts = Accounts.Count > 0;
 
-                return true;
+                return Task.FromResult(true);
             }
             catch (Exception ex)
             {
-                ShowExceptionMessage("RemoveAccount", ex);
-                return false;
+                App.ShowExceptionMessage("RemoveAccount", ex);
+                return Task.FromResult(false);
             }
             finally
             {
@@ -310,15 +309,13 @@ namespace Hacked.Maui.ViewModels
 
                     if (showSuccessMessage)
                     {
-                        var message = "No known breaches found for this email address.";
-                        
-                        await Application.Current.MainPage.DisplayAlert("Good news!", message, "close");
+                        await Application.Current.MainPage.DisplayAlert("Good news!", "No known breaches found for this email address.", "close");
                     }
                 }
             }
             catch (Exception ex)
             {
-                ShowExceptionMessage("UpdateBreachesForAccountAsync", ex);
+                App.ShowExceptionMessage("UpdateBreachesForAccountAsync", ex);
             }
             finally
             {
@@ -346,10 +343,9 @@ namespace Hacked.Maui.ViewModels
         
         private async Task GoToAddAccountAsync()
         {
-            await ((Application.Current.MainPage as RootPage).Detail as NavigationPage).Navigation.PushModalAsync(new AddAccountPage());
+            await ((Application.Current.MainPage as RootPage).Detail as NavigationPage).Navigation.PushAsync(new AddAccountPage());
         }
-
-
+        
         // Stats
 
         public void UpdateStatistics()
@@ -381,18 +377,6 @@ namespace Hacked.Maui.ViewModels
             return list;
         }
         
-        private void ShowExceptionMessage(string callerName, Exception ex)
-        {
-            TaskHelpers.RunOnUiThread(async () =>
-            {
-                var message = $"An unexpected error has occured. If this happens again, contact us at awesome.apps@outlook.com and share the error message below" +
-                              $"\r\n\n{callerName} Error:" +
-                              $"\r\n {ex.Message}";
-                
-                await Application.Current.MainPage.DisplayAlert(message, "Unexpected Error", "close");
-            });
-        }
-
         #endregion
 
         #region event handlers
