@@ -1,0 +1,63 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:tdc="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:tlv="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:tmc="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
+             x:Class="Hacked.Maui.Views.MenuPage">
+
+    <Grid BackgroundColor="{DynamicResource ThemeAccentLightColor}"
+          RowDefinitions="200,*">
+
+        <Grid x:Name="HeaderGrid"
+              BackgroundColor="{DynamicResource ThemeTextDarkColor}">
+            <Image x:Name="UserImage"
+                   Source="user_login.png"
+                   Margin="30,60"
+                   HorizontalOptions="Fill"
+                   VerticalOptions="Fill" />
+        </Grid>
+
+        <tdc:RadListView x:Name="listView"
+                         SelectionMode="Single"
+                         Grid.Row="1">
+            <tdc:RadListView.ItemTemplate>
+                <DataTemplate>
+                    <tlv:ListViewTemplateCell>
+                        <HorizontalStackLayout>
+                            <Image Source="{Binding Icon}"
+                                   WidthRequest="50"
+                                   HeightRequest="50"
+                                   Margin="10,10,0,10" />
+                            <Label Text="{Binding Title}"
+                                   TextColor="{DynamicResource ThemeAccentLightColor}"
+                                   VerticalOptions="Center"
+                                   FontSize="Large"
+                                   Margin="10" />
+                        </HorizontalStackLayout>
+                    </tlv:ListViewTemplateCell>
+                </DataTemplate>
+            </tdc:RadListView.ItemTemplate>
+            <!--<tdc:RadListView.ItemStyle>
+                    <tlv:ListViewItemStyle BackgroundColor="{DynamicResource ThemeBackgroundColor}"
+                                           TextCellTextColor="{DynamicResource ThemeAccentLightColor}"
+                                           BorderColor="#0A3A82"
+                                           BorderWidth="2"
+                                           BorderLocation="All" />
+                </tdc:RadListView.ItemStyle>
+                <tdc:RadListView.SelectedItemStyle>
+                    <tlv:ListViewItemStyle BackgroundColor="#83A9E2"
+                                           TextCellTextColor="#AAC7F6"
+                                           BorderColor="#0A3A82"
+                                           BorderWidth="2"
+                                           BorderLocation="Bottom" />
+                </tdc:RadListView.SelectedItemStyle>
+                <tdc:RadListView.PressedItemStyle>
+                    <tlv:ListViewItemStyle BackgroundColor="#C1C1C1"
+                                           TextCellTextColor="#AAC7F6"
+                                           BorderColor="#0B3D89"
+                                           BorderWidth="2"
+                                           BorderLocation="Bottom" />
+                </tdc:RadListView.PressedItemStyle>-->
+        </tdc:RadListView>
+    </Grid>
+</ContentPage>
