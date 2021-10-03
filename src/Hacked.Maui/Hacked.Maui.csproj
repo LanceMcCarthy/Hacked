@@ -1,8 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>net6.0-ios;net6.0-android;net6.0-maccatalyst</TargetFrameworks>
-		 <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows')) and '$(MSBuildRuntimeType)' == 'Full'">$(TargetFrameworks);net6.0-windows10.0.19041</TargetFrameworks> 
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows')) and '$(MSBuildRuntimeType)' == 'Full'">$(TargetFrameworks);net6.0-windows10.0.19041</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<RootNamespace>Hacked.Maui</RootNamespace>
 		<UseMaui>true</UseMaui>
@@ -13,14 +12,24 @@
 		<ApplicationTitle>Hacked.Maui</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.Hacked.Maui</ApplicationId>
+		<ApplicationId>com.LancelotSoftware.Hacked.Maui</ApplicationId>
 
 		<!-- Versions -->
 		<ApplicationVersion>1.0</ApplicationVersion>
 		<AndroidVersionCode>1</AndroidVersionCode>
 
 		<!-- Required for C# Hot Reload -->
-		<UseInterpreter Condition="'$(Configuration)' == 'Debug'">True</UseInterpreter>
+		<UseInterpreter Condition="'$(Configuration)' == 'Debug'">False</UseInterpreter>
+		<MtouchLink Condition="'$(TargetFramework)' == 'net6.0-ios'  OR '$(TargetFramework)' == 'net6.0-maccatalyst'">SdkOnly</MtouchLink>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
+		<OutputType>WinExe</OutputType>
+		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-maccatalyst'">
+		<DefineConstants>$(DefineConstants);__MACCATALYST__</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -46,70 +55,32 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiImage Remove="Resources\Images\gear_blue.png" />
-	  <MauiImage Remove="Resources\Images\gear_green.png" />
-	  <MauiImage Remove="Resources\Images\gear_red.png" />
-	  <MauiImage Remove="Resources\Images\icon.png" />
-	  <MauiImage Remove="Resources\Images\ic_about.png" />
-	  <MauiImage Remove="Resources\Images\ic_accounts.png" />
-	  <MauiImage Remove="Resources\Images\ic_action_logout.png" />
-	  <MauiImage Remove="Resources\Images\ic_backup.png" />
-	  <MauiImage Remove="Resources\Images\ic_dashboard.png" />
-	  <MauiImage Remove="Resources\Images\ic_menu.png" />
-	  <MauiImage Remove="Resources\Images\ic_settings.png" />
-	  <MauiImage Remove="Resources\Images\settings_white.png" />
-	  <MauiImage Remove="Resources\Images\user_login.png" />
+		<PackageReference Include="Telerik.UI.for.Maui" Version="0.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <BundleResource Include="Resources\Images\gear_blue.png" />
-	  <BundleResource Include="Resources\Images\gear_green.png" />
-	  <BundleResource Include="Resources\Images\gear_red.png" />
-	  <BundleResource Include="Resources\Images\icon.png" />
-	  <BundleResource Include="Resources\Images\ic_about.png" />
-	  <BundleResource Include="Resources\Images\ic_accounts.png" />
-	  <BundleResource Include="Resources\Images\ic_action_logout.png" />
-	  <BundleResource Include="Resources\Images\ic_backup.png" />
-	  <BundleResource Include="Resources\Images\ic_dashboard.png" />
-	  <BundleResource Include="Resources\Images\ic_menu.png" />
-	  <BundleResource Include="Resources\Images\ic_settings.png" />
-	  <BundleResource Include="Resources\Images\settings_white.png" />
-	  <BundleResource Include="Resources\Images\user_login.png" />
+		<ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
+		<ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Telerik.UI.for.Maui" Version="0.0.1" />
+		<Compile Update="Views\AddAccountPage.xaml.cs">
+			<DependentUpon>AddAccountPage.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\AccountDetailPage.xaml.cs">
+			<DependentUpon>AccountDetailPage.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\AccountsPage.xaml.cs">
+			<DependentUpon>AccountsPage.xaml</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
-  <ItemGroup>
-	  <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
-	  <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
+	<ItemGroup>
+		<MauiXaml Update="Views\AddAccountPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\AccountDetailPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 	</ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Views\AddAccountPage.xaml.cs">
-      <DependentUpon>AddAccountPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\AccountDetailPage.xaml.cs">
-      <DependentUpon>AccountDetailPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\AccountsPage.xaml.cs">
-      <DependentUpon>AccountsPage.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <MauiXaml Update="Views\AddAccountPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="Views\AccountDetailPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-  </ItemGroup>
-
-	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
-		<OutputType>WinExe</OutputType>
-		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-	</PropertyGroup>
-
 </Project>
