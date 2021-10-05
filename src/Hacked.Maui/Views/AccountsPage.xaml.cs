@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Hacked.Core.Models;
 using Hacked.Maui.Common;
 using Hacked.Maui.ViewModels;
 using Microsoft.Maui;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
+using Telerik.XamarinForms.DataControls;
 using Telerik.XamarinForms.DataControls.ListView;
+using Telerik.XamarinForms.Input;
 
 namespace Hacked.Maui.Views
 {
@@ -71,6 +75,61 @@ namespace Hacked.Maui.Views
                 //AccountsListView.EndItemSwipe();
             }
         }
+        
+        private void AddAccountPopup_Clicked(object sender, EventArgs e)
+        {
+            popup.IsOpen = true;
+        }
+
+        private async void AddAccount_OnClicked(object sender, EventArgs e)
+        {
+            await AttemptEmailAddAsync(EmailEntry?.Text);
+        }
+
+        private async void EmailEntry_OnCompleted(object sender, EventArgs e)
+        {
+            await AttemptEmailAddAsync(EmailEntry?.Text);
+        }
+
+        private void EmailEntry_OnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            bool isValid = false;
+
+            if (sender is RadEntry entry)
+            {
+                isValid = !string.IsNullOrEmpty(entry.Text);
+            }
+
+            AddAccountButton.BackgroundColor = isValid
+                ? (Color)Application.Current.Resources["ThemeAccentDarkColor"]
+                : (Color)Application.Current.Resources["ThemeTextLightColor"];
+
+            AddAccountButton.TextColor = isValid
+                ? (Color)Application.Current.Resources["ThemeBackgroundColor"]
+                : (Color)Application.Current.Resources["ThemeTextColor"];
+
+            AddAccountButton.IsEnabled = isValid;
+        }
+
+        private async Task AttemptEmailAddAsync(string emailAddress)
+        {
+            if (string.IsNullOrEmpty(emailAddress))
+                return;
+
+            var addedAccount = await ViewModelLocator.Accounts.AddAccount(emailAddress);
+
+            if (addedAccount == null)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "The account was not added, try again", "OK");
+            }
+
+            popup.IsOpen = false;
+        }
+
+        private async void CancelButton_OnClicked(object sender, EventArgs e)
+        {
+            popup.IsOpen = false;
+        }
 
         //private async void AccountsListView_OnRefreshRequested(object sender, PullToRefreshRequestedEventArgs e)
         //{
@@ -98,36 +157,36 @@ namespace Hacked.Maui.Views
         //    }
         //}
 
-        //private async void AccountsListView_OnItemSwipeCompleted(object sender, ItemSwipeCompletedEventArgs e)
-        //{
-        //    var listView = sender as RadListView;
+        private async void AccountsListView_OnItemSwipeCompleted(object sender, ItemSwipeCompletedEventArgs e)
+        {
+            var listView = sender as RadListView;
 
-        //    if (e == null || listView == null)
-        //        return;
+            if (e == null || listView == null)
+                return;
 
-        //    if (e.Item is MonitoredAccount account)
-        //    {
-        //        if (e.Offset > 201)
-        //        {
-        //            var lastCount = account.Breaches.Count;
+            if (e.Item is MonitoredAccount account)
+            {
+                if (e.Offset > 201)
+                {
+                    var lastCount = account.Breaches.Count;
 
-        //            await ViewModelLocator.Main.UpdateBreachesForAccountAsync(account);
+                    await ViewModelLocator.Accounts.UpdateBreachesForAccountAsync(account);
 
-        //            if (account.Breaches.Count > lastCount)
-        //            {
-        //                ViewModelLocator.Main.SaveAccounts();
-        //                await Application.Current.MainPage.DisplayAlert("New breaches have been detected", "Alert", "close");
-        //            }
+                    if (account.Breaches.Count > lastCount)
+                    {
+                        ViewModelLocator.Accounts.SaveAccounts();
+                        await Application.Current.MainPage.DisplayAlert("New breaches have been detected", "Alert", "close");
+                    }
 
-        //            listView?.EndItemSwipe();
-        //        }
-        //        else if (e.Offset < -200)
-        //        {
-        //            ViewModelLocator.Main.RemoveAccount(account);
-        //            listView.EndItemSwipe();
-        //        }
-        //    }
-        //}
+                    listView?.EndItemSwipe();
+                }
+                else if (e.Offset < -200)
+                {
+                    ViewModelLocator.Accounts.RemoveAccount(account);
+                    listView.EndItemSwipe();
+                }
+            }
+        }
 
         //private async void AccountsListView_OnItemTapped(object sender, ItemTapEventArgs e)
         //{

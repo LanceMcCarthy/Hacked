@@ -3,6 +3,9 @@
              x:Class="Hacked.Maui.Views.AccountsPage"
              xmlns:tdc="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.Maui.Controls.Compatibility"
              xmlns:tlv="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:tp="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:tmc="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
+             xmlns:ti="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.Maui.Controls.Compatibility"
              xmlns:viewModels="clr-namespace:Hacked.Maui.ViewModels"
              BindingContext="{x:Static viewModels:ViewModelLocator.Accounts}"
              BackgroundColor="{DynamicResource SecondaryColor}">
@@ -21,16 +24,13 @@
                     <tlv:ListViewTemplateCell>
                         <Grid Padding="10">
                             <VerticalStackLayout>
-                                <Label Text="{Binding Address}"
-                                       TextColor="{DynamicResource ThemeDarkAccent}" />
-                                <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}"
-                                       TextColor="{DynamicResource ThemeAccent}" />
-                                <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}"
-                                       TextColor="{DynamicResource ThemeLightAccent}" />
+                                <Label Text="{Binding Address}" />
+                                <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}" />
+                                <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}" />
                                 <Grid IsVisible="{Binding IsUpdating}"
-                                      BackgroundColor="{DynamicResource ThemeAccentColor}">
+                                      BackgroundColor="Gold">
                                     <Label Text="Is Refreshing..."
-                                           TextColor="{DynamicResource ThemeBackgroundColor}"
+                                           TextColor="Yellow"
                                            HorizontalTextAlignment="Center"
                                            VerticalTextAlignment="Center"
                                            Margin="0,2" />
@@ -39,8 +39,6 @@
 
                             <ActivityIndicator IsRunning="{Binding IsUpdating}"
                                                IsVisible="{Binding IsUpdating}"
-                                               Color="{DynamicResource ThemeAccentColor}"
-                                               BackgroundColor="{DynamicResource ThemeBackgroundColor}"
                                                HorizontalOptions="Fill"
                                                VerticalOptions="Fill" />
                         </Grid>
@@ -52,12 +50,14 @@
                     <Grid ColumnDefinitions="100, Auto, 100">
                         <Button Text="refresh"
                                 TextColor="White"
-                                BackgroundColor="#00BF32" />
+                                BackgroundColor="#00BF32"
+                                Clicked="RefreshSwipeButton_Clicked" />
 
                         <Button Text="delete"
                                 TextColor="White"
                                 BackgroundColor="#CE0005"
-                                Grid.Column="2" />
+                                Grid.Column="2"
+                                Clicked="DeleteSwipeButton_Clicked" />
                     </Grid>
                 </DataTemplate>
             </tdc:RadListView.ItemSwipeContentTemplate>
@@ -123,11 +123,54 @@
 
                 <Button x:Name="AddAccountModalButton"
                         Text="add an account"
-                        Command="{Binding GoToAddAccountCommand}"
                         TextColor="{DynamicResource ThemeBackgroundColor}"
                         BackgroundColor="{DynamicResource ThemeAccentColor}"
                         CornerRadius="5"
-                        Margin="10" />
+                        Margin="10"
+                        Clicked="AddAccountPopup_Clicked">
+                    <tp:RadPopup.Popup>
+                        <tp:RadPopup x:Name="popup"
+                                     IsModal="True"
+                                     OutsideBackgroundColor="#B3FFF493">
+                            <tmc:RadBorder CornerRadius="6"
+                                           BackgroundColor="#93D7FF"
+                                           Padding="10">
+                                <Grid BackgroundColor="{DynamicResource ThemeBackgroundColor}">
+                                    <VerticalStackLayout Margin="20"
+                                                         HorizontalOptions="Center">
+                                        <Label HorizontalOptions="Start"
+                                               Text="Enter an account to monitor"
+                                               TextColor="{DynamicResource ThemeAccentLightColor}" />
+                                        <ti:RadEntry x:Name="EmailEntry"
+                                                        Completed="EmailEntry_OnCompleted"
+                                                        Keyboard="Email"
+                                                        WatermarkText="enter email address or username"
+                                                        WatermarkTextColor="{DynamicResource ThemeTextLightColor}"
+                                                        TextColor="{DynamicResource ThemeTextColor}"
+                                                        TextChanged="EmailEntry_OnTextChanged" />
+                                        <Button x:Name="AddAccountButton"
+                                                IsEnabled="True"
+                                                Text="add account"
+                                                TextColor="{DynamicResource ThemeTextColor}"
+                                                BackgroundColor="{DynamicResource ThemeTextLightColor}"
+                                                Clicked="AddAccount_OnClicked" />
+                                        <Button x:Name="CancelButton"
+                                                Clicked="CancelButton_OnClicked"
+                                                Text="cancel"
+                                                TextColor="{DynamicResource ThemeTextColor}"
+                                                BackgroundColor="Transparent" />
+                                    </VerticalStackLayout>
+
+                                    <ActivityIndicator IsVisible="{Binding IsBusy}"
+                                                       IsRunning="{Binding IsBusy}"
+                                                       BackgroundColor="{DynamicResource ThemeBackgroundColor}"
+                                                       HorizontalOptions="Fill"
+                                                       VerticalOptions="Fill" />
+                                </Grid>
+                            </tmc:RadBorder>
+                        </tp:RadPopup>
+                    </tp:RadPopup.Popup>
+                </Button>
             </VerticalStackLayout>
         </Grid>
     </Grid>
