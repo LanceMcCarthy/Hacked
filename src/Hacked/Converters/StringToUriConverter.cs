@@ -9,6 +9,9 @@ namespace Hacked.Converters
         {
             if (value is string url)
             {
+                if (string.IsNullOrEmpty(url))
+                    return "";
+
                 return new Uri($"http://{value}", UriKind.RelativeOrAbsolute);
             }
 
