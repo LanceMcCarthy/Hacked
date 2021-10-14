@@ -1,4 +1,5 @@
-﻿using Microsoft.Maui.Controls.Hosting;
+﻿using Microsoft.Maui;
+using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Maui.Hosting;
 using Telerik.Maui.Controls.Compatibility;
 
@@ -17,7 +18,7 @@ namespace Hacked.Maui
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
-            
+
             return builder.Build();
         }
     }
