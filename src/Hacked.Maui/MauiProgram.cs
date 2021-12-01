@@ -16,8 +16,9 @@ namespace Hacked.Maui
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                    fonts.AddFont("telerikfontexamples.ttf", "telerikfontexamples");
                 });
-            
+
             return builder.Build();
         }
     }
