@@ -37,7 +37,7 @@
                     </tlv:ListViewTemplateCell>
                 </DataTemplate>
             </tdc:RadListView.ItemTemplate>
-            <!--<tdc:RadListView.ItemStyle>
+            <tdc:RadListView.ItemStyle>
                     <tlv:ListViewItemStyle BackgroundColor="{DynamicResource ThemeBackgroundColor}"
                                            TextCellTextColor="{DynamicResource ThemeAccentLightColor}"
                                            BorderColor="#0A3A82"
@@ -57,7 +57,7 @@
                                            BorderColor="#0B3D89"
                                            BorderWidth="2"
                                            BorderLocation="Bottom" />
-                </tdc:RadListView.PressedItemStyle>-->
+                </tdc:RadListView.PressedItemStyle>
         </tdc:RadListView>
     </Grid>
 </ContentPage>
