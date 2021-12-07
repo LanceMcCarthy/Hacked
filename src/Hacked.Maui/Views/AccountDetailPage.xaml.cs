@@ -2,13 +2,12 @@
 using Microsoft.Maui.Controls;
 using System.Collections.Generic;
 
-namespace Hacked.Maui.Views
+namespace Hacked.Maui.Views;
+
+public partial class AccountDetailPage : ContentPage
 {
-    public partial class AccountDetailPage : ContentPage
+    public AccountDetailPage()
     {
-        public AccountDetailPage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

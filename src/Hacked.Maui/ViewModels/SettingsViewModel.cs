@@ -5,15 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using CommonHelpers.Common;
 
-namespace Hacked.Maui.ViewModels
-{
-    public class SettingsViewModel : ViewModelBase
-    {
-        public SettingsViewModel()
-        {
-            
-        }
+namespace Hacked.Maui.ViewModels;
 
-        public string AppVersion => "1.0";
+public class SettingsViewModel : ViewModelBase
+{
+    public SettingsViewModel()
+    {
+            
     }
+
+    public string AppVersion => "1.0";
 }

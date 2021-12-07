@@ -4,16 +4,15 @@ using CommonHelpers.Common;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Essentials;
 
-namespace Hacked.Maui.ViewModels
-{
-    public class AboutViewModel : ViewModelBase
-    {
-        public AboutViewModel()
-        {
-            Title = "About";
-            OpenWebCommand = new Command(async()=> await Launcher.OpenAsync(new Uri("https://xamarin.com/platform")));
-        }
+namespace Hacked.Maui.ViewModels;
 
-        public ICommand OpenWebCommand { get; }
+public class AboutViewModel : ViewModelBase
+{
+    public AboutViewModel()
+    {
+        Title = "About";
+        OpenWebCommand = new Command(async()=> await Launcher.OpenAsync(new Uri("https://xamarin.com/platform")));
     }
+
+    public ICommand OpenWebCommand { get; }
 }

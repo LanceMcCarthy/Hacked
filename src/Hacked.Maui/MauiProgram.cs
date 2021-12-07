@@ -2,24 +2,23 @@
 using Microsoft.Maui.Hosting;
 using Telerik.Maui.Controls.Compatibility;
 
-namespace Hacked.Maui
+namespace Hacked.Maui;
+
+public static class MauiProgram
 {
-    public static class MauiProgram
+    public static MauiApp CreateMauiApp()
     {
-        public static MauiApp CreateMauiApp()
-        {
-            var builder = MauiApp.CreateBuilder();
+        var builder = MauiApp.CreateBuilder();
 
-            builder
-                .UseMauiApp<App>()
-                .UseTelerik()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("telerikfontexamples.ttf", "telerikfontexamples");
-                });
+        builder
+            .UseMauiApp<App>()
+            .UseTelerik()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("telerikfontexamples.ttf", "telerikfontexamples");
+            });
 
-            return builder.Build();
-        }
+        return builder.Build();
     }
 }

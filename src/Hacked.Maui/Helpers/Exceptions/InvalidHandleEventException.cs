@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Hacked.Maui.Helpers.Exceptions
+namespace Hacked.Maui.Helpers.Exceptions;
+
+/// <summary>
+/// Represents errors that occur during WeakEventManager.HandleEvent execution.
+/// </summary>
+public class InvalidHandleEventException : Exception
 {
     /// <summary>
-    /// Represents errors that occur during WeakEventManager.HandleEvent execution.
+    /// Initializes a new instance of the <see cref="InvalidHandleEventException"/> class.
     /// </summary>
-    public class InvalidHandleEventException : Exception
+    /// <param name="message">Message.</param>
+    /// <param name="targetParameterCountException">Target parameter count exception.</param>
+    public InvalidHandleEventException(string message, TargetParameterCountException targetParameterCountException)
+        : base(message, targetParameterCountException)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvalidHandleEventException"/> class.
-        /// </summary>
-        /// <param name="message">Message.</param>
-        /// <param name="targetParameterCountException">Target parameter count exception.</param>
-        public InvalidHandleEventException(string message, TargetParameterCountException targetParameterCountException)
-            : base(message, targetParameterCountException)
-        {
-        }
     }
 }

@@ -4,105 +4,104 @@ using Hacked.Maui.Helpers.Events;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Essentials;
 
-namespace Hacked.Maui.Helpers.Commands
+namespace Hacked.Maui.Helpers.Commands;
+
+public abstract class BaseCommand<TCanExecute>
 {
-    public abstract class BaseCommand<TCanExecute>
+    readonly Func<TCanExecute?, bool> canExecute;
+    readonly DelegateWeakEventManager weakEventManager = new DelegateWeakEventManager();
+
+    volatile int executionCount;
+
+    /// <summary>
+    /// Initializes BaseCommand
+    /// </summary>
+    /// <param name="canExecute"></param>
+    /// <param name="allowsMultipleExecutions"></param>
+    private protected BaseCommand(Func<TCanExecute?, bool>? canExecute, bool allowsMultipleExecutions)
     {
-        readonly Func<TCanExecute?, bool> canExecute;
-        readonly DelegateWeakEventManager weakEventManager = new DelegateWeakEventManager();
+        this.canExecute = canExecute ?? (_ => true);
+        AllowsMultipleExecutions = allowsMultipleExecutions;
+    }
 
-        volatile int executionCount;
+    /// <summary>
+    /// Occurs when changes occur that affect whether or not the command should execute
+    /// </summary>
+    public event EventHandler CanExecuteChanged
+    {
+        add => weakEventManager.AddEventHandler(value);
+        remove => weakEventManager.RemoveEventHandler(value);
+    }
 
-        /// <summary>
-        /// Initializes BaseCommand
-        /// </summary>
-        /// <param name="canExecute"></param>
-        /// <param name="allowsMultipleExecutions"></param>
-        private protected BaseCommand(Func<TCanExecute?, bool>? canExecute, bool allowsMultipleExecutions)
+    /// <summary>
+    /// Returns true when the Command is currently executing. Returns false when the Command is not executing
+    /// </summary>
+    public bool IsExecuting => ExecutionCount > 0;
+
+    /// <summary>
+    /// Returns true if the Command allows simultaneous executions
+    /// </summary>
+    public bool AllowsMultipleExecutions { get; }
+
+    protected int ExecutionCount
+    {
+        get => executionCount;
+        set
         {
-            this.canExecute = canExecute ?? (_ => true);
-            AllowsMultipleExecutions = allowsMultipleExecutions;
-        }
-
-        /// <summary>
-        /// Occurs when changes occur that affect whether or not the command should execute
-        /// </summary>
-        public event EventHandler CanExecuteChanged
-        {
-            add => weakEventManager.AddEventHandler(value);
-            remove => weakEventManager.RemoveEventHandler(value);
-        }
-
-        /// <summary>
-        /// Returns true when the Command is currently executing. Returns false when the Command is not executing
-        /// </summary>
-        public bool IsExecuting => ExecutionCount > 0;
-
-        /// <summary>
-        /// Returns true if the Command allows simultaneous executions
-        /// </summary>
-        public bool AllowsMultipleExecutions { get; }
-
-        protected int ExecutionCount
-        {
-            get => executionCount;
-            set
+            var shouldRaiseCanExecuteChanged = (AllowsMultipleExecutions, executionCount, value) switch
             {
-                var shouldRaiseCanExecuteChanged = (AllowsMultipleExecutions, executionCount, value) switch
-                {
-                    (true, _, _) => false,
-                    (false, 0, > 0) => true,
-                    (false, > 0, 0) => true,
-                    (false, _, _) => false
-                };
+                (true, _, _) => false,
+                (false, 0, > 0) => true,
+                (false, > 0, 0) => true,
+                (false, _, _) => false
+            };
 
-                executionCount = value;
+            executionCount = value;
 
-                if (shouldRaiseCanExecuteChanged)
-                    RaiseCanExecuteChanged();
-            }
+            if (shouldRaiseCanExecuteChanged)
+                RaiseCanExecuteChanged();
         }
+    }
 
-        /// <summary>
-        /// Determines whether the command can execute in its current state
-        /// </summary>
-        /// <returns><c>true</c>, if this command can be executed; otherwise, <c>false</c>.</returns>
-        /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
-        public bool CanExecute(TCanExecute? parameter) => (AllowsMultipleExecutions, IsExecuting) switch
-        {
-            (true, _) => canExecute(parameter),
-            (false, true) => false,
-            (false, false) => canExecute(parameter),
-        };
+    /// <summary>
+    /// Determines whether the command can execute in its current state
+    /// </summary>
+    /// <returns><c>true</c>, if this command can be executed; otherwise, <c>false</c>.</returns>
+    /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
+    public bool CanExecute(TCanExecute? parameter) => (AllowsMultipleExecutions, IsExecuting) switch
+    {
+        (true, _) => canExecute(parameter),
+        (false, true) => false,
+        (false, false) => canExecute(parameter),
+    };
 
-        /// <summary>
-        /// Raises the `ICommand.CanExecuteChanged` event.
-        /// </summary
-        public void RaiseCanExecuteChanged()
-        {
-            // Automatically marshall to the Main Thread to adhere to the way that Xamarin.Forms automatically marshalls binding events to Main Thread
-            if (MainThread.IsMainThread)
-                weakEventManager.RaiseEvent(this, EventArgs.Empty, nameof(CanExecuteChanged));
-            else
-                Device.BeginInvokeOnMainThread(() => weakEventManager.RaiseEvent(this, EventArgs.Empty, nameof(CanExecuteChanged)));
-        }
+    /// <summary>
+    /// Raises the `ICommand.CanExecuteChanged` event.
+    /// </summary
+    public void RaiseCanExecuteChanged()
+    {
+        // Automatically marshall to the Main Thread to adhere to the way that Xamarin.Forms automatically marshalls binding events to Main Thread
+        if (MainThread.IsMainThread)
+            weakEventManager.RaiseEvent(this, EventArgs.Empty, nameof(CanExecuteChanged));
+        else
+            Device.BeginInvokeOnMainThread(() => weakEventManager.RaiseEvent(this, EventArgs.Empty, nameof(CanExecuteChanged)));
+    }
 
-        /// <summary>
-        /// Raises the `ICommand.CanExecuteChanged` event. Recommend using RaiseCanExecuteChanged() instead.
-        /// </summary>
-        public void ChangeCanExecute() => RaiseCanExecuteChanged();
+    /// <summary>
+    /// Raises the `ICommand.CanExecuteChanged` event. Recommend using RaiseCanExecuteChanged() instead.
+    /// </summary>
+    public void ChangeCanExecute() => RaiseCanExecuteChanged();
 
-        protected static bool IsNullable<T>()
-        {
-            var type = typeof(T);
+    protected static bool IsNullable<T>()
+    {
+        var type = typeof(T);
 
-            if (!type.GetTypeInfo().IsValueType)
-                return true; // ref-type
+        if (!type.GetTypeInfo().IsValueType)
+            return true; // ref-type
 
-            if (Nullable.GetUnderlyingType(type) != null)
-                return true; // Nullable<T>
+        if (Nullable.GetUnderlyingType(type) != null)
+            return true; // Nullable<T>
 
-            return false; // Non-nullable value-type
-        }
+        return false; // Non-nullable value-type
     }
 }

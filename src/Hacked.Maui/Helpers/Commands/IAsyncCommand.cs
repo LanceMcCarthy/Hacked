@@ -1,72 +1,71 @@
 ﻿using System.Threading.Tasks;
 
-namespace Hacked.Maui.Helpers.Commands
+namespace Hacked.Maui.Helpers.Commands;
+
+/// <summary>
+/// An Async implementation of ICommand for Task
+/// </summary>
+public interface IAsyncCommand<in TExecute, in TCanExecute> : IAsyncCommand<TExecute>
 {
     /// <summary>
-    /// An Async implementation of ICommand for Task
+    /// Determines whether the command can execute in its current state
     /// </summary>
-    public interface IAsyncCommand<in TExecute, in TCanExecute> : IAsyncCommand<TExecute>
-    {
-        /// <summary>
-        /// Determines whether the command can execute in its current state
-        /// </summary>
-        /// <returns><c>true</c>, if this command can be executed; otherwise, <c>false</c>.</returns>
-        /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
-        bool CanExecute(TCanExecute parameter);
-    }
+    /// <returns><c>true</c>, if this command can be executed; otherwise, <c>false</c>.</returns>
+    /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
+    bool CanExecute(TCanExecute parameter);
+}
+
+/// <summary>
+/// An Async implementation of ICommand for Task
+/// </summary>
+public interface IAsyncCommand<in T> : System.Windows.Input.ICommand
+{
+    /// <summary>
+    /// Returns true when the Command is currently executing. Returns false when the Command is not executing
+    /// </summary>
+    bool IsExecuting { get; }
 
     /// <summary>
-    /// An Async implementation of ICommand for Task
+    /// Returns true if the Command allows simultaneous executions
     /// </summary>
-    public interface IAsyncCommand<in T> : System.Windows.Input.ICommand
-    {
-        /// <summary>
-        /// Returns true when the Command is currently executing. Returns false when the Command is not executing
-        /// </summary>
-        bool IsExecuting { get; }
-
-        /// <summary>
-        /// Returns true if the Command allows simultaneous executions
-        /// </summary>
-        bool AllowsMultipleExecutions { get; }
-
-        /// <summary>
-        /// Executes the Command as a Task
-        /// </summary>
-        /// <returns>The Task to execute</returns>
-        /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
-        System.Threading.Tasks.Task ExecuteAsync(T parameter);
-
-        /// <summary>
-        /// Raises the CanExecuteChanged event.
-        /// </summary>
-        void RaiseCanExecuteChanged();
-    }
+    bool AllowsMultipleExecutions { get; }
 
     /// <summary>
-    /// An Async implementation of ICommand for Task
+    /// Executes the Command as a Task
     /// </summary>
-    public interface IAsyncCommand : System.Windows.Input.ICommand
-    {
-        /// <summary>
-        /// Returns true when the Command is currently executing. Returns false when the Command is not executing
-        /// </summary>
-        bool IsExecuting { get; }
+    /// <returns>The Task to execute</returns>
+    /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
+    System.Threading.Tasks.Task ExecuteAsync(T parameter);
 
-        /// <summary>
-        /// Returns true if the Command allows simultaneous executions
-        /// </summary>
-        bool AllowsMultipleExecutions { get; }
+    /// <summary>
+    /// Raises the CanExecuteChanged event.
+    /// </summary>
+    void RaiseCanExecuteChanged();
+}
 
-        /// <summary>
-        /// Executes the Command as a Task
-        /// </summary>
-        /// <returns>The Task to execute</returns>
-        Task ExecuteAsync();
+/// <summary>
+/// An Async implementation of ICommand for Task
+/// </summary>
+public interface IAsyncCommand : System.Windows.Input.ICommand
+{
+    /// <summary>
+    /// Returns true when the Command is currently executing. Returns false when the Command is not executing
+    /// </summary>
+    bool IsExecuting { get; }
 
-        /// <summary>
-        /// Raises the CanExecuteChanged event.
-        /// </summary>
-        void RaiseCanExecuteChanged();
-    }
+    /// <summary>
+    /// Returns true if the Command allows simultaneous executions
+    /// </summary>
+    bool AllowsMultipleExecutions { get; }
+
+    /// <summary>
+    /// Executes the Command as a Task
+    /// </summary>
+    /// <returns>The Task to execute</returns>
+    Task ExecuteAsync();
+
+    /// <summary>
+    /// Raises the CanExecuteChanged event.
+    /// </summary>
+    void RaiseCanExecuteChanged();
 }
