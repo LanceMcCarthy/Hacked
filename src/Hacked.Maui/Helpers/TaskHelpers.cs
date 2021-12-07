@@ -2,23 +2,22 @@
 using System;
 using System.Diagnostics;
 
-namespace Hacked.Maui.Helpers
+namespace Hacked.Maui.Helpers;
+
+public static class TaskHelpers
 {
-    public static class TaskHelpers
+    public static bool RunOnUiThread(Action a)
     {
-        public static bool RunOnUiThread(Action a)
+        try
         {
-            try
-            {
-                Device.BeginInvokeOnMainThread(a);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                //TODO log exception
-                Debug.WriteLine($"RunOnUiThread Helper Exception: {ex.Message}");
-                return false;
-            }
+            Device.BeginInvokeOnMainThread(a);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            //TODO log exception
+            Debug.WriteLine($"RunOnUiThread Helper Exception: {ex.Message}");
+            return false;
         }
     }
 }

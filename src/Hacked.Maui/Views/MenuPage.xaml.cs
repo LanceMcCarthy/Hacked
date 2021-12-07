@@ -1,42 +1,41 @@
 ﻿using Hacked.Maui.Models;
 using Microsoft.Maui.Controls;
 using System.Collections.Generic;
-using Telerik.Maui.Controls;
 using Telerik.XamarinForms.DataControls;
+using Telerik.Maui.Controls;
 
-namespace Hacked.Maui.Views
+namespace Hacked.Maui.Views;
+
+public partial class MenuPage : ContentPage
 {
-    public partial class MenuPage : ContentPage
+    public RadListView MenuListView;
+
+    public MenuPage()
     {
-        public RadListView MenuListView;
+        InitializeComponent();
 
-        public MenuPage()
+        MenuListView = this.listView;
+
+        listView.ItemsSource = new List<NavigationMenuItem>
         {
-            InitializeComponent();
-
-            MenuListView = this.listView;
-
-            listView.ItemsSource = new List<NavigationMenuItem>
+            new()
             {
-                new NavigationMenuItem
-                {
-                    Title = "Main",
-                    IconSource = "ic_accounts.png",
-                    TargetType = typeof(AccountsPage)
-                },
-                new NavigationMenuItem
-                {
-                    Title = "Settings",
-                    IconSource = "ic_settings.png",
-                    TargetType = typeof(AddAccountPage)
-                },
-                new NavigationMenuItem
-                {
-                    Title = "About",
-                    IconSource = "ic_about.png",
-                    TargetType = typeof(AboutPage)
-                }
-            };
-        }
+                Title = "Main",
+                IconSource = "ic_accounts.png",
+                TargetType = typeof(AccountsPage)
+            },
+            new()
+            {
+                Title = "Settings",
+                IconSource = "ic_settings.png",
+                TargetType = typeof(AddAccountPage)
+            },
+            new()
+            {
+                Title = "About",
+                IconSource = "ic_about.png",
+                TargetType = typeof(AboutPage)
+            }
+        };
     }
 }

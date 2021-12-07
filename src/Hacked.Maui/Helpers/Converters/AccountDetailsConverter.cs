@@ -4,23 +4,22 @@ using System.Linq;
 using Hacked.Core.Models;
 using Microsoft.Maui.Controls;
 
-namespace Hacked.Maui.Helpers.Converters
+namespace Hacked.Maui.Helpers.Converters;
+
+internal class AccountDetailsConverter : IValueConverter
 {
-    internal class AccountDetailsConverter : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (!(value is MonitoredAccount account))
-                return "account is null";
+        if (!(value is MonitoredAccount account))
+            return "account is null";
 
-            var newCount = account.Breaches.Where(a => a.IsNew).ToList().Count;
+        var newCount = account.Breaches.Where(a => a.IsNew).ToList().Count;
 
-            return $"Breaches: {account.Breaches.Count}, New: {newCount}";
-        }
+        return $"Breaches: {account.Breaches.Count}, New: {newCount}";
+    }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -2,20 +2,19 @@
 using System.Globalization;
 using Microsoft.Maui.Controls;
 
-namespace Hacked.Maui.Helpers.Converters
+namespace Hacked.Maui.Helpers.Converters;
+
+internal class NullToBoolConverter : IValueConverter
 {
-    internal class NullToBoolConverter : IValueConverter
+    public bool IsInverted { get; set; }
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public bool IsInverted { get; set; }
+        return (value != null);
+    }
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return (value != null);
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
     }
 }

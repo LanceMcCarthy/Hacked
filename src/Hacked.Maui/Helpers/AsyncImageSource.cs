@@ -26,28 +26,27 @@ using Microsoft.Maui.Controls;
 using System;
 using System.Threading.Tasks;
 
-namespace Hacked.Maui.Helpers
+namespace Hacked.Maui.Helpers;
+
+public static class AsyncImageSource
 {
-    public static class AsyncImageSource
+    public static NotifyTaskCompletion<ImageSource> FromTask(Task<ImageSource> task, ImageSource defaultSource)
     {
-        public static NotifyTaskCompletion<ImageSource> FromTask(Task<ImageSource> task, ImageSource defaultSource)
-        {
-            return new NotifyTaskCompletion<ImageSource>(task, defaultSource);
-        }
+        return new NotifyTaskCompletion<ImageSource>(task, defaultSource);
+    }
 
-        public static NotifyTaskCompletion<ImageSource> FromUriAndResource(string uri, string resource)
-        {
-            var u = new Uri(uri);
-            return FromUriAndResource(u, resource);
-        }
+    public static NotifyTaskCompletion<ImageSource> FromUriAndResource(string uri, string resource)
+    {
+        var u = new Uri(uri);
+        return FromUriAndResource(u, resource);
+    }
 
-        public static NotifyTaskCompletion<ImageSource> FromUriAndResource(Uri uri, string resource)
-        {
-            var t = Task.Run(() => ImageSource.FromUri(uri));
+    public static NotifyTaskCompletion<ImageSource> FromUriAndResource(Uri uri, string resource)
+    {
+        var t = Task.Run(() => ImageSource.FromUri(uri));
 
-            var defaultResource = ImageSource.FromResource(resource);
+        var defaultResource = ImageSource.FromResource(resource);
 
-            return FromTask(t, defaultResource);
-        }
+        return FromTask(t, defaultResource);
     }
 }

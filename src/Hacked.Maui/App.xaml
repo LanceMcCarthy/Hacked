@@ -3,6 +3,7 @@
              xmlns:windows="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.WindowsSpecific;assembly=Microsoft.Maui.Controls"
              xmlns:local="clr-namespace:Hacked.Maui"
              xmlns:converters="clr-namespace:Hacked.Maui.Converters"
+             xmlns:primitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
              x:Class="Hacked.Maui.App"
              windows:Application.ImageDirectory="Assets">
     <Application.Resources>
@@ -115,13 +116,13 @@
                                            Color="{DynamicResource ThemeAccentColor}"
                                            BackgroundColor="{DynamicResource ThemeBackgroundColor}"
                                            HorizontalOptions="Fill"
-                                           VerticalOptions="Fill"/>
+                                           VerticalOptions="Fill"/>-->
 
                         <primitives:RadBusyIndicator IsVisible="{Binding IsUpdating}"
                                                      IsBusy="{Binding IsUpdating}"
                                                      AnimationType="Animation3"
                                                      BackgroundColor="{DynamicResource ThemeBackgroundColor}"
-                                                     AnimationContentColor="{DynamicResource ThemeAccentColor}" />-->
+                                                     AnimationContentColor="{DynamicResource ThemeAccentColor}" />
                 </Grid>
             </DataTemplate>
 
