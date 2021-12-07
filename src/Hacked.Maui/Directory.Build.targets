@@ -15,7 +15,16 @@
   </ItemGroup>
 
   <!-- Required - Overwrite tasks that are not needed when multitargeting -->
-  <Target Name="ValidateWinUIPlatform" />
   <Target Name="BinPlaceBootstrapDll" />
+
+  <!-- HACK: Prevent the Platform checks -->
+  <Target Name="ValidateWinUIPlatform" />
+
+  <!-- HACK: Do not copy the native bootstrap files -->
+  <Target Name="_RemoveWasdkBootstrapDll" BeforeTargets="ResolveReferences">
+	  <ItemGroup>
+		  <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)%(Extension)' == 'Microsoft.WindowsAppRuntime.Bootstrap.dll'" />
+	  </ItemGroup>
+  </Target>
 
 </Project>
