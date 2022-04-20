@@ -2,7 +2,6 @@
 using Microsoft.Maui.Controls;
 using System.Collections.Generic;
 using Telerik.XamarinForms.DataControls;
-using Telerik.Maui.Controls;
 
 namespace Hacked.Maui.Views;
 

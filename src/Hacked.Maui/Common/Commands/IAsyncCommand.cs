@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Hacked.Maui.Helpers.Commands;
+namespace Hacked.Maui.Common.Commands;
 
 /// <summary>
 /// An Async implementation of ICommand for Task

@@ -16,7 +16,7 @@ public partial class App : Application
 
     protected override void OnStart()
     {
-        ThemeHelper.LoadTheme();
+        //ThemeHelper.LoadTheme();
     }
 
     public static void ShowExceptionMessage(string callerName, Exception ex)

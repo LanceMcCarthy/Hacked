@@ -1,10 +1,10 @@
-﻿using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.Xaml;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Xaml;
 
-namespace Hacked.Maui.Helpers.Extensions;
+namespace Hacked.Maui.Common.Extensions;
 
 [ContentProperty("Source")]
 public class ImageUriExtension : IMarkupExtension

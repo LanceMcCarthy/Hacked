@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Hacked.Maui.Helpers;
 
-namespace Hacked.Maui.Helpers.Events;
+namespace Hacked.Maui.Common.Events;
 
 public class DelegateWeakEventManager
 {

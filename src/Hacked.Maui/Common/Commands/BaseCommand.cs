@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Reflection;
-using Hacked.Maui.Helpers.Events;
 using Microsoft.Maui.Controls;
-using Microsoft.Maui.Essentials;
 
-namespace Hacked.Maui.Helpers.Commands;
+namespace Hacked.Maui.Common.Commands;
 
 public abstract class BaseCommand<TCanExecute>
 {

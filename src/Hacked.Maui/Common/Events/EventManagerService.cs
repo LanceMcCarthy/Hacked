@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using Hacked.Maui.Helpers.Exceptions;
+using Hacked.Maui.Helpers;
 
-namespace Hacked.Maui.Helpers.Events;
+namespace Hacked.Maui.Common.Events;
 
 static class EventManagerService
 {

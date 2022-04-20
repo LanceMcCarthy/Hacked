@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Hacked.Maui.ViewModels;
+﻿using Hacked.Maui.ViewModels;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
-using Telerik.XamarinForms.Input;
+using System;
+using System.Threading.Tasks;
+using Telerik.Maui.Controls;
 
 namespace Hacked.Maui.Views;
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Maui.Controls;
-using Microsoft.Maui.Essentials;
 using System;
 using System.Collections.Generic;
+using Microsoft.Maui.ApplicationModel.Communication;
 
 namespace Hacked.Maui.Views;
 

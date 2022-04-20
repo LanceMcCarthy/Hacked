@@ -1,7 +1,8 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Maui.Storage;
 
-namespace Hacked.Maui.Helpers.Extensions;
+namespace Hacked.Maui.Common.Extensions;
 
 public static class FileExtensions
 {
@@ -10,7 +11,7 @@ public static class FileExtensions
     static FileExtensions()
     {
         // Gets the target platform's valid save location
-        LocalFolder = Microsoft.Maui.Essentials.FileSystem.AppDataDirectory;
+        LocalFolder = FileSystem.AppDataDirectory;
     }
 
     public static string SaveTextToFile(string text, string fileName)
@@ -41,10 +42,8 @@ public static class FileExtensions
     {
         return await Task.Run(() =>
         {
-            using (var fileStream = File.OpenRead(filePath))
-            {
-                return fileStream;
-            }
+            using var fileStream = File.OpenRead(filePath);
+            return fileStream;
         });
     }
 
@@ -61,15 +60,14 @@ public static class FileExtensions
         if (File.Exists(filePath))
             File.Delete(filePath);
 
-        using (var fileStream = File.OpenWrite(filePath))
-        {
-            if (dataStream.CanSeek)
-                dataStream.Position = 0;
+        await using var fileStream = File.OpenWrite(filePath);
 
-            await dataStream.CopyToAsync(fileStream);
+        if (dataStream.CanSeek)
+            dataStream.Position = 0;
 
-            return filePath;
-        }
+        await dataStream.CopyToAsync(fileStream);
+
+        return filePath;
     }
 
     public static async Task<string> SaveBytesToFileAsync(this byte[] dataBytes, string fileName)
