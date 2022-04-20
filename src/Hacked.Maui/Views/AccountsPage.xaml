@@ -1,11 +1,10 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Hacked.Maui.Views.AccountsPage"
+             xmlns:telerik="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
              xmlns:tdc="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.Maui.Controls.Compatibility"
              xmlns:tlv="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.Maui.Controls.Compatibility"
              xmlns:tp="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
-             xmlns:tmc="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
-             xmlns:ti="clr-namespace:Telerik.XamarinForms.Input;assembly=Telerik.Maui.Controls.Compatibility"
              xmlns:viewModels="clr-namespace:Hacked.Maui.ViewModels"
              BindingContext="{x:Static viewModels:ViewModelLocator.Accounts}"
              BackgroundColor="{DynamicResource SecondaryColor}">
@@ -132,7 +131,7 @@
                         <tp:RadPopup x:Name="popup"
                                      IsModal="True"
                                      OutsideBackgroundColor="#B3FFF493">
-                            <tmc:RadBorder CornerRadius="6"
+                            <telerik:RadBorder CornerRadius="6"
                                            BackgroundColor="#93D7FF"
                                            Padding="10">
                                 <Grid BackgroundColor="{DynamicResource ThemeBackgroundColor}">
@@ -141,11 +140,11 @@
                                         <Label HorizontalOptions="Start"
                                                Text="Enter an account to monitor"
                                                TextColor="{DynamicResource ThemeAccentLightColor}" />
-                                        <ti:RadEntry x:Name="EmailEntry"
+                                        <telerik:RadEntry x:Name="EmailEntry"
                                                         Completed="EmailEntry_OnCompleted"
                                                         Keyboard="Email"
-                                                        WatermarkText="enter email address or username"
-                                                        WatermarkTextColor="{DynamicResource ThemeTextLightColor}"
+                                                        Placeholder="enter email address or username"
+                                                        PlaceholderColor="{DynamicResource ThemeTextLightColor}"
                                                         TextColor="{DynamicResource ThemeTextColor}"
                                                         TextChanged="EmailEntry_OnTextChanged" />
                                         <Button x:Name="AddAccountButton"
@@ -167,7 +166,7 @@
                                                        HorizontalOptions="Fill"
                                                        VerticalOptions="Fill" />
                                 </Grid>
-                            </tmc:RadBorder>
+                            </telerik:RadBorder>
                         </tp:RadPopup>
                     </tp:RadPopup.Popup>
                 </Button>

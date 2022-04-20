@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Hacked.Maui.Helpers.Exceptions;
-using Hacked.Maui.Helpers.Extensions;
 
-namespace Hacked.Maui.Helpers.Commands;
+namespace Hacked.Maui.Common.Commands;
 
 public class BaseAsyncCommand<TExecute, TCanExecute> : BaseCommand<TCanExecute>, ICommand
 {

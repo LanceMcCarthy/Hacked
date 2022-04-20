@@ -1,14 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using Hacked.Core.Models;
-using Hacked.Maui.Common;
+﻿using Hacked.Core.Models;
 using Hacked.Maui.ViewModels;
-using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Graphics;
+using System;
+using System.Threading.Tasks;
+using Telerik.Maui.Controls;
 using Telerik.XamarinForms.DataControls;
 using Telerik.XamarinForms.DataControls.ListView;
-using Telerik.XamarinForms.Input;
 
 namespace Hacked.Maui.Views;
 

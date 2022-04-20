@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Hacked.Maui.Helpers.Exceptions;
+namespace Hacked.Maui.Common.Exceptions;
 
 /// <summary>
 /// Represents errors that occur during WeakEventManager.HandleEvent execution.

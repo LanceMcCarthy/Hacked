@@ -1,5 +1,6 @@
 ﻿using Hacked.Maui.Models;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Devices;
 using System;
 using System.Collections.Specialized;
 
@@ -22,8 +23,14 @@ public partial class RootPage : FlyoutPage
             ((Application.Current.MainPage as RootPage)?.Detail as NavigationPage)?.Navigation.PushAsync(page);
 
             SideMenuPage.MenuListView.SelectedItem = null;
-
-            if (Device.RuntimePlatform != "UWP")
+            
+            if (DeviceInfo.Platform == DevicePlatform.WinUI || 
+                DeviceInfo.Platform == DevicePlatform.MacCatalyst ||
+                DeviceInfo.Platform == DevicePlatform.macOS)
+            {
+                IsPresented = true;
+            }
+            else
             {
                 IsPresented = false;
             }

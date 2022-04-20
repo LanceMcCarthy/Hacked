@@ -45,37 +45,37 @@ public static class ThemeHelper
         
     private static void SetBlueTheme()
     {
-        Application.Current.Resources["ThemeBackgroundColor"] = Color.FromHex("#f2fffd");
-        Application.Current.Resources["ThemeTextLightColor"] = Color.FromHex("#a5a6a6");
-        Application.Current.Resources["ThemeTextColor"] = Color.FromHex("#6d6d6d");
-        Application.Current.Resources["ThemeTextDarkColor"] = Color.FromHex("#2b2b2b");
-        Application.Current.Resources["ThemeAccentBrightColor"] = Color.FromHex("#13d2e4");
-        Application.Current.Resources["ThemeAccentLightColor"] = Color.FromHex("#009acd");
-        Application.Current.Resources["ThemeAccentColor"] = Color.FromHex("#005dac");
-        Application.Current.Resources["ThemeAccentDarkColor"] = Color.FromHex("#002d87");
+        Application.Current.Resources["ThemeBackgroundColor"] = Color.FromArgb("#f2fffd");
+        Application.Current.Resources["ThemeTextLightColor"] = Color.FromArgb("#a5a6a6");
+        Application.Current.Resources["ThemeTextColor"] = Color.FromArgb("#6d6d6d");
+        Application.Current.Resources["ThemeTextDarkColor"] = Color.FromArgb("#2b2b2b");
+        Application.Current.Resources["ThemeAccentBrightColor"] = Color.FromArgb("#13d2e4");
+        Application.Current.Resources["ThemeAccentLightColor"] = Color.FromArgb("#009acd");
+        Application.Current.Resources["ThemeAccentColor"] = Color.FromArgb("#005dac");
+        Application.Current.Resources["ThemeAccentDarkColor"] = Color.FromArgb("#002d87");
     }
 
     private static void SetRedTheme()
     {
-        Application.Current.Resources["ThemeBackgroundColor"] = Color.FromHex("#fff2f2");
-        Application.Current.Resources["ThemeTextLightColor"] = Color.FromHex("#a5a6a6");
-        Application.Current.Resources["ThemeTextColor"] = Color.FromHex("#6d6d6d");
-        Application.Current.Resources["ThemeTextDarkColor"] = Color.FromHex("#2b2b2b");
-        Application.Current.Resources["ThemeAccentBrightColor"] = Color.FromHex("#fb9897");
-        Application.Current.Resources["ThemeAccentLightColor"] = Color.FromHex("#cd1900");
-        Application.Current.Resources["ThemeAccentColor"] = Color.FromHex("#ac2200");
-        Application.Current.Resources["ThemeAccentDarkColor"] = Color.FromHex("#872400");
+        Application.Current.Resources["ThemeBackgroundColor"] = Color.FromArgb("#fff2f2");
+        Application.Current.Resources["ThemeTextLightColor"] = Color.FromArgb("#a5a6a6");
+        Application.Current.Resources["ThemeTextColor"] = Color.FromArgb("#6d6d6d");
+        Application.Current.Resources["ThemeTextDarkColor"] = Color.FromArgb("#2b2b2b");
+        Application.Current.Resources["ThemeAccentBrightColor"] = Color.FromArgb("#fb9897");
+        Application.Current.Resources["ThemeAccentLightColor"] = Color.FromArgb("#cd1900");
+        Application.Current.Resources["ThemeAccentColor"] = Color.FromArgb("#ac2200");
+        Application.Current.Resources["ThemeAccentDarkColor"] = Color.FromArgb("#872400");
     }
 
     private static void SetGreenTheme()
     {
-        Application.Current.Resources["ThemeBackgroundColor"] = Color.FromHex("#fff2f2");
-        Application.Current.Resources["ThemeTextLightColor"] = Color.FromHex("#a5a6a6");
-        Application.Current.Resources["ThemeTextColor"] = Color.FromHex("#6d6d6d");
-        Application.Current.Resources["ThemeTextDarkColor"] = Color.FromHex("#2b2b2b");
-        Application.Current.Resources["ThemeAccentBrightColor"] = Color.FromHex("#97fb99");
-        Application.Current.Resources["ThemeAccentLightColor"] = Color.FromHex("#00cd3b");
-        Application.Current.Resources["ThemeAccentColor"] = Color.FromHex("#00ac4e");
-        Application.Current.Resources["ThemeAccentDarkColor"] = Color.FromHex("#008753");
+        Application.Current.Resources["ThemeBackgroundColor"] = Color.FromArgb("#fff2f2");
+        Application.Current.Resources["ThemeTextLightColor"] = Color.FromArgb("#a5a6a6");
+        Application.Current.Resources["ThemeTextColor"] = Color.FromArgb("#6d6d6d");
+        Application.Current.Resources["ThemeTextDarkColor"] = Color.FromArgb("#2b2b2b");
+        Application.Current.Resources["ThemeAccentBrightColor"] = Color.FromArgb("#97fb99");
+        Application.Current.Resources["ThemeAccentLightColor"] = Color.FromArgb("#00cd3b");
+        Application.Current.Resources["ThemeAccentColor"] = Color.FromArgb("#00ac4e");
+        Application.Current.Resources["ThemeAccentDarkColor"] = Color.FromArgb("#008753");
     }
 }

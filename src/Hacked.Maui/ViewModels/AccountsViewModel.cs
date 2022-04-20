@@ -7,8 +7,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using CommonHelpers.Common;
 using Hacked.Core.Models;
-using Hacked.Maui.Helpers.Commands;
-using Hacked.Maui.Helpers.Extensions;
 using Hacked.Maui.Views;
 using Hacked.Services.Apis;
 using Microsoft.Maui.Controls;

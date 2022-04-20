@@ -26,7 +26,7 @@ using Microsoft.Maui.Controls;
 using System;
 using System.Threading.Tasks;
 
-namespace Hacked.Maui.Helpers;
+namespace Hacked.Maui.Common;
 
 public static class AsyncImageSource
 {

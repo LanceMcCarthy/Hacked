@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace Hacked.Maui.Helpers.Extensions;
+namespace Hacked.Maui.Common.Extensions;
 
 internal static class SafeFireAndForgetExtensions
 {

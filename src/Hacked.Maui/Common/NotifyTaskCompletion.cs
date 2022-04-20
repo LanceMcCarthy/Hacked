@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
 
-namespace Hacked.Maui.Helpers;
+namespace Hacked.Maui.Common;
 
 public sealed class NotifyTaskCompletion<TResult> : INotifyPropertyChanged
 {
@@ -17,9 +17,9 @@ public sealed class NotifyTaskCompletion<TResult> : INotifyPropertyChanged
         }
     }
 
-    public NotifyTaskCompletion(Task<TResult> task, TResult defaultResult = default(TResult))
+    public NotifyTaskCompletion(Task<TResult> task, TResult defaultResult = default)
     {
-        this._defaultResult = defaultResult;
+        _defaultResult = defaultResult;
         Task = task;
 
         if (!task.IsCompleted)

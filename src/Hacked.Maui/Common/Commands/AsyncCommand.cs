@@ -7,7 +7,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Hacked.Maui.Helpers.Commands;
+namespace Hacked.Maui.Common.Commands;
 
 /// <summary>
 /// An implementation of IAsyncCommand. Allows Commands to safely be used asynchronously with Task.

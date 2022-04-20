@@ -1,6 +1,4 @@
-﻿using Hacked.Maui.Models;
-using Microsoft.Maui.Controls;
-using System.Collections.Generic;
+﻿using Microsoft.Maui.Controls;
 
 namespace Hacked.Maui.Views;
 
