@@ -1,0 +1,176 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Hacked.Maui.Views.AccountsPage"
+             xmlns:telerik="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
+             xmlns:tdc="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:tlv="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:tp="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:viewModels="clr-namespace:Hacked.Maui.ViewModels"
+             BindingContext="{x:Static viewModels:ViewModelLocator.Accounts}"
+             BackgroundColor="{DynamicResource SecondaryColor}">
+
+    <Grid Padding="{OnPlatform iOS='30,60,30,30', Default='30'}"
+          RowDefinitions="*, Auto">
+        <tdc:RadListView x:Name="AccountsListView"
+                         ItemsSource="{Binding Accounts}"
+                         IsPullToRefreshEnabled="{Binding HasAccounts}"
+                         SwipeOffset="70, 0, 70, 0"
+                         SwipeThreshold="10"
+                         SelectionMode="None"
+                         ItemTapped="AccountTapped">
+            <tdc:RadListView.ItemTemplate>
+                <DataTemplate>
+                    <tlv:ListViewTemplateCell>
+                        <Grid Padding="10">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Address}" />
+                                <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}" />
+                                <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}" />
+                                <Grid IsVisible="{Binding IsUpdating}"
+                                      BackgroundColor="Gold">
+                                    <Label Text="Is Refreshing..."
+                                           TextColor="Yellow"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalTextAlignment="Center"
+                                           Margin="0,2" />
+                                </Grid>
+                            </VerticalStackLayout>
+
+                            <ActivityIndicator IsRunning="{Binding IsUpdating}"
+                                               IsVisible="{Binding IsUpdating}"
+                                               HorizontalOptions="Fill"
+                                               VerticalOptions="Fill" />
+                        </Grid>
+                    </tlv:ListViewTemplateCell>
+                </DataTemplate>
+            </tdc:RadListView.ItemTemplate>
+            <tdc:RadListView.ItemSwipeContentTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="100, Auto, 100">
+                        <Button Text="refresh"
+                                TextColor="White"
+                                BackgroundColor="#00BF32"
+                                Clicked="RefreshSwipeButton_Clicked" />
+
+                        <Button Text="delete"
+                                TextColor="White"
+                                BackgroundColor="#CE0005"
+                                Grid.Column="2"
+                                Clicked="DeleteSwipeButton_Clicked" />
+                    </Grid>
+                </DataTemplate>
+            </tdc:RadListView.ItemSwipeContentTemplate>
+            <!--<tdc:RadListView.ItemStyle>
+                <tlv:ListViewItemStyle BackgroundColor="#1263E5"
+                                       TextCellTextColor="#AAC7F6"
+                                       BorderColor="#0A3A82"
+                                       BorderWidth="2"
+                                       BorderLocation="All" />
+            </tdc:RadListView.ItemStyle>
+            <tdc:RadListView.SelectedItemStyle>
+                <tlv:ListViewItemStyle BackgroundColor="#83A9E2"
+                                       TextCellTextColor="#AAC7F6"
+                                       BorderColor="#0A3A82"
+                                       BorderWidth="2"
+                                       BorderLocation="Bottom" />
+            </tdc:RadListView.SelectedItemStyle>
+            <tdc:RadListView.PressedItemStyle>
+                <tlv:ListViewItemStyle BackgroundColor="#C1C1C1"
+                                       TextCellTextColor="#AAC7F6"
+                                       BorderColor="#0B3D89"
+                                       BorderWidth="2"
+                                       BorderLocation="Bottom" />
+            </tdc:RadListView.PressedItemStyle>
+            <tdc:RadListView.ReorderItemStyle>
+                <tlv:ListViewItemStyle BackgroundColor="#0B3D89"
+                                       TextCellTextColor="#AAC7F6"
+                                       BorderColor="Black"
+                                       BorderWidth="2"
+                                       BorderLocation="All" />
+            </tdc:RadListView.ReorderItemStyle>-->
+        </tdc:RadListView>
+
+        <Grid x:Name="FooterGrid"
+              Grid.Row="1">
+            <VerticalStackLayout>
+                <Label x:Name="SwipeTip"
+                       Text="Swipe items left for delete or right for refresh"
+                       TextColor="{DynamicResource ThemeTextColor}"
+                       HorizontalTextAlignment="Center"
+                       Margin="5"
+                       IsVisible="False"
+                       LineBreakMode="WordWrap" />
+
+                <Label x:Name="AccountRefreshTip"
+                       Text="Pull list down to refresh all accounts"
+                       TextColor="{DynamicResource ThemeTextColor}"
+                       HorizontalTextAlignment="Center"
+                       IsVisible="False"
+                       Margin="5"
+                       LineBreakMode="WordWrap" />
+
+                <!--<StackLayout Orientation="Horizontal"
+                             Margin="5">
+                    <Label Text="Show Tips:"
+                           TextColor="{DynamicResource ThemeTextColor}" 
+                           Margin="0,0,10,0"
+                           VerticalOptions="Center"/>
+
+                    <CheckBox x:Name="RefreshTipCheckBox"
+                              CheckedChanged="RefreshTipCheckBox_OnCheckedChanged"/>
+                </StackLayout>-->
+
+                <Button x:Name="AddAccountModalButton"
+                        Text="add an account"
+                        TextColor="{DynamicResource ThemeBackgroundColor}"
+                        BackgroundColor="{DynamicResource ThemeAccentColor}"
+                        CornerRadius="5"
+                        Margin="10"
+                        Clicked="AddAccountPopup_Clicked">
+                    <tp:RadPopup.Popup>
+                        <tp:RadPopup x:Name="popup"
+                                     IsModal="True"
+                                     OutsideBackgroundColor="#B3FFF493">
+                            <telerik:RadBorder CornerRadius="6"
+                                           BackgroundColor="#93D7FF"
+                                           Padding="10">
+                                <Grid BackgroundColor="{DynamicResource ThemeBackgroundColor}">
+                                    <VerticalStackLayout Margin="20"
+                                                         HorizontalOptions="Center">
+                                        <Label HorizontalOptions="Start"
+                                               Text="Enter an account to monitor"
+                                               TextColor="{DynamicResource ThemeAccentLightColor}" />
+                                        <telerik:RadEntry x:Name="EmailEntry"
+                                                        Completed="EmailEntry_OnCompleted"
+                                                        Keyboard="Email"
+                                                        Placeholder="enter email address or username"
+                                                        PlaceholderColor="{DynamicResource ThemeTextLightColor}"
+                                                        TextColor="{DynamicResource ThemeTextColor}"
+                                                        TextChanged="EmailEntry_OnTextChanged" />
+                                        <Button x:Name="AddAccountButton"
+                                                IsEnabled="True"
+                                                Text="add account"
+                                                TextColor="{DynamicResource ThemeTextColor}"
+                                                BackgroundColor="{DynamicResource ThemeTextLightColor}"
+                                                Clicked="AddAccount_OnClicked" />
+                                        <Button x:Name="CancelButton"
+                                                Clicked="CancelButton_OnClicked"
+                                                Text="cancel"
+                                                TextColor="{DynamicResource ThemeTextColor}"
+                                                BackgroundColor="Transparent" />
+                                    </VerticalStackLayout>
+
+                                    <ActivityIndicator IsVisible="{Binding IsBusy}"
+                                                       IsRunning="{Binding IsBusy}"
+                                                       BackgroundColor="{DynamicResource ThemeBackgroundColor}"
+                                                       HorizontalOptions="Fill"
+                                                       VerticalOptions="Fill" />
+                                </Grid>
+                            </telerik:RadBorder>
+                        </tp:RadPopup>
+                    </tp:RadPopup.Popup>
+                </Button>
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>
