@@ -9,7 +9,7 @@ using Hacked.Maui.Common.Extensions;
 
 namespace Hacked.Maui.ViewModels;
 
-public class AccountsViewModel : ViewModelBase
+public class MonitoredAccountsViewModel : ViewModelBase
 {
     #region fields
 
@@ -29,7 +29,7 @@ public class AccountsViewModel : ViewModelBase
         
     #endregion
 
-    public AccountsViewModel()
+    public MonitoredAccountsViewModel()
     {
         InitData();
             

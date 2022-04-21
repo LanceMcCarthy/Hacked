@@ -6,7 +6,7 @@ namespace Hacked.Maui.Common.Commands;
 public abstract class BaseCommand<TCanExecute>
 {
     readonly Func<TCanExecute?, bool> canExecute;
-    readonly DelegateWeakEventManager weakEventManager = new DelegateWeakEventManager();
+    readonly DelegateWeakEventManager weakEventManager = new();
 
     volatile int executionCount;
 
@@ -77,11 +77,11 @@ public abstract class BaseCommand<TCanExecute>
     /// </summary
     public void RaiseCanExecuteChanged()
     {
-        // Automatically marshall to the Main Thread to adhere to the way that Xamarin.Forms automatically marshalls binding events to Main Thread
+        // Automatically marshall to the Main Thread to adhere to the way that Xamarin.Forms automatically marshals binding events to Main Thread
         if (MainThread.IsMainThread)
             weakEventManager.RaiseEvent(this, EventArgs.Empty, nameof(CanExecuteChanged));
         else
-            Device.BeginInvokeOnMainThread(() => weakEventManager.RaiseEvent(this, EventArgs.Empty, nameof(CanExecuteChanged)));
+            App.Current.Dispatcher.Dispatch(() => weakEventManager.RaiseEvent(this, EventArgs.Empty, nameof(CanExecuteChanged)));
     }
 
     /// <summary>
