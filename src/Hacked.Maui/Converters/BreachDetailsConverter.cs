@@ -1,7 +1,5 @@
-﻿using System;
+﻿using Hacked.Core.Models;
 using System.Globalization;
-using Hacked.Core.Models;
-using Microsoft.Maui.Controls;
 
 namespace Hacked.Maui.Converters;
 

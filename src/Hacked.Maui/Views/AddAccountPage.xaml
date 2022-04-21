@@ -1,41 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewModels="clr-namespace:Hacked.Maui.ViewModels"
-             BindingContext="{x:Static viewModels:ViewModelLocator.Accounts}"
-             xmlns:telerik="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
-             x:Class="Hacked.Maui.Views.AddAccountPage">
-
-    <Grid BackgroundColor="{DynamicResource ThemeBackgroundColor}">
-        <VerticalStackLayout Margin="20"
-                             HorizontalOptions="Center">
-            <Label HorizontalOptions="Start"
-                   Text="Enter an account to monitor"
-                   TextColor="{DynamicResource ThemeAccentLightColor}" />
-            <telerik:RadEntry x:Name="EmailEntry"
-                            Completed="EmailEntry_OnCompleted"
-                            Keyboard="Email"
-                            Placeholder="enter email address or username"
-                            PlaceholderColor="{DynamicResource ThemeTextLightColor}"
-                            TextColor="{DynamicResource ThemeTextColor}"
-                            TextChanged="EmailEntry_OnTextChanged" />
-            <Button x:Name="AddAccountButton"
-                    IsEnabled="True"
-                    Text="add account"
-                    TextColor="{DynamicResource ThemeTextColor}"
-                    BackgroundColor="{DynamicResource ThemeTextLightColor}"
-                    Clicked="AddAccount_OnClicked" />
-            <Button x:Name="CancelButton"
-                    Clicked="CancelButton_OnClicked"
-                    Text="cancel"
-                    TextColor="{DynamicResource ThemeTextColor}"
-                    BackgroundColor="Transparent" />
-        </VerticalStackLayout>
-
-        <ActivityIndicator IsVisible="{Binding IsBusy}"
-                           IsRunning="{Binding IsBusy}"
-                           BackgroundColor="{DynamicResource ThemeBackgroundColor}"
-                           HorizontalOptions="Fill"
-                           VerticalOptions="Fill" />
-    </Grid>
+             x:Class="Hacked.Maui.Views.AddAccountPage"
+             Title="AddAccountPage">
+    <StackLayout>
+        <Label Text="Welcome to .NET MAUI!"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />
+    </StackLayout>
 </ContentPage>

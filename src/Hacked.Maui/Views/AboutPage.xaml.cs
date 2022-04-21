@@ -1,22 +1,19 @@
-﻿using Microsoft.Maui.Controls;
-using System;
-using System.Collections.Generic;
-using Microsoft.Maui.ApplicationModel.Communication;
+using Hacked.Maui.ViewModels;
 
 namespace Hacked.Maui.Views;
 
 public partial class AboutPage : ContentPage
 {
-    public AboutPage()
-    {
-        InitializeComponent();
+	public AboutPage()
+	{
+		InitializeComponent();
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
 
-        //StartAnimations();
+        StartAnimations();
     }
 
     private void StartAnimations()

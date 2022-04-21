@@ -1,8 +1,5 @@
-﻿using System;
+﻿using Hacked.Maui.Common;
 using System.Diagnostics;
-using Hacked.Maui.Common;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Graphics;
 
 namespace Hacked.Maui.Helpers;
 
@@ -45,6 +42,9 @@ public static class ThemeHelper
         
     private static void SetBlueTheme()
     {
+        if (Application.Current == null)
+            return;
+
         Application.Current.Resources["ThemeBackgroundColor"] = Color.FromArgb("#f2fffd");
         Application.Current.Resources["ThemeTextLightColor"] = Color.FromArgb("#a5a6a6");
         Application.Current.Resources["ThemeTextColor"] = Color.FromArgb("#6d6d6d");
@@ -57,6 +57,9 @@ public static class ThemeHelper
 
     private static void SetRedTheme()
     {
+        if (Application.Current == null)
+            return;
+
         Application.Current.Resources["ThemeBackgroundColor"] = Color.FromArgb("#fff2f2");
         Application.Current.Resources["ThemeTextLightColor"] = Color.FromArgb("#a5a6a6");
         Application.Current.Resources["ThemeTextColor"] = Color.FromArgb("#6d6d6d");
@@ -69,6 +72,9 @@ public static class ThemeHelper
 
     private static void SetGreenTheme()
     {
+        if (Application.Current == null)
+            return;
+
         Application.Current.Resources["ThemeBackgroundColor"] = Color.FromArgb("#fff2f2");
         Application.Current.Resources["ThemeTextLightColor"] = Color.FromArgb("#a5a6a6");
         Application.Current.Resources["ThemeTextColor"] = Color.FromArgb("#6d6d6d");

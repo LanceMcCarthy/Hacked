@@ -4,9 +4,6 @@
 // Use at own risk, no warranty provided.
 //
 
-using System;
-using System.Threading.Tasks;
-
 namespace Hacked.Maui.Common.Commands;
 
 /// <summary>
