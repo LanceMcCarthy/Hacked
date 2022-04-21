@@ -1,5 +1,3 @@
-using Hacked.Maui.ViewModels;
-
 namespace Hacked.Maui.Views;
 
 public partial class AboutPage : ContentPage
