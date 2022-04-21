@@ -46,6 +46,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="CommonHelpers" Version="1.2.0" />
+	  <PackageReference Include="Telerik.UI.for.Maui" Version="0.7.0" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
 	  <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
 	</ItemGroup>
