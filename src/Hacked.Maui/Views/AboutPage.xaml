@@ -2,10 +2,85 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Hacked.Maui.Views.AboutPage"
+             xmlns:telerik="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
+             xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
+             BindingContext="{x:Static vms:ViewModelLocator.About}"
              Title="About">
-    <StackLayout>
-        <Label Text="Welcome to .NET MAUI!"
-                VerticalOptions="Center" 
-                HorizontalOptions="Center" />
-    </StackLayout>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="HeaderGrid">
+        </Grid>
+
+        <Grid x:Name="GearsLogo"
+              Grid.Row="1"
+              Margin="10">
+            <VerticalStackLayout HorizontalOptions="Center"
+                                 VerticalOptions="Center">
+                <StackLayout Orientation="Horizontal"
+                             HorizontalOptions="Center">
+                    <Image x:Name="RedGear"
+                           HeightRequest="80"
+                           WidthRequest="80"
+                           Source="GearRed100.png" />
+                    <Image x:Name="GreenGear"
+                           HeightRequest="80"
+                           WidthRequest="80"
+                           Rotation="22.5"
+                           Source="GearGreen100.png"
+                           Margin="-10,0,-10,0" />
+                    <Image x:Name="BlueGear"
+                           HeightRequest="80"
+                           WidthRequest="80"
+                           Source="GearBlue100.png" />
+                </StackLayout>
+                <Label FontSize="24"
+                       HorizontalOptions="Center"
+                       Text="Lancelot Software, LLC" />
+            </VerticalStackLayout>
+        </Grid>
+
+        <VerticalStackLayout Grid.Row="2"
+                             Margin="10,0,10,10"
+                             VerticalOptions="Start">
+            <Label FontAttributes="Bold"
+                   Text="Hacked?" />
+
+            <StackLayout Orientation="Horizontal"
+                         Spacing="5">
+                <Label Text="v"
+                       FontSize="Small" />
+                <Label Text="{Binding AppVersion}"
+                       FontSize="Small" />
+                <Label Text="© 2016-2021 Lancelot Software"
+                       FontSize="Small" />
+            </StackLayout>
+
+            <Label FontAttributes="Bold"
+                   Text="Credits" />
+            <Label Text="Json.NET © 2016 Newtonsoft"
+                   FontSize="Small" />
+            <Label Text="Data from Haveibeenpwned by Troy Hunt"
+                   FontSize="Small" />
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.Row="3"
+                             Margin="10,0,10,10"
+                             VerticalOptions="End">
+            <telerik:RadButton x:Name="ContactUsButton"
+                             Clicked="ContactUsButton_OnClick"
+                             Text="contact us"
+                             CornerRadius="5"/>
+            <telerik:RadButton x:Name="ReviewButton"
+                             Clicked="ReviewButton_OnClickButton_OnClick"
+                             Text="rate this app"
+                             CornerRadius="5" />
+        </VerticalStackLayout>
+    </Grid>
 </ContentPage>
