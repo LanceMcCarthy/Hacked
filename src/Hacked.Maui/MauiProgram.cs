@@ -1,4 +1,6 @@
-﻿namespace Hacked.Maui
+﻿using Telerik.Maui.Controls.Compatibility;
+
+namespace Hacked.Maui
 {
     public static class MauiProgram
     {
@@ -7,8 +9,10 @@
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseTelerik()
                 .ConfigureFonts(fonts =>
                 {
+                    fonts.AddFont("telerikfontexamples.ttf", "telerikfontexamples");
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
