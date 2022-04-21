@@ -13,7 +13,7 @@
 		<ApplicationTitle>Hacked.Maui</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>com.companyname.hacked.maui</ApplicationId>
+		<ApplicationId>com.LancelotSoftware.Hacked.maui</ApplicationId>
 		<ApplicationId Condition="$(TargetFramework.Contains('-windows'))">CF4A174D-C538-468A-ADB0-EAF18ADB1493</ApplicationId>
 
 		<!-- Versions -->
