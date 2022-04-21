@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Hacked.Maui.Common.Exceptions;
+using Hacked.Maui.Helpers;
 using System.Reflection;
 using System.Reflection.Emit;
-using Hacked.Maui.Helpers;
 
 namespace Hacked.Maui.Common.Events;
 

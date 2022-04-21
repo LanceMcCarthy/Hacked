@@ -1,5 +1,4 @@
 ﻿using Hacked.Core.Common;
-using Microsoft.Maui.Essentials;
 
 namespace Hacked.Maui.Common;
 

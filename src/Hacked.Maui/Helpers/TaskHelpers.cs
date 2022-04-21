@@ -1,6 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace Hacked.Maui.Helpers;
 
@@ -10,8 +8,7 @@ public static class TaskHelpers
     {
         try
         {
-            Device.BeginInvokeOnMainThread(a);
-            return true;
+            return Application.Current != null && Application.Current.Dispatcher.Dispatch(a);
         }
         catch (Exception ex)
         {

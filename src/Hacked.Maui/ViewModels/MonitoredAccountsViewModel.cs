@@ -1,20 +1,15 @@
-﻿using System;
+﻿using CommonHelpers.Common;
+using Hacked.Core.Models;
+using Hacked.Maui.Common.Commands;
+using Hacked.Services.Apis;
+using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using CommonHelpers.Common;
-using Hacked.Core.Models;
-using Hacked.Maui.Views;
-using Hacked.Services.Apis;
-using Microsoft.Maui.Controls;
-using Newtonsoft.Json;
+using Hacked.Maui.Common.Extensions;
 
 namespace Hacked.Maui.ViewModels;
 
-public class AccountsViewModel : ViewModelBase
+public class MonitoredAccountsViewModel : ViewModelBase
 {
     #region fields
 
@@ -34,7 +29,7 @@ public class AccountsViewModel : ViewModelBase
         
     #endregion
 
-    public AccountsViewModel()
+    public MonitoredAccountsViewModel()
     {
         InitData();
             
@@ -132,8 +127,8 @@ public class AccountsViewModel : ViewModelBase
         try
         {
             var json = JsonConvert.SerializeObject(_accounts);
-                
-            FileExtensions.SaveTextToFile(json, "AccountsJsonData.txt");
+
+            Hacked.Maui.Common.Extensions.FileExtensions.SaveTextToFile(json, "AccountsJsonData.txt");
 
             Debug.WriteLine($"--- {_accounts.Count} Accounts Saved via Json ---");
         }
@@ -336,12 +331,14 @@ public class AccountsViewModel : ViewModelBase
         
     private async Task GoToSettingsAsync()
     {
-        await ((Application.Current.MainPage as RootPage).Detail as NavigationPage).Navigation.PushAsync(new SettingsPage());
+        // TODO navigation
+        //await ((Application.Current.MainPage as RootPage).Detail as NavigationPage).Navigation.PushAsync(new SettingsPage());
     }
         
     private async Task GoToAddAccountAsync()
     {
-        await ((Application.Current.MainPage as RootPage).Detail as NavigationPage).Navigation.PushAsync(new AddAccountPage());
+        // TODO navigation
+        //await ((Application.Current.MainPage as RootPage).Detail as NavigationPage).Navigation.PushAsync(new AddAccountPage());
     }
         
     // Stats

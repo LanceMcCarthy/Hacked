@@ -1,8 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using Microsoft.Maui.Storage;
-
-namespace Hacked.Maui.Common.Extensions;
+﻿namespace Hacked.Maui.Common.Extensions;
 
 public static class FileExtensions
 {
@@ -32,10 +28,7 @@ public static class FileExtensions
         // Use Combine so that the correct file path slashes are used
         var filePath = Path.Combine(LocalFolder, fileName);
 
-        if (!File.Exists(filePath))
-            return null;
-
-        return File.ReadAllText(filePath);
+        return File.Exists(filePath) ? File.ReadAllText(filePath) : null;
     }
 
     public static async Task<Stream> LoadStreamFromFileAsync(string filePath)

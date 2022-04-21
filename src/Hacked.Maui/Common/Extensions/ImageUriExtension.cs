@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.Xaml;
+﻿using System.Diagnostics;
 
 namespace Hacked.Maui.Common.Extensions;
 

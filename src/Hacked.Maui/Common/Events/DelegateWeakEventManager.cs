@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Hacked.Maui.Helpers;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Hacked.Maui.Helpers;
 
 namespace Hacked.Maui.Common.Events;
 

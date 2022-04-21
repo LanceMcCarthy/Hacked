@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Hacked.Maui.Common.Exceptions;
+﻿namespace Hacked.Maui.Common.Exceptions;
 
 public class InvalidCommandParameterException : Exception
 {
