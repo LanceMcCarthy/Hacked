@@ -2,10 +2,32 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Hacked.Maui.Views.AccountDetailsPage"
-             Title="AccountDetailsPage">
-    <StackLayout>
-        <Label Text="Welcome to .NET MAUI!"
-                VerticalOptions="Center" 
-                HorizontalOptions="Center" />
-    </StackLayout>
+             xmlns:tdc="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:telerik="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
+             xmlns:primitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
+             BindingContext="{x:Static vms:ViewModelLocator.MonitoredAccounts}"
+             Title="Account Details">
+
+    <Grid Padding="10"
+          BindingContext="{Binding SelectedAccount}">
+        <StackLayout>
+            <Label Text="{Binding Address}" />
+            <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}" />
+            <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}" />
+            <Grid IsVisible="{Binding IsUpdating}"
+                  BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}">
+                <Label Text="Is Refreshing..."
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center"
+                       Margin="0,2" />
+            </Grid>
+        </StackLayout>
+
+        <primitives:RadBusyIndicator IsVisible="{Binding IsUpdating}"
+                                     IsBusy="{Binding IsUpdating}"
+                                     AnimationType="Animation3"
+                                     BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
+                                     AnimationContentColor="{StaticResource Primary}" />
+    </Grid>
 </ContentPage>
