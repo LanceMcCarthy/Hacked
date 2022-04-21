@@ -6,6 +6,15 @@
                     xmlns:primitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
                     xmlns:lv="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.Maui.Controls.Compatibility">
 
+    <Color x:Key="ThemeBackgroundColor">#f2fffd</Color>
+    <Color x:Key="ThemeTextLightColor">#a5a6a6</Color>
+    <Color x:Key="ThemeTextColor">#6d6d6d</Color>
+    <Color x:Key="ThemeTextDarkColor">#2b2b2b</Color>
+    <Color x:Key="ThemeAccentBrightColor">#13d2e4</Color>
+    <Color x:Key="ThemeAccentLightColor">#009acd</Color>
+    <Color x:Key="ThemeAccentColor">#005dac</Color>
+    <Color x:Key="ThemeAccentDarkColor">#002d87</Color>
+
     <lv:ListViewItemStyle x:Key="NormalListItemStyle"
                           BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
                           BorderColor="{StaticResource Dark}"
