@@ -3,13 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Hacked.Maui"
              xmlns:converters="clr-namespace:Hacked.Maui.Converters"
-             xmlns:primitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
-             xmlns:lv="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.Maui.Controls.Compatibility"
              x:Class="Hacked.Maui.App">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles.xaml"/>
+                <ResourceDictionary Source="Resources/TelerikStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <converters:InvertBoolConverter x:Key="InvertBoolConverter" />
@@ -20,70 +19,6 @@
             <converters:AccountDetailsConverter x:Key="AccountDetailsConverter" />
             <converters:BreachTitleConverter x:Key="BreachTitleConverter" />
             <converters:BreachDetailsConverter x:Key="BreachDetailsConverter" />
-
-            <lv:ListViewItemStyle x:Key="NormalListItemStyle"
-                                   BackgroundColor="{DynamicResource ThemeBackgroundColor}"
-                                   BorderColor="{DynamicResource ThemeAccentLightColor}"
-                                   BorderWidth="2"
-                                   BorderLocation="All" />
-
-            <DataTemplate x:Key="BreachClassItemTemplate">
-                <Label Text="{Binding}"
-                       TextColor="{DynamicResource ThemeTextLightColor}"
-                       Margin="0,0,5,0" />
-            </DataTemplate>
-
-            <DataTemplate x:Key="BreachItemTemplate">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-
-                    <StackLayout Margin="10,5,10,5">
-                        <Label Text="{Binding Name}"
-                               TextColor="{DynamicResource ThemeTextDarkColor}"
-                               FontAttributes="Bold" />
-                        <Label Text="{Binding BreachDate, StringFormat='Breached on: {0}'}"
-                               TextColor="{DynamicResource ThemeTextColor}" />
-                        <Label Text="{Binding PwnCount, StringFormat='Accounts breached: {0}'}"
-                               TextColor="{DynamicResource ThemeTextColor}" />
-                    </StackLayout>
-
-                    <ListView ItemsSource="{Binding DataClasses}"
-                              ItemTemplate="{StaticResource BreachClassItemTemplate}"
-                              InputTransparent="True"
-                              Margin="0,5,5,5"
-                              Grid.Column="1" />
-                </Grid>
-            </DataTemplate>
-
-            <DataTemplate x:Key="MonitoredAccountItemTemplate">
-                <Grid Padding="10">
-                    <StackLayout>
-                        <Label Text="{Binding Address}"
-                               TextColor="{DynamicResource ThemeDarkAccent}" />
-                        <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}"
-                               TextColor="{DynamicResource ThemeAccent}" />
-                        <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}"
-                               TextColor="{DynamicResource ThemeLightAccent}" />
-                        <Grid IsVisible="{Binding IsUpdating}"
-                              BackgroundColor="{DynamicResource ThemeAccentColor}">
-                            <Label Text="Is Refreshing..."
-                                   TextColor="{DynamicResource ThemeBackgroundColor}"
-                                   HorizontalTextAlignment="Center"
-                                   VerticalTextAlignment="Center"
-                                   Margin="0,2" />
-                        </Grid>
-                    </StackLayout>
-
-                    <primitives:RadBusyIndicator IsVisible="{Binding IsUpdating}"
-                                                 IsBusy="{Binding IsUpdating}"
-                                                 AnimationType="Animation3"
-                                                 BackgroundColor="{DynamicResource ThemeBackgroundColor}"
-                                                 AnimationContentColor="{DynamicResource ThemeAccentColor}" />
-                </Grid>
-            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
