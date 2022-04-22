@@ -17,7 +17,7 @@ namespace Hacked.Maui
 
         private void RegisterRoutes()
         {
-            Routing.RegisterRoute("accounts/details", typeof(AccountDetailsPage));
+            Routing.RegisterRoute("accounts/accountdetails", typeof(AccountDetailsPage));
             Routing.RegisterRoute("accounts/addaccount", typeof(AddAccountPage));
             //Routing.RegisterRoute("settings/about", typeof(AboutPage));
         }

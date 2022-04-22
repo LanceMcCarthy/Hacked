@@ -12,63 +12,60 @@ public partial class MonitoredAccountsPage : ContentPage
 	public MonitoredAccountsPage()
 	{
 		InitializeComponent();
-	}
+    }
 
     private async void AccountTapped(object? sender, ItemTapEventArgs e)
     {
-        if (sender == null || AccountsListView.IsSwipingInProgress)
-            return;
-
-        if (e.Item is MonitoredAccount account)
+        if (e.Item is MonitoredAccount account && sender is RadListView { IsSwipingInProgress: false })
         {
             ViewModelLocator.MonitoredAccounts.SelectedAccount = account;
 
-            // TODO navigation
+            // TODO navigation https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/shell/navigation#absolute-routes
             //await ((Application.Current.MainPage as RootPage)?.Detail as NavigationPage)?.Navigation.PushModalAsync(new AccountDetailPage());
+            await Shell.Current.GoToAsync("/accountdetails");
         }
     }
 
     private async void RefreshSwipeButton_Clicked(object sender, EventArgs e)
     {
-        if (AccountsListView == null)
-            return;
-
         try
         {
-            if (sender is Button button && button.BindingContext is MonitoredAccount account)
-            {
-                var lastCount = account.Breaches.Count;
+            // Performed by command now
+            //if (sender is Button { BindingContext: MonitoredAccount account })
+            //{
+            //    var countBeforeUpdate = account.Breaches.Count;
 
-                await ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
+            //    await ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
 
-                if (account.Breaches.Count > lastCount)
-                {
-                    ViewModelLocator.MonitoredAccounts.SaveAccounts();
-                    await this.DisplayAlert("New breaches have been detected", "Alert", "close");
-                }
-            }
+            //    if (account.Breaches.Count <= countBeforeUpdate)
+            //        return;
+                
+            //    ViewModelLocator.MonitoredAccounts.SaveAccounts();
+
+            //    await Shell.Current.DisplayAlert("New breaches have been detected", "Alert", "close");
+            //}
         }
         finally
         {
-            //AccountsListView.EndItemSwipe();
+            if (sender is RadListView rlv)
+                rlv.EndItemSwipe();
         }
     }
 
     private void DeleteSwipeButton_Clicked(object sender, EventArgs e)
     {
-        if (AccountsListView == null)
-            return;
-
         try
         {
-            if (sender is Button button && button?.BindingContext is MonitoredAccount account)
-            {
-                ViewModelLocator.MonitoredAccounts.RemoveAccount(account);
-            }
+            // Performed by command now
+            //if (sender is Button { BindingContext: MonitoredAccount account })
+            //{
+            //    ViewModelLocator.MonitoredAccounts.RemoveAccount(account);
+            //}
         }
         finally
         {
-            //AccountsListView.EndItemSwipe();
+            if (sender is RadListView rlv)
+                rlv.EndItemSwipe();
         }
     }
 
@@ -89,22 +86,19 @@ public partial class MonitoredAccountsPage : ContentPage
 
     private void EmailEntry_OnTextChanged(object sender, TextChangedEventArgs e)
     {
-        bool isValid = false;
-
         if (sender is RadEntry entry)
         {
-            isValid = !string.IsNullOrEmpty(entry.Text);
+            AddAccountButton.IsEnabled = !string.IsNullOrEmpty(entry.Text);
         }
 
-        AddAccountButton.BackgroundColor = isValid
-            ? (Color)Application.Current.Resources["ThemeAccentDarkColor"]
-            : (Color)Application.Current.Resources["ThemeTextLightColor"];
-
-        AddAccountButton.TextColor = isValid
-            ? (Color)Application.Current.Resources["ThemeBackgroundColor"]
-            : (Color)Application.Current.Resources["ThemeTextColor"];
-
-        AddAccountButton.IsEnabled = isValid;
+        // This will get set by the VisualStateManager on the implicit RadButton style in TelerikStyles
+        //AddAccountButton.BackgroundColor = isValid
+        //    ? (Color)Application.Current.Resources["ThemeAccentDarkColor"]
+        //    : (Color)Application.Current.Resources["ThemeTextLightColor"];
+        //AddAccountButton.TextColor = isValid
+        //    ? (Color)Application.Current.Resources["ThemeBackgroundColor"]
+        //    : (Color)Application.Current.Resources["ThemeTextColor"];
+        // AddAccountButton.IsEnabled = isValid;
     }
 
     private async Task AttemptEmailAddAsync(string emailAddress)
@@ -116,87 +110,80 @@ public partial class MonitoredAccountsPage : ContentPage
 
         if (addedAccount == null)
         {
-            await Application.Current.MainPage.DisplayAlert("Error", "The account was not added, try again", "OK");
+            await Shell.Current.DisplayAlert("Error", "The account was not added, try again", "OK");
         }
 
         popup.IsOpen = false;
     }
 
-    private async void CancelButton_OnClicked(object sender, EventArgs e)
+    private void CancelButton_OnClicked(object sender, EventArgs e)
     {
         popup.IsOpen = false;
     }
 
-    //private async void AccountsListView_OnRefreshRequested(object sender, PullToRefreshRequestedEventArgs e)
-    //{
-    //    if (AccountsListView == null)
-    //        return;
+    private async void AccountsListView_OnRefreshRequested(object sender, PullToRefreshRequestedEventArgs e)
+    {
+        try
+        {
+            if (!ViewModelLocator.MonitoredAccounts.HasAccounts)
+                return;
 
-    //    try
-    //    {
-    //        if (!ViewModelLocator.MonitoredAccounts.HasAccounts)
-    //            return;
+            await ViewModelLocator.MonitoredAccounts.FindAllAccountsBreachesAsync();
 
-    //        await ViewModelLocator.MonitoredAccounts.FindAllAccountsBreachesAsync();
-
-    //        //if first time, hide tip and persist via settings
-    //        if (AccountRefreshTip.IsVisible)
-    //        {
-    //            await AccountRefreshTip.FadeTo(0, 500, Easing.CubicInOut);
-    //            AccountRefreshTip.IsVisible = false;
-    //            Settings.AccountRefreshShown = true;
-    //        }
-    //    }
-    //    finally
-    //    {
-    //        AccountsListView.EndRefresh();
-    //    }
-    //}
+            //if first time, hide tip and persist via settings
+            if (AccountRefreshTip.IsVisible)
+            {
+                await AccountRefreshTip.FadeTo(0, 500, Easing.CubicInOut);
+                AccountRefreshTip.IsVisible = false;
+                Settings.AccountRefreshShown = true;
+            }
+        }
+        finally
+        {
+            if (sender is RadListView rlv)
+                rlv.EndRefresh();
+        }
+    }
 
     private async void AccountsListView_OnItemSwipeCompleted(object sender, ItemSwipeCompletedEventArgs e)
     {
-        var listView = sender as RadListView;
-
-        if (e == null || listView == null)
+        if (e.Item is not MonitoredAccount account) 
             return;
 
-        if (e.Item is MonitoredAccount account)
+        if (e.Offset > 201)
         {
-            if (e.Offset > 201)
+            var lastCount = account.Breaches.Count;
+
+            await ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
+
+            if (account.Breaches.Count > lastCount)
             {
-                var lastCount = account.Breaches.Count;
+                ViewModelLocator.MonitoredAccounts.SaveAccounts();
 
-                await ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
-
-                if (account.Breaches.Count > lastCount)
-                {
-                    ViewModelLocator.MonitoredAccounts.SaveAccounts();
-
-                    await Application.Current.MainPage.DisplayAlert("New breaches have been detected", "Alert", "close");
-                }
-
-                listView?.EndItemSwipe();
-            }
-            else if (e.Offset < -200)
-            {
-                await ViewModelLocator.MonitoredAccounts.RemoveAccount(account);
-
-                listView.EndItemSwipe();
+                await Shell.Current.DisplayAlert("New breaches have been detected", "Alert", "close");
             }
         }
+        else if (e.Offset < -200)
+        {
+            await ViewModelLocator.MonitoredAccounts.RemoveAccount(account);
+        }
+
+        if (sender is RadListView rlv)
+            rlv.EndRefresh();
     }
 
     private async void AccountsListView_OnItemTapped(object sender, ItemTapEventArgs e)
     {
-        if (sender == null || AccountsListView.IsSwipingInProgress)
+        if (sender is RadListView { IsSwipingInProgress: true })
             return;
 
         if (e?.Item is MonitoredAccount account)
         {
             ViewModelLocator.MonitoredAccounts.SelectedAccount = account;
 
-            // todo navigation
+            // todo navigation https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/shell/navigation#absolute-routes
             //await ((Application.Current.MainPage as RootPage)?.Detail as NavigationPage)?.Navigation.PushAsync(new AccountDetailsPage());
+            await Shell.Current.GoToAsync("accountdetails");
         }
     }
 
