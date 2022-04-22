@@ -26,7 +26,8 @@ public class MonitoredAccountsViewModel : ViewModelBase
     private AsyncCommand _findAllAccountBreachesCommand;
     private AsyncCommand _goToSettingsCommand;
     private AsyncCommand _goToAddAccountCommand;
-        
+    private AsyncCommand<MonitoredAccount> _refreshAccountCommand;
+
     #endregion
 
     public MonitoredAccountsViewModel()
@@ -94,6 +95,8 @@ public class MonitoredAccountsViewModel : ViewModelBase
 
     public AsyncCommand GoToAddAccountCommand => _goToAddAccountCommand ??= new AsyncCommand(GoToAddAccountAsync);
 
+    public AsyncCommand<MonitoredAccount> RefreshAccountCommand => _refreshAccountCommand ??= new AsyncCommand<MonitoredAccount>(UpdateBreachesForAccountAsync, account => account != null);
+
     #endregion
 
     #region Methods
@@ -127,10 +130,10 @@ public class MonitoredAccountsViewModel : ViewModelBase
         try
         {
             var json = JsonConvert.SerializeObject(_accounts);
-
+            
             Hacked.Maui.Common.Extensions.FileExtensions.SaveTextToFile(json, "AccountsJsonData.txt");
 
-            Debug.WriteLine($"--- {_accounts.Count} Accounts Saved via Json ---");
+            Debug.WriteLine($"--- {_accounts.Count} Accounts Saved ---");
         }
         catch (Exception ex)
         {
@@ -268,7 +271,52 @@ public class MonitoredAccountsViewModel : ViewModelBase
         }
     }
 
-    public async Task UpdateBreachesForAccountAsync(MonitoredAccount account, bool showSuccessMessage = false)
+    public async Task UpdateBreachesForAccountAsync(MonitoredAccount account)
+    {
+        IsBusy = true;
+        IsBusyMessage = $"Checking {account.Address} for breaches...";
+        account.IsUpdating = true;
+
+        try
+        {
+            _apiService ??= new BeenPwnedService();
+
+            var result = await _apiService.CheckForBreachesAsync(account);
+
+            //compare old list against new list to see if anything is new
+            foreach (var breach in result)
+            {
+                if (!account.Breaches.Contains(breach))
+                {
+                    breach.IsNew = true;
+                }
+            }
+
+            //replace old list with new one
+            account.Breaches = result;
+        }
+        catch (HttpRequestException ex)
+        {
+            if (ex.Message.Contains("404") || ex.Message.Contains("net_http_message_not_success_statuscode"))
+            {
+                //if no results, update with empty list
+                account.Breaches = new ObservableCollection<Breach>();
+            }
+        }
+        catch (Exception ex)
+        {
+            App.ShowExceptionMessage("UpdateBreachesForAccountAsync", ex);
+        }
+        finally
+        {
+            IsBusy = false;
+            IsBusyMessage = "";
+            account.IsUpdating = false;
+            account.LastUpdated = DateTime.Now;
+        }
+    }
+
+    public async Task UpdateBreachesForAccountAsync(MonitoredAccount account, bool showSuccessMessage)
     {
         IsBusy = true;
         IsBusyMessage = $"Checking {account.Address} for breaches...";
@@ -331,14 +379,16 @@ public class MonitoredAccountsViewModel : ViewModelBase
         
     private async Task GoToSettingsAsync()
     {
-        // TODO navigation
+        // TODO navigation https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/shell/navigation#absolute-routes
         //await ((Application.Current.MainPage as RootPage).Detail as NavigationPage).Navigation.PushAsync(new SettingsPage());
+        await Shell.Current.GoToAsync("/settings");
     }
         
     private async Task GoToAddAccountAsync()
     {
-        // TODO navigation
+        // TODO navigation https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/shell/navigation#absolute-routes
         //await ((Application.Current.MainPage as RootPage).Detail as NavigationPage).Navigation.PushAsync(new AddAccountPage());
+        await Shell.Current.GoToAsync("/accounts/addaccount");
     }
         
     // Stats
