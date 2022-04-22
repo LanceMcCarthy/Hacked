@@ -15,17 +15,107 @@
     <Color x:Key="ThemeAccentColor">#005dac</Color>
     <Color x:Key="ThemeAccentDarkColor">#002d87</Color>
 
+    <!-- Full icon list here - https://docs.telerik.com/devtools/xamarin/styling-and-appearance/telerik-font-icons -->
+    <x:String x:Key="StarIcon">&#xE805;</x:String>
+    <x:String x:Key="MenuIcon">&#xE808;</x:String>
+    <x:String x:Key="PlusIcon">&#xF0FE;</x:String>
+    <x:String x:Key="MinusIcon">&#xF146;</x:String>
+    <x:String x:Key="RightArrowEnclosedIcon">&#xF138;</x:String>
+    <x:String x:Key="LeftArrowEnclosedIcon">&#xF137;</x:String>
+    <x:String x:Key="CancelEnclosedIcon">&#xE851;</x:String>
+    <x:String x:Key="InfoEnclosedIcon">&#xE815;</x:String>
+    <x:String x:Key="TrashIcon">&#xE827;</x:String>
+    <x:String x:Key="CheckMarkIcon">&#xE809;</x:String>
+    <x:String x:Key="GearSolidIcon">&#xE80F;</x:String>
+    <x:String x:Key="GearOutlinedIcon">&#xE822;</x:String>
+    <x:String x:Key="StarSolidIcon">&#xE805;</x:String>
+    <x:String x:Key="StarOutlinedIcon">&#xE801;</x:String>
+    <x:String x:Key="DraftIcon">&#xE828;</x:String>
+    <x:String x:Key="GaugeIcon">&#xE84F;</x:String>
+    <x:String x:Key="CancelIcon">&#xE80A;</x:String>
+    <x:String x:Key="ArrowsUpIcon">&#xE800;</x:String>
+    <x:String x:Key="ArrowsDownIcon">&#xE803;</x:String>
+
     <lv:ListViewItemStyle x:Key="NormalListItemStyle"
                           BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
                           BorderColor="{StaticResource Dark}"
                           BorderWidth="2"
                           BorderLocation="All" />
 
+    <Style x:Key="LargeIconRadButtonStyle"
+           TargetType="telerik:RadButton">
+        <Setter Property="BorderColor"
+                Value="Transparent" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="CornerRadius"
+                Value="25" />
+        <Setter Property="Margin"
+                Value="10" />
+        <Setter Property="WidthRequest"
+                Value="50" />
+        <Setter Property="HeightRequest"
+                Value="50" />
+        <Setter Property="FontFamily"
+                Value="telerikfontexamples" />
+        <Setter Property="FontSize">
+            <Setter.Value>
+                <OnPlatform x:TypeArguments="x:Double">
+                    <On Platform="iOS">28</On>
+                    <On Platform="Android">26</On>
+                    <On Platform="WinUI">28</On>
+                </OnPlatform>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="VisualStateManager.VisualStateGroups">
+            <VisualStateGroupList>
+                <VisualStateGroup x:Name="CommonStates">
+                    <VisualState x:Name="Normal">
+                        <VisualState.Setters>
+                            <Setter Property="TextColor"
+                                    Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Primary}}" />
+                            <Setter Property="BackgroundColor"
+                                    Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+                        </VisualState.Setters>
+                    </VisualState>
+                    <VisualState x:Name="Disabled">
+                        <VisualState.Setters>
+                            <Setter Property="TextColor"
+                                    Value="{AppThemeBinding Light={StaticResource DarkGray}, Dark={StaticResource LightGray}}" />
+                            <Setter Property="BackgroundColor"
+                                    Value="{AppThemeBinding Light={StaticResource LightGray}, Dark={StaticResource DarkGray}}" />
+                        </VisualState.Setters>
+                    </VisualState>
+                </VisualStateGroup>
+            </VisualStateGroupList>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MediumIconRadButtonStyle"
+           TargetType="telerik:RadButton"
+           BasedOn="{StaticResource LargeIconRadButtonStyle}">
+        <Setter Property="FontSize">
+            <Setter.Value>
+                <OnPlatform x:TypeArguments="x:Double">
+                    <On Platform="iOS">18</On>
+                    <On Platform="Android">16</On>
+                    <On Platform="WinUI">18</On>
+                </OnPlatform>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ImageBorderCircleStyle"
+           TargetType="telerik:RadBorder">
+        <Setter Property="BorderThickness"
+                Value="2" />
+        <Setter Property="CornerRadius"
+                Value="90" />
+        <Setter Property="BorderColor"
+                Value="{DynamicResource Blue100Accent}" />
+    </Style>
+
     <Style TargetType="telerik:RadButton">
-        <Setter Property="TextColor"
-                Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Primary}}" />
-        <Setter Property="BackgroundColor"
-                Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
         <Setter Property="FontFamily"
                 Value="OpenSansRegular" />
         <Setter Property="FontSize"

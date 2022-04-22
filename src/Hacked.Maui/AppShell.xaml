@@ -1,14 +1,86 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Shell
-    x:Class="Hacked.Maui.AppShell"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:Hacked.Maui"
-    Shell.FlyoutBehavior="Disabled">
+<Shell x:Class="Hacked.Maui.AppShell"
+       xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:local="clr-namespace:Hacked.Maui"
+       xmlns:views="clr-namespace:Hacked.Maui.Views"
+       xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+       ios:Page.UseSafeArea="True"
+       FlyoutBehavior="{OnIdiom Phone=Disabled, Default=Locked}"
+       FlyoutWidth="50">
+    <Shell.FlyoutFooterTemplate>
+        <DataTemplate>
+            <Grid RowDefinitions="68">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+                </Grid.GestureRecognizers>
+                <Image Source="tab_settings.png"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Center"
+                       WidthRequest="40"
+                       HeightRequest="40" />
 
-    <ShellContent
-        Title="Hello, World!"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+            </Grid>
+        </DataTemplate>
+    </Shell.FlyoutFooterTemplate>
+    <Shell.ItemTemplate>
+        <DataTemplate>
+            <Grid RowDefinitions="68"
+                  HeightRequest="68">
+                <Image Source="{Binding FlyoutIcon}"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Center" />
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+
+    <!-- Desktop/Tablet-->
+    <FlyoutItem x:Name="HomeFlyoutItem"
+                Title="Home"
+                Icon="tab_home.png">
+        <ShellContent Title="Monitored Accounts"
+                      ContentTemplate="{DataTemplate views:MonitoredAccountsPage}"
+                      Route="accounts" />
+    </FlyoutItem>
+    <FlyoutItem x:Name="SettingsFlyoutItem"
+                Route="settings"
+                Icon="tab_settings.png"
+                FlyoutItemIsVisible="False">
+        <ShellContent Title="Settings"
+                      ContentTemplate="{DataTemplate views:SettingsPage}"
+                      Route="settings" />
+    </FlyoutItem>
+    <FlyoutItem x:Name="AboutFlyoutItem"
+                Title="About"
+                Icon="tab_account.png">
+        <ShellContent Title="About"
+                      ContentTemplate="{DataTemplate views:AboutPage}"
+                      Route="about" />
+    </FlyoutItem>
+
+    <!-- Phone -->
+    <TabBar x:Name="PhoneTabs">
+        <Tab x:Name="HomeTab"
+             Title="Home"
+             Icon="tab_home.png">
+            <ShellContent Title="Monitored Accounts"
+                          ContentTemplate="{DataTemplate views:MonitoredAccountsPage}"
+                          Route="accounts" />
+        </Tab>
+        <Tab x:Name="SettingsTab"
+             Title="Settings"
+             Icon="tab_settings.png">
+            <ShellContent Title="Settings"
+                          ContentTemplate="{DataTemplate views:SettingsPage}"
+                          Route="settings" />
+        </Tab>
+        <Tab x:Name="AboutTab"
+             Title="About"
+             Icon="tab_briefcase.png">
+            <ShellContent Title="About"
+                          ContentTemplate="{DataTemplate views:AboutPage}"
+                          Route="about" />
+        </Tab>
+    </TabBar>
 
 </Shell>
