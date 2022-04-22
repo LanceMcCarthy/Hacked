@@ -127,10 +127,10 @@ public class MonitoredAccountsViewModel : ViewModelBase
         try
         {
             var json = JsonConvert.SerializeObject(_accounts);
-
+            
             Hacked.Maui.Common.Extensions.FileExtensions.SaveTextToFile(json, "AccountsJsonData.txt");
 
-            Debug.WriteLine($"--- {_accounts.Count} Accounts Saved via Json ---");
+            Debug.WriteLine($"--- {_accounts.Count} Accounts Saved ---");
         }
         catch (Exception ex)
         {
@@ -331,14 +331,16 @@ public class MonitoredAccountsViewModel : ViewModelBase
         
     private async Task GoToSettingsAsync()
     {
-        // TODO navigation
+        // TODO navigation https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/shell/navigation#absolute-routes
         //await ((Application.Current.MainPage as RootPage).Detail as NavigationPage).Navigation.PushAsync(new SettingsPage());
+        await Shell.Current.GoToAsync("/settings");
     }
         
     private async Task GoToAddAccountAsync()
     {
-        // TODO navigation
+        // TODO navigation https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/shell/navigation#absolute-routes
         //await ((Application.Current.MainPage as RootPage).Detail as NavigationPage).Navigation.PushAsync(new AddAccountPage());
+        await Shell.Current.GoToAsync("/accounts/addaccount");
     }
         
     // Stats
