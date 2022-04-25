@@ -46,62 +46,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Resources\Fonts\telerikfontexamples.ttf" />
-	  <None Remove="Resources\Images\add_icon.svg" />
-	  <None Remove="Resources\Images\search_icon.svg" />
-	  <None Remove="Resources\Images\tab_account.svg" />
-	  <None Remove="Resources\Images\tab_account_on.svg" />
-	  <None Remove="Resources\Images\tab_briefcase.svg" />
-	  <None Remove="Resources\Images\tab_briefcase_on.svg" />
-	  <None Remove="Resources\Images\tab_home.svg" />
-	  <None Remove="Resources\Images\tab_home_on.svg" />
-	  <None Remove="Resources\Images\tab_information.svg" />
-	  <None Remove="Resources\Images\tab_information_on.svg" />
-	  <None Remove="Resources\Images\tab_settings.svg" />
-	  <None Remove="Resources\Images\tab_settings_on.svg" />
-	  <None Remove="Resources\Images\tab_upload.svg" />
-	  <None Remove="Resources\Images\tab_upload_on.svg" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <AndroidResource Include="Resources\Fonts\telerikfontexamples.ttf" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-	  <MauiIcon Include="Resources\Images\add_icon.svg" />
-	  <MauiIcon Include="Resources\Images\search_icon.svg" />
-	  <MauiIcon Include="Resources\Images\tab_account.svg" />
-	  <MauiIcon Include="Resources\Images\tab_account_on.svg" />
-	  <MauiIcon Include="Resources\Images\tab_briefcase.svg" />
-	  <MauiIcon Include="Resources\Images\tab_briefcase_on.svg" />
-	  <MauiIcon Include="Resources\Images\tab_home.svg" />
-	  <MauiIcon Include="Resources\Images\tab_home_on.svg" />
-	  <MauiIcon Include="Resources\Images\tab_information.svg" />
-	  <MauiIcon Include="Resources\Images\tab_information_on.svg" />
-	  <MauiIcon Include="Resources\Images\tab_settings.svg" />
-	  <MauiIcon Include="Resources\Images\tab_settings_on.svg" />
-	  <MauiIcon Include="Resources\Images\tab_upload.svg" />
-	  <MauiIcon Include="Resources\Images\tab_upload_on.svg" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <PackageReference Include="CommonHelpers" Version="1.2.0" />
 	  <PackageReference Include="Telerik.UI.for.Maui" Version="0.7.0" />
-	</ItemGroup>
-
-
-	<ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
-		<PackageReference Include="WinUIEx" Version="1.3.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
 	  <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
 	</ItemGroup>
 
 	<ItemGroup>
