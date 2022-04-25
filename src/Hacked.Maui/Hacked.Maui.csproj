@@ -31,7 +31,6 @@
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\appicon.svg" ForegroundFile="Resources\appiconfg.svg" Color="#512BD4" />
-		<MauiIcon Include="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\appiconfg.svg" Color="#512BD4" BaseSize="128,128" />
@@ -44,24 +43,6 @@
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <MauiImage Remove="Resources\Images\add_icon.svg" />
-	  <MauiImage Remove="Resources\Images\dotnet_bot.svg" />
-	  <MauiImage Remove="Resources\Images\search_icon.svg" />
-	  <MauiImage Remove="Resources\Images\tab_account.svg" />
-	  <MauiImage Remove="Resources\Images\tab_account_on.svg" />
-	  <MauiImage Remove="Resources\Images\tab_briefcase.svg" />
-	  <MauiImage Remove="Resources\Images\tab_briefcase_on.svg" />
-	  <MauiImage Remove="Resources\Images\tab_home.svg" />
-	  <MauiImage Remove="Resources\Images\tab_home_on.svg" />
-	  <MauiImage Remove="Resources\Images\tab_information.svg" />
-	  <MauiImage Remove="Resources\Images\tab_information_on.svg" />
-	  <MauiImage Remove="Resources\Images\tab_settings.svg" />
-	  <MauiImage Remove="Resources\Images\tab_settings_on.svg" />
-	  <MauiImage Remove="Resources\Images\tab_upload.svg" />
-	  <MauiImage Remove="Resources\Images\tab_upload_on.svg" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -84,20 +65,6 @@
 
 	<ItemGroup>
 	  <AndroidResource Include="Resources\Fonts\telerikfontexamples.ttf" />
-	  <AndroidResource Include="Resources\Images\add_icon.svg" />
-	  <AndroidResource Include="Resources\Images\search_icon.svg" />
-	  <AndroidResource Include="Resources\Images\tab_account.svg" />
-	  <AndroidResource Include="Resources\Images\tab_account_on.svg" />
-	  <AndroidResource Include="Resources\Images\tab_briefcase.svg" />
-	  <AndroidResource Include="Resources\Images\tab_briefcase_on.svg" />
-	  <AndroidResource Include="Resources\Images\tab_home.svg" />
-	  <AndroidResource Include="Resources\Images\tab_home_on.svg" />
-	  <AndroidResource Include="Resources\Images\tab_information.svg" />
-	  <AndroidResource Include="Resources\Images\tab_information_on.svg" />
-	  <AndroidResource Include="Resources\Images\tab_settings.svg" />
-	  <AndroidResource Include="Resources\Images\tab_settings_on.svg" />
-	  <AndroidResource Include="Resources\Images\tab_upload.svg" />
-	  <AndroidResource Include="Resources\Images\tab_upload_on.svg" />
 	</ItemGroup>
 
 
@@ -131,6 +98,10 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
 	  <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
 	</ItemGroup>
 
 	<ItemGroup>
