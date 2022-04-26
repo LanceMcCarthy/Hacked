@@ -1,5 +1,9 @@
-﻿using Microsoft.Maui.LifecycleEvents;
+﻿using AppKit;
+using CoreGraphics;
+using Foundation;
+using Microsoft.Maui.LifecycleEvents;
 using Telerik.Maui.Controls.Compatibility;
+using UIKit;
 
 #if WINDOWS
 using Microsoft.UI;
@@ -19,14 +23,16 @@ namespace Hacked.Maui
                 .UseTelerik()
                 .ConfigureFonts(fonts =>
                 {
-                    fonts.AddFont("telerikfontexamples.ttf", "telerikfontexamples");
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                    fonts.AddFont("telerikfontexamples.ttf", "telerikfontexamples");
+                    fonts.AddFont("Font Awesome 6 Brands-Regular-400.otf", "Font Awesome 6 Brands-Regular-400");
                 });
 
-#if WINDOWS
+
             builder.ConfigureLifecycleEvents(events =>
             {
+#if WINDOWS
                 events.AddWindows(wndLifeCycleBuilder =>
                 {
                     wndLifeCycleBuilder.OnWindowCreated(window =>
@@ -44,10 +50,30 @@ namespace Hacked.Maui
                         winuiAppWindow.MoveAndResize(new RectInt32(x, y, width, height));
                     });
                 });
-            });
+#elif MACCATALYST
+                
+                events.AddiOS(wndLifeCycleBuilder =>
+                {
+                    wndLifeCycleBuilder.SceneWillConnect((scene, session, options) =>
+                    {
+                        if (scene is UIWindowScene { SizeRestrictions: { } } windowScene)
+                        {
+                            windowScene.SizeRestrictions.MaximumSize = new CGSize(1200, 900);
+                            windowScene.SizeRestrictions.MinimumSize = new CGSize(600, 400);
+                        }
+                    });
+
+                });
 #endif
+            });
+
 
             return builder.Build();
+
+            // var uiWindow = windowScene.KeyWindow;
+
+            //windowScene.SizeRestrictions.MaximumSize = new CGSize(1200, 900);
+            //windowScene.SizeRestrictions.MinimumSize = new CGSize(600, 400);
         }
     }
 }
