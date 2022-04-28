@@ -1,14 +1,17 @@
-﻿using AppKit;
-using CoreGraphics;
-using Foundation;
-using Microsoft.Maui.LifecycleEvents;
+﻿using Microsoft.Maui.LifecycleEvents;
 using Telerik.Maui.Controls.Compatibility;
-using UIKit;
 
 #if WINDOWS
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Windows.Graphics;
+
+#elif MACCATALYST
+using AppKit;
+using CoreGraphics;
+using Foundation;
+using UIKit;
+
 #endif
 
 namespace Hacked.Maui
