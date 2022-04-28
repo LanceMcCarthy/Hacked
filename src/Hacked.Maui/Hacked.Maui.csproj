@@ -47,7 +47,7 @@
 
 
 	<ItemGroup>
-	  <None Remove="Resources\Fonts\Font Awesome 6 Brands-Regular-400.otf" />
+	  <None Remove="Resources\Fonts\fa-solid-900.ttf" />
 	</ItemGroup>
 
 	<ItemGroup>

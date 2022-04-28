@@ -8,6 +8,7 @@
              xmlns:tp="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
              xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
              xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
+             xmlns:res="clr-namespace:Hacked.Maui.Resources"
              BindingContext="{x:Static vms:ViewModelLocator.MonitoredAccounts}"
              Title="Monitored Accounts">
 
@@ -17,7 +18,6 @@
 
         <tdc:RadListView x:Name="AccountsListView"
                          ItemsSource="{Binding Accounts}"
-                         ItemTemplate="{StaticResource MonitoredAccountTelerikItemTemplate}"
                          IsPullToRefreshEnabled="{Binding HasAccounts}"
                          SwipeOffset="70, 0, 70, 0"
                          SwipeThreshold="10"
@@ -26,7 +26,41 @@
                          SelectedItemStyle="{StaticResource SelectedItemStyle}"
                          PressedItemStyle="{StaticResource PressedItemStyle}"
                          ReorderItemStyle="{StaticResource ReorderItemStyle}"
-                         ItemTapped="AccountTapped">
+                         ItemTapped="AccountTapped" >
+            <tdc:RadListView.ItemTemplate>
+                <DataTemplate x:DataType="models:MonitoredAccount">
+                    <tlv:ListViewTemplateCell>
+                        <Grid Padding="10">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Address}"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}" />
+                                <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}" />
+                                <Label Text="{Binding NewBreachCount}"
+                                       IsVisible="{Binding HasNewBreaches}"
+                                       FontAttributes="Bold" />
+                                <Grid IsVisible="{Binding IsUpdating}"
+                                      BackgroundColor="Gold">
+                                    <Label Text="Is Refreshing..."
+                                           TextColor="Yellow"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalTextAlignment="Center"
+                                           Margin="0,2" />
+                                </Grid>
+                            </VerticalStackLayout>
+
+                            <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
+                                               Style="{StaticResource FontAwesomeLabelStyle}"
+                                               Command="{Binding RemoveAccountCommand, Source={x:RelativeSource AncestorType={x:Type vms:MonitoredAccountsViewModel}}}"
+                                               CommandParameter="{Binding}"
+                                               IsEnabled="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}"
+                                               VerticalOptions="End"
+                                               HorizontalOptions="End"
+                                               Margin="10" />
+                        </Grid>
+                    </tlv:ListViewTemplateCell>
+                </DataTemplate>
+            </tdc:RadListView.ItemTemplate>
             <tdc:RadListView.ItemSwipeContentTemplate>
                 <DataTemplate>
                     <Grid ColumnDefinitions="100, Auto, 100">
@@ -34,19 +68,24 @@
                                 TextColor="White"
                                 BackgroundColor="#00BF32"
                                 Clicked="RefreshSwipeButton_Clicked"
-                                Command="{Binding BindingContext.RefreshAccountCommand, Source={RelativeSource AncestorType={x:Type CollectionView}}}"
-                                CommandParameter="{Binding .}" />
+                                Command="{Binding RefreshAccountCommand, Source={x:RelativeSource AncestorType={x:Type vms:MonitoredAccountsViewModel}}}"
+                                CommandParameter="{Binding}" />
 
                         <Button Text="delete"
                                 TextColor="White"
                                 BackgroundColor="#CE0005"
                                 Grid.Column="2"
                                 Clicked="DeleteSwipeButton_Clicked"
-                                Command="{Binding BindingContext.RemoveAccountCommand, Source={RelativeSource AncestorType={x:Type CollectionView}}}"
-                                CommandParameter="{Binding .}" />
+                                Command="{Binding RemoveAccountCommand, Source={x:RelativeSource AncestorType={x:Type vms:MonitoredAccountsViewModel}}}"
+                                CommandParameter="{Binding}" />
                     </Grid>
                 </DataTemplate>
             </tdc:RadListView.ItemSwipeContentTemplate>
+            <tdc:RadListView.LayoutDefinition>
+                <tlv:ListViewGridLayout ItemLength="200"
+                                        HorizontalItemSpacing="2"
+                                        VerticalItemSpacing="2" />
+            </tdc:RadListView.LayoutDefinition>
         </tdc:RadListView>
 
         <!--<CollectionView ItemsSource="{Binding Accounts}"

@@ -29,7 +29,7 @@ namespace Hacked.Maui
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                     fonts.AddFont("telerikfontexamples.ttf", "telerikfontexamples");
-                    fonts.AddFont("Font Awesome 6 Brands-Regular-400.otf", "Font Awesome 6 Brands-Regular-400");
+                    fonts.AddFont("fa-solid-900.ttf", "Font Awesome 6 Free Regular");
                 });
 
 
