@@ -644,6 +644,7 @@ static class IconFont
     public const string Recycle = "\uf1b8";
     public const string RedoAlt = "\uf2f9";
     public const string Redo = "\uf01e";
+    public const string Refresh = "\uf021";
     public const string Registered = "\uf25d";
     public const string ReplyAll = "\uf122";
     public const string Reply = "\uf3e5";

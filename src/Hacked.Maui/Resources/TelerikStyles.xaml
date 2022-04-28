@@ -5,7 +5,9 @@
                     xmlns:telerik="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
                     xmlns:primitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
                     xmlns:lv="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.Maui.Controls.Compatibility"
-                    xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core">
+                    xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
+                    xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
+                    xmlns:res="clr-namespace:Hacked.Maui.Resources">
 
     <Color x:Key="ThemeBackgroundColor">#f2fffd</Color>
     <Color x:Key="ThemeTextLightColor">#a5a6a6</Color>
@@ -73,9 +75,13 @@
         <lv:ListViewTemplateCell>
             <Grid Padding="10">
                 <VerticalStackLayout>
-                    <Label Text="{Binding Address}" />
+                    <Label Text="{Binding Address}"
+                           FontAttributes="Bold" />
                     <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}" />
                     <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}" />
+                    <Label Text="{Binding NewBreachCount}"
+                           IsVisible="{Binding HasNewBreaches}"
+                           FontAttributes="Bold" />
                     <Grid IsVisible="{Binding IsUpdating}"
                           BackgroundColor="Gold">
                         <Label Text="Is Refreshing..."
@@ -85,6 +91,15 @@
                                Margin="0,2" />
                     </Grid>
                 </VerticalStackLayout>
+
+                <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
+                                   Style="{StaticResource FontAwesomeLabelStyle}"
+                                   Command="{Binding RemoveAccountCommand, Source={x:RelativeSource AncestorType={x:Type vms:MonitoredAccountsViewModel}}}"
+                                   CommandParameter="{Binding}"
+                                   IsEnabled="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}"
+                                   VerticalOptions="End"
+                                   HorizontalOptions="End"
+                                   Margin="10" />
             </Grid>
         </lv:ListViewTemplateCell>
     </DataTemplate>
@@ -103,7 +118,7 @@
                           TextCellTextColor="#AAC7F6"
                           BorderColor="#0A3A82"
                           BorderWidth="2"
-                          BorderLocation="All" />
+                          BorderLocation="All"/>
 
     <lv:ListViewItemStyle x:Key="SelectedItemStyle"
                           BackgroundColor="#83A9E2"
