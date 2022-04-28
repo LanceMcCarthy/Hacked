@@ -128,7 +128,7 @@ public partial class MonitoredAccountsPage : ContentPage
             if (!ViewModelLocator.MonitoredAccounts.HasAccounts)
                 return;
 
-            await ViewModelLocator.MonitoredAccounts.FindAllAccountsBreachesAsync();
+            ViewModelLocator.MonitoredAccounts.FindAllAccountsBreachesAsync();
 
             //if first time, hide tip and persist via settings
             if (AccountRefreshTip.IsVisible)
@@ -154,7 +154,7 @@ public partial class MonitoredAccountsPage : ContentPage
         {
             var lastCount = account.Breaches.Count;
 
-            await ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
+            ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
 
             if (account.Breaches.Count > lastCount)
             {
@@ -165,7 +165,7 @@ public partial class MonitoredAccountsPage : ContentPage
         }
         else if (e.Offset < -200)
         {
-            await ViewModelLocator.MonitoredAccounts.RemoveAccount(account);
+            ViewModelLocator.MonitoredAccounts.RemoveAccount(account);
         }
 
         if (sender is RadListView rlv)
