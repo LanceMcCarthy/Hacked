@@ -14,17 +14,15 @@ public partial class MonitoredAccountsPage : ContentPage
 		InitializeComponent();
     }
 
-    private async void AccountTapped(object? sender, ItemTapEventArgs e)
-    {
-        if (e.Item is MonitoredAccount account && sender is RadListView { IsSwipingInProgress: false })
-        {
-            ViewModelLocator.MonitoredAccounts.SelectedAccount = account;
+    //private async void AccountTapped(object? sender, ItemTapEventArgs e)
+    //{
+    //    if (e.Item is MonitoredAccount account && sender is RadListView { IsSwipingInProgress: false })
+    //    {
+    //        ViewModelLocator.MonitoredAccounts.SelectedAccount = account;
 
-            // TODO navigation https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/shell/navigation#absolute-routes
-            //await ((Application.Current.MainPage as RootPage)?.Detail as NavigationPage)?.Navigation.PushModalAsync(new AccountDetailPage());
-            await Shell.Current.GoToAsync("/accountdetails");
-        }
-    }
+    //        await Shell.Current.GoToAsync("/accountdetails");
+    //    }
+    //}
 
     private async void RefreshSwipeButton_Clicked(object sender, EventArgs e)
     {
