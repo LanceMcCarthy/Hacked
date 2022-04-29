@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CommonHelpers.Mvvm;
 using Hacked.Maui.Common.Extensions;
+using Telerik.XamarinForms.DataControls.ListView.Commands;
 
 namespace Hacked.Maui.ViewModels;
 
@@ -25,7 +26,7 @@ public class MonitoredAccountsViewModel : ViewModelBase
     private DelegateCommand<MonitoredAccount> _removeAccountCommand;
     private DelegateCommand _findAllAccountBreachesCommand;
     private DelegateCommand _goToSettingsCommand;
-    private DelegateCommand _goToAddAccountCommand;
+    private DelegateCommand<ItemTapCommandContext> _viewDetailsCommand;
     private DelegateCommand<MonitoredAccount> _refreshAccountCommand;
 
     #endregion
@@ -93,7 +94,7 @@ public class MonitoredAccountsViewModel : ViewModelBase
 
     public DelegateCommand GoToSettingsCommand => _goToSettingsCommand ??= new DelegateCommand(GoToSettingsAsync);
 
-    public DelegateCommand GoToAddAccountCommand => _goToAddAccountCommand ??= new DelegateCommand(GoToAddAccountAsync);
+    public DelegateCommand<ItemTapCommandContext> ViewDetailsCommand => _viewDetailsCommand ??= new DelegateCommand<ItemTapCommandContext>(ViewDetails);
 
     public DelegateCommand<MonitoredAccount> RefreshAccountCommand => _refreshAccountCommand ??= new DelegateCommand<MonitoredAccount>(UpdateBreachesForAccountAsync);
 
@@ -396,13 +397,12 @@ public class MonitoredAccountsViewModel : ViewModelBase
         await Shell.Current.GoToAsync("/settings");
     }
         
-    private async void GoToAddAccountAsync()
+    private async void ViewDetails(ItemTapCommandContext context)
     {
-        // TODO navigation https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/shell/navigation#absolute-routes
-        //await ((Application.Current.MainPage as RootPage).Detail as NavigationPage).Navigation.PushAsync(new AddAccountPage());
-        await Shell.Current.GoToAsync("/accounts/addaccount");
+        this.SelectedAccount = context.Item as MonitoredAccount;
+        await Shell.Current.GoToAsync("/accountdetails");
     }
-        
+    
     // Stats
 
     public void UpdateStatistics()
