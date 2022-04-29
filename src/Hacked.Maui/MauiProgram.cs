@@ -1,7 +1,7 @@
 ﻿using Microsoft.Maui.LifecycleEvents;
 using Telerik.Maui.Controls.Compatibility;
 
-#if WINDOWS
+#if WINDOWS10_0_17763_0_OR_GREATER
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Windows.Graphics;
@@ -11,8 +11,12 @@ using AppKit;
 using CoreGraphics;
 using Foundation;
 using UIKit;
-
+#elif IOS
+#elif ANDROID
+#elif TIZEN
+// nothing special here, yet
 #endif
+
 
 namespace Hacked.Maui
 {
@@ -35,7 +39,7 @@ namespace Hacked.Maui
 
             builder.ConfigureLifecycleEvents(events =>
             {
-#if WINDOWS
+#if WINDOWS10_0_17763_0_OR_GREATER
                 events.AddWindows(wndLifeCycleBuilder =>
                 {
                     wndLifeCycleBuilder.OnWindowCreated(window =>
