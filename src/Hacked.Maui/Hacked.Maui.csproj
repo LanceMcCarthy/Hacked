@@ -55,6 +55,11 @@
 	  <PackageReference Include="Telerik.UI.for.Maui" Version="0.8.0" />
 	</ItemGroup>
 
+	<ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.0-preview3" />
+	</ItemGroup>
+
+
 	<ItemGroup>
 	  <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
 	  <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
