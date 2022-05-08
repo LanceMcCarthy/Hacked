@@ -2,12 +2,14 @@
 using Telerik.Maui.Controls.Compatibility;
 
 #if WINDOWS10_0_17763_0_OR_GREATER
-using Microsoft.UI;
-using Microsoft.UI.Windowing;
-using Windows.Graphics;
 using Hacked.Maui.Platforms.Windows;
-using Microsoft.UI.Xaml;
-using WinRT;
+//using Windows.Graphics;
+//using Microsoft.UI.Composition;
+//using Microsoft.UI.Composition.SystemBackdrops;
+//using Microsoft.UI.Windowing;
+//using Microsoft.UI.Xaml;
+//using WinRT;
+using WinUIEx;
 
 #elif MACCATALYST
 using AppKit;
@@ -20,7 +22,6 @@ using UIKit;
 #elif TIZEN
 // nothing special here, yet
 #endif
-
 
 namespace Hacked.Maui
 {
@@ -40,7 +41,6 @@ namespace Hacked.Maui
                     fonts.AddFont("fa-solid-900.ttf", "Font Awesome 6 Free Regular");
                 });
 
-
             builder.ConfigureLifecycleEvents(events =>
             {
 #if WINDOWS10_0_17763_0_OR_GREATER
@@ -49,69 +49,28 @@ namespace Hacked.Maui
                 {
                     wndLifeCycleBuilder.OnWindowCreated(window =>
                     {
-                        IntPtr nativeWindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(window);
-                        WindowId win32WindowsId = Win32Interop.GetWindowIdFromWindow(nativeWindowHandle);
-                        AppWindow winuiAppWindow = AppWindow.GetFromWindowId(win32WindowsId);
-                        
-                        // Hard coded logic to center window on a 1920x1080 display, adjust as needed
+                        // OPTION 1 - Use PInvoke to get monitor's details and place it center
+                        // window.PlacementCenterWindowInMonitorWin32(); // see Platforms/Windows/WindowsHelpers.cs
+
+
+                        // Dimensions for options 2 and 3 (hard coded for a 1920x1080 display)
                         const int width = 1200;
                         const int height = 800;
                         const int x = 1920 / 2 - width / 2;
                         const int y = 1080 / 2 - height / 2;
 
-                        winuiAppWindow.MoveAndResize(new RectInt32(x, y, width, height));
+                        //// OPTION 2 - You can use winUIEx extension method (add the WinUIEx NuGet package)
+                        window.MoveAndResize(x, y, width, height);
+
+                        //// Option 3 - Get the AppWindow reference and call the window methods directly
+                        //AppWindow winuiAppWindow = window.GetAppWindowForWinUI(); // see Platforms/Windows/WindowsHelpers.cs
+                        //winuiAppWindow.MoveAndResize(new RectInt32(x, y, width, height));
 
 
-                        // *** For Mica support ** //
-                        Microsoft.UI.Composition.SystemBackdrops.MicaController micaController;
-                        Microsoft.UI.Composition.SystemBackdrops.SystemBackdropConfiguration configurationSource;
-
-                        if (Microsoft.UI.Composition.SystemBackdrops.MicaController.IsSupported())
-                        {
-                            var dispatcherQueueHelper = new WindowsSystemDispatcherQueueHelper(); // in Platforms.Windows folder
-                            dispatcherQueueHelper.EnsureWindowsSystemDispatcherQueueController();
-
-                            // Hooking up the policy object
-                            configurationSource = new Microsoft.UI.Composition.SystemBackdrops.SystemBackdropConfiguration();
-                            
-                            // Initial configuration state.
-                            configurationSource.IsInputActive = true;
-
-                            switch (((FrameworkElement)window.Content).ActualTheme)
-                            {
-                                case ElementTheme.Dark: configurationSource.Theme = Microsoft.UI.Composition.SystemBackdrops.SystemBackdropTheme.Dark; break;
-                                case ElementTheme.Light: configurationSource.Theme = Microsoft.UI.Composition.SystemBackdrops.SystemBackdropTheme.Light; break;
-                                case ElementTheme.Default: configurationSource.Theme = Microsoft.UI.Composition.SystemBackdrops.SystemBackdropTheme.Default; break;
-                            }
-
-                            micaController = new Microsoft.UI.Composition.SystemBackdrops.MicaController();
-
-                            // Enable the system backdrop.
-                            // Note: Be sure to have "using WinRT;" to support the Window.As<...>() call.
-                            micaController.AddSystemBackdropTarget(window.As<Microsoft.UI.Composition.ICompositionSupportsSystemBackdrop>());
-                            micaController.SetSystemBackdropConfiguration(configurationSource);
-
-                            window.Activated += (object sender, WindowActivatedEventArgs args) =>
-                            {
-                                configurationSource.IsInputActive = args.WindowActivationState != WindowActivationState.Deactivated;
-                            };
-
-                            window.Closed += (object sender, WindowEventArgs args) =>
-                            {
-                                // Make sure any Mica/Acrylic controller is disposed so it doesn't try to
-                                // use this closed window.
-                                if (micaController != null)
-                                {
-                                    micaController.Dispose();
-                                    micaController = null;
-                                }
-
-                                configurationSource = null;
-                            };
-                        }
+                        // *** For Mica or Acrylic support ** //
+                        window.TryMicaOrAcrylic();
                     });
                 });
-
                 
 #elif MACCATALYST
                 
