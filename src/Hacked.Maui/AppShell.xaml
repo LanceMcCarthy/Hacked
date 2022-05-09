@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell x:Class="Hacked.Maui.AppShell"
+       xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:local="clr-namespace:Hacked.Maui"
+       xmlns:views="clr-namespace:Hacked.Maui.Views"
+       xmlns:res="clr-namespace:Hacked.Maui.Resources"
+       xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+       ios:Page.UseSafeArea="True"
+       FlyoutWidth="50">
+
+    <!-- FlyoutBehavior="{OnIdiom Phone=Disabled, Default=Locked}" -->
+
+    <!-- good reference: https://docs.microsoft.com/en-us/dotnet/maui/fundamentals/shell/flyout -->
+    <FlyoutItem x:Name="AccountsFlyoutItem"
+                Title="Accounts"
+                Icon="tab_home.png">
+        <ShellContent Title="Accounts"
+                      ContentTemplate="{DataTemplate views:MonitoredAccountsPage}"
+                      Route="accounts"/>
+    </FlyoutItem>
+    <FlyoutItem x:Name="SettingsFlyoutItem"
+                Route="settings"
+                Icon="tab_settings.png">
+        <ShellContent Title="Settings"
+                      ContentTemplate="{DataTemplate views:SettingsPage}"
+                      Route="settings" />
+    </FlyoutItem>
+    <FlyoutItem x:Name="AboutFlyoutItem"
+                Title="About"
+                Icon="tab_account.png">
+        <ShellContent Title="About"
+                      ContentTemplate="{DataTemplate views:AboutPage}"
+                      Route="about" />
+    </FlyoutItem>
+
+
+    <!-- Item template for each menu item on the flyout panel -->
+    <Shell.ItemTemplate>
+        <DataTemplate>
+            <Grid Margin="0,10"
+                  Padding="0">
+                <Image Source="{Binding FlyoutIcon}"
+                       WidthRequest="32"
+                       HeightRequest="32"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       Margin="0"/>
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
+
+    <!-- Desktop/Tablet-->
+
+    <!-- Manually defined FlyoutItems if I want more control-->
+    <!-- <FlyoutItem x:Name="AccountsFlyoutItem"
+                Title="Accounts"
+                Icon="tab_home.png">
+        <ShellContent Title="Accounts"
+                      ContentTemplate="{DataTemplate views:MonitoredAccountsPage}"
+                      Route="accounts" 
+                      Icon=""/>
+    </FlyoutItem>
+    <FlyoutItem x:Name="SettingsFlyoutItem"
+                Route="settings"
+                Icon="tab_settings.png">
+        <ShellContent Title="Settings"
+                      ContentTemplate="{DataTemplate views:SettingsPage}"
+                      Route="settings" />
+    </FlyoutItem>
+    <FlyoutItem x:Name="AboutFlyoutItem"
+                Title="About"
+                Icon="tab_account.png">
+        <ShellContent Title="About"
+                      ContentTemplate="{DataTemplate views:AboutPage}"
+                      Route="about" />
+    </FlyoutItem>-->
+
+    <!-- Phone -->
+    <!--<TabBar x:Name="PhoneTabs">
+        <Tab x:Name="HomeTab"
+             Title="Home"
+             Icon="tab_home.png">
+            <ShellContent Title="Monitored Accounts"
+                          ContentTemplate="{DataTemplate views:MonitoredAccountsPage}"
+                          Route="accounts" />
+        </Tab>
+        <Tab x:Name="SettingsTab"
+             Title="Settings"
+             Icon="tab_settings.png">
+            <ShellContent Title="Settings"
+                          ContentTemplate="{DataTemplate views:SettingsPage}"
+                          Route="settings" />
+        </Tab>
+        <Tab x:Name="AboutTab"
+             Title="About"
+             Icon="tab_briefcase.png">
+            <ShellContent Title="About"
+                          ContentTemplate="{DataTemplate views:AboutPage}"
+                          Route="about" />
+        </Tab>
+    </TabBar>-->
+
+    <!--<Shell.FlyoutFooterTemplate>
+        <DataTemplate>
+            <Grid RowDefinitions="68">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+                </Grid.GestureRecognizers>
+                -->
+                <!--<Image Source="tab_settings.png"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center"
+                                   WidthRequest="40"
+                                   HeightRequest="40" />-->
+                <!--
+
+                <Label Text="{x:Static res:IconFont.Cog}"
+                       Style="{StaticResource FontAwesomeLabelStyle}" />
+            </Grid>
+        </DataTemplate>
+    </Shell.FlyoutFooterTemplate>-->
+
+</Shell>
