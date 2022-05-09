@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Hacked.Maui.Views.MonitoredAccountsPage"
+             xmlns:telerik="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
+             xmlns:tdc="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:tlv="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:tp="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:tlvc="clr-namespace:Telerik.XamarinForms.DataControls.ListView.Commands;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
+             xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
+             xmlns:behaviors="clr-namespace:Hacked.Maui.Behaviors"
+             xmlns:res="clr-namespace:Hacked.Maui.Resources"
+             BindingContext="{x:Static vms:ViewModelLocator.MonitoredAccounts}"
+             Title="Monitored Accounts">
+
+    <Grid x:Name="RootGrid"
+          RowDefinitions="*, Auto, Auto">
+
+        <!-- Not needed, will style custom item template directly
+             ItemStyle="{StaticResource NormalItemStyle}"
+             SelectedItemStyle="{StaticResource SelectedItemStyle}"
+             PressedItemStyle="{StaticResource PressedItemStyle}"
+             ReorderItemStyle="{StaticResource ReorderItemStyle}" -->
+
+        <!-- TODO add later, when UX is better (use OnPlatform to only allow on mobile)
+             IsPullToRefreshEnabled="{Binding HasAccounts}"
+             SwipeOffset="70, 0, 70, 0"
+             SwipeThreshold="10"
+        -->
+
+        <tdc:RadListView x:Name="AccountsListView"
+                         ItemsSource="{Binding Accounts}"
+                         SelectedItem="{Binding SelectedAccount}"
+                         SelectionMode="None">
+            <tdc:RadListView.Commands>
+                <tlvc:ListViewUserCommand Id="ItemTap"
+                                          Command="{Binding ViewDetailsCommand}" />
+            </tdc:RadListView.Commands>
+            <tdc:RadListView.ItemTemplate>
+                <DataTemplate x:DataType="models:MonitoredAccount">
+                    <tlv:ListViewTemplateCell>
+                        <Grid Background="{AppThemeBinding Light={StaticResource LightGray}, Dark={StaticResource DarkGray}}"
+                              Padding="10"
+                              ColumnDefinitions="*,Auto"
+                              RowDefinitions="Auto,Auto">
+
+                            <VerticalStackLayout Grid.RowSpan="2">
+                                <Label Text="{Binding Address}"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding Breaches.Count, StringFormat='Breachs: {0}'}"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}" />
+                                <Label Text="{Binding NewBreachCount}"
+                                       IsVisible="{Binding HasNewBreaches}"
+                                       FontAttributes="Bold" />
+                                <Grid IsVisible="{Binding IsUpdating}"
+                                      BackgroundColor="Gold">
+                                    <Label Text="Is Refreshing..."
+                                           TextColor="Yellow"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalTextAlignment="Center"
+                                           Margin="0,2" />
+                                </Grid>
+                            </VerticalStackLayout>
+
+                            <!--<telerik:RadButton Text="{x:Static res:IconFont.InfoCircle}"
+                                               Style="{StaticResource FontAwesomeLabelStyle}"
+                                               Command="{Binding ViewDetailsCommand, Source={x:RelativeSource AncestorType={x:Type vms:MonitoredAccountsViewModel}}}"
+                                               CommandParameter="{Binding}"
+                                               VerticalOptions="Center"
+                                               Margin="5"
+                                               Grid.Column="1"
+                                               Grid.Row="0"/>-->
+
+                            <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
+                                               Style="{StaticResource FontAwesomeLabelStyle}"
+                                               Command="{Binding RemoveAccountCommand, Source={x:RelativeSource AncestorType={x:Type vms:MonitoredAccountsViewModel}}}"
+                                               CommandParameter="{Binding}"
+                                               IsEnabled="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}"
+                                               VerticalOptions="Center"
+                                               Margin="5"
+                                               Grid.Column="1"
+                                               Grid.Row="0"/>
+                        </Grid>
+                    </tlv:ListViewTemplateCell>
+                </DataTemplate>
+            </tdc:RadListView.ItemTemplate>
+            <tdc:RadListView.LayoutDefinition>
+                <OnPlatform x:TypeArguments="tlv:ListViewLayoutBase">
+                    <On Platform="iOS, Android">
+                        <On.Value>
+                            <tlv:ListViewLinearLayout VerticalItemSpacing="5" />
+                        </On.Value>
+                    </On>
+                    <On Platform="WinUI, MacCatalyst">
+                        <On.Value>
+                            <tlv:ListViewGridLayout SpanCount="3"
+                                                    HorizontalItemSpacing="5"
+                                                    VerticalItemSpacing="5" />
+                        </On.Value>
+                    </On>
+                </OnPlatform>
+            </tdc:RadListView.LayoutDefinition>
+            <!--<tdc:RadListView.ItemSwipeContentTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="100, Auto, 100">
+                        <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
+                                           Style="{StaticResource FontAwesomeLabelStyle}"
+                                           TextColor="White"
+                                           BackgroundColor="#00BF32"
+                                           Clicked="RefreshSwipeButton_Clicked"
+                                           Command="{Binding RefreshAccountCommand, Source={x:RelativeSource AncestorType={x:Type vms:MonitoredAccountsViewModel}}}"
+                                           CommandParameter="{Binding}" />
+
+                        <telerik:RadButton Text="{x:Static res:IconFont.Trash}"
+                                           Style="{StaticResource FontAwesomeLabelStyle}"
+                                           TextColor="White"
+                                           BackgroundColor="#CE0005"
+                                           Grid.Column="2"
+                                           Clicked="DeleteSwipeButton_Clicked"
+                                           Command="{Binding RemoveAccountCommand, Source={x:RelativeSource AncestorType={x:Type vms:MonitoredAccountsViewModel}}}"
+                                           CommandParameter="{Binding}" />
+                    </Grid>
+                </DataTemplate>
+            </tdc:RadListView.ItemSwipeContentTemplate>-->
+        </tdc:RadListView>
+
+        <!--<CollectionView ItemsSource="{Binding Accounts}"
+                        EmptyView="You Are Not Monitoring Any Accounts">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:MonitoredAccount">
+                    <Grid Padding="10">
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Address}" />
+                            <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}" />
+                            <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}" />
+                            <Grid IsVisible="{Binding IsUpdating}"
+                                  BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}">
+                                <Label Text="Is Refreshing..."
+                                       HorizontalTextAlignment="Center"
+                                       VerticalTextAlignment="Center"
+                                       Margin="0,2" />
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <tp:RadBusyIndicator IsVisible="{Binding IsUpdating}"
+                                             IsBusy="{Binding IsUpdating}" />
+                    </Grid>
+
+                    <SwipeView>
+                        <SwipeView.LeftItems>
+                            <SwipeItems>
+                                <SwipeItem Text="Refresh"
+                                           IconImageSource="search_icon.png"
+                                           BackgroundColor="LightGreen"
+                                           Command="{Binding BindingContext.RefreshAccountCommand, Source={RelativeSource AncestorType={x:Type CollectionView}}}"
+                                           CommandParameter="{Binding .}"/>
+                                <SwipeItem Text="Delete"
+                                           IconImageSource="delete.png"
+                                           BackgroundColor="Pink"
+                                           Command="{Binding BindingContext.RemoveAccountCommand, Source={RelativeSource AncestorType={x:Type CollectionView}}}"
+                                           CommandParameter="{Binding .}"/>
+                            </SwipeItems>
+                        </SwipeView.LeftItems>
+
+                        <Grid Padding="10">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Address}" />
+                                <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}" />
+                                <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}" />
+                                <Grid IsVisible="{Binding IsUpdating}"
+                                      BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}">
+                                    <Label Text="Is Refreshing..."
+                                           HorizontalTextAlignment="Center"
+                                           VerticalTextAlignment="Center"
+                                           Margin="0,2" />
+                                </Grid>
+                            </VerticalStackLayout>
+
+                            <tp:RadBusyIndicator IsVisible="{Binding IsUpdating}"
+                                                 IsBusy="{Binding IsUpdating}" />
+                        </Grid>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>-->
+
+        <VerticalStackLayout Grid.Row="1">
+            <Label x:Name="SwipeTip"
+                   Text="Swipe items left for delete or right for refresh"
+                   HorizontalTextAlignment="Center"
+                   Margin="5"
+                   IsVisible="False"
+                   LineBreakMode="WordWrap" />
+
+            <Label x:Name="AccountRefreshTip"
+                   Text="Pull list down to refresh all accounts"
+                   HorizontalTextAlignment="Center"
+                   IsVisible="False"
+                   Margin="5"
+                   LineBreakMode="WordWrap" />
+
+            <!--<StackLayout Orientation="Horizontal"
+                             Margin="5">
+                    <Label Text="Show Tips:"
+                           TextColor="{DynamicResource ThemeTextColor}" 
+                           Margin="0,0,10,0"
+                           VerticalOptions="Center"/>
+
+                    <CheckBox x:Name="RefreshTipCheckBox"
+                              CheckedChanged="RefreshTipCheckBox_OnCheckedChanged"/>
+                </StackLayout>-->
+        </VerticalStackLayout>
+
+        <telerik:RadButton x:Name="AddAccountModalButton"
+                           Text="add an account"
+                           CornerRadius="5"
+                           Margin="10"
+                           Clicked="AddAccountPopup_Clicked"
+                           Grid.Row="2">
+            
+        </telerik:RadButton>
+    </Grid>
+
+    <telerik:RadPopup.Popup>
+        <telerik:RadPopup x:Name="popup"
+                          IsModal="True"
+                          Placement="Center"
+                          OutsideBackgroundColor="#DDFFFFFF">
+            <telerik:RadBorder CornerRadius="6"
+                               BackgroundColor="{AppThemeBinding Light={StaticResource Dark}, Dark={StaticResource Primary}}"
+                               Padding="10">
+                <Grid>
+                    <VerticalStackLayout Margin="20"
+                                         Spacing="10"
+                                         Padding="20">
+                        <Label Text="Enter an account to monitor"
+                               TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" />
+                        <telerik:RadEntry x:Name="EmailEntry"
+                                          Completed="EmailEntry_OnCompleted"
+                                          Keyboard="Email"
+                                          Placeholder="enter email address or username"
+                                          PlaceholderColor="{AppThemeBinding Light={StaticResource Dark}, Dark={StaticResource Primary}}"
+                                          TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
+                                          BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"
+                                          TextChanged="EmailEntry_OnTextChanged"
+                                          WidthRequest="700" />
+                        <telerik:RadButton x:Name="AddAccountButton"
+                                           Text="add account"
+                                           TextColor="Wheat"
+                                           BackgroundColor="DarkRed"
+                                           Clicked="AddAccount_OnClicked">
+                            <telerik:RadButton.Triggers>
+                                <Trigger TargetType="telerik:RadButton"
+                                         Property="IsEnabled"
+                                         Value="True">
+                                    <Setter Property="TextColor"
+                                            Value="White" />
+                                    <Setter Property="BackgroundColor"
+                                            Value="DarkGreen" />
+                                </Trigger>
+                            </telerik:RadButton.Triggers>
+                        </telerik:RadButton>
+                        <telerik:RadButton x:Name="CancelButton"
+                                           Clicked="CancelButton_OnClicked"
+                                           Text="cancel"
+                                           TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
+                                           BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" />
+                    </VerticalStackLayout>
+
+                    <ActivityIndicator IsVisible="{Binding IsBusy}"
+                                       IsRunning="{Binding IsBusy}"
+                                       HorizontalOptions="Fill"
+                                       VerticalOptions="Fill" />
+                </Grid>
+            </telerik:RadBorder>
+        </telerik:RadPopup>
+    </telerik:RadPopup.Popup>
+</ContentPage>
