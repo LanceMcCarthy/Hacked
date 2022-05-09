@@ -18,6 +18,8 @@
     <Color x:Key="ThemeAccentLightColor">#009acd</Color>
     <Color x:Key="ThemeAccentColor">#005dac</Color>
     <Color x:Key="ThemeAccentDarkColor">#002d87</Color>-->
+    <Color x:Key="LightTranslucent">#99FFFFFF</Color>
+    <Color x:Key="DarkTranslucent">#AA000000</Color>
 
     <!-- Telerik icon font - list here - https://docs.telerik.com/devtools/xamarin/styling-and-appearance/telerik-font-icons -->
     <x:String x:Key="StarIcon">&#xE805;</x:String>
