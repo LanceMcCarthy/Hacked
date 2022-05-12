@@ -64,6 +64,12 @@
 	  <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <MauiXaml Update="Controls\ImageCollage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 <!-- ******** PUBLISHING Android ********
 	dotnet publish -f:net6.0-android -c:Release
 	I can replace some or all of the XML defined items with CLI params 

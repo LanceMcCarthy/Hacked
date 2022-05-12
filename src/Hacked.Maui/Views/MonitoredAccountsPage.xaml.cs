@@ -88,15 +88,6 @@ public partial class MonitoredAccountsPage : ContentPage
         {
             AddAccountButton.IsEnabled = !string.IsNullOrEmpty(entry.Text);
         }
-
-        // This will get set by the VisualStateManager on the implicit RadButton style in TelerikStyles
-        //AddAccountButton.BackgroundColor = isValid
-        //    ? (Color)Application.Current.Resources["ThemeAccentDarkColor"]
-        //    : (Color)Application.Current.Resources["ThemeTextLightColor"];
-        //AddAccountButton.TextColor = isValid
-        //    ? (Color)Application.Current.Resources["ThemeBackgroundColor"]
-        //    : (Color)Application.Current.Resources["ThemeTextColor"];
-        // AddAccountButton.IsEnabled = isValid;
     }
 
     private async Task AttemptEmailAddAsync(string emailAddress)
