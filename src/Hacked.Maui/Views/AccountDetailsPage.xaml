@@ -38,7 +38,7 @@
             </Grid>-->
         </Grid>
 
-        <!--<tdc:RadListView x:Name="BreachesListView"
+        <tdc:RadListView x:Name="BreachesListView"
                          ItemsSource="{Binding SelectedAccount.Breaches}"
                          IsItemsReorderEnabled="False"
                          SelectionMode="None"
@@ -91,7 +91,7 @@
                     </On>
                 </OnPlatform>
             </tdc:RadListView.LayoutDefinition>
-        </tdc:RadListView>-->
+        </tdc:RadListView>
 
         <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
                            Style="{StaticResource FontAwesomeLabelStyle}"

@@ -11,6 +11,7 @@
              xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
              xmlns:behaviors="clr-namespace:Hacked.Maui.Behaviors"
              xmlns:res="clr-namespace:Hacked.Maui.Resources"
+             xmlns:controls="clr-namespace:Hacked.Maui.Controls"
              BindingContext="{x:Static vms:ViewModelLocator.MonitoredAccounts}"
              Title="Monitored Accounts">
 
@@ -21,7 +22,15 @@
              ItemStyle="{StaticResource NormalItemStyle}"
              SelectedItemStyle="{StaticResource SelectedItemStyle}"
              PressedItemStyle="{StaticResource PressedItemStyle}"
-             ReorderItemStyle="{StaticResource ReorderItemStyle}" -->
+             ReorderItemStyle="{StaticResource ReorderItemStyle}"
+        
+        <OnPlatform x:TypeArguments="x:Double">
+                                    <On Platform="iOS, Android"
+                                        Value="200"/>
+                                    <On Platform="WinUI, MacCatalyst"
+                                        Value="200"/>
+                                </OnPlatform>
+        -->
 
         <!-- TODO add later, when UX is better (use OnPlatform to only allow on mobile)
              IsPullToRefreshEnabled="{Binding HasAccounts}"
@@ -44,6 +53,26 @@
                               Padding="10"
                               ColumnDefinitions="*,Auto"
                               RowDefinitions="Auto,Auto">
+                            <Grid.WidthRequest>
+                                <OnPlatform x:TypeArguments="x:Double">
+                                    <On Platform="iOS, Android"
+                                        Value="200"/>
+                                    <On Platform="WinUI, MacCatalyst"
+                                        Value="200"/>
+                                </OnPlatform>
+                            </Grid.WidthRequest>
+                            <Grid.HeightRequest>
+                                <OnPlatform x:TypeArguments="x:Double">
+                                    <On Platform="iOS, Android"
+                                        Value="200" />
+                                    <On Platform="WinUI, MacCatalyst"
+                                        Value="200" />
+                                </OnPlatform>
+                            </Grid.HeightRequest>
+
+                            <controls:ImageCollage AssociatedAccount="{Binding}"
+                                                   Grid.ColumnSpan="2"
+                                                   Grid.RowSpan="2"/>
 
                             <VerticalStackLayout Grid.RowSpan="2">
                                 <Label Text="{Binding Address}"
@@ -97,7 +126,7 @@
                         <On.Value>
                             <tlv:ListViewGridLayout SpanCount="3"
                                                     HorizontalItemSpacing="5"
-                                                    VerticalItemSpacing="5" />
+                                                    VerticalItemSpacing="5"/>
                         </On.Value>
                     </On>
                 </OnPlatform>
@@ -248,17 +277,14 @@
                                           WidthRequest="700" />
                         <telerik:RadButton x:Name="AddAccountButton"
                                            Text="add account"
-                                           TextColor="Wheat"
-                                           BackgroundColor="DarkRed"
+                                           TextColor="Red"
                                            Clicked="AddAccount_OnClicked">
                             <telerik:RadButton.Triggers>
                                 <Trigger TargetType="telerik:RadButton"
                                          Property="IsEnabled"
                                          Value="True">
                                     <Setter Property="TextColor"
-                                            Value="White" />
-                                    <Setter Property="BackgroundColor"
-                                            Value="DarkGreen" />
+                                            Value="Green" />
                                 </Trigger>
                             </telerik:RadButton.Triggers>
                         </telerik:RadButton>

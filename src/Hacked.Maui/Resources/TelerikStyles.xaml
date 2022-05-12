@@ -231,6 +231,12 @@
                 Value="{DynamicResource Blue100Accent}" />
     </Style>
 
+    <Style x:Key="FontAwesomeLabelStyle"
+           TargetType="Label">
+        <Setter Property="FontFamily"
+                Value="Font Awesome 6 Free Regular"/>
+    </Style>
+
 
     <!-- Instance Styles (being replaced by custom ItemTemplate
 
