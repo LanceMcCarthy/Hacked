@@ -4,9 +4,12 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                     xmlns:telerik="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
                     xmlns:primitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
-                    xmlns:lv="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.Maui.Controls.Compatibility"
-                    xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core">
+                    xmlns:tlv="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.Maui.Controls.Compatibility"
+                    xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
+                    xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
+                    xmlns:res="clr-namespace:Hacked.Maui.Resources">
 
+    <!-- Use colors in Styles.xaml instead of here
     <Color x:Key="ThemeBackgroundColor">#f2fffd</Color>
     <Color x:Key="ThemeTextLightColor">#a5a6a6</Color>
     <Color x:Key="ThemeTextColor">#6d6d6d</Color>
@@ -14,9 +17,11 @@
     <Color x:Key="ThemeAccentBrightColor">#13d2e4</Color>
     <Color x:Key="ThemeAccentLightColor">#009acd</Color>
     <Color x:Key="ThemeAccentColor">#005dac</Color>
-    <Color x:Key="ThemeAccentDarkColor">#002d87</Color>
+    <Color x:Key="ThemeAccentDarkColor">#002d87</Color>-->
+    <Color x:Key="LightTranslucent">#99FFFFFF</Color>
+    <Color x:Key="DarkTranslucent">#AA000000</Color>
 
-    <!-- Full icon list here - https://docs.telerik.com/devtools/xamarin/styling-and-appearance/telerik-font-icons -->
+    <!-- Telerik icon font - list here - https://docs.telerik.com/devtools/xamarin/styling-and-appearance/telerik-font-icons -->
     <x:String x:Key="StarIcon">&#xE805;</x:String>
     <x:String x:Key="MenuIcon">&#xE808;</x:String>
     <x:String x:Key="PlusIcon">&#xF0FE;</x:String>
@@ -37,7 +42,6 @@
     <x:String x:Key="ArrowsUpIcon">&#xE800;</x:String>
     <x:String x:Key="ArrowsDownIcon">&#xE803;</x:String>
 
-
     <!-- DataTemplates -->
 
     <DataTemplate x:Key="BreachClassItemTemplate">
@@ -45,37 +49,47 @@
                Margin="0,0,5,0" />
     </DataTemplate>
 
+    <!-- TODO switch to using this resource when template design is complete
     <DataTemplate x:Key="BreachItemTemplate"
                   x:DataType="models:Breach">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
+        <tlv:ListViewTemplateCell>
+            <Grid Background="LightBlue">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
 
-            <StackLayout Margin="10,5,10,5">
-                <Label Text="{Binding Name}"
-                       FontAttributes="Bold" />
-                <Label Text="{Binding BreachDate, StringFormat='Breached on: {0}'}" />
-                <Label Text="{Binding PwnCount, StringFormat='Accounts breached: {0}'}" />
-            </StackLayout>
+                <StackLayout Margin="10,5,10,5">
+                    <Label Text="{Binding Name}"
+                           FontAttributes="Bold" />
+                    <Label Text="{Binding BreachDate, StringFormat='Breached on: {0}'}" />
+                    <Label Text="{Binding PwnCount, StringFormat='Accounts breached: {0}'}" />
+                </StackLayout>
 
-            <ListView ItemsSource="{Binding DataClasses}"
-                      ItemTemplate="{StaticResource BreachClassItemTemplate}"
-                      InputTransparent="True"
-                      Margin="0,5,5,5"
-                      Grid.Column="1" />
-        </Grid>
-    </DataTemplate>
+                <telerik:RadItemsControl ItemsSource="{Binding DataClasses}"
+                                         ItemTemplate="{StaticResource BreachClassItemTemplate}"
+                                         InputTransparent="True"
+                                         Margin="0,5,5,5"
+                                         Grid.Column="1"/>
+            </Grid>
+        </tlv:ListViewTemplateCell>
+    </DataTemplate>-->
 
+    <!-- TODO switch to using this resource when template design is complete
+    
     <DataTemplate x:Key="MonitoredAccountTelerikItemTemplate"
                   x:DataType="models:MonitoredAccount">
-        <lv:ListViewTemplateCell>
-            <Grid Padding="10">
+        <tlv:ListViewTemplateCell>
+            <Grid Background="{AppThemeBinding Light={StaticResource LightGray}, Dark={StaticResource DarkGray}}"
+                  Padding="10">
                 <VerticalStackLayout>
-                    <Label Text="{Binding Address}" />
+                    <Label Text="{Binding Address}"
+                           FontAttributes="Bold" />
                     <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}" />
                     <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}" />
+                    <Label Text="{Binding NewBreachCount}"
+                           IsVisible="{Binding HasNewBreaches}"
+                           FontAttributes="Bold" />
                     <Grid IsVisible="{Binding IsUpdating}"
                           BackgroundColor="Gold">
                         <Label Text="Is Refreshing..."
@@ -85,47 +99,18 @@
                                Margin="0,2" />
                     </Grid>
                 </VerticalStackLayout>
+
+                <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
+                                   Style="{StaticResource FontAwesomeLabelStyle}"
+                                   Command="{Binding RemoveAccountCommand, Source={x:RelativeSource AncestorType={x:Type vms:MonitoredAccountsViewModel}}}"
+                                   CommandParameter="{Binding}"
+                                   IsEnabled="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}"
+                                   VerticalOptions="End"
+                                   HorizontalOptions="End"
+                                   Margin="10" />
             </Grid>
-        </lv:ListViewTemplateCell>
-    </DataTemplate>
-
-
-    <!-- Instance Styles -->
-
-    <lv:ListViewItemStyle x:Key="ThemeAwareItemStyle"
-                          BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}"
-                          BorderColor="{StaticResource Dark}"
-                          BorderWidth="2"
-                          BorderLocation="All" />
-
-    <lv:ListViewItemStyle x:Key="NormalItemStyle"
-                          BackgroundColor="#1263E5"
-                          TextCellTextColor="#AAC7F6"
-                          BorderColor="#0A3A82"
-                          BorderWidth="2"
-                          BorderLocation="All" />
-
-    <lv:ListViewItemStyle x:Key="SelectedItemStyle"
-                          BackgroundColor="#83A9E2"
-                          TextCellTextColor="#AAC7F6"
-                          BorderColor="#0A3A82"
-                          BorderWidth="2"
-                          BorderLocation="Bottom" />
-
-    <lv:ListViewItemStyle x:Key="PressedItemStyle"
-                          BackgroundColor="#C1C1C1"
-                          TextCellTextColor="#AAC7F6"
-                          BorderColor="#0B3D89"
-                          BorderWidth="2"
-                          BorderLocation="Bottom" />
-
-    <lv:ListViewItemStyle x:Key="ReorderItemStyle"
-                          BackgroundColor="#0B3D89"
-                          TextCellTextColor="#AAC7F6"
-                          BorderColor="Black"
-                          BorderWidth="2"
-                          BorderLocation="All" />
-
+        </tlv:ListViewTemplateCell>
+    </DataTemplate>-->
 
     <!-- Implicit Styles -->
 
@@ -170,7 +155,6 @@
         <Setter Property="AnimationContentColor"
                 Value="{StaticResource Primary}" />
     </Style>
-
 
     <!-- Keyed Styles -->
 
@@ -246,5 +230,49 @@
         <Setter Property="BorderColor"
                 Value="{DynamicResource Blue100Accent}" />
     </Style>
+
+    <Style x:Key="FontAwesomeLabelStyle"
+           TargetType="Label">
+        <Setter Property="FontFamily"
+                Value="Font Awesome 6 Free Regular"/>
+    </Style>
+
+
+    <!-- Instance Styles (being replaced by custom ItemTemplate
+
+    <tlv:ListViewItemStyle x:Key="ThemeAwareItemStyle"
+                          BackgroundColor="{AppThemeBinding Light={StaticResource LightGray}, Dark={StaticResource DarkGray}}"
+                          TextCellTextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Light}}"
+                          BorderColor="{AppThemeBinding Light={StaticResource Dark}, Dark={StaticResource Primary}}"
+                          BorderWidth="2"
+                          BorderLocation="All" />
+
+    <tlv:ListViewItemStyle x:Key="NormalItemStyle"
+                          BackgroundColor="{StaticResource LightGray}"
+                          TextCellTextColor="{StaticResource MidGray}"
+                          BorderColor="{StaticResource Primary}"
+                          BorderWidth="2"
+                          BorderLocation="All"/>
+
+    <tlv:ListViewItemStyle x:Key="SelectedItemStyle"
+                          BackgroundColor="#83A9E2"
+                          TextCellTextColor="#AAC7F6"
+                          BorderColor="#0A3A82"
+                          BorderWidth="2"
+                          BorderLocation="Bottom" />
+
+    <tlv:ListViewItemStyle x:Key="PressedItemStyle"
+                          BackgroundColor="#C1C1C1"
+                          TextCellTextColor="#AAC7F6"
+                          BorderColor="#0B3D89"
+                          BorderWidth="2"
+                          BorderLocation="Bottom" />
+
+    <tlv:ListViewItemStyle x:Key="ReorderItemStyle"
+                          BackgroundColor="#0B3D89"
+                          TextCellTextColor="#AAC7F6"
+                          BorderColor="Black"
+                          BorderWidth="2"
+                          BorderLocation="All" />-->
 
 </ResourceDictionary>

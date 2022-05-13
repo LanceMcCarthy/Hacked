@@ -14,17 +14,15 @@ public partial class MonitoredAccountsPage : ContentPage
 		InitializeComponent();
     }
 
-    private async void AccountTapped(object? sender, ItemTapEventArgs e)
-    {
-        if (e.Item is MonitoredAccount account && sender is RadListView { IsSwipingInProgress: false })
-        {
-            ViewModelLocator.MonitoredAccounts.SelectedAccount = account;
+    //private async void AccountTapped(object? sender, ItemTapEventArgs e)
+    //{
+    //    if (e.Item is MonitoredAccount account && sender is RadListView { IsSwipingInProgress: false })
+    //    {
+    //        ViewModelLocator.MonitoredAccounts.SelectedAccount = account;
 
-            // TODO navigation https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/shell/navigation#absolute-routes
-            //await ((Application.Current.MainPage as RootPage)?.Detail as NavigationPage)?.Navigation.PushModalAsync(new AccountDetailPage());
-            await Shell.Current.GoToAsync("/accountdetails");
-        }
-    }
+    //        await Shell.Current.GoToAsync("/accountdetails");
+    //    }
+    //}
 
     private async void RefreshSwipeButton_Clicked(object sender, EventArgs e)
     {
@@ -90,15 +88,6 @@ public partial class MonitoredAccountsPage : ContentPage
         {
             AddAccountButton.IsEnabled = !string.IsNullOrEmpty(entry.Text);
         }
-
-        // This will get set by the VisualStateManager on the implicit RadButton style in TelerikStyles
-        //AddAccountButton.BackgroundColor = isValid
-        //    ? (Color)Application.Current.Resources["ThemeAccentDarkColor"]
-        //    : (Color)Application.Current.Resources["ThemeTextLightColor"];
-        //AddAccountButton.TextColor = isValid
-        //    ? (Color)Application.Current.Resources["ThemeBackgroundColor"]
-        //    : (Color)Application.Current.Resources["ThemeTextColor"];
-        // AddAccountButton.IsEnabled = isValid;
     }
 
     private async Task AttemptEmailAddAsync(string emailAddress)
@@ -128,7 +117,7 @@ public partial class MonitoredAccountsPage : ContentPage
             if (!ViewModelLocator.MonitoredAccounts.HasAccounts)
                 return;
 
-            await ViewModelLocator.MonitoredAccounts.FindAllAccountsBreachesAsync();
+            ViewModelLocator.MonitoredAccounts.FindAllAccountsBreachesAsync();
 
             //if first time, hide tip and persist via settings
             if (AccountRefreshTip.IsVisible)
@@ -154,7 +143,7 @@ public partial class MonitoredAccountsPage : ContentPage
         {
             var lastCount = account.Breaches.Count;
 
-            await ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
+            ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
 
             if (account.Breaches.Count > lastCount)
             {
@@ -165,7 +154,7 @@ public partial class MonitoredAccountsPage : ContentPage
         }
         else if (e.Offset < -200)
         {
-            await ViewModelLocator.MonitoredAccounts.RemoveAccount(account);
+            ViewModelLocator.MonitoredAccounts.RemoveAccount(account);
         }
 
         if (sender is RadListView rlv)

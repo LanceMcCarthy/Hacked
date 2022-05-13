@@ -1,11 +1,12 @@
 ﻿using CommonHelpers.Common;
 using Hacked.Core.Models;
-using Hacked.Maui.Common.Commands;
 using Hacked.Services.Apis;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using CommonHelpers.Mvvm;
 using Hacked.Maui.Common.Extensions;
+using Telerik.XamarinForms.DataControls.ListView.Commands;
 
 namespace Hacked.Maui.ViewModels;
 
@@ -21,12 +22,12 @@ public class MonitoredAccountsViewModel : ViewModelBase
     private bool _areAccountsLoaded;
     private bool _hasAccounts;
     private int _newBreachesTotal;
-    private AsyncCommand _findSelectedAccountBreachesCommand;
-    private AsyncCommand<MonitoredAccount> _removeAccountCommand;
-    private AsyncCommand _findAllAccountBreachesCommand;
-    private AsyncCommand _goToSettingsCommand;
-    private AsyncCommand _goToAddAccountCommand;
-    private AsyncCommand<MonitoredAccount> _refreshAccountCommand;
+    private DelegateCommand _findSelectedAccountBreachesCommand;
+    private DelegateCommand<MonitoredAccount> _removeAccountCommand;
+    private DelegateCommand _findAllAccountBreachesCommand;
+    private DelegateCommand _goToSettingsCommand;
+    private DelegateCommand<ItemTapCommandContext> _viewDetailsCommand;
+    private DelegateCommand<MonitoredAccount> _refreshAccountCommand;
 
     #endregion
 
@@ -85,17 +86,17 @@ public class MonitoredAccountsViewModel : ViewModelBase
 
     #region Commands
 
-    public AsyncCommand FindSelectedAccountBreachesCommand => _findSelectedAccountBreachesCommand ??= new AsyncCommand(() => UpdateBreachesForAccountAsync(SelectedAccount));
+    public DelegateCommand FindSelectedAccountBreachesCommand => _findSelectedAccountBreachesCommand ??= new DelegateCommand(() => UpdateBreachesForAccountAsync(SelectedAccount));
 
-    public AsyncCommand<MonitoredAccount> RemoveAccountCommand => _removeAccountCommand ??= new AsyncCommand<MonitoredAccount>(RemoveAccount, account => account != null);
+    public DelegateCommand<MonitoredAccount> RemoveAccountCommand => _removeAccountCommand ??= new DelegateCommand<MonitoredAccount>(RemoveAccount);
 
-    public AsyncCommand FindAllAccountBreachesCommand => _findAllAccountBreachesCommand ??= new AsyncCommand(FindAllAccountsBreachesAsync);
+    public DelegateCommand FindAllAccountBreachesCommand => _findAllAccountBreachesCommand ??= new DelegateCommand(FindAllAccountsBreachesAsync);
 
-    public AsyncCommand GoToSettingsCommand => _goToSettingsCommand ??= new AsyncCommand(GoToSettingsAsync);
+    public DelegateCommand GoToSettingsCommand => _goToSettingsCommand ??= new DelegateCommand(GoToSettingsAsync);
 
-    public AsyncCommand GoToAddAccountCommand => _goToAddAccountCommand ??= new AsyncCommand(GoToAddAccountAsync);
+    public DelegateCommand<ItemTapCommandContext> ViewDetailsCommand => _viewDetailsCommand ??= new DelegateCommand<ItemTapCommandContext>(ViewDetails);
 
-    public AsyncCommand<MonitoredAccount> RefreshAccountCommand => _refreshAccountCommand ??= new AsyncCommand<MonitoredAccount>(UpdateBreachesForAccountAsync, account => account != null);
+    public DelegateCommand<MonitoredAccount> RefreshAccountCommand => _refreshAccountCommand ??= new DelegateCommand<MonitoredAccount>(UpdateBreachesForAccountAsync);
 
     #endregion
 
@@ -227,10 +228,13 @@ public class MonitoredAccountsViewModel : ViewModelBase
         }
     }
 
-    public Task<bool> RemoveAccount(MonitoredAccount account)
+    public void RemoveAccount(MonitoredAccount account)
     {
-        if (!RemoveAccountCommand.CanExecute(account))
-            return Task.FromResult(false);
+        if (account == null)
+        {
+            Debug.WriteLine("Account to remove is null", "RemoveAccount");
+            return;
+        }
 
         try
         {
@@ -256,13 +260,10 @@ public class MonitoredAccountsViewModel : ViewModelBase
             SaveAccounts();
 
             HasAccounts = Accounts.Count > 0;
-
-            return Task.FromResult(true);
         }
         catch (Exception ex)
         {
             App.ShowExceptionMessage("RemoveAccount", ex);
-            return Task.FromResult(false);
         }
         finally
         {
@@ -271,8 +272,14 @@ public class MonitoredAccountsViewModel : ViewModelBase
         }
     }
 
-    public async Task UpdateBreachesForAccountAsync(MonitoredAccount account)
+    public async void UpdateBreachesForAccountAsync(MonitoredAccount account)
     {
+        if (account == null)
+        {
+            Debug.WriteLine("Account to check for new breaches is null", "UpdateBreachesForAccountAsync");
+            return;
+        }
+
         IsBusy = true;
         IsBusyMessage = $"Checking {account.Address} for breaches...";
         account.IsUpdating = true;
@@ -318,6 +325,12 @@ public class MonitoredAccountsViewModel : ViewModelBase
 
     public async Task UpdateBreachesForAccountAsync(MonitoredAccount account, bool showSuccessMessage)
     {
+        if (account == null)
+        {
+            Debug.WriteLine("Account to check for new breaches is null", "UpdateBreachesForAccountAsync");
+            return;
+        }
+
         IsBusy = true;
         IsBusyMessage = $"Checking {account.Address} for breaches...";
         account.IsUpdating = true;
@@ -367,7 +380,7 @@ public class MonitoredAccountsViewModel : ViewModelBase
         }
     }
 
-    public async Task FindAllAccountsBreachesAsync()
+    public async void FindAllAccountsBreachesAsync()
     {
         foreach (var monitoredAccount in Accounts)
         {
@@ -377,20 +390,19 @@ public class MonitoredAccountsViewModel : ViewModelBase
         SaveAccounts();
     }
         
-    private async Task GoToSettingsAsync()
+    private async void GoToSettingsAsync()
     {
         // TODO navigation https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/shell/navigation#absolute-routes
         //await ((Application.Current.MainPage as RootPage).Detail as NavigationPage).Navigation.PushAsync(new SettingsPage());
         await Shell.Current.GoToAsync("/settings");
     }
         
-    private async Task GoToAddAccountAsync()
+    private async void ViewDetails(ItemTapCommandContext context)
     {
-        // TODO navigation https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/shell/navigation#absolute-routes
-        //await ((Application.Current.MainPage as RootPage).Detail as NavigationPage).Navigation.PushAsync(new AddAccountPage());
-        await Shell.Current.GoToAsync("/accounts/addaccount");
+        this.SelectedAccount = context.Item as MonitoredAccount;
+        await Shell.Current.GoToAsync("/accountdetails");
     }
-        
+    
     // Stats
 
     public void UpdateStatistics()

@@ -2,30 +2,108 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Hacked.Maui.Views.AccountDetailsPage"
-             xmlns:tdc="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.Maui.Controls.Compatibility"
              xmlns:telerik="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
+             xmlns:tdc="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:tlv="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.Maui.Controls.Compatibility"
              xmlns:primitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
              xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
+             xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
+             xmlns:res="clr-namespace:Hacked.Maui.Resources"
              BindingContext="{x:Static vms:ViewModelLocator.MonitoredAccounts}"
              Title="Account Details">
 
     <Grid Padding="10"
-          BindingContext="{Binding SelectedAccount}">
-        <StackLayout>
-            <Label Text="{Binding Address}" />
-            <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}" />
-            <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}" />
-            <Grid IsVisible="{Binding IsUpdating}"
+          RowDefinitions="Auto,*"
+          RowSpacing="10">
+
+        <Grid>
+            <VerticalStackLayout Spacing="5"
+                                 Padding="10,5"
+                                 HorizontalOptions="Center">
+                <Label Text="{Binding SelectedAccount.Address}"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center" />
+                <Label Text="{Binding SelectedAccount.Breaches.Count, StringFormat='Breach Count: {0}'}"
+                       HorizontalOptions="Center" />
+                <Label Text="{Binding SelectedAccount.LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+
+            <!--<Grid IsVisible="{Binding SelectedAccount.IsUpdating}"
                   BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}">
                 <Label Text="Is Refreshing..."
                        HorizontalTextAlignment="Center"
                        VerticalTextAlignment="Center"
                        Margin="0,2" />
-            </Grid>
-        </StackLayout>
+            </Grid>-->
+        </Grid>
 
-        <primitives:RadBusyIndicator IsVisible="{Binding IsUpdating}"
-                                     IsBusy="{Binding IsUpdating}"
+        <tdc:RadListView x:Name="BreachesListView"
+                         ItemsSource="{Binding SelectedAccount.Breaches}"
+                         IsItemsReorderEnabled="False"
+                         SelectionMode="None"
+                         Grid.Row="1">
+            <tdc:RadListView.ItemStyle>
+                <tlv:ListViewItemStyle BackgroundColor="{StaticResource LightGray}"
+                                       TextCellTextColor="{StaticResource MidGray}"
+                                       BorderColor="{StaticResource Primary}"
+                                       BorderWidth="2"
+                                       BorderLocation="All" />
+            </tdc:RadListView.ItemStyle>
+            <tdc:RadListView.ItemTemplate>
+                <DataTemplate x:DataType="models:Breach">
+                    <tlv:ListViewTemplateCell>
+                        <Grid Background="LightBlue">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <StackLayout Margin="10,5,10,5">
+                                <Label Text="{Binding Name}"
+                                       FontAttributes="Bold" />
+                                <Label Text="{Binding BreachDate, StringFormat='Breached on: {0}'}" />
+                                <Label Text="{Binding PwnCount, StringFormat='Accounts breached: {0}'}" />
+                            </StackLayout>
+
+                            <telerik:RadItemsControl ItemsSource="{Binding DataClasses}"
+                                                     ItemTemplate="{StaticResource BreachClassItemTemplate}"
+                                                     InputTransparent="True"
+                                                     Margin="0,5,5,5"
+                                                     Grid.Column="1"/>
+                        </Grid>
+                    </tlv:ListViewTemplateCell>
+                </DataTemplate>
+            </tdc:RadListView.ItemTemplate>
+            <tdc:RadListView.LayoutDefinition>
+                <OnPlatform x:TypeArguments="tlv:ListViewLayoutBase">
+                    <On Platform="iOS, Android">
+                        <On.Value>
+                            <tlv:ListViewLinearLayout VerticalItemSpacing="5" />
+                        </On.Value>
+                    </On>
+                    <On Platform="WinUI, MacCatalyst">
+                        <On.Value>
+                            <tlv:ListViewGridLayout SpanCount="3"
+                                                    HorizontalItemSpacing="5"
+                                                    VerticalItemSpacing="5" />
+                        </On.Value>
+                    </On>
+                </OnPlatform>
+            </tdc:RadListView.LayoutDefinition>
+        </tdc:RadListView>
+
+        <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
+                           Style="{StaticResource FontAwesomeLabelStyle}"
+                           Command="{Binding RemoveAccountCommand}"
+                           CommandParameter="{Binding SelectedAccount}"
+                           IsEnabled="{Binding SelectedAccount.IsUpdating, Converter={StaticResource InvertBoolConverter}}"
+                           VerticalOptions="Start"
+                           HorizontalOptions="End"
+                           Margin="10" />
+
+        <primitives:RadBusyIndicator IsVisible="{Binding SelectedAccount.IsUpdating}"
+                                     IsBusy="{Binding SelectedAccount.IsUpdating}"
                                      AnimationType="Animation3"
                                      BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
                                      AnimationContentColor="{StaticResource Primary}" />
