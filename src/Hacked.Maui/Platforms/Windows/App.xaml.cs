@@ -1,48 +1,45 @@
-﻿using Microsoft.Maui.Handlers;
-using Microsoft.UI;
-using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 
-namespace Hacked.Maui.WinUI
+// To learn more about WinUI, the WinUI project structure,
+// and more about our project templates, see: http://aka.ms/winui-project-info.
+
+namespace Hacked.Maui.WinUI;
+
+/// <summary>
+/// Provides application-specific behavior to supplement the default Application class.
+/// </summary>
+public partial class App : MauiWinUIApplication
 {
-    public partial class App : MauiWinUIApplication
+    public App()
     {
-        public App()
-        {
-            this.InitializeComponent();
-            this.RequestedTheme = ApplicationTheme.Light;
+        this.InitializeComponent();
+        this.RequestedTheme = ApplicationTheme.Light;
             
-            WindowHandler.ElementMapper.AppendToMapping(nameof(IWindow), (handler, view) =>
-            {
-                // Native WinUI app
-                var nativeApp = handler.PlatformView as Hacked.Maui.WinUI.App;
+        // Do this work in MauiProgram.cs instead.
+        //WindowHandler.ElementMapper.AppendToMapping(nameof(IWindow), (handler, view) =>
+        //{
+        //    // Native WinUI app
+        //    var nativeApp = handler.PlatformView as Hacked.Maui.WinUI.App;
 
-                // Maui app
-                var app = view as Hacked.Maui.App;
+        //    // Maui app
+        //    var app = view as Hacked.Maui.App;
+        //});
+    }
 
-                // Doesnt work in RC1
-                //IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(handler.PlatformView);
-                //WindowId windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
+    protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
 
-                //AppWindow appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
-                //appWindow.MoveAndResize(new Windows.Graphics.RectInt32(0, 0, 500, 500));
-            });
-        }
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
+    {
+        base.OnLaunched(args);
 
-        protected override MauiApp CreateMauiApp() => MauiProgram.CreateMauiApp();
+        // Doesnt work either
+        //var viewId = args.UWPLaunchActivatedEventArgs.CurrentlyShownApplicationViewId;
 
-        protected override void OnLaunched(LaunchActivatedEventArgs args)
-        {
-            base.OnLaunched(args);
+        //IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(viewId);
+        //WindowId windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
 
-            // Doesnt work either
-            //var viewId = args.UWPLaunchActivatedEventArgs.CurrentlyShownApplicationViewId;
-
-            //IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(viewId);
-            //WindowId windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
-
-            //AppWindow appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
-            //appWindow.MoveAndResize(new Windows.Graphics.RectInt32(0, 0, 500, 500));
-        }
+        //AppWindow appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+        //appWindow.MoveAndResize(new Windows.Graphics.RectInt32(0, 0, 500, 500));
     }
 }
+

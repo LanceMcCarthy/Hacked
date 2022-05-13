@@ -7,38 +7,33 @@ namespace Hacked.Maui
         public AppShell()
         {
             InitializeComponent();
-            RegisterRoutes();
 
-            if (DeviceInfo.Idiom == DeviceIdiom.Phone || DeviceInfo.Idiom == DeviceIdiom.Tablet)
-            {
-                CurrentItem = PhoneTabs;
-            }
-        }
-
-        private void RegisterRoutes()
-        {
             Routing.RegisterRoute("accounts/accountdetails", typeof(AccountDetailsPage));
-            Routing.RegisterRoute("accounts/addaccount", typeof(AddAccountPage));
             //Routing.RegisterRoute("settings/about", typeof(AboutPage));
+
+            //if (DeviceInfo.Idiom == DeviceIdiom.Phone || DeviceInfo.Idiom == DeviceIdiom.Tablet)
+            //{
+            //    CurrentItem = PhoneTabs;
+            //}
         }
 
-        private void TapGestureRecognizer_Tapped(object sender, EventArgs e)
-        {
-            GoToAsync("//settings");
-        }
+        //private void TapGestureRecognizer_Tapped(object sender, EventArgs e)
+        //{
+        //    GoToAsync("//settings");
+        //}
 
-        protected override void OnAppearing()
-        {
-            base.OnAppearing();
+        //protected override void OnAppearing()
+        //{
+        //    base.OnAppearing();
 
-            if (DeviceInfo.Idiom == DeviceIdiom.Phone || DeviceInfo.Idiom == DeviceIdiom.Tablet)
-            {
-                CurrentItem = HomeTab;
-            }
-            else
-            {
-                CurrentItem = HomeFlyoutItem;
-            }
-        }
+        //    //if (DeviceInfo.Idiom == DeviceIdiom.Phone || DeviceInfo.Idiom == DeviceIdiom.Tablet)
+        //    //{
+        //    //    CurrentItem = HomeTab;
+        //    //}
+        //    //else
+        //    //{
+        //    //    CurrentItem = HomeFlyoutItem;
+        //    //}
+        //}
     }
 }

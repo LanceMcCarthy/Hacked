@@ -1,34 +1,33 @@
 ﻿using Hacked.Maui.Helpers;
 
-namespace Hacked.Maui
+namespace Hacked.Maui;
+
+public partial class App : Application
 {
-    public partial class App : Application
+    public App()
     {
-        public App()
-        {
-            InitializeComponent();
+        InitializeComponent();
 
-            MainPage = new AppShell();
-        }
+        MainPage = new AppShell();
+    }
 
-        protected override void OnStart()
-        {
-            //ThemeHelper.LoadTheme();
-        }
+    protected override void OnStart()
+    {
+        //ThemeHelper.LoadTheme();
+    }
 
-        public static void ShowExceptionMessage(string callerName, Exception ex)
+    public static void ShowExceptionMessage(string callerName, Exception ex)
+    {
+        TaskHelpers.RunOnUiThread(async () =>
         {
-            TaskHelpers.RunOnUiThread(async () =>
+            var message = "An unexpected error has occurred. If this happens again, contact us at awesome.apps@outlook.com and share the error message below" +
+                          $"\r\n\n{callerName} Error:" +
+                          $"\r\n {ex.Message}";
+
+            if (Current?.MainPage != null)
             {
-                var message = "An unexpected error has occurred. If this happens again, contact us at awesome.apps@outlook.com and share the error message below" +
-                              $"\r\n\n{callerName} Error:" +
-                              $"\r\n {ex.Message}";
-
-                if (Current?.MainPage != null)
-                {
-                    await Current.MainPage.DisplayAlert(message, "Unexpected Error", "close");
-                }
-            });
-        }
+                await Shell.Current.DisplayAlert(message, "Unexpected Error", "close");
+            }
+        });
     }
 }

@@ -8,7 +8,7 @@ public class AboutViewModel : ViewModelBase
     public AboutViewModel()
     {
         Title = "About";
-        OpenWebCommand = new DelegateCommand(async()=> await Launcher.OpenAsync(new Uri("https://xamarin.com/platform")));
+        OpenWebCommand = new DelegateCommand(async()=> await Launcher.OpenAsync(new Uri("https://telerik.com")));
     }
 
     public DelegateCommand OpenWebCommand { get; }
