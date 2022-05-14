@@ -41,7 +41,8 @@ namespace Hacked.Maui.Platforms.Windows
 
                 window.Activated += (object sender, WindowActivatedEventArgs args) =>
                 {
-                    configurationSource.IsInputActive = args.WindowActivationState != WindowActivationState.Deactivated;
+                    if(configurationSource != null)
+                        configurationSource.IsInputActive = args.WindowActivationState != WindowActivationState.Deactivated;
                 };
 
                 window.Closed += (object sender, WindowEventArgs args) =>
