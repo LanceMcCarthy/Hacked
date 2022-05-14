@@ -4,9 +4,13 @@ using Hacked.Services.Apis;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Windows.Input;
 using CommonHelpers.Mvvm;
+using Hacked.Maui.Common.Commands;
 using Hacked.Maui.Common.Extensions;
 using Telerik.XamarinForms.DataControls.ListView.Commands;
+using Telerik.XamarinForms.DataGrid;
+using Telerik.XamarinForms.DataGrid.Commands;
 
 namespace Hacked.Maui.ViewModels;
 
@@ -30,6 +34,8 @@ public class MonitoredAccountsViewModel : ViewModelBase
     private DelegateCommand<MonitoredAccount> _refreshAccountCommand;
 
     #endregion
+
+    private DelegateCommand<object> cellTapCommand;
 
     public MonitoredAccountsViewModel()
     {
@@ -97,6 +103,16 @@ public class MonitoredAccountsViewModel : ViewModelBase
     public DelegateCommand<ItemTapCommandContext> ViewDetailsCommand => _viewDetailsCommand ??= new DelegateCommand<ItemTapCommandContext>(ViewDetails);
 
     public DelegateCommand<MonitoredAccount> RefreshAccountCommand => _refreshAccountCommand ??= new DelegateCommand<MonitoredAccount>(UpdateBreachesForAccountAsync);
+
+    public DelegateCommand<object> CellTapCommand => cellTapCommand ??= new DelegateCommand<object>(DataGridCellTapped);
+
+    private void DataGridCellTapped(object parameter)
+    {
+        if (parameter is DataGridCellInfo {Item: MonitoredAccount account})
+        {
+            this.SelectedAccount = account;
+        }
+    }
 
     #endregion
 
