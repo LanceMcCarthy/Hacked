@@ -29,48 +29,31 @@
                                                 Command="{Binding CellTapCommand}" />
             </tdg:RadDataGrid.Commands>
             <tdg:RadDataGrid.Columns>
-                <tdg:DataGridTextColumn PropertyName="Address"
-                                        HeaderText="Account" />
-
-                <tdg:DataGridTemplateColumn HeaderText="Breaches">
-                    <tdg:DataGridColumn.CellContentTemplate>
+                <tdg:DataGridTemplateColumn HeaderText="Options"
+                                            SizeMode="Fixed"
+                                            Width="110">
+                    <tdg:DataGridTemplateColumn.CellContentTemplate>
                         <DataTemplate>
-                            <Label Text="{Binding Breaches.Count}"
-                                   Margin="0, 5, 0, 5"
-                                   HorizontalOptions="Center"
-                                   VerticalTextAlignment="Center" />
-                        </DataTemplate>
-                    </tdg:DataGridColumn.CellContentTemplate>
-                </tdg:DataGridTemplateColumn>
-
-                <tdg:DataGridTextColumn PropertyName="LastUpdated"
-                                        HeaderText="LastUpdated" />
-
-                <tdg:DataGridTextColumn PropertyName="Address"
-                                        HeaderText="Account" />
-
-                <tdg:DataGridTextColumn PropertyName="Address"
-                                        HeaderText="Account" />
-
-                <tdg:DataGridBooleanColumn PropertyName="HasNewBreaches"
-                                           HeaderText="New Breaches?" />
-
-                <tdg:DataGridTemplateColumn HeaderText="Options">
-                    <tdg:DataGridColumn.CellContentTemplate>
-                        <DataTemplate>
-                            <Grid>
+                            <Grid ColumnDefinitions="*,*"
+                                  ColumnSpacing="5">
+                                
                                 <HorizontalStackLayout Padding="5"
                                                        Spacing="5">
+                                    <!--<telerik:RadButton Text="{x:Static res:IconFont.InfoCircle}"
+                                                       Style="{StaticResource FontAwesomeLabelStyle}"
+                                                       Command="{Binding BindingContext.ViewDetailsCommand, Source={x:Reference MonitoredAccountDataGrid}}"
+                                                       CommandParameter="{Binding}"
+                                                       Margin="5" />-->
                                     <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
                                                        Style="{StaticResource FontAwesomeLabelStyle}"
                                                        Command="{Binding BindingContext.RefreshAccountCommand, Source={x:Reference MonitoredAccountDataGrid}}"
                                                        CommandParameter="{Binding}"
-                                                       Margin="5" />
+                                                       HorizontalOptions="Fill"/>
                                     <telerik:RadButton Text="{x:Static res:IconFont.Trash}"
                                                        Style="{StaticResource FontAwesomeLabelStyle}"
                                                        Command="{Binding BindingContext.RemoveAccountCommand, Source={x:Reference MonitoredAccountDataGrid}}"
                                                        CommandParameter="{Binding}"
-                                                       Margin="5" />
+                                                       HorizontalOptions="Fill"/>
                                 </HorizontalStackLayout>
 
                                 <telerik:RadBorder IsVisible="{Binding IsUpdating}"
@@ -78,7 +61,7 @@
                                                    BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}">
                                     <Label Text="Refreshing..."
                                            HorizontalOptions="Center"
-                                           VerticalOptions="Center"/>
+                                           VerticalOptions="Center" />
                                 </telerik:RadBorder>
 
                                 <!--<tp:RadBusyIndicator IsBusy="{Binding IsUpdating}"
@@ -86,9 +69,44 @@
                                                      AnimationType="Animation5"/>-->
                             </Grid>
                         </DataTemplate>
-                    </tdg:DataGridColumn.CellContentTemplate>
+                    </tdg:DataGridTemplateColumn.CellContentTemplate>
+                </tdg:DataGridTemplateColumn>
+                
+                <tdg:DataGridTextColumn PropertyName="Address"
+                                        HeaderText="Account" />
+
+                <!--<tdg:DataGridTextColumn PropertyName="Breaches.Count"
+                                        HeaderText="Breaches">
+                    <tdg:DataGridTextColumn.CellContentTemplate>
+                        <DataTemplate>
+                            <Label Text="{Binding Breaches.Count}"
+                                   Margin="0, 5, 0, 5"
+                                   HorizontalOptions="Center"
+                                   VerticalTextAlignment="Center" />
+                        </DataTemplate>
+                    </tdg:DataGridTextColumn.CellContentTemplate>
+                </tdg:DataGridTextColumn>-->
+
+                <tdg:DataGridTemplateColumn HeaderText="Breaches">
+                    <tdg:DataGridTemplateColumn.CellContentTemplate>
+                        <DataTemplate>
+                            <Label Text="{Binding Breaches.Count}"
+                                   Margin="0, 5, 0, 5"
+                                   HorizontalOptions="Center"
+                                   VerticalTextAlignment="Center" />
+                        </DataTemplate>
+                    </tdg:DataGridTemplateColumn.CellContentTemplate>
                 </tdg:DataGridTemplateColumn>
 
+                <tdg:DataGridDateColumn PropertyName="LastUpdated"
+                                        HeaderText="LastUpdated"
+                                        CellContentFormat="{}{0: ddd-d-MMM-yyyy}" />
+
+                <tdg:DataGridBooleanColumn PropertyName="HasNewBreaches"
+                                           HeaderText="New Breaches?" />
+                
+                <tdg:DataGridBooleanColumn PropertyName="NewBreachCount"
+                                           HeaderText="New Breach Count" />
             </tdg:RadDataGrid.Columns>
         </tdg:RadDataGrid>
 
