@@ -1,16 +1,13 @@
 ﻿using CommonHelpers.Common;
+using CommonHelpers.Mvvm;
 using Hacked.Core.Models;
+using Hacked.Maui.Common.Extensions;
 using Hacked.Services.Apis;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Windows.Input;
-using CommonHelpers.Mvvm;
-using Hacked.Maui.Common.Commands;
-using Hacked.Maui.Common.Extensions;
 using Telerik.XamarinForms.DataControls.ListView.Commands;
 using Telerik.XamarinForms.DataGrid;
-using Telerik.XamarinForms.DataGrid.Commands;
 
 namespace Hacked.Maui.ViewModels;
 
@@ -110,7 +107,9 @@ public class MonitoredAccountsViewModel : ViewModelBase
     {
         if (parameter is DataGridCellInfo {Item: MonitoredAccount account})
         {
-            this.SelectedAccount = account;
+            SelectedAccount = account;
+            
+            Shell.Current.GoToAsync("/accountdetails");
         }
     }
 
@@ -120,23 +119,21 @@ public class MonitoredAccountsViewModel : ViewModelBase
 
     private void InitData()
     {
-        // load accounts
-        var loadedAccounts = LoadAccounts();
+        // Add loaded accounts instead of replacing entire collection
+        Accounts.Clear();
 
-        // add loaded accounts instead of replacing entire collection
-        foreach (var loadedAccount in loadedAccounts)
+        foreach (var loadedAccount in LoadAccounts())
             Accounts.Add(loadedAccount);
 
-        // once accounts are loaded, update stats
+        // Once accounts are loaded, update stats
         UpdateStatistics();
 
-        //check for any
+        // Check for any
         HasAccounts = Accounts.Any();
 
-        //select first if there are any
+        // Select first if there are any
         if (HasAccounts)
-            SelectedAccount = Accounts[0];
-            
+            SelectedAccount = Accounts.FirstOrDefault();
     }
         
     public void SaveAccounts()
