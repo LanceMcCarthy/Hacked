@@ -55,19 +55,12 @@
 
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.0-preview3" />
-		<PackageReference Include="WinUIEx" Version="1.4.2" />
-		<!--<PackageReference Include="PInvoke.User32" Version="0.7.104" />-->
+		<PackageReference Include="WinUIEx" Version="1.4.3" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
 	  <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <MauiXaml Update="Controls\ImageCollage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	</ItemGroup>
 
 <!-- ******** PUBLISHING Android ********
