@@ -10,7 +10,7 @@ public partial class ImageCollage : ContentView
 	}
 
     public static readonly BindableProperty AssociatedAccountProperty =
-        BindableProperty.Create("IsExpanded", typeof(MonitoredAccount), typeof(ImageCollage), null, propertyChanged:OnAssociatedAccountChanged);
+        BindableProperty.Create("AssociatedAccount", typeof(MonitoredAccount), typeof(ImageCollage), null, propertyChanged:OnAssociatedAccountChanged);
 
     private static void OnAssociatedAccountChanged(BindableObject bindable, object oldvalue, object newvalue)
     {
@@ -18,7 +18,7 @@ public partial class ImageCollage : ContentView
         {
             if (newvalue == null)
             {
-                self.RootFlexLayout.Children.Clear();
+                self.WrapLayout.Children.Clear();
             }
 
             if (newvalue is MonitoredAccount acct)
@@ -28,18 +28,16 @@ public partial class ImageCollage : ContentView
                 
                 for (var i = 0; i < acct.Breaches.Count; i++)
                 {
-                    if (i == 8)
+                    // No more than 8
+                    if (i == 9)
                         break;
 
                     var img = new Image
                     {
-                        Source = new UriImageSource { Uri = acct.Breaches[i].LogoPath },
-                        Aspect = Aspect.AspectFill,
-
-                        Margin = 5
+                        Source = new UriImageSource { Uri = acct.Breaches[i].LogoPath }
                     };
                     
-                    self.RootFlexLayout.Children.Add(img);
+                    self.WrapLayout.Children.Add(img);
                 }
             }
         }

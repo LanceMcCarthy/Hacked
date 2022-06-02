@@ -24,7 +24,7 @@ public partial class MonitoredAccountsPage : ContentPage
     //    }
     //}
 
-    private async void RefreshSwipeButton_Clicked(object sender, EventArgs e)
+    private void RefreshSwipeButton_Clicked(object sender, EventArgs e)
     {
         try
         {
