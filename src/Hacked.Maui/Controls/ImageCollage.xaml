@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:telerik="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
              x:Class="Hacked.Maui.Controls.ImageCollage">
-    <FlexLayout x:Name="RootFlexLayout" AlignContent="SpaceEvenly" Wrap="Wrap" />
+    <telerik:RadWrapLayout x:Name="WrapLayout"
+                           Orientation="Horizontal"
+                           ItemHeight="50"
+                           ItemWidth="50" />
 </ContentView>
