@@ -135,11 +135,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-    - name: Decode the Keystore
-      run: |
-        $file_bytes = [System.Convert]::FromBase64String("${{ secrets.ANDROID_SIGNING_KEYSTORE_BASE64 }}")
-        $keyStorePath = ${{ env.ANDROID_SIGNING_KEYSTORE_FILENAME }}
-        [IO.File]::WriteAllBytes($keyStorePath, $file_bytes)
+      - name: Decode the Keystore
+        run: |
+          $file_bytes = [System.Convert]::FromBase64String("${{ secrets.ANDROID_SIGNING_KEYSTORE_BASE64 }}")
+          $keyStorePath = ${{ env.ANDROID_SIGNING_KEYSTORE_FILENAME }}
+          [IO.File]::WriteAllBytes($keyStorePath, $file_bytes)
 
       - name: Setup .NET 6
         uses: actions/setup-dotnet@v2
