@@ -1,0 +1,241 @@
+name: Build .NET MAUI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/Hacked.Maui/**/*'
+      - '.github/workflows/build-maui.yml' 
+
+  workflow_call:
+    secrets:
+      ANDROID_SIGNING_KEYSTORE_BASE64:
+        required: true
+      ANDROID_SIGNING_KEYSTORE_FILENAME:
+        required: true
+      ANDROID_SIGNING_STORE_PASS:  
+        required: true
+      ANDROID_SIGNING_KEY_ALIAS:
+        required: true
+      ANDROID_SIGNING_KEY_PASS:  
+        required: true
+
+env:
+  MACOS_ARTIFACTS_PATH: "artifacts_macos"
+  IOS_ARTIFACTS_PATH: "artifacts_ios"
+  ANDROID_ARTIFACTS_PATH: "artifacts_android"
+  WINDOWS_ARTIFACTS_PATH: "artifacts_windows"
+  PROJECT_PATH: "src/Hacked.Maui/Hacked.maui.csproj"
+  NUGETCONFIG_PATH: "src/MAUI/NuGet.Config"
+
+jobs:
+  windows-build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+          include-prerelease: true
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Install MAUI Workloads
+        run: |
+          dotnet workload install maui --source https://api.nuget.org/v3/index.json
+
+      - name: Restore dependencies
+        shell: pwsh
+        run: |
+          dotnet restore ${{ env.PROJECT_PATH }} --configfile ${{ env.NUGETCONFIG_PATH }}
+        env:
+            TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
+            TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }} 
+
+      - name: Build Maui WinUI project
+        shell: pwsh
+        run: |
+          dotnet build ${{ env.PROJECT_PATH }} -c Debug -f net6.0-windows10.0.19041.0
+        #  dotnet build ${{ env.PROJECT_PATH }} -c Release -f net6.0-windows10.0.19041.0
+
+      - name: Create artifacts folder
+        shell: pwsh
+        run: |
+           cd ${{ github.workspace }}
+           mkdir -p ${{ env.WINDOWS_ARTIFACTS_PATH }}
+
+      - name: Copy WinUI msix package
+        shell: pwsh
+        run: |
+           Get-Childitem –Path ${{ github.workspace }} -Include *.msix -File -Recurse | Copy-Item -Destination ${{ env.WINDOWS_ARTIFACTS_PATH }}
+
+      - name: Publish build artifacts
+        uses: actions/upload-artifact@v2
+        with:     
+          name: "WinUI .NET MAUI artifacts" 
+          path: "${{ env.WINDOWS_ARTIFACTS_PATH }}/*"
+          if-no-files-found: warn
+          retention-days: 90
+
+  macos-build-macos:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+          include-prerelease: true
+
+      - name: Install MAUI Workloads
+        run: |
+          dotnet workload install maui --source https://api.nuget.org/v3/index.json
+
+      - name: Restore dependencies
+        shell: pwsh
+        run: |
+          dotnet restore ${{ env.PROJECT_PATH }} --configfile ${{ env.NUGETCONFIG_PATH }}
+        env:
+            TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
+            TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }} 
+
+      - name: Build MacCatalyst App
+        shell: bash
+        run: |
+          dotnet build ${{ env.PROJECT_PATH }} -f net6.0-maccatalyst -c Release
+        #  dotnet build ${{ env.PROJECT_PATH }} -f net6.0-maccatalyst -c Release
+        #  dotnet publish ${{ env.PROJECT_PATH }} -f net6.0-maccatalyst -c Release -p:BuildIpa=True 
+
+      - name: Create artifacts folder
+        shell: pwsh
+        run: |
+           cd ${{ github.workspace }}
+           mkdir -p ${{ env.MACOS_ARTIFACTS_PATH }}
+ 
+      - name: Copy MacOS packages
+        shell: pwsh
+        run: |
+           Get-Childitem –Path ${{ github.workspace }} -Include *.pkg -File -Recurse | Copy-Item -Destination ${{ env.MACOS_ARTIFACTS_PATH }}
+
+      - name: Publish macOS build artifacts
+        uses: actions/upload-artifact@v2
+        with:     
+          name: "macOS artifacts" 
+          path: "${{ env.MACOS_ARTIFACTS_PATH }}/*"
+          if-no-files-found: warn
+          retention-days: 90
+  
+  macos-build-android:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v2
+
+    - name: Decode the Keystore
+      run: |
+        $file_bytes = [System.Convert]::FromBase64String("${{ secrets.ANDROID_SIGNING_KEYSTORE_BASE64 }}")
+        $keyStorePath = ${{ env.ANDROID_SIGNING_KEYSTORE_FILENAME }}
+        [IO.File]::WriteAllBytes($keyStorePath, $file_bytes)
+
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+          include-prerelease: true
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'microsoft'
+          java-version: '11'     
+
+      - name: Install MAUI Workloads
+        run: |
+          dotnet workload install maui --source https://api.nuget.org/v3/index.json
+
+      - name: Restore dependencies
+        shell: pwsh
+        run: |
+          dotnet restore ${{ env.PROJECT_PATH }} --configfile ${{ env.NUGETCONFIG_PATH }}
+        env:
+            TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
+            TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }} 
+
+      - name: Build MAUI Android
+        shell: pwsh
+        run: |
+          dotnet build ${{ env.PROJECT_PATH }} -c Debug -f net6.0-android --no-restore
+        #  dotnet build ${{ env.PROJECT_PATH }} -c Debug -f net6.0-android --no-restore
+        #  dotnet publish ${{ env.PROJECT_PATH }} -c Release -f net6.0-android --no-restore /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{ env.ANDROID_SIGNING_KEYSTORE_FILENAME }} /p:AndroidSigningStorePass=${{ secrets.ANDROID_SIGNING_STORE_PASS }} /p:AndroidSigningKeyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }} /p:AndroidSigningKeyPass=${{ secrets.ANDROID_SIGNING_KEY_PASS }}
+
+      - name: Create artifacts folder
+        shell: pwsh
+        run: |
+           cd ${{ github.workspace }}
+           mkdir -p ${{ env.ANDROID_ARTIFACTS_PATH }}
+
+      - name: Copy signed APKs & AABs
+        shell: pwsh 
+        run: |
+           Get-Childitem –Path ${{ github.workspace }} -Include *Signed.apk -File -Recurse | Copy-Item -Destination ${{ env.ANDROID_ARTIFACTS_PATH }}
+           Get-Childitem –Path ${{ github.workspace }} -Include *Signed.aab -File -Recurse | Copy-Item -Destination ${{ env.ANDROID_ARTIFACTS_PATH }}
+
+      - name: Publish Android build artifacts
+        uses: actions/upload-artifact@v2
+        with:     
+          name: "Android artifacts" 
+          path: "${{ env.ANDROID_ARTIFACTS_PATH }}/*"
+          if-no-files-found: warn
+          retention-days: 90
+
+  macos-build-ios:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup .NET 6
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+          include-prerelease: true
+
+      - name: Install MAUI Workloads
+        run: |
+          dotnet workload install maui --source https://api.nuget.org/v3/index.json
+
+      - name: Restore dependencies
+        shell: pwsh
+        run: |
+          dotnet restore ${{ env.PROJECT_PATH }} --configfile ${{ env.NUGETCONFIG_PATH }}
+        env:
+            TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
+            TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }} 
+
+      - name: Build iOS App
+        shell: bash
+        run: |
+          dotnet build ${{ env.PROJECT_PATH }} -f net6.0-ios -c Debug
+        #  dotnet build ${{ env.PROJECT_PATH }} -f net6.0-ios -c Release
+        #  dotnet publish ${{ env.PROJECT_PATH }} -f net6.0-ios -c Release -p:BuildIpa=True
+
+      - name: Create artifacts folder
+        shell: pwsh
+        run: |
+           cd ${{ github.workspace }}
+           mkdir -p ${{ env.IOS_ARTIFACTS_PATH }}
+   
+      - name: Copy iOS packages
+        shell: pwsh
+        run: |
+           Get-Childitem –Path ${{ github.workspace }} -Include *.pkg -File -Recurse | Copy-Item -Destination ${{ env.IOS_ARTIFACTS_PATH }}
+
+      - name: Publish iOS build artifacts
+        uses: actions/upload-artifact@v2
+        with:     
+          name: "iOS artifacts" 
+          path: "${{ env.IOS_ARTIFACTS_PATH }}/*"
+          if-no-files-found: warn
+          retention-days: 90
