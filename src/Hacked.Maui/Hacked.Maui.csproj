@@ -15,7 +15,6 @@
         <ApplicationTitle>Hacked?</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.lancelotsoftware.hacked</ApplicationId>
         <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
 
         <!-- Versions -->
@@ -28,9 +27,21 @@
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+        <ProvisioningType>manual</ProvisioningType>
+        <CodesignKey>Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
     </PropertyGroup>
 
-    <ItemGroup>
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
+		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
+	</PropertyGroup>
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
+	</PropertyGroup>
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<ApplicationId>com.lancelotsoftware.hacked</ApplicationId>
+	</PropertyGroup>
+	
+	<ItemGroup>
         <!-- App Icon -->
         <MauiIcon Include="Resources\appicon.svg" ForegroundFile="Resources\appiconfg.svg" Color="#512BD4" />
 
@@ -83,46 +94,49 @@
     <!-- ******** END ANDROID ******** -->
 
     <!-- ******** PUBLISHING iOS ********
+	Find files in 
+	C:\Users\mccarthy\OneDrive - LancelotSoftware.onmicrosoft.com\Documents\Certificates and Provisioning Profiles iOS\LancelotSoftware\2022\Profiles
+	
     dotnet publish -f:net6.0-ios -c:Release /p:ServerAddress=192.168.1.184 /p:ServerUser=$MACOS_USER_NAME /p:ServerPassword=$MACOS_USER_PASSWORD /p:TcpPort=58181 /p:ArchiveOnBuild=true /p:_DotNetRootRemoteDirectory=/Users/mccarthy/Library/Caches/Xamarin/XMA/SDKs/dotnet/ /p:EnableAssemblyILStripping=false
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
         <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
         <CodesignKey>Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
-        <CodesignProvision>MvpCompanion_AppStore_2022.mobileprovision</CodesignProvision>
+        <CodesignProvision>HackedApp_AdHoc_2022.mobileprovision</CodesignProvision>
+		or for store
+        <CodesignProvision>HackedApp_AppStore_2022.mobileprovision</CodesignProvision>
     </PropertyGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
         <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
         <CodesignKey>Apple Development: Lance McCarthy (AJ9XMDH9A2)</CodesignKey>
-        <CodesignProvision>MvpCompanion_Dev_2022.mobileprovision</CodesignProvision>
+        <CodesignProvision>HackedApp_Dev_iOS_2022.mobileprovision</CodesignProvision>
         <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
     </PropertyGroup>-->
 
     <!-- ******** END iOS ******** -->
 
-    <!-- ******** PUBLISHING MacCatalyst ******** -->
+    <!-- ******** PUBLISHING MacCatalyst ******** 
+    Find files in
+    C:\Users\mccarthy\OneDrive - LancelotSoftware.onmicrosoft.com\Documents\Certificates and Provisioning Profiles iOS\LancelotSoftware\2022\Profiles
+-->
 
-    <!--<PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst')) and '$(Configuration)' == 'Release'">
+	<!--<PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst')) and '$(Configuration)' == 'Release'">
         <RuntimeIdentifier>maccatalyst-x64</RuntimeIdentifier>
         <CodesignKey>Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>$(apple_release_codesignIdentity)
-        <CodesignProvision>MvpCompanion_MacStore_2022.provisionprofile</CodesignProvision>
+        <CodesignProvision>HackedApp_MacStore_2022.provisionprofile</CodesignProvision>
     </PropertyGroup>-->
 
     <!--<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
         <RuntimeIdentifier>maccatalyst-x64</RuntimeIdentifier>
         <CodesignKey>Apple Development: Lance McCarthy (AJ9XMDH9A2)</CodesignKey>
-        <CodesignProvision>MvpCompanion_Dev_2022.mobileprovision</CodesignProvision>
+        <CodesignProvision>HackedApp_Dev_MacOS_2022.mobileprovision</CodesignProvision>
     </PropertyGroup>-->
 
     <!-- ******** END MacCatalyst ******** -->
 
     <!-- ******** PUBLISHING Windows ******** -->
 
-    <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) and '$(Configuration)' == 'Release'">
-        <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
-        <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
-    </PropertyGroup>
-    
     <!-- This is just like packaging WinUI projects	
     msbuild /restore /t:Publish /p:TargetFramework=net6.0-windows10.0.19041 /p:configuration=release /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=true /p:PackageCertificateThumbprint=$PFX_THUMBPRINT /p:PackageCe
     rtificatePassword=$PFX_PASSWORD
