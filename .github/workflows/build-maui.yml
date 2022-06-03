@@ -27,7 +27,7 @@ env:
   ANDROID_ARTIFACTS_PATH: "artifacts_android"
   WINDOWS_ARTIFACTS_PATH: "artifacts_windows"
   PROJECT_PATH: "src/Hacked.Maui/Hacked.maui.csproj"
-  NUGETCONFIG_PATH: "src/MAUI/NuGet.Config"
+  NUGETCONFIG_PATH: "src/nuGet.config"
 
 jobs:
   windows-build-windows:
@@ -107,7 +107,7 @@ jobs:
       - name: Build MacCatalyst App
         shell: bash
         run: |
-          dotnet build ${{ env.PROJECT_PATH }} -f net6.0-maccatalyst -c Release
+          dotnet build ${{ env.PROJECT_PATH }} -f net6.0-maccatalyst -c Debug
         #  dotnet build ${{ env.PROJECT_PATH }} -f net6.0-maccatalyst -c Release
         #  dotnet publish ${{ env.PROJECT_PATH }} -f net6.0-maccatalyst -c Release -p:BuildIpa=True 
 
@@ -120,7 +120,7 @@ jobs:
       - name: Copy MacOS packages
         shell: pwsh
         run: |
-           Get-Childitem –Path ${{ github.workspace }} -Include *.pkg -File -Recurse | Copy-Item -Destination ${{ env.MACOS_ARTIFACTS_PATH }}
+           Get-Childitem -Path ${{ github.workspace }} -Include *.pkg -File -Recurse | Copy-Item -Destination ${{ env.MACOS_ARTIFACTS_PATH }}
 
       - name: Publish macOS build artifacts
         uses: actions/upload-artifact@v2
@@ -135,11 +135,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Decode the Keystore
-        run: |
-          $file_bytes = [System.Convert]::FromBase64String("${{ secrets.ANDROID_SIGNING_KEYSTORE_BASE64 }}")
-          $keyStorePath = ${{ env.ANDROID_SIGNING_KEYSTORE_FILENAME }}
-          [IO.File]::WriteAllBytes($keyStorePath, $file_bytes)
+      # - name: Decode the Keystore
+      #   run: |
+      #     $file_bytes = [System.Convert]::FromBase64String("${{ secrets.ANDROID_SIGNING_KEYSTORE_BASE64 }}")
+      #     [IO.File]::WriteAllBytes("${{ secrets.ANDROID_SIGNING_KEYSTORE_FILENAME }}", $file_bytes)
 
       - name: Setup .NET 6
         uses: actions/setup-dotnet@v2
@@ -180,8 +179,8 @@ jobs:
       - name: Copy signed APKs & AABs
         shell: pwsh 
         run: |
-           Get-Childitem –Path ${{ github.workspace }} -Include *Signed.apk -File -Recurse | Copy-Item -Destination ${{ env.ANDROID_ARTIFACTS_PATH }}
-           Get-Childitem –Path ${{ github.workspace }} -Include *Signed.aab -File -Recurse | Copy-Item -Destination ${{ env.ANDROID_ARTIFACTS_PATH }}
+           Get-Childitem -Path ${{ github.workspace }} -Include *Signed.apk -File -Recurse | Copy-Item -Destination ${{ env.ANDROID_ARTIFACTS_PATH }}
+           Get-Childitem -Path ${{ github.workspace }} -Include *Signed.aab -File -Recurse | Copy-Item -Destination ${{ env.ANDROID_ARTIFACTS_PATH }}
 
       - name: Publish Android build artifacts
         uses: actions/upload-artifact@v2
@@ -230,7 +229,7 @@ jobs:
       - name: Copy iOS packages
         shell: pwsh
         run: |
-           Get-Childitem –Path ${{ github.workspace }} -Include *.pkg -File -Recurse | Copy-Item -Destination ${{ env.IOS_ARTIFACTS_PATH }}
+           Get-Childitem -Path ${{ github.workspace }} -Include *.pkg -File -Recurse | Copy-Item -Destination ${{ env.IOS_ARTIFACTS_PATH }}
 
       - name: Publish iOS build artifacts
         uses: actions/upload-artifact@v2
