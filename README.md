@@ -19,7 +19,7 @@ An application so you can be notified of any data breaches that included your pe
 
 | Pipeline | Branch | Status      |
 |----------|--------|-------------|
-| MAUI | `main` | [![Build status](https://dev.azure.com/lance/Hacked/_apis/build/status/Hacked%20MAUI)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=75) |
+| Build MAUI | `main` | [![Build status](https://dev.azure.com/lance/Hacked/_apis/build/status/Build%20MAUI)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=75) |
 | UWP Main | `main` | ![main](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Main) |
 | UWP Beta | `release-preview` | ![release-preview](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Beta) |
 | UWP Release | `release` | ![release](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Release) |
