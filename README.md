@@ -19,14 +19,14 @@ An application so you can be notified of any data breaches that included your pe
 
 | Pipeline | Branch | Status      |
 |----------|--------|-------------|
-| Build MAUI | `main` | [![Build status](https://dev.azure.com/lance/Hacked/_apis/build/status/Build%20MAUI)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=75) |
-| UWP Main | `main` | ![main](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Main) |
-| UWP Beta | `release-preview` | ![release-preview](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Beta) |
-| UWP Release | `release` | ![release](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Release) |
+| Build MAUI | `main` | [![build maui](https://dev.azure.com/lance/Hacked/_apis/build/status/Build%20MAUI)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=75) |
+| UWP Main | `main` | [![uwp main](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Main)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=49) |
+| UWP Beta | `release-preview` | [![uwp beta](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Beta)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=63) |
+| UWP Release | `release` | [![uwp release](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Release)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=48) |
 
 ### Azure DevOps Release Pipeline
 
 | Pipeline        | Status         |
 |-----------------|----------------|
 | UWP Prerelease      | ![Prerelease badge](https://vsrm.dev.azure.com/lance/_apis/public/Release/badge/162ec65c-f681-4f5b-9aca-227480581bf5/2/2) |
-| UWP Microsoft Store | ![Microsoft store badge](https://vsrm.dev.azure.com/lance/_apis/public/Release/badge/162ec65c-f681-4f5b-9aca-227480581bf5/1/1) |
+| UWP Microsoft Store | ![Microsoft Store badge](https://vsrm.dev.azure.com/lance/_apis/public/Release/badge/162ec65c-f681-4f5b-9aca-227480581bf5/1/1) |
