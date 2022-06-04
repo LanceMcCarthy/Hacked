@@ -1,6 +1,6 @@
-# Hacked
+# Hacked 
 
-An application so you can be notified of any data breaches that included your personal information. Available on Desktop (Windows 10 and Mac), Mobile (iOS, Android and Windows Phone) and others (Xbox, Samsung TV).
+An application so you can be notified of any data breaches that included your personal information. Available on Desktop (Windows 10 and Mac), Mobile (iOS, Android and iPad) and others (Xbox, Samsung TV).
 
 ![image](https://user-images.githubusercontent.com/3520532/103462956-e4d8a080-4cf6-11eb-8779-ed3cbf600977.png)
 
@@ -9,9 +9,13 @@ An application so you can be notified of any data breaches that included your pe
 * [Prelease download](https://dvlup.blob.core.windows.net/hacked-app-files/distributions/uwp-drop/index.html) (sideload w/automatic updates)
 * [Microsoft Store](https://www.microsoft.com/store/productId/9NBLGGH6850J)
 
-## Azure DevOps
+### GitHub Actions
 
-### Builds
+| Branch | Status |
+|--------|--------|
+| `main` | [![Build .NET MAUI](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml) |
+
+### Azure DevOps Build Pipeline
 
 | Pipeline | Branch | Status      |
 |----------|--------|-------------|
@@ -19,7 +23,7 @@ An application so you can be notified of any data breaches that included your pe
 | Beta | `release-preview` | ![release-preview](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Beta) |
 | Release | `release` | ![release](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Release) |
 
-### Releases
+### Azure DevOps Release Pipeline
 
 | Pipeline        | Status         |
 |-----------------|----------------|
