@@ -62,16 +62,19 @@
     <ItemGroup>
         <PackageReference Include="CommonHelpers" Version="1.2.0" />
         <PackageReference Include="Telerik.UI.for.Maui" Version="1.0.1" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.0" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'"/>
+        <PackageReference Include="WinUIEx" Version="1.5.0" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'"/>
     </ItemGroup>
 
-    <ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.0-preview3" />
-        <PackageReference Include="WinUIEx" Version="1.4.3" />
+	<ItemGroup>
+      <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
+      <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
-      <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
+      <MauiXaml Update="Controls\BreachItemView.xaml">
+        <Generator>MSBuild:Compile</Generator>
+      </MauiXaml>
     </ItemGroup>
 
     <!-- ******** PUBLISHING Android ********
