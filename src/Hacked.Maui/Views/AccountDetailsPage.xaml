@@ -2,16 +2,12 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Hacked.Maui.Views.AccountDetailsPage"
-             xmlns:telerik="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
-             xmlns:tdc="clr-namespace:Telerik.XamarinForms.DataControls;assembly=Telerik.Maui.Controls.Compatibility"
-             xmlns:tlv="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.Maui.Controls.Compatibility"
-             xmlns:primitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
+             xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
              xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
              xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
              xmlns:res="clr-namespace:Hacked.Maui.Resources"
              xmlns:controls="clr-namespace:Hacked.Maui.Controls"
-             BindingContext="{x:Static vms:ViewModelLocator.MonitoredAccounts}"
-             Title="Account Details">
+             BindingContext="{x:Static vms:ViewModelLocator.MonitoredAccounts}">
 
     <Grid Padding="10"
           RowDefinitions="Auto,*"
@@ -25,97 +21,80 @@
                                  HorizontalOptions="Center">
                 <Label Text="{Binding SelectedAccount.Address}"
                        FontAttributes="Bold"
-                       HorizontalOptions="Center" />
+                       HorizontalOptions="Center"
+                       FontSize="Large"/>
                 <Label Text="{Binding SelectedAccount.Breaches.Count, StringFormat='Breach Count: {0}'}"
-                       HorizontalOptions="Center" />
+                       HorizontalOptions="Center" 
+                       FontSize="Medium"/>
                 <Label Text="{Binding SelectedAccount.LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}"
                        HorizontalOptions="Center" />
             </VerticalStackLayout>
 
-            <!--<Grid IsVisible="{Binding SelectedAccount.IsUpdating}"
+            <Grid IsVisible="{Binding SelectedAccount.IsUpdating}"
                   BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}">
                 <Label Text="Is Refreshing..."
                        HorizontalTextAlignment="Center"
                        VerticalTextAlignment="Center"
                        Margin="0,2" />
-            </Grid>-->
+            </Grid>
         </Grid>
 
-        <tdc:RadListView x:Name="BreachesListView"
-                         ItemsSource="{Binding SelectedAccount.Breaches}"
-                         IsItemsReorderEnabled="False"
-                         SelectionMode="None"
-                         Grid.Row="1">
-            <tdc:RadListView.ItemStyle>
-                <tlv:ListViewItemStyle BorderColor="{StaticResource Primary}"
+        <telerik:RadListView x:Name="BreachesListView"
+                             ItemsSource="{Binding SelectedAccount.Breaches}"
+                             IsItemsReorderEnabled="False"
+                             SelectionMode="None"
+                             Grid.Row="1">
+            <!--<telerik:RadListView.ItemStyle>
+                <telerik:ListViewItemStyle BorderColor="{StaticResource Primary}"
+                                       BorderWidth="1"
+                                       BorderLocation="All"/>
+            </telerik:RadListView.ItemStyle>
+            <telerik:RadListView.SelectedItemStyle>
+                <telerik:ListViewItemStyle BorderColor="{StaticResource Dark}"
+                                       BackgroundColor="{StaticResource Primary}"
                                        BorderWidth="1"
                                        BorderLocation="All" />
-            </tdc:RadListView.ItemStyle>
-            <tdc:RadListView.ItemTemplate>
+            </telerik:RadListView.SelectedItemStyle>-->
+            <telerik:RadListView.ItemTemplate>
                 <DataTemplate x:DataType="models:Breach">
-                    <tlv:ListViewTemplateCell>
-                        <Grid ColumnDefinitions="Auto, *"
-                              RowDefinitions="Auto, *"
-                              Padding="5">
-                            <telerik:RadBorder WidthRequest="50"
-                                               HeightRequest="50"
-                                               CornerRadius="5"
-                                               Padding="5"
-                                               Margin="5,5,0,0"
-                                               BackgroundColor="{StaticResource DarkTranslucent}">
-                                <Image Source="{Binding LogoPath}" />
-                            </telerik:RadBorder>
-
-                            <VerticalStackLayout Margin="10,5,10,5"
-                                                 Grid.Column="1">
-                                <Label Text="{Binding Name}"
-                                       FontAttributes="Bold" />
-                                <Label Text="{Binding BreachDate, StringFormat='Breached on: {0}'}" />
-                                <Label Text="{Binding PwnCount, StringFormat='Accounts breached: {0}'}" />
-                            </VerticalStackLayout>
-
-                            <telerik:RadItemsControl ItemsSource="{Binding DataClasses}"
-                                                     ItemTemplate="{StaticResource BreachClassItemTemplate}"
-                                                     InputTransparent="True"
-                                                     Margin="0,5,5,5"
-                                                     Grid.Row="1"
-                                                     Grid.Column="0"/>
-                        </Grid>
-                    </tlv:ListViewTemplateCell>
+                    <telerik:ListViewTemplateCell>
+                        <controls:BreachItemView />
+                    </telerik:ListViewTemplateCell>
                 </DataTemplate>
-            </tdc:RadListView.ItemTemplate>
-            <tdc:RadListView.LayoutDefinition>
-                <OnPlatform x:TypeArguments="tlv:ListViewLayoutBase">
+            </telerik:RadListView.ItemTemplate>
+            <telerik:RadListView.LayoutDefinition>
+                <OnPlatform x:TypeArguments="telerik:ListViewLayoutBase">
                     <On Platform="iOS, Android">
                         <On.Value>
-                            <tlv:ListViewLinearLayout VerticalItemSpacing="5"
-                                                      HorizontalItemSpacing="5" />
+                            <telerik:ListViewLinearLayout VerticalItemSpacing="5"
+                                                          HorizontalItemSpacing="5" />
                         </On.Value>
                     </On>
                     <On Platform="WinUI, MacCatalyst">
                         <On.Value>
-                            <tlv:ListViewGridLayout SpanCount="3"
-                                                    HorizontalItemSpacing="5"
-                                                    VerticalItemSpacing="5" />
+                            <telerik:ListViewGridLayout SpanCount="3"
+                                                        HorizontalItemSpacing="5"
+                                                        VerticalItemSpacing="5" />
                         </On.Value>
                     </On>
                 </OnPlatform>
-            </tdc:RadListView.LayoutDefinition>
-        </tdc:RadListView>
+            </telerik:RadListView.LayoutDefinition>
+        </telerik:RadListView>
 
         <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
                            Style="{StaticResource FontAwesomeLabelStyle}"
-                           Command="{Binding RemoveAccountCommand}"
+                           Command="{Binding RefreshAccountCommand}"
                            CommandParameter="{Binding SelectedAccount}"
                            IsEnabled="{Binding SelectedAccount.IsUpdating, Converter={StaticResource InvertBoolConverter}}"
                            VerticalOptions="Start"
                            HorizontalOptions="End"
                            Margin="10" />
 
-        <primitives:RadBusyIndicator IsVisible="{Binding SelectedAccount.IsUpdating}"
-                                     IsBusy="{Binding SelectedAccount.IsUpdating}"
-                                     AnimationType="Animation3"
-                                     BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
-                                     AnimationContentColor="{StaticResource Primary}" />
+        <telerik:RadBusyIndicator IsVisible="{Binding SelectedAccount.IsUpdating}"
+                                  IsBusy="{Binding SelectedAccount.IsUpdating}"
+                                  AnimationType="Animation3"
+                                  BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
+                                  AnimationContentColor="{StaticResource Primary}" 
+                                  Grid.RowSpan="2"/>
     </Grid>
 </ContentPage>
