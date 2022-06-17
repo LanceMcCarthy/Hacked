@@ -61,8 +61,8 @@
 
     <ItemGroup>
         <PackageReference Include="CommonHelpers" Version="1.2.0" />
-        <PackageReference Include="Telerik.UI.for.Maui" Version="1.0.1" />
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.0" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'" />
+        <PackageReference Include="Telerik.UI.for.Maui" Version="1.0.2" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.1" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'" />
         <PackageReference Include="WinUIEx" Version="1.5.0" Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'" />
     </ItemGroup>
 

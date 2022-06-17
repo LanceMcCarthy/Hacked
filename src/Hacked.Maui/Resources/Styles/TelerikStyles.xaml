@@ -2,9 +2,7 @@
 <?xaml-comp compile="true" ?>
 <ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                    xmlns:telerik="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
-                    xmlns:primitives="clr-namespace:Telerik.XamarinForms.Primitives;assembly=Telerik.Maui.Controls.Compatibility"
-                    xmlns:tlv="clr-namespace:Telerik.XamarinForms.DataControls.ListView;assembly=Telerik.Maui.Controls.Compatibility"
+                    xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
                     xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
                     xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
                     xmlns:res="clr-namespace:Hacked.Maui.Resources">
@@ -52,7 +50,7 @@
     <!-- TODO switch to using this resource when template design is complete
     <DataTemplate x:Key="BreachItemTemplate"
                   x:DataType="models:Breach">
-        <tlv:ListViewTemplateCell>
+        <telerik:ListViewTemplateCell>
             <Grid Background="LightBlue">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
@@ -72,14 +70,14 @@
                                          Margin="0,5,5,5"
                                          Grid.Column="1"/>
             </Grid>
-        </tlv:ListViewTemplateCell>
+        </telerik:ListViewTemplateCell>
     </DataTemplate>-->
 
     <!-- TODO switch to using this resource when template design is complete
     
     <DataTemplate x:Key="MonitoredAccountTelerikItemTemplate"
                   x:DataType="models:MonitoredAccount">
-        <tlv:ListViewTemplateCell>
+        <telerik:ListViewTemplateCell>
             <Grid Background="{AppThemeBinding Light={StaticResource LightGray}, Dark={StaticResource DarkGray}}"
                   Padding="10">
                 <VerticalStackLayout>
@@ -109,7 +107,7 @@
                                    HorizontalOptions="End"
                                    Margin="10" />
             </Grid>
-        </tlv:ListViewTemplateCell>
+        </telerik:ListViewTemplateCell>
     </DataTemplate>-->
 
     <!-- Implicit Styles -->
@@ -147,7 +145,7 @@
         </Setter>
     </Style>
 
-    <Style TargetType="primitives:RadBusyIndicator">
+    <Style TargetType="telerik:RadBusyIndicator">
         <Setter Property="AnimationType"
                 Value="Animation3" />
         <Setter Property="BackgroundColor"
@@ -179,7 +177,7 @@
                 <OnPlatform x:TypeArguments="x:Double">
                     <On Platform="iOS">28</On>
                     <On Platform="Android">26</On>
-                    <On Platform="WinUI">28</On>
+                    <On Platform="WinUI, MacCatalyst">28</On>
                 </OnPlatform>
             </Setter.Value>
         </Setter>
@@ -215,7 +213,7 @@
                 <OnPlatform x:TypeArguments="x:Double">
                     <On Platform="iOS">18</On>
                     <On Platform="Android">16</On>
-                    <On Platform="WinUI">18</On>
+                    <On Platform="WinUI, MacCatalyst">18</On>
                 </OnPlatform>
             </Setter.Value>
         </Setter>
@@ -240,35 +238,35 @@
 
     <!-- Instance Styles (being replaced by custom ItemTemplate
 
-    <tlv:ListViewItemStyle x:Key="ThemeAwareItemStyle"
+    <telerik:ListViewItemStyle x:Key="ThemeAwareItemStyle"
                           BackgroundColor="{AppThemeBinding Light={StaticResource LightGray}, Dark={StaticResource DarkGray}}"
                           TextCellTextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Light}}"
                           BorderColor="{AppThemeBinding Light={StaticResource Dark}, Dark={StaticResource Primary}}"
                           BorderWidth="2"
                           BorderLocation="All" />
 
-    <tlv:ListViewItemStyle x:Key="NormalItemStyle"
+    <telerik:ListViewItemStyle x:Key="NormalItemStyle"
                           BackgroundColor="{StaticResource LightGray}"
                           TextCellTextColor="{StaticResource MidGray}"
                           BorderColor="{StaticResource Primary}"
                           BorderWidth="2"
                           BorderLocation="All"/>
 
-    <tlv:ListViewItemStyle x:Key="SelectedItemStyle"
+    <telerik:ListViewItemStyle x:Key="SelectedItemStyle"
                           BackgroundColor="#83A9E2"
                           TextCellTextColor="#AAC7F6"
                           BorderColor="#0A3A82"
                           BorderWidth="2"
                           BorderLocation="Bottom" />
 
-    <tlv:ListViewItemStyle x:Key="PressedItemStyle"
+    <telerik:ListViewItemStyle x:Key="PressedItemStyle"
                           BackgroundColor="#C1C1C1"
                           TextCellTextColor="#AAC7F6"
                           BorderColor="#0B3D89"
                           BorderWidth="2"
                           BorderLocation="Bottom" />
 
-    <tlv:ListViewItemStyle x:Key="ReorderItemStyle"
+    <telerik:ListViewItemStyle x:Key="ReorderItemStyle"
                           BackgroundColor="#0B3D89"
                           TextCellTextColor="#AAC7F6"
                           BorderColor="Black"

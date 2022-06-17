@@ -1,5 +1,5 @@
 ﻿using System.Windows.Input;
-using Telerik.XamarinForms.DataGrid.Commands;
+using Telerik.Maui.Controls.Compatibility.DataGrid.Commands;
 
 namespace Hacked.Maui.Common.Commands;
 
