@@ -95,7 +95,7 @@ public partial class MonitoredAccountsPage : ContentPage
         if (string.IsNullOrEmpty(emailAddress))
             return;
 
-        var addedAccount = await ViewModelLocator.MonitoredAccounts.AddAccount(emailAddress);
+        var addedAccount = await ViewModelLocator.MonitoredAccounts.AddAccountAsync(emailAddress);
 
         if (addedAccount == null)
         {
@@ -110,14 +110,14 @@ public partial class MonitoredAccountsPage : ContentPage
         popup.IsOpen = false;
     }
 
-    private void AccountsListView_OnRefreshRequested(object sender, PullToRefreshRequestedEventArgs e)
+    private async void AccountsListView_OnRefreshRequested(object sender, PullToRefreshRequestedEventArgs e)
     {
         try
         {
             if (!ViewModelLocator.MonitoredAccounts.HasAccounts)
                 return;
 
-            ViewModelLocator.MonitoredAccounts.FindAllAccountsBreachesAsync();
+            await ViewModelLocator.MonitoredAccounts.FindAllAccountsBreachesAsync();
 
             //if first time, hide tip and persist via settings
             //if (AccountRefreshTip.IsVisible)
@@ -144,7 +144,7 @@ public partial class MonitoredAccountsPage : ContentPage
         {
             var lastCount = account.Breaches.Count;
 
-            ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
+            await ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
 
             if (account.Breaches.Count > lastCount)
             {
@@ -155,7 +155,7 @@ public partial class MonitoredAccountsPage : ContentPage
         }
         else if (e.Offset < -200)
         {
-            ViewModelLocator.MonitoredAccounts.RemoveAccount(account);
+            await ViewModelLocator.MonitoredAccounts.RemoveAccountAsync(account);
         }
 
         if (sender is RadListView rlv)

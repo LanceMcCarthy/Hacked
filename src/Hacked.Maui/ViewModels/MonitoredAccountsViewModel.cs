@@ -1,12 +1,11 @@
 ﻿using CommonHelpers.Common;
-using CommonHelpers.Mvvm;
 using Hacked.Core.Models;
+using Hacked.Maui.Common.Commands;
 using Hacked.Maui.Common.Extensions;
 using Hacked.Services.Apis;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using Hacked.Maui.Common.Commands;
 using Telerik.Maui.Controls.Compatibility.DataControls.ListView.Commands;
 using Telerik.Maui.Controls.Compatibility.DataGrid;
 
@@ -29,17 +28,26 @@ public class MonitoredAccountsViewModel : ViewModelBase
     
     public MonitoredAccountsViewModel()
     {
-        FindSelectedAccountBreachesCommand = new AsyncCommand(() => UpdateBreachesForAccountAsync(SelectedAccount), onException:HandleException);
-        RemoveAccountCommand = new DelegateCommand<MonitoredAccount>(RemoveAccount);
-        FindAllAccountBreachesCommand = new DelegateCommand(FindAllAccountsBreachesAsync);
-        GoToSettingsCommand = new DelegateCommand(GoToSettingsAsync);
-        ViewDetailsCommand = new DelegateCommand<ItemTapCommandContext>(ViewDetails);
+        FindSelectedAccountBreachesCommand = new AsyncCommand(
+            () => UpdateBreachesForAccountAsync(SelectedAccount), 
+            () => SelectedAccount != null,
+            ex =>
+            {
+                if (ex.Message.Contains("404") || ex.Message.Contains("net_http_message_not_success_statuscode"))
+                {
+                    SelectedAccount.Breaches = new ObservableCollection<Breach>();
+                }
+            });
+        RemoveAccountCommand = new AsyncCommand<MonitoredAccount>(RemoveAccountAsync);
+        FindAllAccountBreachesCommand = new AsyncCommand(FindAllAccountsBreachesAsync);
+        GoToSettingsCommand = new AsyncCommand(GoToSettingsAsync);
+        ViewDetailsCommand = new AsyncCommand<ItemTapCommandContext>(ViewDetailsAsync);
         RefreshAccountCommand= new AsyncCommand<MonitoredAccount>(UpdateBreachesForAccountAsync);
-        CellTapCommand= new DelegateCommand<object>(DataGridCellTapped);
+        CellTapCommand= new AsyncCommand<object>(DataGridCellTappedAsync);
 
         InitData();
             
-        Accounts.CollectionChanged += Accounts_CollectionChanged;
+        Accounts.CollectionChanged += (s,e) => HasAccounts = Accounts.Count > 0;
     }
 
     #region Properties
@@ -92,27 +100,17 @@ public class MonitoredAccountsViewModel : ViewModelBase
 
     public AsyncCommand FindSelectedAccountBreachesCommand { get; }
 
-    public DelegateCommand<MonitoredAccount> RemoveAccountCommand { get; }
+    public AsyncCommand<MonitoredAccount> RemoveAccountCommand { get; }
 
-    public DelegateCommand FindAllAccountBreachesCommand { get; }
+    public AsyncCommand FindAllAccountBreachesCommand { get; }
 
-    public DelegateCommand GoToSettingsCommand { get; }
+    public AsyncCommand GoToSettingsCommand { get; }
 
-    public DelegateCommand<ItemTapCommandContext> ViewDetailsCommand { get; }
+    public AsyncCommand<ItemTapCommandContext> ViewDetailsCommand { get; }
 
     public AsyncCommand<MonitoredAccount> RefreshAccountCommand { get; }
 
-    public DelegateCommand<object> CellTapCommand { get; }
-
-    private void DataGridCellTapped(object parameter)
-    {
-        if (parameter is DataGridCellInfo {Item: MonitoredAccount account})
-        {
-            SelectedAccount = account;
-            
-            Shell.Current.GoToAsync("/accountdetails");
-        }
-    }
+    public AsyncCommand<object> CellTapCommand { get; }
 
     #endregion
 
@@ -206,7 +204,7 @@ public class MonitoredAccountsViewModel : ViewModelBase
         }
     }
         
-    public async Task<MonitoredAccount> AddAccount(string address)
+    public async Task<MonitoredAccount> AddAccountAsync(string address)
     {
         try
         {
@@ -271,7 +269,7 @@ public class MonitoredAccountsViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            App.ShowExceptionMessage("AddAccount", ex);
+            App.ShowExceptionMessage("AddAccountAsync", ex);
             return null;
         }
         finally
@@ -281,12 +279,12 @@ public class MonitoredAccountsViewModel : ViewModelBase
         }
     }
 
-    public void RemoveAccount(MonitoredAccount account)
+    public Task RemoveAccountAsync(MonitoredAccount account)
     {
         if (account == null)
         {
             Debug.WriteLine("Account to remove is null", "RemoveAccount");
-            return;
+            return Task.FromException(new NullReferenceException("Account to remove is null"));
         }
 
         try
@@ -317,12 +315,15 @@ public class MonitoredAccountsViewModel : ViewModelBase
         catch (Exception ex)
         {
             App.ShowExceptionMessage("RemoveAccount", ex);
+            return Task.FromException(ex);
         }
         finally
         {
             IsBusy = false;
             IsBusyMessage = "";
         }
+
+        return Task.CompletedTask;
     }
 
     public async Task UpdateBreachesForAccountAsync(MonitoredAccount account)
@@ -376,8 +377,7 @@ public class MonitoredAccountsViewModel : ViewModelBase
         }
     }
     
-
-    public async void FindAllAccountsBreachesAsync()
+    public async Task FindAllAccountsBreachesAsync()
     {
         foreach (var monitoredAccount in Accounts)
         {
@@ -387,16 +387,26 @@ public class MonitoredAccountsViewModel : ViewModelBase
         SaveAccounts();
     }
         
-    private async void GoToSettingsAsync()
+    private async Task GoToSettingsAsync()
     {
         await Shell.Current.GoToAsync("/settings");
     }
         
-    private async void ViewDetails(ItemTapCommandContext context)
+    private async Task ViewDetailsAsync(ItemTapCommandContext context)
     {
         SelectedAccount = context.Item as MonitoredAccount;
 
         await Shell.Current.GoToAsync("/accountdetails");
+    }
+
+    private async Task DataGridCellTappedAsync(object parameter)
+    {
+        if (parameter is DataGridCellInfo {Item: MonitoredAccount account})
+        {
+            SelectedAccount = account;
+            
+            await Shell.Current.GoToAsync("/accountdetails");
+        }
     }
     
     // Stats
@@ -429,31 +439,6 @@ public class MonitoredAccountsViewModel : ViewModelBase
 
         return list;
     }
-
-
-
-    private void HandleException(Exception ex)
-    {
-        if (ex.Message.Contains("404") || ex.Message.Contains("net_http_message_not_success_statuscode"))
-        {
-//if no results, update with empty list
-            account.Breaches = new ObservableCollection<Breach>();
-
-            if (showSuccessMessage)
-            { 
-                Shell.Current.DisplayAlert("Good news!", "No known breaches found for this email address.", "close");
-            }
-        }
-    }
-
-    #endregion
-
-    #region Event Handlers
-
-    private void Accounts_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-    {
-        HasAccounts = Accounts.Count > 0;
-    }
-
+    
     #endregion
 }
