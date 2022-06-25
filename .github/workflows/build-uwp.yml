@@ -7,19 +7,7 @@ on:
     paths:
       - 'src/Hacked/**/*'
       - 'src/Hacked.BackgroundTasks/**/*'
-      - 'src/Hacked.Core/**/*'
-      - 'src/Hacked.DataLayer/**/*'
-      - 'src/Hacked.Services/**/*'
       - '.github/workflows/build-uwp.yml'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'src/Hacked/**/*'
-      - 'src/Hacked.BackgroundTasks/**/*'
-      - 'src/Hacked.Core/**/*'
-      - 'src/Hacked.DataLayer/**/*'
-      - 'src/Hacked.Services/**/*'
 
 env:
   SOLUTION_PATH: 'src/Hacked_Uwp.sln'
