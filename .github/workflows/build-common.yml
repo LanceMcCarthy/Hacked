@@ -1,0 +1,45 @@
+name: Build Common
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/Hacked.Core/**/*'
+      - 'src/Hacked.DataLayer/**/*'
+      - 'src/Hacked.Services/**/*'
+
+env:
+  CORE_PROJECT_PATH: 'src/Hacked.Core/Hacked.Core.csproj'
+  DATA_PROJECT_PATH: "src/Hacked.DataLayer/Hacked.DataLayer.csproj"
+  SERVICES_PROJECT_PATH: "src/Hacked.Services/Hacked.Services.csproj"
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.1
+      with:
+        msbuild-architecture: x64
+      
+    - name: NuGet Restore
+      run: |
+        nuget restore ${{ env.CORE_PROJECT_PATH }}
+        nuget restore ${{ env.DATA_PROJECT_PATH }}
+        nuget restore ${{ env.SERVICES_PROJECT_PATH }}
+    
+    - name: Build Core
+      run: msbuild ${{ env.CORE_PROJECT_PATH }} /p:Platform=x64 /p:Configuration=Debug
+
+    - name: Build Data Layer
+      run: msbuild ${{ env.DATA_PROJECT_PATH }} /p:Platform=x64 /p:Configuration=Debug
+
+    - name: Build Services
+      run: msbuild ${{ env.SERVICES_PROJECT_PATH }} /p:Platform=x64 /p:Configuration=Debug
