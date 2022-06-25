@@ -7,15 +7,17 @@ on:
     paths:
       - 'src/Uwp/**/*'
       - '.github/workflows/main-uwp.yml' 
+
   pull_request:
     branches:
-     - main
+      - main
      paths:
-     - 'src/Hacked/**/*'
-     - 'src/Hacked.BackgroundTasks/**/*'
-     - 'src/Hacked.Core/**/*'
-     - 'src/Hacked.DataLayer/**/*'
-     - 'src/Hacked.Services/**/*'
+      - 'src/Hacked/**/*'
+      - 'src/Hacked.BackgroundTasks/**/*'
+      - 'src/Hacked.Core/**/*'
+      - 'src/Hacked.DataLayer/**/*'
+      - 'src/Hacked.Services/**/*'
+
 env:
   SOLUTION_PATH: 'src/Hacked_Uwp.sln'
   PROJECT_PATH: "src/Hacked/Hacked.csproj"
