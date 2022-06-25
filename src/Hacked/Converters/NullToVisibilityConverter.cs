@@ -2,20 +2,19 @@
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 
-namespace Hacked.Converters
+namespace Hacked.Converters;
+
+public class NullToVisibilityConverter : IValueConverter
 {
-    public class NullToVisibilityConverter : IValueConverter
+    public bool IsInverted { get; set; }
+
+    public object Convert(object value, Type targetType, object parameter, string language)
     {
-        public bool IsInverted { get; set; }
+        return (value == null) ? Visibility.Collapsed : Visibility.Visible;
+    }
 
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            return (value == null) ? Visibility.Collapsed : Visibility.Visible;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            return value;
-        }
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        return value;
     }
 }

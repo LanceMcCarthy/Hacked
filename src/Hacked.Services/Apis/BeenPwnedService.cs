@@ -1,181 +1,180 @@
-﻿using System;
+﻿using Hacked.Core.Common;
+using Hacked.Core.Models;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Hacked.Core.Common;
-using Hacked.Core.Models;
-using Newtonsoft.Json;
 
-namespace Hacked.Services.Apis
+namespace Hacked.Services.Apis;
+
+public class BeenPwnedService : IDisposable
 {
-    public class BeenPwnedService : IDisposable
+    private HttpClient client;
+    private readonly HttpClientHandler handler;
+    private DateTime lastCalled;
+
+    public BeenPwnedService(HttpClientHandler handler = null)
     {
-        private HttpClient client;
-        private readonly HttpClientHandler handler;
-        private DateTime lastCalled;
+        if (handler != null)
+            this.handler = handler;
 
-        public BeenPwnedService(HttpClientHandler handler = null)
+        ValidateClient();
+    }
+
+    /// <summary>
+    /// The API takes a single parameter which is the account to be searched for. 
+    /// The account is not case sensitive and will be trimmed of leading or trailing white spaces. The account should always be URL encoded
+    /// </summary>
+    /// <param name="account">Email address, should always be URL encoded</param>
+    /// <param name="truncateResponse">Determine whether only the name of the breach is returned rather than the complete breach data</param>
+    /// <returns>A collection of breaches</returns>
+    public async Task<ObservableCollection<Breach>> CheckForBreachesAsync(MonitoredAccount account, bool truncateResponse = false)
+    {
+        ValidateClient();
+
+        await ValidateRequestDelayAsync();
+
+        using (var request = new HttpRequestMessage(HttpMethod.Get, $"breachedaccount/{account.Address}?truncateResponse={truncateResponse}"))
         {
-            if (handler != null)
-                this.handler = handler;
-
-            ValidateClient();
-        }
-
-        /// <summary>
-        /// The API takes a single parameter which is the account to be searched for. 
-        /// The account is not case sensitive and will be trimmed of leading or trailing white spaces. The account should always be URL encoded
-        /// </summary>
-        /// <param name="account">Email address, should always be URL encoded</param>
-        /// <param name="truncateResponse">Determine whether only the name of the breach is returned rather than the complete breach data</param>
-        /// <returns>A collection of breaches</returns>
-        public async Task<ObservableCollection<Breach>> CheckForBreachesAsync(MonitoredAccount account, bool truncateResponse = false)
-        {
-            ValidateClient();
-
-            await ValidateRequestDelayAsync();
-
-            using (var request = new HttpRequestMessage(HttpMethod.Get, $"breachedaccount/{account.Address}?truncateResponse={truncateResponse}"))
+            using (var response = await client.SendAsync(request))
             {
-                using (var response = await client.SendAsync(request))
+                if (response.IsSuccessStatusCode)
                 {
-                    if (response.IsSuccessStatusCode)
-                    {
-                        Debug.WriteLine("Check for breaches - request made");
+                    Debug.WriteLine("Check for breaches - request made");
 
-                        lastCalled = DateTime.UtcNow;
+                    lastCalled = DateTime.UtcNow;
 
-                        var json = await response.Content.ReadAsStringAsync();
+                    var json = await response.Content.ReadAsStringAsync();
 
-                        Debug.WriteLine($"Check for breaches - json:\r\n\n{json}\r\n\n");
+                    Debug.WriteLine($"Check for breaches - json:\r\n\n{json}\r\n\n");
 
-                        var result = JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
+                    var result = JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
 
-                        account.LastUpdated = DateTime.Now;
+                    account.LastUpdated = DateTime.Now;
 
-                        Debug.WriteLine($"Check for breaches - JSON.NET result:\r\n\n{result}\r\n\n");
+                    Debug.WriteLine($"Check for breaches - JSON.NET result:\r\n\n{result}\r\n\n");
 
-                        return result;
-                    }
-                    else
-                    {
-                        throw new PwnedApiException("HttpException Calling API Service") { StatusCode = response.StatusCode };
-                    }
+                    return result;
+                }
+                else
+                {
+                    throw new PwnedApiException("HttpException Calling API Service") { StatusCode = response.StatusCode };
                 }
             }
         }
+    }
 
-        /// <summary>
-        ///  Gets all breaches in the system.
-        /// </summary>
-        /// <param name="truncateResponse">Determine whether only the name of the breach is returned rather than the complete breach data</param>
-        /// <returns>A collection of breaches</returns>
-        public async Task<ObservableCollection<Breach>> GetAllKnownBreachesAsync(bool truncateResponse = false)
+    /// <summary>
+    ///  Gets all breaches in the system.
+    /// </summary>
+    /// <param name="truncateResponse">Determine whether only the name of the breach is returned rather than the complete breach data</param>
+    /// <returns>A collection of breaches</returns>
+    public async Task<ObservableCollection<Breach>> GetAllKnownBreachesAsync(bool truncateResponse = false)
+    {
+        ValidateClient();
+        await ValidateRequestDelayAsync();
+
+        using (var request = new HttpRequestMessage(HttpMethod.Get, $"breaches?truncateResponse={truncateResponse}"))
+        using (var response = await client.SendAsync(request))
         {
-            ValidateClient();
-            await ValidateRequestDelayAsync();
+            lastCalled = DateTime.UtcNow;
 
-            using (var request = new HttpRequestMessage(HttpMethod.Get, $"breaches?truncateResponse={truncateResponse}"))
-            using (var response = await client.SendAsync(request))
-            {
-                lastCalled = DateTime.UtcNow;
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
 
-                var json = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
-                
-                return result;
-            }
+            return result;
         }
+    }
 
-        /// <summary>
-        /// A "data class" is an attribute of a record compromised in a breach. 
-        /// For example, many breaches expose data classes such as "Email addresses" and "Passwords". 
-        /// The values returned by this service are ordered alphabetically in a string array and will expand over time as new breaches expose previously unseen classes of data.
-        /// </summary>
-        /// <returns>an array of classes</returns>
-        public async Task<List<string>> GetAllKnownDataClassesAsync()
+    /// <summary>
+    /// A "data class" is an attribute of a record compromised in a breach. 
+    /// For example, many breaches expose data classes such as "Email addresses" and "Passwords". 
+    /// The values returned by this service are ordered alphabetically in a string array and will expand over time as new breaches expose previously unseen classes of data.
+    /// </summary>
+    /// <returns>an array of classes</returns>
+    public async Task<List<string>> GetAllKnownDataClassesAsync()
+    {
+        ValidateClient();
+        await ValidateRequestDelayAsync();
+
+        using (var request = new HttpRequestMessage(HttpMethod.Get, "dataclasses"))
+        using (var response = await client.SendAsync(request))
         {
-            ValidateClient();
-            await ValidateRequestDelayAsync();
+            lastCalled = DateTime.UtcNow;
 
-            using (var request = new HttpRequestMessage(HttpMethod.Get, "dataclasses"))
-            using (var response = await client.SendAsync(request))
-            {
-                lastCalled = DateTime.UtcNow;
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<List<string>>(json);
 
-                var json = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<List<string>>(json);
+            //Needed to align with HIBP new policy of 1.5 seconds between calls
+            await Task.Delay(TimeSpan.FromMilliseconds(1500));
 
-                //Needed to align with HIBP new policy of 1.5 seconds between calls
-                await Task.Delay(TimeSpan.FromMilliseconds(1500));
-
-                return result;
-            }
+            return result;
         }
+    }
 
-        /// <summary>
-        /// The API takes a single parameter which is the email address to be searched for. 
-        /// Unlike searching for breaches, usernames that are not email addresses cannot be searched for. 
-        /// The email is not case sensitive and will be trimmed of leading or trailing white spaces. The email should always be URL encoded.
-        /// </summary>
-        /// <param name="emailaddress">Email address, should always be URL encoded</param>
-        /// <param name="truncateResponse">Determine whether only the name of the breach is returned rather than the complete breach data</param>
-        /// <returns>A collection of breaches</returns>
-        public async Task<ObservableCollection<Breach>> GetPastesAsync(string emailAddress, bool truncateResponse = false)
+    /// <summary>
+    /// The API takes a single parameter which is the email address to be searched for. 
+    /// Unlike searching for breaches, usernames that are not email addresses cannot be searched for. 
+    /// The email is not case sensitive and will be trimmed of leading or trailing white spaces. The email should always be URL encoded.
+    /// </summary>
+    /// <param name="emailaddress">Email address, should always be URL encoded</param>
+    /// <param name="truncateResponse">Determine whether only the name of the breach is returned rather than the complete breach data</param>
+    /// <returns>A collection of breaches</returns>
+    public async Task<ObservableCollection<Breach>> GetPastesAsync(string emailAddress, bool truncateResponse = false)
+    {
+        ValidateClient();
+        await ValidateRequestDelayAsync();
+
+        using (var request = new HttpRequestMessage(HttpMethod.Get, $"breachedaccount/{emailAddress}?truncateResponse={truncateResponse}"))
+        using (var response = await client.SendAsync(request))
         {
-            ValidateClient();
-            await ValidateRequestDelayAsync();
+            lastCalled = DateTime.UtcNow;
 
-            using (var request = new HttpRequestMessage(HttpMethod.Get, $"breachedaccount/{emailAddress}?truncateResponse={truncateResponse}"))
-            using (var response = await client.SendAsync(request))
-            {
-                lastCalled = DateTime.UtcNow;
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
 
-                var json = await response.Content.ReadAsStringAsync();
-                var result = JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
-                
-                return result;
-            }
+            return result;
         }
+    }
 
-        private void ValidateClient()
+    private void ValidateClient()
+    {
+        if (client != null)
+            return;
+
+        // If we're passed a handler, use it to instantiate the client. Otherwise, don't use one.
+        client = handler != null ? new HttpClient(handler) : new HttpClient();
+
+        client.BaseAddress = new Uri("https://haveibeenpwned.com/api/v3/");
+        client?.DefaultRequestHeaders.Add("User-Agent", "Hacked-for-Windows-Universal");
+        client?.DefaultRequestHeaders.Add("hibp-api-key", Secrets.HibpApiKey);
+    }
+
+    /// <summary>
+    /// This method determines if the next call to HIBP needs to be delayed
+    /// Logic - If less than 1500ms has elapsed, delay the call until 1500ms has elapsed
+    /// </summary>
+    /// <returns></returns>
+    private async Task ValidateRequestDelayAsync()
+    {
+        var timeElapsedSinceLastCall = DateTime.UtcNow - lastCalled;
+        Debug.WriteLine($"BeenPwndService - timeElapsedSinceLastCall: {timeElapsedSinceLastCall}");
+
+        if (timeElapsedSinceLastCall < TimeSpan.FromMilliseconds(1500))
         {
-            if (client != null)
-                return;
+            var timeNeededToWait = TimeSpan.FromMilliseconds(1500) - timeElapsedSinceLastCall;
+            Debug.WriteLine($"BeenPwndService - timeNeededToWait: {timeNeededToWait}");
 
-            // If we're passed a handler, use it to instantiate the client. Otherwise, don't use one.
-            client = handler != null ? new HttpClient(handler) : new HttpClient();
-
-            client.BaseAddress = new Uri("https://haveibeenpwned.com/api/v3/");
-            client?.DefaultRequestHeaders.Add("User-Agent", "Hacked-for-Windows-Universal");
-            client?.DefaultRequestHeaders.Add("hibp-api-key", Secrets.HibpApiKey);
+            // Delay the call until 1.5 seconds has elapsed
+            await Task.Delay(timeNeededToWait);
         }
+    }
 
-        /// <summary>
-        /// This method determines if the next call to HIBP needs to be delayed
-        /// Logic - If less than 1500ms has elapsed, delay the call until 1500ms has elapsed
-        /// </summary>
-        /// <returns></returns>
-        private async Task ValidateRequestDelayAsync()
-        {
-            var timeElapsedSinceLastCall = DateTime.UtcNow - lastCalled;
-            Debug.WriteLine($"BeenPwndService - timeElapsedSinceLastCall: {timeElapsedSinceLastCall}");
-
-            if (timeElapsedSinceLastCall < TimeSpan.FromMilliseconds(1500))
-            {
-                var timeNeededToWait = TimeSpan.FromMilliseconds(1500) - timeElapsedSinceLastCall;
-                Debug.WriteLine($"BeenPwndService - timeNeededToWait: {timeNeededToWait}");
-
-                // Delay the call until 1.5 seconds has elapsed
-                await Task.Delay(timeNeededToWait);
-            }
-        }
-
-        public void Dispose()
-        {
-            client?.Dispose();
-        }
+    public void Dispose()
+    {
+        client?.Dispose();
     }
 }

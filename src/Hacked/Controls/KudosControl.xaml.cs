@@ -15,218 +15,218 @@ using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace Hacked.Controls
+namespace Hacked.Controls;
+
+public sealed partial class KudosControl : UserControl
 {
-    public sealed partial class KudosControl : UserControl
+    private StoreContext context;
+    private const string VungleKudoPlacementId = "KUDOSAD-0259168";
+    public event EventHandler<AdRequestedArgs> PlayAdRequested;
+
+    public KudosControl()
     {
-        private StoreContext context;
-        private const string VungleKudoPlacementId = "KUDOSAD-0259168";
-        public event EventHandler<AdRequestedArgs> PlayAdRequested;
+        InitializeComponent();
 
-        public KudosControl()
+        Kudoses = LoadKudos();
+        KudosGridView.ItemsSource = Kudoses;
+    }
+
+    #region Dependency Properties
+
+    public static readonly DependencyProperty KudosesProperty = DependencyProperty.Register(
+        nameof(Kudoses), typeof(ObservableCollection<Kudos>), typeof(KudosControl), new PropertyMetadata(default(ObservableCollection<Kudos>)));
+
+    public ObservableCollection<Kudos> Kudoses
+    {
+        get => (ObservableCollection<Kudos>)GetValue(KudosesProperty);
+        set => SetValue(KudosesProperty, value);
+    }
+
+    #endregion
+
+    #region Event handlers
+
+    public async void KudosGridView_OnItemClick(object sender, ItemClickEventArgs e)
+    {
+        if (!(e.ClickedItem is Kudos kudo)) return;
+
+        if (ApiInformation.IsTypePresent("Microsoft.Services.Store.Engagement.StoreServicesCustomEventLogger"))
+            StoreServicesCustomEventLogger.GetDefault().Log($"{kudo.Title} Kudos Item Selected");
+
+        if (kudo.Category == KudoCategory.Consumable ||
+            kudo.Category == KudoCategory.Subscription ||
+            kudo.Category == KudoCategory.Durable)
         {
-            InitializeComponent();
-
-            Kudoses = LoadKudos();
-            KudosGridView.ItemsSource = Kudoses;
+            await PurchaseKudosAsync(kudo.StoreId);
         }
 
-        #region Dependency Properties
-
-        public static readonly DependencyProperty KudosesProperty = DependencyProperty.Register(
-            "Kudoses", typeof(ObservableCollection<Kudos>), typeof(KudosControl), new PropertyMetadata(default(ObservableCollection<Kudos>)));
-
-        public ObservableCollection<Kudos> Kudoses
+        if (kudo.Category == KudoCategory.Free)
         {
-            get => (ObservableCollection<Kudos>) GetValue(KudosesProperty);
-            set => SetValue(KudosesProperty, value);
-        }
-
-        #endregion
-
-        #region Event handlers
-
-        public async void KudosGridView_OnItemClick(object sender, ItemClickEventArgs e)
-        {
-            if (!(e.ClickedItem is Kudos kudo)) return;
-
-            if (ApiInformation.IsTypePresent("Microsoft.Services.Store.Engagement.StoreServicesCustomEventLogger"))
-                StoreServicesCustomEventLogger.GetDefault().Log($"{kudo.Title} Kudos Item Selected");
-
-            if (kudo.Category == KudoCategory.Consumable ||
-                kudo.Category == KudoCategory.Subscription ||
-                kudo.Category == KudoCategory.Durable)
+            if (kudo.Title == "Store Rating")
             {
-                await PurchaseKudosAsync(kudo.StoreId);
+                await ShowRatingReviewDialog();
             }
 
-            if (kudo.Category == KudoCategory.Free)
+            if (kudo.Title == "Play Ad")
             {
-                if (kudo.Title == "Store Rating")
-                {
-                    await ShowRatingReviewDialog();
-                }
-
-                if (kudo.Title == "Play Ad")
-                {
-                    PlayAdRequested?.Invoke(this, new AdRequestedArgs(VungleKudoPlacementId));
-                }
+                PlayAdRequested?.Invoke(this, new AdRequestedArgs(VungleKudoPlacementId));
             }
         }
+    }
 
-        #endregion
+    #endregion
 
-        #region Instance methods and events
+    #region Instance methods and events
 
-        public async Task ShowRatingReviewDialog()
+    public async Task ShowRatingReviewDialog()
+    {
+        try
         {
-            try
+            UpdateBusyMessage("rating and review in progress (you should see a separate window)...");
+
+            var result = await StoreRequestHelper.SendRequestAsync(StoreContext.GetDefault(), 16, "");
+
+            UpdateBusyMessage("action complete, reviewing result...");
+
+            if (result.ExtendedError != null)
+                return;
+
+            var jsonObject = JObject.Parse(result.Response);
+            var status = jsonObject.SelectToken("status")?.ToString();
+
+            UpdateBusyMessage("action complete, showing result...");
+
+            if (status == "success")
             {
-                UpdateBusyMessage("rating and review in progress (you should see a separate window)...");
+                await new MessageDialog("Thank you for taking the time to leave a rating! If you left 3 stars or lower, please let me know how I can improve the app (go to About page).", "Success").ShowAsync();
+            }
+            else if (status == "aborted")
+            {
+                var md = new MessageDialog("If you prefer not to leave a bad rating but still want to provide feedback, click the email button below. I work hard to make sure you have a great app experience and would love to hear from you.", "Review Aborted");
 
-                var result = await StoreRequestHelper.SendRequestAsync(StoreContext.GetDefault(), 16, "");
+                md.Commands.Add(new UICommand("send email"));
+                md.Commands.Add(new UICommand("not now"));
 
-                UpdateBusyMessage("action complete, reviewing result...");
+                var mdResult = await md.ShowAsync();
 
-                if (result.ExtendedError != null)
-                    return;
-
-                var jsonObject = JObject.Parse(result.Response);
-                var status = jsonObject.SelectToken("status")?.ToString();
-
-                UpdateBusyMessage("action complete, showing result...");
-
-                if (status == "success")
+                if (mdResult.Label == "send email")
                 {
-                    await new MessageDialog("Thank you for taking the time to leave a rating! If you left 3 stars or lower, please let me know how I can improve the app (go to About page).", "Success").ShowAsync();
-                }
-                else if (status == "aborted")
-                {
-                    var md = new MessageDialog("If you prefer not to leave a bad rating but still want to provide feedback, click the email button below. I work hard to make sure you have a great app experience and would love to hear from you.", "Review Aborted");
+                    var uri = new Uri($"mailto:awesome.apps@outlook.com?subject=Hacked%20Feedback&body=[write%20message%20here]", UriKind.Absolute);
 
-                    md.Commands.Add(new UICommand("send email"));
-                    md.Commands.Add(new UICommand("not now"));
-
-                    var mdResult = await md.ShowAsync();
-
-                    if (mdResult.Label == "send email")
+                    await Launcher.LaunchUriAsync(uri, new LauncherOptions
                     {
-                        var uri = new Uri($"mailto:awesome.apps@outlook.com?subject=Hacked%20Feedback&body=[write%20message%20here]", UriKind.Absolute);
-
-                        await Launcher.LaunchUriAsync(uri, new LauncherOptions
-                        {
-                            DesiredRemainingView = ViewSizePreference.UseHalf,
-                            DisplayApplicationPicker = true,
-                            PreferredApplicationPackageFamilyName = "microsoft.windowscommunicationsapps_8wekyb3d8bbwe",
-                            PreferredApplicationDisplayName = "Mail"
-                        });
-                    }
+                        DesiredRemainingView = ViewSizePreference.UseHalf,
+                        DisplayApplicationPicker = true,
+                        PreferredApplicationPackageFamilyName = "microsoft.windowscommunicationsapps_8wekyb3d8bbwe",
+                        PreferredApplicationDisplayName = "Mail"
+                    });
                 }
-                else
-                {
-                    await new MessageDialog($"The rating or review did not complete, here's what Windows had to say: {jsonObject.SelectToken("status")}.\r\n\nIf you meant to leave a review, try again. If this keeps happening, contact us and share the error code above.", "Rating or Review was not successful").ShowAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                DisplayMessageHelpers.ShowExceptionMessageOnUiThread("ShowRatingReviewDialog", ex);
-            }
-            finally
-            {
-                UpdateBusyMessage();
-            }
-        }
-
-        public async Task PurchaseKudosAsync(string storeId)
-        {
-            try
-            {
-                UpdateBusyMessage("in-app purchase in progress (you should see a separate window)...");
-
-                if (context == null)
-                    context = StoreContext.GetDefault();
-
-                var result = await context.RequestPurchaseAsync(storeId);
-
-                UpdateBusyMessage("action complete, reviewing result...");
-
-                var extendedError = "";
-
-                if (result.ExtendedError != null)
-                    extendedError = result.ExtendedError.Message;
-
-                var resultMessage = "";
-
-                switch (result.Status)
-                {
-                    case StorePurchaseStatus.AlreadyPurchased:
-                        resultMessage = "You have already purchased this kudos, thank you!";
-                        break;
-                    case StorePurchaseStatus.Succeeded:
-                        resultMessage = "Kudos provided! Thank you for your support and help in keeping this app free.";
-                        break;
-                    case StorePurchaseStatus.NotPurchased:
-                        resultMessage = "Kudos were not purchased. Don't worry, you were not charged for peeking ;)";
-                        break;
-                    case StorePurchaseStatus.NetworkError:
-                        resultMessage = "The purchase was unsuccessful due to a network error.\r\n\nError:\r\n" + extendedError;
-                        break;
-                    case StorePurchaseStatus.ServerError:
-                        resultMessage = "The purchase was unsuccessful due to a server error.\r\n\nError:\r\n" + extendedError;
-                        break;
-                    default:
-                        resultMessage = "The purchase was unsuccessful due to an unknown error.\r\n\nError:\r\n" + extendedError;
-                        break;
-                }
-
-                UpdateBusyMessage("action complete, showing result...");
-
-                await new MessageDialog(resultMessage).ShowAsync();
-            }
-            catch (Exception ex)
-            {
-                DisplayMessageHelpers.ShowExceptionMessageOnUiThread("ShowRatingReviewDialog", ex);
-            }
-            finally
-            {
-                UpdateBusyMessage();
-            }
-        }
-
-        private void UpdateBusyMessage(string message = "")
-        {
-            if (!string.IsNullOrEmpty(message))
-            {
-                KudosBusyIndicator.IsActive = true;
-                KudosBusyIndicator.Content = message;
             }
             else
             {
-                KudosBusyIndicator.IsActive = false;
-                KudosBusyIndicator.Content = "";
+                await new MessageDialog($"The rating or review did not complete, here's what Windows had to say: {jsonObject.SelectToken("status")}.\r\n\nIf you meant to leave a review, try again. If this keeps happening, contact us and share the error code above.", "Rating or Review was not successful").ShowAsync();
             }
         }
-
-        #endregion
-
-        #region Static Helpers
-
-        private static ObservableCollection<Kudos> LoadKudos()
+        catch (Exception ex)
         {
-            return new ObservableCollection<Kudos>
+            DisplayMessageHelpers.ShowExceptionMessageOnUiThread("ShowRatingReviewDialog", ex);
+        }
+        finally
+        {
+            UpdateBusyMessage();
+        }
+    }
+
+    public async Task PurchaseKudosAsync(string storeId)
+    {
+        try
+        {
+            UpdateBusyMessage("in-app purchase in progress (you should see a separate window)...");
+
+            if (context == null)
+                context = StoreContext.GetDefault();
+
+            var result = await context.RequestPurchaseAsync(storeId);
+
+            UpdateBusyMessage("action complete, reviewing result...");
+
+            var extendedError = "";
+
+            if (result.ExtendedError != null)
+                extendedError = result.ExtendedError.Message;
+
+            var resultMessage = "";
+
+            switch (result.Status)
+            {
+                case StorePurchaseStatus.AlreadyPurchased:
+                    resultMessage = "You have already purchased this kudos, thank you!";
+                    break;
+                case StorePurchaseStatus.Succeeded:
+                    resultMessage = "Kudos provided! Thank you for your support and help in keeping this app free.";
+                    break;
+                case StorePurchaseStatus.NotPurchased:
+                    resultMessage = "Kudos were not purchased. Don't worry, you were not charged for peeking ;)";
+                    break;
+                case StorePurchaseStatus.NetworkError:
+                    resultMessage = "The purchase was unsuccessful due to a network error.\r\n\nError:\r\n" + extendedError;
+                    break;
+                case StorePurchaseStatus.ServerError:
+                    resultMessage = "The purchase was unsuccessful due to a server error.\r\n\nError:\r\n" + extendedError;
+                    break;
+                default:
+                    resultMessage = "The purchase was unsuccessful due to an unknown error.\r\n\nError:\r\n" + extendedError;
+                    break;
+            }
+
+            UpdateBusyMessage("action complete, showing result...");
+
+            await new MessageDialog(resultMessage).ShowAsync();
+        }
+        catch (Exception ex)
+        {
+            DisplayMessageHelpers.ShowExceptionMessageOnUiThread("ShowRatingReviewDialog", ex);
+        }
+        finally
+        {
+            UpdateBusyMessage();
+        }
+    }
+
+    private void UpdateBusyMessage(string message = "")
+    {
+        if (!string.IsNullOrEmpty(message))
+        {
+            KudosBusyIndicator.IsActive = true;
+            KudosBusyIndicator.Content = message;
+        }
+        else
+        {
+            KudosBusyIndicator.IsActive = false;
+            KudosBusyIndicator.Content = "";
+        }
+    }
+
+    #endregion
+
+    #region Static Helpers
+
+    private static ObservableCollection<Kudos> LoadKudos()
+    {
+        return new ObservableCollection<Kudos>
             {
                 new Kudos
                 {
-                    Title = "Play Ad", 
-                    Category = KudoCategory.Free, 
-                    Price = "Free", 
+                    Title = "Play Ad",
+                    Category = KudoCategory.Free,
+                    Price = "Free",
                     ImageUrl = "/Images/VideoAd_Colored.png"
                 },
                 new Kudos
                 {
-                    Title = "Store Rating", 
-                    Category = KudoCategory.Free, 
-                    Price = "Free", 
+                    Title = "Store Rating",
+                    Category = KudoCategory.Free,
+                    Price = "Free",
                     ImageUrl = "/Images/4starStar_Colored.png"
                 },
                 new Kudos
@@ -278,8 +278,7 @@ namespace Hacked.Controls
                     ImageUrl = "/Images/DinnerKudo_Colored.png"
                 }
             };
-        }
-
-        #endregion
     }
+
+    #endregion
 }
