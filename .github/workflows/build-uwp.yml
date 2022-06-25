@@ -1,15 +1,25 @@
 name: Build UWP
 
-on: [push, pull_request]
-  branches:
-    - main
-    paths:
-    - 'src/Hacked/**/*'
-    - 'src/Hacked.BackgroundTasks/**/*'
-    - 'src/Hacked.Core/**/*'
-    - 'src/Hacked.DataLayer/**/*'
-    - 'src/Hacked.Services/**/*'
-    - '.github/workflows/main-uwp.yml' 
+on:
+  push:
+    branches:
+      - main
+      paths:
+      - 'src/Hacked/**/*'
+      - 'src/Hacked.BackgroundTasks/**/*'
+      - 'src/Hacked.Core/**/*'
+      - 'src/Hacked.DataLayer/**/*'
+      - 'src/Hacked.Services/**/*'
+      - '.github/workflows/main-uwp.yml'
+  pr:
+    branches:
+      - main
+      paths:
+      - 'src/Hacked/**/*'
+      - 'src/Hacked.BackgroundTasks/**/*'
+      - 'src/Hacked.Core/**/*'
+      - 'src/Hacked.DataLayer/**/*'
+      - 'src/Hacked.Services/**/*'
 
 env:
   SOLUTION_PATH: 'src/Hacked_Uwp.sln'
