@@ -6,13 +6,7 @@ on:
       - main
     paths:
       - 'src/Hacked.Maui/**/*'
-      - '.github/workflows/build-maui.yml' 
-
-  pull_request:
-    branches:
-      - main
-     paths:
-      - 'src/Hacked.Maui/**/*'
+      - '.github/workflows/build-maui.yml'
 
   workflow_call:
     secrets:
