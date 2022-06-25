@@ -10,7 +10,7 @@ on:
       - 'src/Hacked.Core/**/*'
       - 'src/Hacked.DataLayer/**/*'
       - 'src/Hacked.Services/**/*'
-      - '.github/workflows/main-uwp.yml'
+      - '.github/workflows/build-uwp.yml'
   pull_request:
     branches:
       - main
