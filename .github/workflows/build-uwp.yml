@@ -11,7 +11,7 @@ on:
       - 'src/Hacked.DataLayer/**/*'
       - 'src/Hacked.Services/**/*'
       - '.github/workflows/main-uwp.yml'
-  pr:
+  pull_request:
     branches:
       - main
     paths:
