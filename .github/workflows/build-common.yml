@@ -11,7 +11,7 @@ on:
 
 env:
   CORE_PROJECT_PATH: 'src/Hacked.Core/Hacked.Core.csproj'
-  SERVICES_PROJECT_PATH: "src/Hacked.Services/Hacked.Services.csproj"
+  SERVICES_PROJECT_PATH: 'src/Hacked.Services/Hacked.Services.csproj'
   NUGETCONFIG_PATH: "src/nuget.config"
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
       
     - name: NuGet Restore
       run: |
-        nuget restore ${{ env.SERVICES_PROJECT_PATH }} --configfile ${{ env.NUGETCONFIG_PATH }}
+        dotnet restore ${{ env.SERVICES_PROJECT_PATH }} --configfile ${{ env.NUGETCONFIG_PATH }}
       env:
           TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
           TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }} 

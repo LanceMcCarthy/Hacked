@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace Hacked.Core.Args
-{
-    public class AdRequestedArgs : EventArgs
-    {
-        public AdRequestedArgs(string placementId)
-        {
-            this.PlacementId = placementId;
-        }
+namespace Hacked.Core.Args;
 
-        public string PlacementId { get; set; }
+public class AdRequestedArgs : EventArgs
+{
+    public AdRequestedArgs(string placementId)
+    {
+        this.PlacementId = placementId;
     }
+
+    public string PlacementId { get; set; }
 }

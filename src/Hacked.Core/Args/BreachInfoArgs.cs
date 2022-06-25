@@ -1,10 +1,9 @@
-﻿using System;
-using Hacked.Core.Models;
+﻿using Hacked.Core.Models;
+using System;
 
-namespace Hacked.Core.Args
+namespace Hacked.Core.Args;
+
+public class BreachInfoArgs : EventArgs
 {
-    public class BreachInfoArgs : EventArgs
-    {
-        public Breach Breach { get; set; }
-    }
+    public Breach Breach { get; set; }
 }
