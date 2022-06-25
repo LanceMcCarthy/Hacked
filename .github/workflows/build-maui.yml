@@ -8,6 +8,12 @@ on:
       - 'src/Hacked.Maui/**/*'
       - '.github/workflows/build-maui.yml' 
 
+  pull_request:
+    branches:
+     - main
+     paths:
+     - 'src/Hacked.Maui/**/*'
+
   workflow_call:
     secrets:
       ANDROID_SIGNING_KEYSTORE_BASE64:
@@ -27,7 +33,7 @@ env:
   ANDROID_ARTIFACTS_PATH: "artifacts_android"
   WINDOWS_ARTIFACTS_PATH: "artifacts_windows"
   PROJECT_PATH: "src/Hacked.Maui/Hacked.maui.csproj"
-  NUGETCONFIG_PATH: "src/nuGet.config"
+  NUGETCONFIG_PATH: "src/nuget.config"
 
 jobs:
   windows-build-windows:
