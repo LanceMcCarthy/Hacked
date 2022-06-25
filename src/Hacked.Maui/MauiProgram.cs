@@ -49,28 +49,14 @@ namespace Hacked.Maui
                 {
                     wndLifeCycleBuilder.OnWindowCreated(window =>
                     {
-                        // OPTION 1 - Use PInvoke to get monitor's details and place it center
-                        // window.PlacementCenterWindowInMonitorWin32(); // see Platforms/Windows/WindowsHelpers.cs
-
-                        // Dimensions for options 2 and 3 (hard coded for a 1920x1080 display)
                         const int width = 1920;
                         const int height = 1080;
                         const int x = 3440 / 2 - width / 2;
                         const int y = 1440 / 2 - height / 2;
-
-
+                        
                         // OPTION 2 - You can use WinUIEx extension method (add the WinUIEx NuGet package)
                         window.MoveAndResize(x, y, width, height);
-
-
-                        // Option 3 - Get the AppWindow reference and call the window methods directly
-                        //AppWindow winuiAppWindow = window.GetAppWindowForWinUI(); // see Platforms/Windows/WindowsHelpers.cs
-                        //winuiAppWindow.MoveAndResize(new RectInt32(x, y, width, height));
-
-                        // Option 4 - Simplest
-                        //window.CenterOnScreen();
-
-
+                        
                         // *** For Mica or Acrylic support ** //
                         window.TryMicaOrAcrylic();
                     });

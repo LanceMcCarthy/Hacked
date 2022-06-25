@@ -2,8 +2,8 @@ using Hacked.Core.Models;
 using Hacked.Maui.Common;
 using Hacked.Maui.ViewModels;
 using Telerik.Maui.Controls;
-using Telerik.XamarinForms.DataControls;
-using Telerik.XamarinForms.DataControls.ListView;
+using Telerik.Maui.Controls.Compatibility.DataControls;
+using Telerik.Maui.Controls.Compatibility.DataControls.ListView;
 
 namespace Hacked.Maui.Views;
 
@@ -95,7 +95,7 @@ public partial class MonitoredAccountsPage : ContentPage
         if (string.IsNullOrEmpty(emailAddress))
             return;
 
-        var addedAccount = await ViewModelLocator.MonitoredAccounts.AddAccount(emailAddress);
+        var addedAccount = await ViewModelLocator.MonitoredAccounts.AddAccountAsync(emailAddress);
 
         if (addedAccount == null)
         {
@@ -117,15 +117,16 @@ public partial class MonitoredAccountsPage : ContentPage
             if (!ViewModelLocator.MonitoredAccounts.HasAccounts)
                 return;
 
-            ViewModelLocator.MonitoredAccounts.FindAllAccountsBreachesAsync();
+            await ViewModelLocator.MonitoredAccounts.FindAllAccountsBreachesAsync();
 
             //if first time, hide tip and persist via settings
-            if (AccountRefreshTip.IsVisible)
-            {
-                await AccountRefreshTip.FadeTo(0, 500, Easing.CubicInOut);
-                AccountRefreshTip.IsVisible = false;
-                Settings.AccountRefreshShown = true;
-            }
+            //if (AccountRefreshTip.IsVisible)
+            //{
+            //    await AccountRefreshTip.FadeTo(0, 500, Easing.CubicInOut);
+
+            //    AccountRefreshTip.IsVisible = false;
+            //    Settings.AccountRefreshShown = true;
+            //}
         }
         finally
         {
@@ -143,7 +144,7 @@ public partial class MonitoredAccountsPage : ContentPage
         {
             var lastCount = account.Breaches.Count;
 
-            ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
+            await ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
 
             if (account.Breaches.Count > lastCount)
             {
@@ -154,7 +155,7 @@ public partial class MonitoredAccountsPage : ContentPage
         }
         else if (e.Offset < -200)
         {
-            ViewModelLocator.MonitoredAccounts.RemoveAccount(account);
+            await ViewModelLocator.MonitoredAccounts.RemoveAccountAsync(account);
         }
 
         if (sender is RadListView rlv)
@@ -170,33 +171,31 @@ public partial class MonitoredAccountsPage : ContentPage
         {
             ViewModelLocator.MonitoredAccounts.SelectedAccount = account;
 
-            // todo navigation https://docs.microsoft.com/en-us/xamarin/xamarin-forms/app-fundamentals/shell/navigation#absolute-routes
-            //await ((Application.Current.MainPage as RootPage)?.Detail as NavigationPage)?.Navigation.PushAsync(new AccountDetailsPage());
             await Shell.Current.GoToAsync("accountdetails");
         }
     }
 
-    private async void RefreshTipCheckBox_OnIsCheckedChanged(object sender, CheckedChangedEventArgs e)
-    {
-        if (e.Value == false)
-        {
-            await AccountRefreshTip.FadeTo(0, 300, Easing.CubicInOut);
-            AccountRefreshTip.IsVisible = false;
-            Settings.AccountRefreshShown = true;
+    //private async void RefreshTipCheckBox_OnIsCheckedChanged(object sender, CheckedChangedEventArgs e)
+    //{
+    //    if (e.Value == false)
+    //    {
+    //        await AccountRefreshTip.FadeTo(0, 300, Easing.CubicInOut);
+    //        AccountRefreshTip.IsVisible = false;
+    //        Settings.AccountRefreshShown = true;
 
-            await SwipeTip.FadeTo(0, 300, Easing.CubicInOut);
-            SwipeTip.IsVisible = false;
-            Settings.SwipeTipShown = true;
-        }
-        else if (e.Value == true)
-        {
-            await AccountRefreshTip.FadeTo(1, 300, Easing.CubicInOut);
-            AccountRefreshTip.IsVisible = true;
-            Settings.AccountRefreshShown = false;
+    //        await SwipeTip.FadeTo(0, 300, Easing.CubicInOut);
+    //        SwipeTip.IsVisible = false;
+    //        Settings.SwipeTipShown = true;
+    //    }
+    //    else if (e.Value == true)
+    //    {
+    //        await AccountRefreshTip.FadeTo(1, 300, Easing.CubicInOut);
+    //        AccountRefreshTip.IsVisible = true;
+    //        Settings.AccountRefreshShown = false;
 
-            await SwipeTip.FadeTo(1, 300, Easing.CubicInOut);
-            SwipeTip.IsVisible = true;
-            Settings.SwipeTipShown = false;
-        }
-    }
+    //        await SwipeTip.FadeTo(1, 300, Easing.CubicInOut);
+    //        SwipeTip.IsVisible = true;
+    //        Settings.SwipeTipShown = false;
+    //    }
+    //}
 }
