@@ -1,11 +1,10 @@
-﻿namespace Hacked.Core.Models
+﻿namespace Hacked.Core.Models;
+
+public enum KudoCategory
 {
-    public enum KudoCategory
-    {
-        Free,
-        Durable,
-        Consumable,
-        Subscription,
-        Other
-    }
+    Free,
+    Durable,
+    Consumable,
+    Subscription,
+    Other
 }

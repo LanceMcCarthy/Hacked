@@ -1,25 +1,24 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
-namespace Hacked.Core.Models
+namespace Hacked.Core.Models;
+
+public class Paste
 {
-    public class Paste
-    {
-        [JsonProperty("Source")]
-        public string Source { get; set; }
+    [JsonProperty("Source")]
+    public string Source { get; set; }
 
-        [JsonProperty("Id")]
-        public string Id { get; set; }
+    [JsonProperty("Id")]
+    public string Id { get; set; }
 
-        [JsonProperty("Title", NullValueHandling = NullValueHandling.Ignore)]
-        public string Title { get; set; }
+    [JsonProperty("Title", NullValueHandling = NullValueHandling.Ignore)]
+    public string Title { get; set; }
 
-        [JsonProperty("Date")]
-        public DateTimeOffset Date { get; set; }
+    [JsonProperty("Date")]
+    public DateTimeOffset Date { get; set; }
 
-        [JsonProperty("EmailCount")]
-        public long EmailCount { get; set; }
-    }
+    [JsonProperty("EmailCount")]
+    public long EmailCount { get; set; }
 }
 
 /*
