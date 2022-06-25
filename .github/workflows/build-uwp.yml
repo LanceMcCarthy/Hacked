@@ -42,7 +42,7 @@ jobs:
         msbuild-architecture: x64
       
     - name: NuGet Restore UWP Project
-      run: nuget restore ${{ env.PROJECT_PATH }} -ConfigFile ${{ env.NUGETCONFIG_PATH }}
+      run: nuget restore ${{ env.SOLUTION_PATH }} -ConfigFile ${{ env.NUGETCONFIG_PATH }}
       env:
         TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
         TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }}  
