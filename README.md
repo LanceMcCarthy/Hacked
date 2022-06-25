@@ -14,6 +14,7 @@ An application so you can be notified of any data breaches that included your pe
 | Branch | Status |
 |--------|--------|
 | `main` | [![Build .NET MAUI](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml) |
+| `main` | [![Build UWP](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-uwp.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-uwp.yml) |
 
 ### Azure DevOps Build Pipeline
 
