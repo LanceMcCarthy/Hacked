@@ -1,85 +1,84 @@
-﻿using System.Threading.Tasks;
-using Hacked.ViewModels;
+﻿using Hacked.ViewModels;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
-namespace Hacked.Controls
+namespace Hacked.Controls;
+
+public sealed partial class AddAccount : UserControl
 {
-    public sealed partial class AddAccount : UserControl
+    private string enteredText;
+
+    public AddAccount()
     {
-        private string enteredText;
+        InitializeComponent();
 
-        public AddAccount()
+        if (!DesignMode.DesignModeEnabled)
         {
-            InitializeComponent();
-
-            if(!DesignMode.DesignModeEnabled)
-            {
-                CoreWindow.GetForCurrentThread().KeyDown += AddAccount_KeyDown;
-            }
+            CoreWindow.GetForCurrentThread().KeyDown += AddAccount_KeyDown;
         }
+    }
 
-        public async Task FocusTextBoxAsync(FocusState state)
-        {
-            await Task.Delay(300);
-            EmailInput.Focus(state);
-        }
+    public async Task FocusTextBoxAsync(FocusState state)
+    {
+        await Task.Delay(300);
+        EmailInput.Focus(state);
+    }
 
-        private void AddAccount_KeyDown(CoreWindow sender, KeyEventArgs args)
+    private void AddAccount_KeyDown(CoreWindow sender, KeyEventArgs args)
+    {
+        if (Visibility == Visibility.Visible)
         {
-            if (Visibility == Visibility.Visible)
+            if (args.VirtualKey == VirtualKey.Enter)
             {
-                if (args.VirtualKey == VirtualKey.Enter)
+                if (!string.IsNullOrEmpty(enteredText))
                 {
-                    if (!string.IsNullOrEmpty(enteredText))
-                    {
-                        AddMonitoredAccount();
-                    }
+                    AddMonitoredAccount();
                 }
             }
         }
+    }
 
-        private void CancelButton_OnClick(object sender, RoutedEventArgs e)
+    private void CancelButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        ResetAndHide();
+    }
+
+    private void OkayButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(enteredText))
         {
-            ResetAndHide();
+            AddMonitoredAccount();
         }
+    }
 
-        private void OkayButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (!string.IsNullOrEmpty(enteredText))
-            {
-                AddMonitoredAccount();
-            }
-        }
+    private void TxtChanged(object sender, TextChangedEventArgs e)
+    {
+        AddButton.IsEnabled = !string.IsNullOrEmpty(EmailInput.Text);
 
-        private void TxtChanged(object sender, TextChangedEventArgs e)
-        {
-            AddButton.IsEnabled = !string.IsNullOrEmpty(EmailInput.Text);
+        if (AddButton.IsEnabled)
+            enteredText = EmailInput.Text;
+    }
 
-            if (AddButton.IsEnabled)
-                enteredText = EmailInput.Text;
-        }
+    private async void AddMonitoredAccount()
+    {
+        if (string.IsNullOrEmpty(enteredText))
+            return;
 
-        private async void AddMonitoredAccount()
-        {
-            if (string.IsNullOrEmpty(enteredText))
-                return;
+        var addAccount = (DataContext as MainViewModel)?.AddAccount(enteredText);
 
-            var addAccount = (DataContext as MainViewModel)?.AddAccount(enteredText);
+        if (addAccount != null)
+            await addAccount;
 
-            if (addAccount != null)
-                await addAccount;
+        ResetAndHide();
+    }
 
-            ResetAndHide();
-        }
-
-        private void ResetAndHide()
-        {
-            EmailInput.Text = "";
-            Visibility = Visibility.Collapsed;
-        }
+    private void ResetAndHide()
+    {
+        EmailInput.Text = "";
+        Visibility = Visibility.Collapsed;
     }
 }
