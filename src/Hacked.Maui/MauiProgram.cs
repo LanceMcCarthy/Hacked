@@ -49,14 +49,17 @@ namespace Hacked.Maui
                 {
                     wndLifeCycleBuilder.OnWindowCreated(window =>
                     {
-                        const int width = 1920;
-                        const int height = 1080;
-                        const int x = 3440 / 2 - width / 2;
-                        const int y = 1440 / 2 - height / 2;
-                        
-                        // OPTION 2 - You can use WinUIEx extension method (add the WinUIEx NuGet package)
-                        window.MoveAndResize(x, y, width, height);
-                        
+                        //const int width = 1920;
+                        //const int height = 1080;
+                        //const int x = 3440 / 2 - width / 2;
+                        //const int y = 1440 / 2 - height / 2;
+                        //window.MoveAndResize(x, y, width, height);
+
+                        var manager = WinUIEx.WindowManager.Get(window);
+                        manager.PersistenceId = "MainWindowPersistanceId";
+                        manager.MinWidth = 640;
+                        manager.MinHeight = 480;
+
                         // *** For Mica or Acrylic support ** //
                         window.TryMicaOrAcrylic();
                     });
