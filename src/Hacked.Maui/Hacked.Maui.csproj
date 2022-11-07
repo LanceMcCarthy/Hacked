@@ -61,11 +61,11 @@
 
     <ItemGroup>
         <PackageReference Include="CommonHelpers" Version="1.2.0" />
-        <PackageReference Include="Telerik.UI.for.Maui" Version="2.3.0" />
+        <PackageReference Include="Telerik.UI.for.Maui" Version="3.2.1" />
     </ItemGroup>
 
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.5"  />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.1.5" />
 		<PackageReference Include="WinUIEx" Version="1.8.0" />
 	</ItemGroup>
 
@@ -74,13 +74,7 @@
       <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <MauiXaml Update="Controls\BreachItemView.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </MauiXaml>
-    </ItemGroup>
-
-    <!-- ******** PUBLISHING Android ********
+	<!-- ******** PUBLISHING Android ********
     dotnet publish -f:net6.0-android -c:Release
     I can replace some or all of the XML defined items with CLI params 
     /p:AndroidKeyStore=True
