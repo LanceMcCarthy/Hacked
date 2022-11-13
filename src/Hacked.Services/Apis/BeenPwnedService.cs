@@ -1,10 +1,11 @@
 ﻿using Hacked.Core.Common;
+using Hacked.Core.Extensions;
 using Hacked.Core.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -12,16 +13,22 @@ namespace Hacked.Services.Apis;
 
 public class BeenPwnedService : IDisposable
 {
-    private HttpClient client;
-    private readonly HttpClientHandler handler;
-    private DateTime lastCalled;
+    private readonly HttpClient client;
 
     public BeenPwnedService(HttpClientHandler handler = null)
     {
-        if (handler != null)
-            this.handler = handler;
+        if (handler == null)
+        {
+            handler = new HttpClientHandler();
 
-        ValidateClient();
+            if (handler.SupportsAutomaticDecompression)
+                handler.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
+        }
+
+        client = new HttpClient(handler);
+        client.BaseAddress = new Uri(HibpConstants.HibpApiBaseAddress);
+        client?.DefaultRequestHeaders.Add(HibpConstants.HibpUserAgentKey, HibpConstants.HibpUserAgentValue);
+        client?.DefaultRequestHeaders.Add(HibpConstants.HibpApiHeaderKey, Secrets.HibpApiKey);
     }
 
     /// <summary>
@@ -33,36 +40,53 @@ public class BeenPwnedService : IDisposable
     /// <returns>A collection of breaches</returns>
     public async Task<ObservableCollection<Breach>> CheckForBreachesAsync(MonitoredAccount account, bool truncateResponse = false)
     {
-        ValidateClient();
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"{HibpConstants.ApiRoute_BreachedAccount}/{account.Address}?truncateResponse={truncateResponse}");
 
-        await ValidateRequestDelayAsync();
+        var retryCount = 0;
 
-        using (var request = new HttpRequestMessage(HttpMethod.Get, $"breachedaccount/{account.Address}?truncateResponse={truncateResponse}"))
+        while (true)
         {
-            using (var response = await client.SendAsync(request))
+            if (retryCount > 50)
             {
-                if (response.IsSuccessStatusCode)
-                {
-                    Debug.WriteLine("Check for breaches - request made");
+                throw new Exception("[CheckForBreachesAsync] Too many retry attempts, please wait a few minutes and try again.");
+            }
 
-                    lastCalled = DateTime.UtcNow;
+            using var response = await client.SendAsync(request);
 
+            switch (response.StatusCode)
+            {
+                //200 = (GOOD response type, list of breaches available in body)
+                case HttpStatusCode.OK:
                     var json = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
+                //400
+                case HttpStatusCode.BadRequest:
+                    throw new PwnedApiException("Bad request — the account does not comply with an acceptable format (i.e. it's an empty string)") { StatusCode = response.StatusCode };
+                //401
+                case HttpStatusCode.Unauthorized:
+                    throw new PwnedApiException("Unauthorized — either no API key was provided or it wasn't valid") { StatusCode = response.StatusCode };
+                //403
+                case HttpStatusCode.Forbidden:
+                    throw new PwnedApiException("Forbidden — no user agent has been specified in the request") { StatusCode = response.StatusCode };
+                //404 = (GOOD response type, no breaches for the submitted account)
+                case HttpStatusCode.NotFound:
+                    throw new PwnedApiException("No Breaches") { StatusCode = response.StatusCode };
+                //503 = returned by Cloudflare if the API service is broken, or if Cloudflare is forcing an access confirmation for the client's IP
+                case HttpStatusCode.ServiceUnavailable:
+                    throw new PwnedApiException("Cloudflare unavailable, API service unreachable.") { StatusCode = response.StatusCode };
+                case HttpStatusCode.InternalServerError:
+                    throw new PwnedApiException("Unknown server error, not on the HIBP expected responses list.") { StatusCode = response.StatusCode };
+                default:
+                    {
+                        if (response.StatusCode.ToString() == "429")
+                        {
+                            // Elegant back-off using the response's recommended retry delay
+                            await response.Headers.RetryAfter.ApplyRetryDelayAsync();
+                            retryCount++;
+                        }
 
-                    Debug.WriteLine($"Check for breaches - json:\r\n\n{json}\r\n\n");
-
-                    var result = JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
-
-                    account.LastUpdated = DateTime.Now;
-
-                    Debug.WriteLine($"Check for breaches - JSON.NET result:\r\n\n{result}\r\n\n");
-
-                    return result;
-                }
-                else
-                {
-                    throw new PwnedApiException("HttpException Calling API Service") { StatusCode = response.StatusCode };
-                }
+                        break;
+                    }
             }
         }
     }
@@ -74,18 +98,55 @@ public class BeenPwnedService : IDisposable
     /// <returns>A collection of breaches</returns>
     public async Task<ObservableCollection<Breach>> GetAllKnownBreachesAsync(bool truncateResponse = false)
     {
-        ValidateClient();
-        await ValidateRequestDelayAsync();
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"{HibpConstants.ApiRoute_Breaches}?truncateResponse={truncateResponse}");
 
-        using (var request = new HttpRequestMessage(HttpMethod.Get, $"breaches?truncateResponse={truncateResponse}"))
-        using (var response = await client.SendAsync(request))
+        var retryCount = 0;
+
+        while (true)
         {
-            lastCalled = DateTime.UtcNow;
+            if (retryCount > 50)
+            {
+                throw new Exception("[GetAllKnownBreachesAsync] Too many retry attempts, please wait a few minutes and try again.");
+            }
 
-            var json = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
+            using var response = await client.SendAsync(request);
 
-            return result;
+            switch (response.StatusCode)
+            {
+                //200 = (GOOD response type, list of breaches available in body)
+                case HttpStatusCode.OK:
+                    var json = await response.Content.ReadAsStringAsync();
+
+                    return JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
+                //400
+                case HttpStatusCode.BadRequest:
+                    throw new PwnedApiException("Bad request — the account does not comply with an acceptable format (i.e. it's an empty string)") { StatusCode = response.StatusCode };
+                //401
+                case HttpStatusCode.Unauthorized:
+                    throw new PwnedApiException("Unauthorized — either no API key was provided or it wasn't valid") { StatusCode = response.StatusCode };
+                //403
+                case HttpStatusCode.Forbidden:
+                    throw new PwnedApiException("Forbidden — no user agent has been specified in the request") { StatusCode = response.StatusCode };
+                //404 = (GOOD response type, no breaches for the submitted account)
+                case HttpStatusCode.NotFound:
+                    throw new PwnedApiException("No Breaches") { StatusCode = response.StatusCode };
+                //503 = returned by Cloudflare if the API service is broken, or if Cloudflare is forcing an access confirmation for the client's IP
+                case HttpStatusCode.ServiceUnavailable:
+                    throw new PwnedApiException("Cloudflare unavailable, API service unreachable.") { StatusCode = response.StatusCode };
+                case HttpStatusCode.InternalServerError:
+                    throw new PwnedApiException("Unknown server error, not on the HIBP expected responses list.") { StatusCode = response.StatusCode };
+                default:
+                    {
+                        if (response.StatusCode.ToString() == "429")
+                        {
+                            // Elegant back-off using the response's recommended retry delay
+                            await response.Headers.RetryAfter.ApplyRetryDelayAsync();
+                            retryCount++;
+                        }
+
+                        break;
+                    }
+            }
         }
     }
 
@@ -97,21 +158,56 @@ public class BeenPwnedService : IDisposable
     /// <returns>an array of classes</returns>
     public async Task<List<string>> GetAllKnownDataClassesAsync()
     {
-        ValidateClient();
-        await ValidateRequestDelayAsync();
+        using var request = new HttpRequestMessage(HttpMethod.Get, HibpConstants.ApiRoute_DataClasses);
 
-        using (var request = new HttpRequestMessage(HttpMethod.Get, "dataclasses"))
-        using (var response = await client.SendAsync(request))
+        var retryCount = 0;
+
+        while (true)
         {
-            lastCalled = DateTime.UtcNow;
+            if (retryCount > 50)
+            {
+                throw new Exception("[GetAllKnownDataClasses] Too many retry attempts, please wait a few minutes and try again.");
+            }
 
-            var json = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<List<string>>(json);
+            using var response = await client.SendAsync(request);
 
-            //Needed to align with HIBP new policy of 1.5 seconds between calls
-            await Task.Delay(TimeSpan.FromMilliseconds(1500));
+            switch (response.StatusCode)
+            {
+                //200 = (GOOD response type, list of breaches available in body)
+                case HttpStatusCode.OK:
+                    // Getting DataClasses is a fast, but frequent operation. Make sure we're not intentionally overpowering the API (10 RPS)
+                    await Task.Delay(TimeSpan.FromMilliseconds(500));
+                    var json = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<List<string>>(json);
+                //400
+                case HttpStatusCode.BadRequest:
+                    throw new PwnedApiException("Bad request — the account does not comply with an acceptable format (i.e. it's an empty string)") { StatusCode = response.StatusCode };
+                //401
+                case HttpStatusCode.Unauthorized:
+                    throw new PwnedApiException("Unauthorized — either no API key was provided or it wasn't valid") { StatusCode = response.StatusCode };
+                //403
+                case HttpStatusCode.Forbidden:
+                    throw new PwnedApiException("Forbidden — no user agent has been specified in the request") { StatusCode = response.StatusCode };
+                //404 = (GOOD response type, no breaches for the submitted account)
+                case HttpStatusCode.NotFound:
+                    throw new PwnedApiException("No DataClasses Found") { StatusCode = response.StatusCode };
+                //503 = returned by Cloudflare if the API service is broken, or if Cloudflare is forcing an access confirmation for the client's IP
+                case HttpStatusCode.ServiceUnavailable:
+                    throw new PwnedApiException("Cloudflare unavailable, API service unreachable.") { StatusCode = response.StatusCode };
+                case HttpStatusCode.InternalServerError:
+                    throw new PwnedApiException("Unknown server error, not on the HIBP expected responses list.") { StatusCode = response.StatusCode };
+                default:
+                    {
+                        if (response.StatusCode.ToString() == "429")
+                        {
+                            // Elegant back-off using the response's recommended retry delay
+                            await response.Headers.RetryAfter.ApplyRetryDelayAsync();
+                            retryCount++;
+                        }
 
-            return result;
+                        break;
+                    }
+            }
         }
     }
 
@@ -120,56 +216,60 @@ public class BeenPwnedService : IDisposable
     /// Unlike searching for breaches, usernames that are not email addresses cannot be searched for. 
     /// The email is not case sensitive and will be trimmed of leading or trailing white spaces. The email should always be URL encoded.
     /// </summary>
-    /// <param name="emailaddress">Email address, should always be URL encoded</param>
+    /// <param name="emailAddress">Email address, should always be URL encoded</param>
     /// <param name="truncateResponse">Determine whether only the name of the breach is returned rather than the complete breach data</param>
     /// <returns>A collection of breaches</returns>
     public async Task<ObservableCollection<Breach>> GetPastesAsync(string emailAddress, bool truncateResponse = false)
     {
-        ValidateClient();
-        await ValidateRequestDelayAsync();
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"{HibpConstants.ApiRoute_BreachedAccount}/{emailAddress}?truncateResponse={truncateResponse}");
 
-        using (var request = new HttpRequestMessage(HttpMethod.Get, $"breachedaccount/{emailAddress}?truncateResponse={truncateResponse}"))
-        using (var response = await client.SendAsync(request))
+        var retryCount = 0;
+
+        while (true)
         {
-            lastCalled = DateTime.UtcNow;
+            if (retryCount > 50)
+            {
+                throw new Exception("[GetPastesAsync] Too many retry attempts, please wait a few minutes and try again.");
+            }
 
-            var json = await response.Content.ReadAsStringAsync();
-            var result = JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
+            using var response = await client.SendAsync(request);
 
-            return result;
-        }
-    }
+            switch (response.StatusCode)
+            {
+                //200 = (GOOD response type, list of breaches available in body)
+                case HttpStatusCode.OK:
+                    var json = await response.Content.ReadAsStringAsync();
 
-    private void ValidateClient()
-    {
-        if (client != null)
-            return;
+                    return JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
+                //400
+                case HttpStatusCode.BadRequest:
+                    throw new PwnedApiException("Bad request — the account does not comply with an acceptable format (i.e. it's an empty string)") { StatusCode = response.StatusCode };
+                //401
+                case HttpStatusCode.Unauthorized:
+                    throw new PwnedApiException("Unauthorized — either no API key was provided or it wasn't valid") { StatusCode = response.StatusCode };
+                //403
+                case HttpStatusCode.Forbidden:
+                    throw new PwnedApiException("Forbidden — no user agent has been specified in the request") { StatusCode = response.StatusCode };
+                //404 = (GOOD response type, no breaches for the submitted account)
+                case HttpStatusCode.NotFound:
+                    throw new PwnedApiException("No Pastes") { StatusCode = response.StatusCode };
+                //503 = returned by Cloudflare if the API service is broken, or if Cloudflare is forcing an access confirmation for the client's IP
+                case HttpStatusCode.ServiceUnavailable:
+                    throw new PwnedApiException("Cloudflare unavailable, API service unreachable.") { StatusCode = response.StatusCode };
+                case HttpStatusCode.InternalServerError:
+                    throw new PwnedApiException("Unknown server error, not on the HIBP expected responses list.") { StatusCode = response.StatusCode };
+                default:
+                    {
+                        if (response.StatusCode.ToString() == "429")
+                        {
+                            // Elegant back-off using the response's recommended retry delay
+                            await response.Headers.RetryAfter.ApplyRetryDelayAsync();
+                            retryCount++;
+                        }
 
-        // If we're passed a handler, use it to instantiate the client. Otherwise, don't use one.
-        client = handler != null ? new HttpClient(handler) : new HttpClient();
-
-        client.BaseAddress = new Uri("https://haveibeenpwned.com/api/v3/");
-        client?.DefaultRequestHeaders.Add("User-Agent", "Hacked-for-Windows-Universal");
-        client?.DefaultRequestHeaders.Add("hibp-api-key", Secrets.HibpApiKey);
-    }
-
-    /// <summary>
-    /// This method determines if the next call to HIBP needs to be delayed
-    /// Logic - If less than 1500ms has elapsed, delay the call until 1500ms has elapsed
-    /// </summary>
-    /// <returns></returns>
-    private async Task ValidateRequestDelayAsync()
-    {
-        var timeElapsedSinceLastCall = DateTime.UtcNow - lastCalled;
-        Debug.WriteLine($"BeenPwndService - timeElapsedSinceLastCall: {timeElapsedSinceLastCall}");
-
-        if (timeElapsedSinceLastCall < TimeSpan.FromMilliseconds(1500))
-        {
-            var timeNeededToWait = TimeSpan.FromMilliseconds(1500) - timeElapsedSinceLastCall;
-            Debug.WriteLine($"BeenPwndService - timeNeededToWait: {timeNeededToWait}");
-
-            // Delay the call until 1.5 seconds has elapsed
-            await Task.Delay(timeNeededToWait);
+                        break;
+                    }
+            }
         }
     }
 
