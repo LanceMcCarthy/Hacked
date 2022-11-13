@@ -36,7 +36,7 @@ public class MainViewModel : ViewModelBase
     private readonly ApplicationDataContainer roamingSettings;
     private readonly StorageFolder localFolder;
 
-    private BeenPwnedService apiService;
+    private readonly BeenPwnedService apiService;
     private bool hasAccounts;
     private bool areAccountsLoaded;
     private bool areAdsRemoved;
@@ -63,12 +63,14 @@ public class MainViewModel : ViewModelBase
             SelectedBreach = SelectedAccount?.Breaches?.FirstOrDefault();
             HasAccounts = true;
             AreAdsRemoved = true;
-            AppVersion = "1.0.2";
+            AppVersion = "2.0.0";
             return;
         }
 
         roamingSettings = ApplicationData.Current.RoamingSettings;
         localFolder = ApplicationData.Current.LocalFolder;
+        
+        apiService = new BeenPwnedService();
     }
 
     #region Properties
@@ -207,9 +209,7 @@ public class MainViewModel : ViewModelBase
 
         isAppInitialized = true;
     }
-
-    //network calls
-
+    
     public async Task<ObservableCollection<Breach>> CheckForBreachesAsync(MonitoredAccount account, bool showSuccessMessage = true)
     {
         IsBusy = true;
@@ -220,25 +220,26 @@ public class MainViewModel : ViewModelBase
 
         try
         {
-            apiService ??= new BeenPwnedService();
-
             result = await apiService.CheckForBreachesAsync(account);
         }
         catch (PwnedApiException ex)
         {
-            if (ex.StatusCode == HttpStatusCode.NotFound && showSuccessMessage)
+            switch (ex.StatusCode)
             {
-                await new MessageDialog($"The breaches database has returned 'no results' for this account.", "Good news!").ShowAsync();
-            }
-            else if (ex.StatusCode == HttpStatusCode.Forbidden)
-            {
-                if (ApiInformation.IsTypePresent("Microsoft.Services.Store.Engagement.StoreServicesCustomEventLogger"))
+                case HttpStatusCode.NotFound when showSuccessMessage:
+                    await new MessageDialog($"The breaches database has returned 'no results' for this account.", "Good news!").ShowAsync();
+                    break;
+                case HttpStatusCode.Forbidden:
                 {
-                    StoreServicesCustomEventLogger.GetDefault().Log("HIBP API Forbidden");
-                }
+                    if (ApiInformation.IsTypePresent("Microsoft.Services.Store.Engagement.StoreServicesCustomEventLogger"))
+                    {
+                        StoreServicesCustomEventLogger.GetDefault().Log("HIBP API Forbidden");
+                    }
 
-                // The result was a 403 or 404
-                DisplayMessageHelpers.ShowExceptionMessageOnUiThread("CheckForBreachesAsync", ex);
+                    // The result was a 403 or 404
+                    DisplayMessageHelpers.ShowExceptionMessageOnUiThread("CheckForBreachesAsync", ex);
+                    break;
+                }
             }
         }
         catch (Exception ex)
@@ -279,14 +280,15 @@ public class MainViewModel : ViewModelBase
             IsBusy = true;
 
             var account = new MonitoredAccount { Address = address };
-
+            
             account.Breaches = await CheckForBreachesAsync(account);
+
             account.LastUpdated = DateTime.Now;
 
             //NOTE we still want to add to monitored accounts even if no results at first
             Accounts.Add(account);
 
-            // Just for analytics, see what users need the most help with
+            // Just for analytic, see what users need the most help with
             var accountType = "";
 
             try
