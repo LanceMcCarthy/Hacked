@@ -404,8 +404,7 @@
                                             Command="{Binding DataContext.RemoveAccountCommand, ElementName=Page}"
                                             CommandParameter="{Binding}"
                                             IsEnabled="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}">
-                                        <SymbolIcon Foreground="White"
-                                                    Symbol="Delete" />
+                                        <SymbolIcon Symbol="Delete" />
                                     </Button>
                                 </Grid>
                             </DataTemplate>
@@ -703,8 +702,14 @@
                                        TextWrapping="Wrap" />
                             <TextBlock HorizontalAlignment="Center"
                                        Foreground="White"
-                                       Text="To add an account, open the pane and select 'add account'."
+                                       Text="Add your first account to keep an eye on."
+                                       Margin="10,0"
                                        TextWrapping="Wrap" />
+                            <Button Margin="10"
+                                    HorizontalAlignment="Stretch"
+                                    Click="AddAccountButton_Click"
+                                    Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"
+                                    Content="add first account"/>
                         </StackPanel>
                     </Grid>
 
@@ -713,6 +718,7 @@
                         <tkControls:AdaptiveGridView x:Name="BreachesListView"
                                                      ItemsSource="{Binding SelectedAccount.Breaches}"
                                                      ItemTemplate="{StaticResource BreachesSquareItemTemplate}"
+                                                     Visibility="{Binding HasAccounts, Converter={StaticResource BoolToVisibilityConverter}}"
                                                      SelectionMode="None"
                                                      ItemHeight="250"
                                                      DesiredWidth="300">
@@ -778,11 +784,9 @@
                                                 Command="{x:Bind ViewModel.FindSelectedAccountBreachCommand}"
                                                 IsEnabled="{Binding SelectedAccount.IsUpdating, Converter={StaticResource InvertBoolConverter}}"
                                                 Visibility="{Binding SelectedAccount, Converter={StaticResource NullToVisibilityConverter}}"
-                                                Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
                                                 Margin="0,5,0,0">
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="Refresh Now"
-                                                           Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
                                                            FontWeight="SemiBold" />
                                             </StackPanel>
                                         </Button>
