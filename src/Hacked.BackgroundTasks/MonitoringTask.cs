@@ -22,7 +22,7 @@ public sealed class MonitoringTask : IBackgroundTask
         var deferral = taskInstance.GetDeferral();
 
         LogMessage($"BG-MONITORING-TASK: started: {DateTime.Now}");
-
+        
         var apiService = new BeenPwnedService();
 
         try
@@ -47,7 +47,7 @@ public sealed class MonitoringTask : IBackgroundTask
 
                     if (incomingBreachList != null && incomingBreachList.Count > 0)
                     {
-                        string alertText = "";
+                        var alertText = "";
 
                         //NOTE - remember, checking count value wont work because a count total can still be the same
 
@@ -86,7 +86,6 @@ public sealed class MonitoringTask : IBackgroundTask
                 catch (PwnedApiException ex)
                 {
                     LogMessage($"BG-MONITORING-TASK: PwnedApiException: {ex.StatusCode}");
-                    continue;
                 }
             }
 
