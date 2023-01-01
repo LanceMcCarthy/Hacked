@@ -322,7 +322,7 @@
       <Version>[2022.2.506.1]</Version>
     </PackageReference>
     <PackageReference Include="VungleSDK">
-      <Version>6.11.0</Version>
+      <Version>6.11.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />
