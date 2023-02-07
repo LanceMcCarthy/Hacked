@@ -122,7 +122,7 @@
                           Placement="Center"
                           OutsideBackgroundColor="#DDFFFFFF">
             <telerik:RadBorder CornerRadius="6"
-                               Padding="10">
+                               Padding="10" >
                 <!--BackgroundColor="{AppThemeBinding Light={StaticResource Dark}, Dark={StaticResource Primary}}"-->
 
                 <Grid>
