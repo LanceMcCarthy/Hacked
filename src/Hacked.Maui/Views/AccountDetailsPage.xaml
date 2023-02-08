@@ -49,7 +49,7 @@
                                        BorderLocation="All"/>
             </telerik:RadListView.ItemStyle>
             <telerik:RadListView.SelectedItemStyle>
-                <telerik:ListViewItemStyle BorderColor="{StaticResource Dark}"
+                <telerik:ListViewItemStyle BorderColor="{StaticResource Primary}"
                                        BackgroundColor="{StaticResource Primary}"
                                        BorderWidth="1"
                                        BorderLocation="All" />
