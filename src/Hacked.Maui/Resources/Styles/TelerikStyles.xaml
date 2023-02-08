@@ -7,18 +7,6 @@
                     xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
                     xmlns:res="clr-namespace:Hacked.Maui.Resources">
 
-    <!-- Use colors in Styles.xaml instead of here
-    <Color x:Key="ThemeBackgroundColor">#f2fffd</Color>
-    <Color x:Key="ThemeTextLightColor">#a5a6a6</Color>
-    <Color x:Key="ThemeTextColor">#6d6d6d</Color>
-    <Color x:Key="ThemeTextDarkColor">#2b2b2b</Color>
-    <Color x:Key="ThemeAccentBrightColor">#13d2e4</Color>
-    <Color x:Key="ThemeAccentLightColor">#009acd</Color>
-    <Color x:Key="ThemeAccentColor">#005dac</Color>
-    <Color x:Key="ThemeAccentDarkColor">#002d87</Color>-->
-    <Color x:Key="LightTranslucent">#99FFFFFF</Color>
-    <Color x:Key="DarkTranslucent">#AA000000</Color>
-
     <!-- Telerik icon font - list here - https://docs.telerik.com/devtools/xamarin/styling-and-appearance/telerik-font-icons -->
     <x:String x:Key="StarIcon">&#xE805;</x:String>
     <x:String x:Key="MenuIcon">&#xE808;</x:String>
@@ -78,7 +66,7 @@
     <DataTemplate x:Key="MonitoredAccountTelerikItemTemplate"
                   x:DataType="models:MonitoredAccount">
         <telerik:ListViewTemplateCell>
-            <Grid Background="{AppThemeBinding Light={StaticResource LightGray}, Dark={StaticResource DarkGray}}"
+            <Grid Background="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray600}}"
                   Padding="10">
                 <VerticalStackLayout>
                     <Label Text="{Binding Address}"
@@ -135,9 +123,9 @@
                     <VisualState x:Name="Disabled">
                         <VisualState.Setters>
                             <Setter Property="TextColor"
-                                    Value="{AppThemeBinding Light={StaticResource DarkGray}, Dark={StaticResource LightGray}}" />
+                                    Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray100}}" />
                             <Setter Property="BackgroundColor"
-                                    Value="{AppThemeBinding Light={StaticResource LightGray}, Dark={StaticResource DarkGray}}" />
+                                    Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray600}}" />
                         </VisualState.Setters>
                     </VisualState>
                 </VisualStateGroup>
@@ -195,9 +183,9 @@
                     <VisualState x:Name="Disabled">
                         <VisualState.Setters>
                             <Setter Property="TextColor"
-                                    Value="{AppThemeBinding Light={StaticResource DarkGray}, Dark={StaticResource LightGray}}" />
+                                    Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray100}}" />
                             <Setter Property="BackgroundColor"
-                                    Value="{AppThemeBinding Light={StaticResource LightGray}, Dark={StaticResource DarkGray}}" />
+                                    Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray600}}" />
                         </VisualState.Setters>
                     </VisualState>
                 </VisualStateGroup>
@@ -239,15 +227,15 @@
     <!-- Instance Styles (being replaced by custom ItemTemplate
 
     <telerik:ListViewItemStyle x:Key="ThemeAwareItemStyle"
-                          BackgroundColor="{AppThemeBinding Light={StaticResource LightGray}, Dark={StaticResource DarkGray}}"
-                          TextCellTextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Light}}"
-                          BorderColor="{AppThemeBinding Light={StaticResource Dark}, Dark={StaticResource Primary}}"
+                          BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray600}}"
+                          TextCellTextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Secondary}}"
+                          BorderColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
                           BorderWidth="2"
                           BorderLocation="All" />
 
     <telerik:ListViewItemStyle x:Key="NormalItemStyle"
-                          BackgroundColor="{StaticResource LightGray}"
-                          TextCellTextColor="{StaticResource MidGray}"
+                          BackgroundColor="{StaticResource Gray100}"
+                          TextCellTextColor="{StaticResource Gray400}"
                           BorderColor="{StaticResource Primary}"
                           BorderWidth="2"
                           BorderLocation="All"/>

@@ -117,7 +117,7 @@
                            IsVisible="False"
                            CornerRadius="6"
                            Padding="10">
-            <!--BackgroundColor="{AppThemeBinding Light={StaticResource Dark}, Dark={StaticResource Primary}}"-->
+            <!--BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"-->
 
             <Grid>
                 <VerticalStackLayout Margin="20"
@@ -132,7 +132,7 @@
                                       Placeholder="enter email address or username"
                                       TextChanged="EmailEntry_OnTextChanged"
                                       WidthRequest="700" />
-                    <!--PlaceholderColor="{AppThemeBinding Light={StaticResource Dark}, Dark={StaticResource Primary}}"
+                    <!--PlaceholderColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
                         TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
                         BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"-->
 
@@ -220,7 +220,7 @@
 
                                             <telerik:RadBorder IsVisible="{Binding IsUpdating}"
                                                                InputTransparent="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}"
-                                                               BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}">
+                                                               BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource PrimaryTranslucent}}">
                                                 <Label Text="Refreshing..."
                                                        HorizontalOptions="Center"
                                                        VerticalOptions="Center" />
@@ -303,7 +303,7 @@
                         <telerik:RadListView.ItemTemplate>
                             <DataTemplate x:DataType="models:MonitoredAccount">
                                 <telerik:ListViewTemplateCell>
-                                    <Grid Background="{AppThemeBinding Light={StaticResource LightGray}, Dark={StaticResource DarkGray}}"
+                                    <Grid Background="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray600}}"
                                           Padding="10"
                                           ColumnDefinitions="*,Auto"
                                           RowDefinitions="Auto,Auto"
