@@ -5,33 +5,38 @@
        xmlns:local="clr-namespace:Hacked.Maui"
        xmlns:views="clr-namespace:Hacked.Maui.Views"
        xmlns:res="clr-namespace:Hacked.Maui.Resources"
+       xmlns:viewModels="using:Hacked.Maui.ViewModels"
        xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
        ios:Page.UseSafeArea="True"
        FlyoutWidth="50">
 
     <!-- FlyoutBehavior="{OnIdiom Phone=Disabled, Default=Locked}" -->
 
-    <!-- good reference: https://docs.microsoft.com/en-us/dotnet/maui/fundamentals/shell/flyout -->
+    <!-- good reference: https://docs.microsoft.com/en-us/dotnet/maui/fundamentals/shell/flyout 
+    -->
     <FlyoutItem x:Name="AccountsFlyoutItem"
                 Title="Accounts"
                 Icon="tab_home.png">
         <ShellContent Title="Accounts"
                       ContentTemplate="{DataTemplate views:MonitoredAccountsPage}"
-                      Route="accounts"/>
+                      x:DataType="viewModels:MonitoredAccountsViewModel"
+                      Route="MonitoredAccounts"/>
     </FlyoutItem>
     <FlyoutItem x:Name="SettingsFlyoutItem"
                 Route="settings"
                 Icon="tab_settings.png">
         <ShellContent Title="Settings"
                       ContentTemplate="{DataTemplate views:SettingsPage}"
-                      Route="settings" />
+                      x:DataType="viewModels:SettingsViewModel"
+                      Route="Settings" />
     </FlyoutItem>
     <FlyoutItem x:Name="AboutFlyoutItem"
                 Title="About"
                 Icon="tab_account.png">
         <ShellContent Title="About"
                       ContentTemplate="{DataTemplate views:AboutPage}"
-                      Route="about" />
+                      x:DataType="viewModels:AboutViewModel"
+                      Route="About" />
     </FlyoutItem>
 
 

@@ -8,8 +8,14 @@ namespace Hacked.Maui
         {
             InitializeComponent();
 
-            Routing.RegisterRoute("accounts/accountdetails", typeof(AccountDetailsPage));
-            //Routing.RegisterRoute("settings/about", typeof(AboutPage));
+            // Registered in XAML
+            //Routing.RegisterRoute("About", typeof(AboutPage));
+            //Routing.RegisterRoute("Settings", typeof(SettingsPage));
+            //Routing.RegisterRoute("MonitoredAccounts", typeof(MonitoredAccountsPage));
+            Routing.RegisterRoute("MonitoredAccounts/AccountDetails", typeof(AccountDetailsPage));
+            
+            // separate page in nav menu for now.
+            //Routing.RegisterRoute("Settings/About", typeof(AboutPage));
 
             //if (DeviceInfo.Idiom == DeviceIdiom.Phone || DeviceInfo.Idiom == DeviceIdiom.Tablet)
             //{

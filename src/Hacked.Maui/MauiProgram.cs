@@ -1,15 +1,11 @@
-﻿using Microsoft.Maui.LifecycleEvents;
+﻿using Hacked.Maui.ViewModels;
+using Hacked.Services.Apis;
+using Microsoft.Maui.LifecycleEvents;
 using Telerik.Maui.Controls.Compatibility;
+using Hacked.Services.Interfaces;
 
 #if WINDOWS10_0_17763_0_OR_GREATER
 using Hacked.Maui.Platforms.Windows;
-//using Windows.Graphics;
-//using Microsoft.UI.Composition;
-//using Microsoft.UI.Composition.SystemBackdrops;
-//using Microsoft.UI.Windowing;
-//using Microsoft.UI.Xaml;
-//using WinRT;
-using WinUIEx;
 
 #elif MACCATALYST
 using AppKit;
@@ -32,6 +28,7 @@ namespace Hacked.Maui
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .RegisterServices()
                 .UseTelerik()
                 .ConfigureFonts(fonts =>
                 {
@@ -81,9 +78,24 @@ namespace Hacked.Maui
                 });
 #endif
             });
-
-
+            
             return builder.Build();
+        }
+
+        public static MauiAppBuilder RegisterServices(this MauiAppBuilder mauiAppBuilder)
+        {
+            // App services
+            mauiAppBuilder.Services.AddSingleton<IPwndBreachService, BeenPwnedService>();
+            mauiAppBuilder.Services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
+
+            // View models
+            mauiAppBuilder.Services.AddSingleton<AboutViewModel>();
+            mauiAppBuilder.Services.AddSingleton<MonitoredAccountsViewModel>();
+            mauiAppBuilder.Services.AddSingleton<SettingsViewModel>();
+            
+            mauiAppBuilder.Services.AddTransient<SettingsViewModel>();
+
+            return mauiAppBuilder;
         }
     }
 }

@@ -4,7 +4,7 @@
              x:Class="Hacked.Maui.Views.AboutPage"
              xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
              xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
-             BindingContext="{x:Static vms:ViewModelLocator.About}"
+             x:DataType="vms:AboutViewModel"
              Title="About">
 
     <Grid>
