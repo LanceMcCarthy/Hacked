@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFrameworks>net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>
-        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net6.0-windows10.0.19041.0</TargetFrameworks>
+	<PropertyGroup>
+	    <TargetFrameworks>net6.0-android;net6.0-ios;net6.0-maccatalyst</TargetFrameworks>
+	    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net6.0-windows10.0.19041.0</TargetFrameworks>
+	    <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
+	    <!-- <TargetFrameworks>$(TargetFrameworks);net6.0-tizen</TargetFrameworks> -->
         <OutputType>Exe</OutputType>
         <RootNamespace>Hacked.Maui</RootNamespace>
         <UseMaui>true</UseMaui>
@@ -13,7 +14,8 @@
         <ApplicationTitle>Hacked?</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
+        <!-- moved ApplicationId to separate section below -->
+	    <!-- moved ApplicationIdGuid to separate section below -->
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -26,20 +28,6 @@
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
     </PropertyGroup>
-
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
-		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
-	</PropertyGroup>
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
-		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
-		<ProvisioningType>manual</ProvisioningType>
-		<CodesignKey>Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
-	</PropertyGroup>
-	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
-		<ApplicationId>com.lancelotsoftware.hacked</ApplicationId>
-		<ProvisioningType>manual</ProvisioningType>
-		<CodesignKey>Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
-	</PropertyGroup>
 	
 	<ItemGroup>
         <!-- App Icon -->
@@ -59,15 +47,41 @@
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
 
+	<!-- Workaround until maui 7.0.60 -->
+	<PropertyGroup>
+		<WindowsAppSdkDeploymentManagerInitialize>false</WindowsAppSdkDeploymentManagerInitialize>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
+		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
+		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
+	</PropertyGroup>
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
+		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
+		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
+	</PropertyGroup>
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
+		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
+		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
+		<ProvisioningType>manual</ProvisioningType>
+		<CodesignKey>Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
+	</PropertyGroup>
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<ApplicationId>com.lancelotsoftware.hacked</ApplicationId>
+		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
+		<ProvisioningType>manual</ProvisioningType>
+		<CodesignKey>Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
+	</PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="CommonHelpers" Version="1.2.0" />
-        <PackageReference Include="Telerik.UI.for.Maui" Version="5.0.0" />
+        <PackageReference Include="Telerik.UI.for.Maui" Version="5.0.1" />
     </ItemGroup>
 
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230118.102" />
-		<PackageReference Include="WinUIEx" Version="2.1.0" />
+		<!--<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230118.102" />-->
+		<PackageReference Include="WinUIEx" Version="1.8.0" />
 	</ItemGroup>
 
 	<ItemGroup>

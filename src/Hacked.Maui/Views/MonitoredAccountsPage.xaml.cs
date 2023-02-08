@@ -1,3 +1,5 @@
+#pragma warning disable CA1416
+
 using Hacked.Core.Models;
 using Hacked.Maui.Common;
 using Hacked.Maui.ViewModels;
@@ -9,9 +11,15 @@ namespace Hacked.Maui.Views;
 
 public partial class MonitoredAccountsPage : ContentPage
 {
-	public MonitoredAccountsPage()
+    public MonitoredAccountsPage()
+    {
+        InitializeComponent();
+    }
+
+    public MonitoredAccountsPage(MonitoredAccountsViewModel vm)
 	{
 		InitializeComponent();
+        this.BindingContext = vm;
     }
 
     //private async void AccountTapped(object? sender, ItemTapEventArgs e)
@@ -67,9 +75,16 @@ public partial class MonitoredAccountsPage : ContentPage
         }
     }
 
+    private void ToggleAddAccountOverlay(bool show = true)
+    {
+        //popup.IsOpen = show;
+        AddAccountOverlayBorder.IsVisible = show;
+    }
+
     private void AddAccountPopup_Clicked(object sender, EventArgs e)
     {
-        popup.IsOpen = true;
+        //popup.IsOpen = true;
+        ToggleAddAccountOverlay();
     }
 
     private async void AddAccount_OnClicked(object sender, EventArgs e)
@@ -94,30 +109,32 @@ public partial class MonitoredAccountsPage : ContentPage
     {
         if (string.IsNullOrEmpty(emailAddress))
             return;
-
-        var addedAccount = await ViewModelLocator.MonitoredAccounts.AddAccountAsync(emailAddress);
+        
+        var addedAccount = await (BindingContext as MonitoredAccountsViewModel).AddAccountAsync(emailAddress);
 
         if (addedAccount == null)
         {
             await Shell.Current.DisplayAlert("Error", "The account was not added, try again", "OK");
         }
 
-        popup.IsOpen = false;
+        //popup.IsOpen = false;
+        ToggleAddAccountOverlay(false);
     }
 
     private void CancelButton_OnClicked(object sender, EventArgs e)
     {
-        popup.IsOpen = false;
+        //popup.IsOpen = false;
+        ToggleAddAccountOverlay(false);
     }
 
     private async void AccountsListView_OnRefreshRequested(object sender, PullToRefreshRequestedEventArgs e)
     {
         try
         {
-            if (!ViewModelLocator.MonitoredAccounts.HasAccounts)
+            if (!(BindingContext as MonitoredAccountsViewModel).HasAccounts)
                 return;
 
-            await ViewModelLocator.MonitoredAccounts.FindAllAccountsBreachesAsync();
+            await (BindingContext as MonitoredAccountsViewModel).FindAllAccountsBreachesAsync();
 
             //if first time, hide tip and persist via settings
             //if (AccountRefreshTip.IsVisible)
@@ -144,18 +161,18 @@ public partial class MonitoredAccountsPage : ContentPage
         {
             var lastCount = account.Breaches.Count;
 
-            await ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
+            await (BindingContext as MonitoredAccountsViewModel).UpdateBreachesForAccountAsync(account);
 
             if (account.Breaches.Count > lastCount)
             {
-                ViewModelLocator.MonitoredAccounts.SaveAccounts();
+                (BindingContext as MonitoredAccountsViewModel).SaveAccounts();
 
                 await Shell.Current.DisplayAlert("New breaches have been detected", "Alert", "close");
             }
         }
         else if (e.Offset < -200)
         {
-            await ViewModelLocator.MonitoredAccounts.RemoveAccountAsync(account);
+            await (BindingContext as MonitoredAccountsViewModel).RemoveAccountAsync(account);
         }
 
         if (sender is RadListView rlv)
@@ -169,7 +186,7 @@ public partial class MonitoredAccountsPage : ContentPage
 
         if (e?.Item is MonitoredAccount account)
         {
-            ViewModelLocator.MonitoredAccounts.SelectedAccount = account;
+            (BindingContext as MonitoredAccountsViewModel).SelectedAccount = account;
 
             await Shell.Current.GoToAsync("accountdetails");
         }

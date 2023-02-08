@@ -1,5 +1,6 @@
 ﻿using Hacked.Core.Common;
 using Hacked.Core.Extensions;
+using Hacked.Services.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Hacked.Services.Apis;
 
-public class PwnedPasswordService : IDisposable
+public class PwnedPasswordService : IPwndPasswordService, IDisposable
 {
     private readonly HttpClient client;
 

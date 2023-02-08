@@ -3,6 +3,7 @@ using Hacked.Core.Models;
 using Hacked.Maui.Common.Commands;
 using Hacked.Maui.Common.Extensions;
 using Hacked.Services.Apis;
+using Hacked.Services.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -15,7 +16,8 @@ public class MonitoredAccountsViewModel : ViewModelBase
 {
     #region fields
 
-    private BeenPwnedService _apiService;
+    private IPwndBreachService _apiService;
+
     private ObservableCollection<MonitoredAccount> _accounts;
     private ObservableCollection<CategoricalChartData> _accountTotalsChartData;
     private Breach _selectedBreach;
@@ -26,8 +28,11 @@ public class MonitoredAccountsViewModel : ViewModelBase
 
     #endregion
     
-    public MonitoredAccountsViewModel()
+    public MonitoredAccountsViewModel(IPwndBreachService srv)
     {
+        //App.Current.Handler.MauiContext.Services.GetServices<IPwndBreachService>();
+        _apiService = srv;
+
         FindSelectedAccountBreachesCommand = new AsyncCommand(
             () => UpdateBreachesForAccountAsync(SelectedAccount), 
             () => SelectedAccount != null,
@@ -341,6 +346,8 @@ public class MonitoredAccountsViewModel : ViewModelBase
         try
         {
             _apiService ??= new BeenPwnedService();
+
+            
 
             var result = await _apiService.CheckForBreachesAsync(account);
 

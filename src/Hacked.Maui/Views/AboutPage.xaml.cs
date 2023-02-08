@@ -1,10 +1,18 @@
+using Hacked.Maui.ViewModels;
+
 namespace Hacked.Maui.Views;
 
 public partial class AboutPage : ContentPage
 {
-	public AboutPage()
+	//public AboutPage()
+	//{
+	//	InitializeComponent();
+    //}
+
+	public AboutPage(AboutViewModel vm)
 	{
 		InitializeComponent();
+        BindingContext = vm;
     }
 
     protected override void OnAppearing()

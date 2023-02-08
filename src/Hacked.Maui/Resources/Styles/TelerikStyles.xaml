@@ -110,7 +110,7 @@
         </telerik:ListViewTemplateCell>
     </DataTemplate>-->
 
-    <!-- Implicit Styles -->
+    <!-- Implicit Styles 
 
     <Style TargetType="telerik:RadButton">
         <Setter Property="FontFamily"
@@ -152,7 +152,7 @@
                 Value="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}" />
         <Setter Property="AnimationContentColor"
                 Value="{StaticResource Primary}" />
-    </Style>
+    </Style>-->
 
     <!-- Keyed Styles -->
 

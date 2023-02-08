@@ -6,8 +6,7 @@
              xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
              xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
              xmlns:res="clr-namespace:Hacked.Maui.Resources"
-             xmlns:controls="clr-namespace:Hacked.Maui.Controls"
-             BindingContext="{x:Static vms:ViewModelLocator.MonitoredAccounts}">
+             xmlns:controls="clr-namespace:Hacked.Maui.Controls">
 
     <Grid Padding="10"
           RowDefinitions="Auto,*"
