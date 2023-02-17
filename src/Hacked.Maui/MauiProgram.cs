@@ -1,4 +1,5 @@
 ﻿using Hacked.Maui.ViewModels;
+using Hacked.Maui.Views;
 using Hacked.Services.Apis;
 using Microsoft.Maui.LifecycleEvents;
 using Telerik.Maui.Controls.Compatibility;
@@ -29,6 +30,8 @@ namespace Hacked.Maui
             builder
                 .UseMauiApp<App>()
                 .RegisterServices()
+                .RegisterViews()
+                .RegisterViewModels()
                 .UseTelerik()
                 .ConfigureFonts(fonts =>
                 {
@@ -36,8 +39,49 @@ namespace Hacked.Maui
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                     fonts.AddFont("telerikfontexamples.ttf", "telerikfontexamples");
                     fonts.AddFont("fa-solid-900.ttf", "Font Awesome 6 Free Regular");
-                });
+                })
+                .RegisterLifecycleEvents();
+            
+            return builder.Build();
+        }
 
+        public static MauiAppBuilder RegisterServices(this MauiAppBuilder builder)
+        {
+            // App services
+            builder.Services.AddSingleton<IPwndBreachService, BeenPwnedService>();
+            builder.Services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
+
+            // View models
+            builder.Services.AddSingleton<AboutViewModel>();
+            builder.Services.AddSingleton<MonitoredAccountsViewModel>();
+            builder.Services.AddSingleton<SettingsViewModel>();
+            
+            builder.Services.AddTransient<SettingsViewModel>();
+
+            return builder;
+        }
+
+        public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
+        {
+            builder.Services.AddTransient<AboutPage>();
+            builder.Services.AddTransient<AccountDetailsPage>();
+            builder.Services.AddTransient<MonitoredAccountsPage>();
+            builder.Services.AddTransient<SettingsPage>();
+
+            return builder;
+        }
+
+        public static MauiAppBuilder RegisterViewModels(this MauiAppBuilder builder)
+        {
+            builder.Services.AddTransient<AboutViewModel>();
+            builder.Services.AddSingleton<MonitoredAccountsViewModel>();
+            builder.Services.AddTransient<SettingsViewModel>();
+
+            return builder;
+        }
+
+        public static MauiAppBuilder RegisterLifecycleEvents(this MauiAppBuilder builder)
+        {
             builder.ConfigureLifecycleEvents(events =>
             {
 #if WINDOWS10_0_17763_0_OR_GREATER
@@ -78,24 +122,8 @@ namespace Hacked.Maui
                 });
 #endif
             });
-            
-            return builder.Build();
-        }
 
-        public static MauiAppBuilder RegisterServices(this MauiAppBuilder mauiAppBuilder)
-        {
-            // App services
-            mauiAppBuilder.Services.AddSingleton<IPwndBreachService, BeenPwnedService>();
-            mauiAppBuilder.Services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
-
-            // View models
-            mauiAppBuilder.Services.AddSingleton<AboutViewModel>();
-            mauiAppBuilder.Services.AddSingleton<MonitoredAccountsViewModel>();
-            mauiAppBuilder.Services.AddSingleton<SettingsViewModel>();
-            
-            mauiAppBuilder.Services.AddTransient<SettingsViewModel>();
-
-            return mauiAppBuilder;
+            return builder;
         }
     }
 }

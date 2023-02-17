@@ -29,4 +29,12 @@ public partial class App : Application
             }
         });
     }
+
+    public static void ShowMessage(string title,string message, string buttonText = "ok")
+    {
+        TaskHelpers.RunOnUiThread(() =>
+        {
+            Shell.Current.DisplayAlert(title, message, buttonText);
+        });
+    }
 }
