@@ -14,7 +14,6 @@
 
     <Grid x:Name="RootGrid_Desktop"
           RowDefinitions="*, Auto">
-
         <telerik:RadDataGrid x:Name="MonitoredAccountDataGrid"
                              ItemsSource="{Binding Accounts}"
                              SelectionMode="None"
@@ -25,21 +24,20 @@
                                                 Command="{Binding CellTapCommand}" />
             </telerik:RadDataGrid.Commands>
             <telerik:RadDataGrid.Columns>
-                <!--<telerik:DataGridTemplateColumn HeaderText="Options"
+                <telerik:DataGridTemplateColumn HeaderText="Options"
                                                 SizeMode="Fixed"
-                                                Width="110">
+                                                Width="160">
                     <telerik:DataGridTemplateColumn.CellContentTemplate>
                         <DataTemplate x:DataType="models:MonitoredAccount">
                             <Grid ColumnDefinitions="*,*"
                                   ColumnSpacing="5">
-
                                 <HorizontalStackLayout Padding="5"
                                                        Spacing="5">
                                     <telerik:RadButton Text="{x:Static res:IconFont.InfoCircle}"
                                                        Style="{StaticResource FontAwesomeLabelStyle}"
                                                        Command="{Binding BindingContext.ViewDetailsCommand, Source={x:Reference MonitoredAccountDataGrid}}"
                                                        CommandParameter="{Binding}"
-                                                       Margin="5" />
+                                                       HorizontalOptions="Fill" />
                                     <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
                                                        Style="{StaticResource FontAwesomeLabelStyle}"
                                                        Command="{Binding BindingContext.RefreshAccountCommand, Source={x:Reference MonitoredAccountDataGrid}}"
@@ -52,36 +50,31 @@
                                                        HorizontalOptions="Fill" />
                                 </HorizontalStackLayout>
 
-                                <telerik:RadBorder IsVisible="{Binding IsUpdating}"
+                                <!--<telerik:RadBorder IsVisible="{Binding IsUpdating}"
                                                    InputTransparent="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}"
                                                    BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}">
                                     <Label Text="Refreshing..."
                                            HorizontalOptions="Center"
                                            VerticalOptions="Center" />
-                                </telerik:RadBorder>
+                                </telerik:RadBorder>-->
 
                                 <telerik:RadBusyIndicator IsBusy="{Binding IsUpdating}"
+                                                          BackgroundColor="Green"
+                                                          AnimationContentColor="White"
                                                           InputTransparent="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}"
+                                                          HorizontalOptions="Fill"
+                                                          VerticalOptions="Fill"
                                                           AnimationType="Animation5" />
                             </Grid>
                         </DataTemplate>
                     </telerik:DataGridTemplateColumn.CellContentTemplate>
-                </telerik:DataGridTemplateColumn>-->
+                </telerik:DataGridTemplateColumn>
 
                 <telerik:DataGridTextColumn PropertyName="Address"
                                             HeaderText="Account" />
 
-                <!--<tdg:DataGridTextColumn PropertyName="Breaches.Count"
-                                        HeaderText="Breaches">
-                    <tdg:DataGridTextColumn.CellContentTemplate>
-                        <DataTemplate>
-                            <Label Text="{Binding Breaches.Count}"
-                                   Margin="0, 5, 0, 5"
-                                   HorizontalOptions="Center"
-                                   VerticalTextAlignment="Center" />
-                        </DataTemplate>
-                    </tdg:DataGridTextColumn.CellContentTemplate>
-                </tdg:DataGridTextColumn>-->
+                <telerik:DataGridTextColumn PropertyName="Breaches.Count"
+                                            HeaderText="Breaches"/>
 
                 <!--<telerik:DataGridTemplateColumn HeaderText="Breaches">
                     <telerik:DataGridTemplateColumn.CellContentTemplate>
@@ -114,6 +107,7 @@
                            Grid.Row="2" />
 
         <telerik:RadBorder x:Name="AddAccountOverlayBorder"
+                           BackgroundColor="White"
                            IsVisible="False"
                            CornerRadius="6"
                            Padding="10">

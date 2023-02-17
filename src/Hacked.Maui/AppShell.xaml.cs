@@ -12,6 +12,8 @@ namespace Hacked.Maui
             //Routing.RegisterRoute("About", typeof(AboutPage));
             //Routing.RegisterRoute("Settings", typeof(SettingsPage));
             //Routing.RegisterRoute("MonitoredAccounts", typeof(MonitoredAccountsPage));
+
+            // Child page route
             Routing.RegisterRoute("MonitoredAccounts/AccountDetails", typeof(AccountDetailsPage));
             
             // separate page in nav menu for now.
@@ -25,7 +27,7 @@ namespace Hacked.Maui
 
         //private void TapGestureRecognizer_Tapped(object sender, EventArgs e)
         //{
-        //    GoToAsync("//settings");
+        //    GoToAsync("//Settings");
         //}
 
         //protected override void OnAppearing()

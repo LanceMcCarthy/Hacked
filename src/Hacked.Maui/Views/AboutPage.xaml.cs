@@ -4,12 +4,12 @@ namespace Hacked.Maui.Views;
 
 public partial class AboutPage : ContentPage
 {
-	//public AboutPage()
-	//{
-	//	InitializeComponent();
-    //}
+    public AboutPage()
+    {
+        InitializeComponent();
+    }
 
-	public AboutPage(AboutViewModel vm)
+    public AboutPage(AboutViewModel vm)
 	{
 		InitializeComponent();
         BindingContext = vm;
@@ -31,9 +31,10 @@ public partial class AboutPage : ContentPage
 
     private async void ContactUsButton_OnClick(object sender, EventArgs e)
     {
+        
         var message = new EmailMessage
         {
-            Subject = "Hacked App - Feedback",
+            Subject = $"Hacked App - Feedback {DeviceInfo.Platform}",
             Body = "[enter your message here]",
             To = new List<string> { "awesome.apps@outlook.com" }
         };
@@ -43,8 +44,10 @@ public partial class AboutPage : ContentPage
 
     private async void ReviewButton_OnClickButton_OnClick(object sender, EventArgs e)
     {
-        await Application.Current.MainPage.DisplayAlert("Coming soon",
-            "The ability to leave a review will be implemented once the app is out of beta.", "ok");
+        await Application.Current.MainPage.DisplayAlert(
+            "Coming soon",
+            "The ability to leave a review will be implemented once the app is out of beta.", 
+            "ok");
     }
 
     //private void CloseModalButton_OnClicked(object sender, EventArgs e)
