@@ -1,6 +1,7 @@
 name: Build .NET MAUI
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -71,7 +72,7 @@ jobs:
       - name: Copy WinUI msix package
         shell: pwsh
         run: |
-           Get-Childitem –Path ${{ github.workspace }} -Include *.msix -File -Recurse | Copy-Item -Destination ${{ env.WINDOWS_ARTIFACTS_PATH }}
+           Get-Childitem -Path ${{ github.workspace }} -Include *.msix -File -Recurse | Copy-Item -Destination ${{ env.WINDOWS_ARTIFACTS_PATH }}
 
       - name: Publish build artifacts
         uses: actions/upload-artifact@v2
