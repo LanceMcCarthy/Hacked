@@ -29,6 +29,7 @@ env:
   WINDOWS_ARTIFACTS_PATH: "artifacts_windows"
   PROJECT_PATH: "src/Hacked.Maui/Hacked.maui.csproj"
   NUGETCONFIG_PATH: "src/nuget.config"
+  PUBLISH_TRIMMED: False
 
 jobs:
   windows-build-windows:
@@ -60,7 +61,7 @@ jobs:
       - name: Build Maui WinUI project
         shell: pwsh
         run: |
-          dotnet build ${{ env.PROJECT_PATH }} -c Debug -f net7.0-windows10.0.19041.0
+          dotnet build ${{ env.PROJECT_PATH }} -c Debug -f net7.0-windows10.0.19041.0 -p:PublishTrimmed=${{ env.PUBLISH_TRIMMED }}
         #  dotnet build ${{ env.PROJECT_PATH }} -c Release -f net7.0-windows10.0.19041.0
 
       - name: Create artifacts folder
@@ -107,7 +108,7 @@ jobs:
       - name: Build MacCatalyst App
         shell: bash
         run: |
-          dotnet build ${{ env.PROJECT_PATH }} -f net7.0-maccatalyst -c Debug
+          dotnet build ${{ env.PROJECT_PATH }} -f net7.0-maccatalyst -c Debug -p:PublishTrimmed=${{ env.PUBLISH_TRIMMED }}
         #  dotnet build ${{ env.PROJECT_PATH }} -f net7.0-maccatalyst -c Release
         #  dotnet publish ${{ env.PROJECT_PATH }} -f net7.0-maccatalyst -c Release -p:BuildIpa=True 
 
@@ -165,7 +166,7 @@ jobs:
       - name: Build MAUI Android
         shell: pwsh
         run: |
-          dotnet build ${{ env.PROJECT_PATH }} -c Debug -f net7.0-android --no-restore
+          dotnet build ${{ env.PROJECT_PATH }} -c Debug -f net7.0-android --no-restore -p:PublishTrimmed=${{ env.PUBLISH_TRIMMED }}
         #  dotnet build ${{ env.PROJECT_PATH }} -c Debug -f net7.0-android --no-restore
         #  dotnet publish ${{ env.PROJECT_PATH }} -c Release -f net7.0-android --no-restore /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{ env.ANDROID_SIGNING_KEYSTORE_FILENAME }} /p:AndroidSigningStorePass=${{ secrets.ANDROID_SIGNING_STORE_PASS }} /p:AndroidSigningKeyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }} /p:AndroidSigningKeyPass=${{ secrets.ANDROID_SIGNING_KEY_PASS }}
 
@@ -214,7 +215,7 @@ jobs:
       - name: Build iOS App
         shell: bash
         run: |
-          dotnet build ${{ env.PROJECT_PATH }} -f net7.0-ios -c Debug
+          dotnet build ${{ env.PROJECT_PATH }} -f net7.0-ios -c Debug -p:PublishTrimmed=${{ env.PUBLISH_TRIMMED }}
         #  dotnet build ${{ env.PROJECT_PATH }} -f net7.0-ios -c Release
         #  dotnet publish ${{ env.PROJECT_PATH }} -f net7.0-ios -c Release -p:BuildIpa=True
 
