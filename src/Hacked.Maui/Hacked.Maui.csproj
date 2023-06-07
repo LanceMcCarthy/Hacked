@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 	    <TargetFrameworks>net7.0-android;net7.0-ios;net7.0-maccatalyst</TargetFrameworks>
-	    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net6.0-windows10.0.19041.0</TargetFrameworks>
+	    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
 		<OutputType>Exe</OutputType>
         <RootNamespace>Hacked.Maui</RootNamespace>
         <UseMaui>true</UseMaui>
@@ -72,13 +72,13 @@
 
     <ItemGroup>
         <PackageReference Include="CommonHelpers" Version="1.2.0" />
-        <PackageReference Include="Telerik.UI.for.Maui" Version="5.0.1" />
+        <PackageReference Include="Telerik.UI.for.Maui" Version="5.2.0" />
     </ItemGroup>
 
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
 		<!--<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.230118.102" />-->
-		<PackageReference Include="WinUIEx" Version="2.2.0" />
+		<PackageReference Include="WinUIEx" Version="1.8.0" />
 	</ItemGroup>
 
 	<ItemGroup>
