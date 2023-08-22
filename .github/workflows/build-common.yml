@@ -14,6 +14,8 @@ env:
   CORE_PROJECT_PATH: 'src/Hacked.Core/Hacked.Core.csproj'
   SERVICES_PROJECT_PATH: 'src/Hacked.Services/Hacked.Services.csproj'
   NUGETCONFIG_PATH: "src/nuget.config"
+  TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
+  TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }}
 
 jobs:
   windows-build:
@@ -31,11 +33,7 @@ jobs:
         msbuild-architecture: x64
       
     - name: NuGet Restore
-      run: |
-        dotnet restore ${{ env.SERVICES_PROJECT_PATH }} --configfile ${{ env.NUGETCONFIG_PATH }}
-      env:
-          TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
-          TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }} 
+      run: dotnet restore ${{ env.SERVICES_PROJECT_PATH }} --configfile ${{ env.NUGETCONFIG_PATH }}
   
     - name: Build Services
       run: msbuild ${{ env.SERVICES_PROJECT_PATH }} /p:Platform=x64 /p:Configuration=Debug
