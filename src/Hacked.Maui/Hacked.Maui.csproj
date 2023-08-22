@@ -44,11 +44,6 @@
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
 
-	<!-- Workaround until maui 7.0.60 
-	<PropertyGroup>
-		<WindowsAppSdkDeploymentManagerInitialize>false</WindowsAppSdkDeploymentManagerInitialize>
-	</PropertyGroup>-->
-
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
 		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
 		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
@@ -71,8 +66,8 @@
 	</PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CommonHelpers" Version="1.2.0" />
-        <PackageReference Include="Telerik.UI.for.Maui" Version="5.2.0" />
+        <PackageReference Include="CommonHelpers" Version="1.2.1" />
+        <PackageReference Include="Telerik.UI.for.Maui" Version="6.1.0" />
     </ItemGroup>
 
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">

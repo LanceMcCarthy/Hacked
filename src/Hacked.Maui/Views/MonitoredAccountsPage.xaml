@@ -18,7 +18,8 @@
                              ItemsSource="{Binding Accounts}"
                              SelectionMode="None"
                              SelectedItem="{Binding SelectedAccount}"
-                             AutoGenerateColumns="False">
+                             AutoGenerateColumns="False"
+                             ShowColumnFooters="True">
             <telerik:RadDataGrid.Commands>
                 <commands:CustomDataGridCommand Id="CellTap"
                                                 Command="{Binding CellTapCommand}" />
@@ -71,10 +72,25 @@
                 </telerik:DataGridTemplateColumn>
 
                 <telerik:DataGridTextColumn PropertyName="Address"
-                                            HeaderText="Account" />
+                                            HeaderText="Account">
+                    <telerik:DataGridTextColumn.AggregateDescriptors>
+                        <telerik:PropertyAggregateDescriptor PropertyName="Address"
+                                                             Function="Count"
+                                                             Caption="Total: " />
+                    </telerik:DataGridTextColumn.AggregateDescriptors>
+                </telerik:DataGridTextColumn>
 
                 <telerik:DataGridTextColumn PropertyName="Breaches.Count"
-                                            HeaderText="Breaches"/>
+                                            HeaderText="Breaches">
+                    <telerik:DataGridTextColumn.AggregateDescriptors>
+                        <telerik:PropertyAggregateDescriptor PropertyName="Breaches.Count"
+                                                             Function="Sum"
+                                                             Caption="Total: " />
+                        <telerik:PropertyAggregateDescriptor PropertyName="Breaches.Count"
+                                                             Function="Average"
+                                                             Caption="Average per account: " />
+                    </telerik:DataGridTextColumn.AggregateDescriptors>
+                </telerik:DataGridTextColumn>
 
                 <!--<telerik:DataGridTemplateColumn HeaderText="Breaches">
                     <telerik:DataGridTemplateColumn.CellContentTemplate>
@@ -107,7 +123,7 @@
                            Grid.Row="2" />
 
         <telerik:RadBorder x:Name="AddAccountOverlayBorder"
-                           BackgroundColor="White"
+                           BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
                            IsVisible="False"
                            CornerRadius="6"
                            Padding="10">
@@ -151,10 +167,6 @@
 
                 </VerticalStackLayout>
 
-                <!--<ActivityIndicator IsVisible="{Binding IsBusy}"
-                                       IsRunning="{Binding IsBusy}"
-                                       HorizontalOptions="Fill"
-                                       VerticalOptions="Fill" />-->
                 <telerik:RadBusyIndicator IsVisible="{Binding IsBusy}"
                                           IsBusy="{Binding IsBusy}"
                                           InputTransparent="{Binding IsBusy, Converter={StaticResource InvertBoolConverter}}"

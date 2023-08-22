@@ -12,8 +12,15 @@ on:
 
 env:
   SOLUTION_PATH: 'src/Hacked_Uwp.sln'
-  PROJECT_PATH: "src/Hacked/Hacked.csproj"
+  PROJECT_PATH: 'src/Hacked/Hacked.csproj'
   NUGETCONFIG_PATH: 'src/nuget.config'
+  Configuration: Debug
+  TargetPlatform: x64
+  BuildMode: CI
+  AppxBundle: Never
+  AppxPackageSigningEnabled: False
+  TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
+  TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }}
 
 jobs:
   windows-build:
@@ -32,17 +39,6 @@ jobs:
       
     - name: NuGet Restore UWP Project
       run: nuget restore ${{ env.SOLUTION_PATH }} -ConfigFile ${{ env.NUGETCONFIG_PATH }}
-      env:
-        TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
-        TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }}  
     
     - name: Build UWP Solution
-      run: msbuild ${{ env.SOLUTION_PATH }} /p:Configuration=${{ env.Configuration }} /p:Platform=${{ env.TargetPlatform }} /p:UapAppxPackageBuildMode=${{ env.BuildMode }} /p:AppxBundle=${{ env.AppxBundle }} /p:AppxPackageSigningEnabled=${{ env.AppxPackageSigningEnabled }} 
-      env:
-        Configuration: Debug
-        TargetPlatform: x64
-        BuildMode: CI
-        AppxBundle: Never
-        AppxPackageSigningEnabled: False
-        TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
-        TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }}
+      run: msbuild ${{ env.SOLUTION_PATH }} /p:Configuration=${{ env.Configuration }} /p:Platform=${{ env.TargetPlatform }} /p:UapAppxPackageBuildMode=${{ env.BuildMode }} /p:AppxBundle=${{ env.AppxBundle }} /p:AppxPackageSigningEnabled=${{ env.AppxPackageSigningEnabled }}
