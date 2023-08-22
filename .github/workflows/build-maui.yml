@@ -69,7 +69,7 @@ jobs:
         run: Get-Childitem -Path ${{ github.workspace }} -Include *.msix -File -Recurse | Copy-Item -Destination ${{ env.WINDOWS_ARTIFACTS_PATH }}
 
       - name: Publish build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:     
           name: "WinUI .NET MAUI artifacts" 
           path: "${{ env.WINDOWS_ARTIFACTS_PATH }}/*"
@@ -95,9 +95,10 @@ jobs:
 
       - name: Build MacCatalyst App
         shell: bash
-        run: dotnet build ${{ env.PROJECT_PATH }} -f net7.0-maccatalyst -c Debug -p:MtouchLink=SdkOnly
-        #  dotnet build ${{ env.PROJECT_PATH }} -f net7.0-maccatalyst -c Release
-        #  dotnet publish ${{ env.PROJECT_PATH }} -f net7.0-maccatalyst -c Release -p:BuildIpa=True 
+        run: |
+          dotnet build ${{ env.PROJECT_PATH }} -f net7.0-maccatalyst -c Debug -p:MtouchLink=SdkOnly
+          # dotnet build ${{ env.PROJECT_PATH }} -f net7.0-maccatalyst -c Release
+          # dotnet publish ${{ env.PROJECT_PATH }} -f net7.0-maccatalyst -c Release -p:BuildIpa=True 
 
       - name: Create artifacts folder
         shell: pwsh
@@ -110,7 +111,7 @@ jobs:
         run: Get-Childitem -Path ${{ github.workspace }} -Include *.pkg -File -Recurse | Copy-Item -Destination ${{ env.MACOS_ARTIFACTS_PATH }}
 
       - name: Publish macOS build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:     
           name: "macOS artifacts" 
           path: "${{ env.MACOS_ARTIFACTS_PATH }}/*"
@@ -148,8 +149,8 @@ jobs:
         shell: pwsh
         run: |
           dotnet build ${{ env.PROJECT_PATH }} -c Debug -f net7.0-android --no-restore
-        #  dotnet build ${{ env.PROJECT_PATH }} -c Debug -f net7.0-android --no-restore
-        #  dotnet publish ${{ env.PROJECT_PATH }} -c Release -f net7.0-android --no-restore /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{ env.ANDROID_SIGNING_KEYSTORE_FILENAME }} /p:AndroidSigningStorePass=${{ secrets.ANDROID_SIGNING_STORE_PASS }} /p:AndroidSigningKeyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }} /p:AndroidSigningKeyPass=${{ secrets.ANDROID_SIGNING_KEY_PASS }}
+          # dotnet build ${{ env.PROJECT_PATH }} -c Debug -f net7.0-android --no-restore
+          # dotnet publish ${{ env.PROJECT_PATH }} -c Release -f net7.0-android --no-restore /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{ env.ANDROID_SIGNING_KEYSTORE_FILENAME }} /p:AndroidSigningStorePass=${{ secrets.ANDROID_SIGNING_STORE_PASS }} /p:AndroidSigningKeyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }} /p:AndroidSigningKeyPass=${{ secrets.ANDROID_SIGNING_KEY_PASS }}
 
       - name: Create artifacts folder
         shell: pwsh
@@ -164,7 +165,7 @@ jobs:
            Get-Childitem -Path ${{ github.workspace }} -Include *Signed.aab -File -Recurse | Copy-Item -Destination ${{ env.ANDROID_ARTIFACTS_PATH }}
 
       - name: Publish Android build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:     
           name: "Android artifacts" 
           path: "${{ env.ANDROID_ARTIFACTS_PATH }}/*"
@@ -190,9 +191,10 @@ jobs:
 
       - name: Build iOS App
         shell: bash
-        run: dotnet build ${{ env.PROJECT_PATH }} -f net7.0-ios -c Debug -p:MtouchLink=SdkOnly
-        #  dotnet build ${{ env.PROJECT_PATH }} -f net7.0-ios -c Release
-        #  dotnet publish ${{ env.PROJECT_PATH }} -f net7.0-ios -c Release -p:BuildIpa=True
+        run: |
+          dotnet build ${{ env.PROJECT_PATH }} -f net7.0-ios -c Debug -p:MtouchLink=SdkOnly
+          # dotnet build ${{ env.PROJECT_PATH }} -f net7.0-ios -c Release
+          # dotnet publish ${{ env.PROJECT_PATH }} -f net7.0-ios -c Release -p:BuildIpa=True
 
       - name: Create artifacts folder
         shell: pwsh
@@ -205,7 +207,7 @@ jobs:
         run: Get-Childitem -Path ${{ github.workspace }} -Include *.app -File -Recurse | Copy-Item -Destination ${{ env.IOS_ARTIFACTS_PATH }}
 
       - name: Publish iOS build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:     
           name: "iOS artifacts" 
           path: "${{ env.IOS_ARTIFACTS_PATH }}/*"
