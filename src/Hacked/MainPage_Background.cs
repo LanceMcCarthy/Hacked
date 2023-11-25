@@ -74,15 +74,15 @@ public sealed partial class MainPage
                     UpdateStatus($"Monitoring Task is running every {updateFrequency} minutes");
                     return true;
                 case BackgroundAccessStatus.DeniedBySystemPolicy:
-                    UpdateStatus($"Monitoring Task task was DENIED access", false);
+                    UpdateStatus("Monitoring Task task was DENIED access", false);
                     await new MessageDialog("The app has denied from adding a background task due to System Policy. This is usually because there are too many background tasks already. " + "r\n\nGo to Phone Settings > Background Apps and free up a couple slots.").ShowAsync();
                     break;
                 case BackgroundAccessStatus.DeniedByUser:
-                    UpdateStatus($"Monitoring Task was DENIED access", false);
+                    UpdateStatus("Monitoring Task was DENIED access", false);
                     await new MessageDialog("You have previously denied the app from adding a background task." + "r\n\nGo to Phone Settings > Background Apps \r\n\nFind this app in the list and re-enable background tasks.").ShowAsync();
                     break;
                 case BackgroundAccessStatus.Unspecified:
-                    UpdateStatus($"Monitoring Task is currently NOT running", false);
+                    UpdateStatus("Monitoring Task is currently NOT running", false);
                     await new MessageDialog(content: "You did not make a choice. If you want to update your Band in the background, please try again.").ShowAsync();
                     break;
                 default:

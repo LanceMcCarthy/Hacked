@@ -4,7 +4,6 @@ using Hacked.Helpers;
 using Microsoft.Services.Store.Engagement;
 using System;
 using System.Collections.Generic;
-using VungleSDK;
 using Windows.ApplicationModel;
 using Windows.Foundation;
 using Windows.Storage;
@@ -23,12 +22,6 @@ public sealed partial class MainPage : Page
     private bool selectionMute;
     private FilterType filterType = FilterType.Name;
 
-    private readonly VungleAd vungleSdk;
-    private const string VungleAppId = "5e347706c28ba7001748f549";
-    private const string VungleMainInterstitialPlacementId = "MAININTERSTITIAL-8569070";
-    private const string VungleKudoPlacementId = "KUDOSAD-0259168";
-    private const string VungleApiEndpoint = "https://ads.api.vungle.com";
-
     public MainPage()
     {
         InitializeComponent();
@@ -37,14 +30,6 @@ public sealed partial class MainPage : Page
         {
             localSettings = ApplicationData.Current.LocalSettings;
         }
-
-        //https://publisher.vungle.com/applications/application/5e347706c28ba7001748f549
-        //https://support.vungle.com/hc/en-us/articles/360003059331-Get-Started-with-Vungle-Windows-SDK-v-6
-
-        vungleSdk = AdFactory.GetInstance(VungleAppId, new VungleSDKConfig { ApiEndpoint = new Uri(VungleApiEndpoint) });
-        vungleSdk.OnInitCompleted += VungleSdk_OnInitCompleted;
-        vungleSdk.Diagnostic += VungleSdk_Diagnostic;
-        vungleSdk.OnAdPlayableChanged += VungleSdkOnAdPlayableChanged;
     }
     
     #region navigation and splitview management
