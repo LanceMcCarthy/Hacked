@@ -327,8 +327,7 @@
                               ItemsSource="{Binding Accounts}"
                               SelectedItem="{x:Bind ViewModel.SelectedAccount, Mode=TwoWay}"
                               SelectionChanged="AccountsListView_OnSelectionChanged"
-                              ui:VisualExtensions.NormalizedCenterPoint="0.5, 0.5"
-                              animations:Implicit.ShowAnimations="{StaticResource CommonShowAnimations}">
+                              ui:VisualExtensions.NormalizedCenterPoint="0.5, 0.5">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="Padding"
@@ -868,11 +867,11 @@
                         <TextBlock Text="New:"
                                    FontWeight="Bold" />
                         <TextBlock x:Name="NoticeFeaturesTextBlock"
-                                   Text="This release has several new features and improvements" />
+                                   Text="This text will be updated on launch" TextWrapping="WrapWholeWords" />
                         <TextBlock Text="Fixes:"
                                    FontWeight="Bold" />
                         <TextBlock x:Name="NoticeFixesTextBlock"
-                                   Text="There were a few minor fixes in this release." />
+                                   Text="This text will be updated on launch" TextWrapping="WrapWholeWords" />
                         <TextBlock Margin="0,10,0,0"
                                    Text="Contact us if you have any questions or concerns."
                                    TextWrapping="Wrap" />
