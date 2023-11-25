@@ -158,7 +158,6 @@
     </Compile>
     <Compile Include="MainPage_Filtering.cs" />
     <Compile Include="MainPage_Methods.cs" />
-    <Compile Include="MainPage_Vungle.cs" />
     <Compile Include="MainPage_EventHandlers.cs" />
     <Compile Include="MainPage_Background.cs" />
     <Compile Include="Properties\Annotations.cs" />
@@ -325,9 +324,6 @@
     </PackageReference>
     <PackageReference Include="Telerik.UI.for.UniversalWindowsPlatform">
       <Version>[2022.2.506.1]</Version>
-    </PackageReference>
-    <PackageReference Include="VungleSDK">
-      <Version>6.11.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />
