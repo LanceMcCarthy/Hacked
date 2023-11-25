@@ -8,7 +8,6 @@
       xmlns:tkControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
       xmlns:controls="using:Microsoft.UI.Xaml.Controls"
       xmlns:animations="using:Microsoft.Toolkit.Uwp.UI.Animations"
-      xmlns:ui1="using:VungleSDK.UI"
       xmlns:viewModels="using:Hacked.ViewModels"
       xmlns:models="using:Hacked.Core.Models"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
@@ -327,8 +326,7 @@
                               ItemsSource="{Binding Accounts}"
                               SelectedItem="{x:Bind ViewModel.SelectedAccount, Mode=TwoWay}"
                               SelectionChanged="AccountsListView_OnSelectionChanged"
-                              ui:VisualExtensions.NormalizedCenterPoint="0.5, 0.5"
-                              animations:Implicit.ShowAnimations="{StaticResource CommonShowAnimations}">
+                              ui:VisualExtensions.NormalizedCenterPoint="0.5, 0.5">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="Padding"
@@ -443,7 +441,7 @@
                                     HorizontalAlignment="Stretch"
                                     Margin="10,5,10,5"/>
 
-                            <Button x:Name="PlayAdButton"
+                            <!--<Button x:Name="PlayAdButton"
                                     Margin="10,5,10,5"
                                     HorizontalAlignment="Stretch"
                                     Background="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
@@ -457,7 +455,7 @@
                                     <Run Text="Click here to play an ad!"
                                          FontWeight="SemiBold" />
                                 </TextBlock>
-                            </Button>
+                            </Button>-->
 
                             <Border Background="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                     Height="2"
@@ -540,10 +538,10 @@
                                                            Text="Json.NET © 2016 Newtonsoft" />
                                                 <TextBlock HorizontalAlignment="Left"
                                                            FontSize="12"
-                                                           Text="Telerik UI for UWP © 2020 Progress" />
+                                                           Text="Progress© Telerik™️ UI for UWP v2023 " />
                                                 <TextBlock HorizontalAlignment="Left"
                                                            FontSize="12"
-                                                           Text="Data from HaveibeenPwned by Troy Hunt" />
+                                                           Text="HaveibeenPwned API data from Troy Hunt" />
 
                                                 <TextBlock MaxWidth="320"
                                                            Margin="0,10,0,10"
@@ -559,16 +557,16 @@
                                                         HorizontalAlignment="Stretch"
                                                         Click="ContactUsButton_OnClick"
                                                         Margin="0,10,0,0"
-                                                        Content="contact us" />
+                                                        Content="📨 contact us 📨" />
 
                                                 <Button x:Name="ReviewButton"
                                                         Margin="0,10,0,0"
                                                         HorizontalAlignment="Stretch"
                                                         Click="ReviewButton_OnClickButton_OnClick"
-                                                        Content="rate this app" />
+                                                        Content="😍 leave a store rating 😍" />
 
                                                 <Button x:Name="FeedbackHubButton"
-                                                        Content="Leave feedback in FeedbackHub"
+                                                        Content="submit feedback in FeedbackHub"
                                                         Visibility="Visible"
                                                         HorizontalAlignment="Stretch"
                                                         Click="FeedbackHubButton_OnClick"
@@ -868,11 +866,11 @@
                         <TextBlock Text="New:"
                                    FontWeight="Bold" />
                         <TextBlock x:Name="NoticeFeaturesTextBlock"
-                                   Text="This release has several new features and improvements" />
+                                   Text="This text will be updated on launch" TextWrapping="WrapWholeWords" />
                         <TextBlock Text="Fixes:"
                                    FontWeight="Bold" />
                         <TextBlock x:Name="NoticeFixesTextBlock"
-                                   Text="There were a few minor fixes in this release." />
+                                   Text="This text will be updated on launch" TextWrapping="WrapWholeWords" />
                         <TextBlock Margin="0,10,0,0"
                                    Text="Contact us if you have any questions or concerns."
                                    TextWrapping="Wrap" />
@@ -882,22 +880,11 @@
         </Grid>
 
         <customControls:KudosControl x:Name="KudosCtrl"
-                                     PlayAdRequested="KudoAdRequested"
                                      DataContext="{Binding}"
                                      Visibility="{Binding IsKudoSelectorOpen, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
                                      VerticalAlignment="Stretch"
                                      HorizontalAlignment="Stretch"
                                      Grid.Row="1" />
-
-        <ui1:VungleAdControl x:Name="VungleAd1"
-                             AppID="5e347706c28ba7001748f549"
-                             Placement="MAININTERSTITIAL-8569070"
-                             Placements="MAININTERSTITIAL-8569070, KUDOSAD-0259168"
-                             ApiEndpoint="https://ads.api.vungle.com"
-                             IsHitTestVisible="False"
-                             Grid.Row="1"
-                             OnAdStart="VungleAd1_Start"
-                             OnAdEnd="VungleAd1_End" />
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="WindowStates">

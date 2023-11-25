@@ -20,7 +20,6 @@ namespace Hacked.Controls;
 public sealed partial class KudosControl : UserControl
 {
     private StoreContext context;
-    private const string VungleKudoPlacementId = "KUDOSAD-0259168";
     public event EventHandler<AdRequestedArgs> PlayAdRequested;
 
     public KudosControl()
@@ -69,7 +68,9 @@ public sealed partial class KudosControl : UserControl
 
             if (kudo.Title == "Play Ad")
             {
-                PlayAdRequested?.Invoke(this, new AdRequestedArgs(VungleKudoPlacementId));
+                // Temporary value until I find something that can replace Vungle
+                var adPlacementId = "1234";
+                PlayAdRequested?.Invoke(this, new AdRequestedArgs(adPlacementId));
             }
         }
     }
@@ -215,21 +216,21 @@ public sealed partial class KudosControl : UserControl
     {
         return new ObservableCollection<Kudos>
             {
-                new Kudos
-                {
-                    Title = "Play Ad",
-                    Category = KudoCategory.Free,
-                    Price = "Free",
-                    ImageUrl = "/Images/VideoAd_Colored.png"
-                },
-                new Kudos
+                //new Kudos
+                //{
+                //    Title = "Play Ad",
+                //    Category = KudoCategory.Free,
+                //    Price = "Free",
+                //    ImageUrl = "/Images/VideoAd_Colored.png"
+                //},
+                new()
                 {
                     Title = "Store Rating",
                     Category = KudoCategory.Free,
                     Price = "Free",
                     ImageUrl = "/Images/4starStar_Colored.png"
                 },
-                new Kudos
+                new()
                 {
                     Title = "Remove Ads",
                     Category = KudoCategory.Durable,
@@ -237,15 +238,15 @@ public sealed partial class KudosControl : UserControl
                     Price = "$0.99",
                     ImageUrl = "/Images/RemoveAdKudo_Colored.png"
                 },
-                new Kudos
+                new()
                 {
                     Title = "Champion",
                     Category = KudoCategory.Subscription,
                     StoreId = StoreIds.RecurringKudos1StoreId,
-                    Price = "$1.09 (mth)",
+                    Price = "$1.09 (month)",
                     ImageUrl = "/Images/RecurringKudo_Colored.png"
                 },
-                new Kudos
+                new()
                 {
                     Title = "Coffee",
                     Category = KudoCategory.Consumable,
@@ -253,15 +254,15 @@ public sealed partial class KudosControl : UserControl
                     Price = "$2.49",
                     ImageUrl = "/Images/CoffeeKudo_Colored.png"
                 },
-                new Kudos
+                new()
                 {
-                    Title = "1mo API Fee",
+                    Title = "Chip in for API Fee",
                     Category = KudoCategory.Consumable,
                     StoreId = StoreIds.CoverApiFeeKudoStoreId,
                     Price = "$3.99",
                     ImageUrl = "/Images/APIFeeKudo_Colored.png"
                 },
-                new Kudos
+                new()
                 {
                     Title = "Lunch",
                     Category = KudoCategory.Consumable,
@@ -269,7 +270,7 @@ public sealed partial class KudosControl : UserControl
                     Price = "$4.89",
                     ImageUrl = "/Images/LunchKudo_Colored.png"
                 },
-                new Kudos
+                new()
                 {
                     Title = "Dinner",
                     Category = KudoCategory.Consumable,
