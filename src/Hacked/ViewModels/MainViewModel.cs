@@ -69,7 +69,7 @@ public class MainViewModel : ViewModelBase
 
         roamingSettings = ApplicationData.Current.RoamingSettings;
         localFolder = ApplicationData.Current.LocalFolder;
-        
+
         apiService = new BeenPwnedService();
     }
 
@@ -209,7 +209,7 @@ public class MainViewModel : ViewModelBase
 
         isAppInitialized = true;
     }
-    
+
     public async Task<ObservableCollection<Breach>> CheckForBreachesAsync(MonitoredAccount account, bool showSuccessMessage = true)
     {
         IsBusy = true;
@@ -230,22 +230,36 @@ public class MainViewModel : ViewModelBase
                     await new MessageDialog($"The breaches database has returned 'no results' for this account.", "Good news!").ShowAsync();
                     break;
                 case HttpStatusCode.Forbidden:
-                {
-                    if (ApiInformation.IsTypePresent("Microsoft.Services.Store.Engagement.StoreServicesCustomEventLogger"))
                     {
-                        StoreServicesCustomEventLogger.GetDefault().Log("HIBP API Forbidden");
-                    }
+                        if (ApiInformation.IsTypePresent("Microsoft.Services.Store.Engagement.StoreServicesCustomEventLogger"))
+                        {
+                            StoreServicesCustomEventLogger.GetDefault().Log("HIBP API Forbidden");
+                        }
 
-                    // The result was a 403 or 404
-                    DisplayMessageHelpers.ShowExceptionMessageOnUiThread("CheckForBreachesAsync", ex);
-                    break;
-                }
+                        // The result was a 403 or 404
+                        DisplayMessageHelpers.ShowExceptionMessageOnUiThread("CheckForBreachesAsync", ex);
+                        break;
+                    }
             }
         }
-        catch (Exception ex)
+        catch (Exception ex) // any other kind of exception, e.g. from HttpClient
         {
-            // Any other kind of exception
-            DisplayMessageHelpers.ShowExceptionMessageOnUiThread("CheckForBreachesAsync", ex);
+            // Retry/backoff logic causes this
+            if (ex.Message.ToLower() == "the request message was already sent. cannot send the same request message multiple times.")
+            {
+                if (ApiInformation.IsTypePresent("Microsoft.Services.Store.Engagement.StoreServicesCustomEventLogger"))
+                {
+                    StoreServicesCustomEventLogger.GetDefault().Log("Rate Limited");
+                }
+
+                DisplayMessageHelpers.ShowExceptionMessageOnUiThread(
+                    "Too Many Requests", 
+                    new Exception("We're sorry, the API is limiting how many checks this app can do within a minute. Try again after 1 or 2 minutes."));
+            }
+            else
+            {
+                DisplayMessageHelpers.ShowExceptionMessageOnUiThread("CheckForBreachesAsync", ex);
+            }
         }
         finally
         {
@@ -280,7 +294,7 @@ public class MainViewModel : ViewModelBase
             IsBusy = true;
 
             var account = new MonitoredAccount { Address = address };
-            
+
             account.Breaches = await CheckForBreachesAsync(account);
 
             account.LastUpdated = DateTime.Now;
@@ -578,10 +592,11 @@ public class MainViewModel : ViewModelBase
 
                 Analytics.TrackEvent("Accounts Restored from backup");
 
-                return new Tuple<bool, string>(true, $"Import Complete:\r\n\n" +
+                return new Tuple<bool, string>(true, "Import Complete:\r\n\n" +
                                                      $"Accounts in file: {backupFileTotal}\n" +
                                                      $"Imported: {newTotal}\n" +
-                                                     $"Skipped: {existingTotal} (already present)");
+                                                     $"Skipped: {existingTotal} (already present).\r\n\n" +
+                                                     "Would you like to refresh all monitored accounts now?");
             }
             else
             {
