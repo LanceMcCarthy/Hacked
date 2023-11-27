@@ -1,15 +1,17 @@
 ﻿using CommonHelpers.Common;
+using CommunityToolkit.Mvvm.Messaging;
+using Hacked.Core.Common;
 using Hacked.Maui.Services;
 
 namespace Hacked.Maui.ViewModels;
 
 public class SettingsViewModel : ViewModelBase
 {
-    private readonly AccountsService accountsService;
+    private readonly AccountsService _accountsService;
 
     public SettingsViewModel(AccountsService accountsService)
     {
-        this.accountsService = accountsService;
+        _accountsService = accountsService;
 
         ImportCommand = new Command(ImportAccounts);
         ExportCommand = new Command(ExportAccounts);
@@ -23,11 +25,29 @@ public class SettingsViewModel : ViewModelBase
 
     private async void ImportAccounts()
     {
-        await accountsService.ImportBackupAsync();
+        var result = await _accountsService.ImportBackupAsync();
+
+        if (!result.Item1)
+        {
+            WeakReferenceMessenger.Default.Send(new MessagingCenterError
+            {
+                Caller = "Import Failed", 
+                Exception = new Exception(result.Item2)
+            });
+        }
     }
 
     private async void ExportAccounts()
     {
-        await accountsService.ExportBackupAsync();
+        var result = await _accountsService.ExportBackupAsync();
+
+        if (!result.Item1)
+        {
+            WeakReferenceMessenger.Default.Send(new MessagingCenterError
+            {
+                Caller = "Export Failed", 
+                Exception = new Exception(result.Item2)
+            });
+        }
     }
 }

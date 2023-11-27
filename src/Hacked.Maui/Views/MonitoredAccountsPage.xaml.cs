@@ -11,11 +11,6 @@ namespace Hacked.Maui.Views;
 
 public partial class MonitoredAccountsPage
 {
-    public MonitoredAccountsPage()
-    {
-        InitializeComponent();
-    }
-
     public MonitoredAccountsPage(MonitoredAccountsViewModel vm)
 	{
 		InitializeComponent();
@@ -32,48 +27,48 @@ public partial class MonitoredAccountsPage
     //    }
     //}
 
-    private void RefreshSwipeButton_Clicked(object sender, EventArgs e)
-    {
-        try
-        {
-            // Performed by command now
-            //if (sender is Button { BindingContext: MonitoredAccount account })
-            //{
-            //    var countBeforeUpdate = account.Breaches.Count;
+    //private void RefreshSwipeButton_Clicked(object sender, EventArgs e)
+    //{
+    //    try
+    //    {
+    //        // Performed by command now
+    //        //if (sender is Button { BindingContext: MonitoredAccount account })
+    //        //{
+    //        //    var countBeforeUpdate = account.Breaches.Count;
 
-            //    await ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
+    //        //    await ViewModelLocator.MonitoredAccounts.UpdateBreachesForAccountAsync(account);
 
-            //    if (account.Breaches.Count <= countBeforeUpdate)
-            //        return;
+    //        //    if (account.Breaches.Count <= countBeforeUpdate)
+    //        //        return;
                 
-            //    ViewModelLocator.MonitoredAccounts.SaveAccounts();
+    //        //    ViewModelLocator.MonitoredAccounts.SaveAccounts();
 
-            //    await Shell.Current.DisplayAlert("New breaches have been detected", "Alert", "close");
-            //}
-        }
-        finally
-        {
-            if (sender is RadListView rlv)
-                rlv.EndItemSwipe();
-        }
-    }
+    //        //    await Shell.Current.DisplayAlert("New breaches have been detected", "Alert", "close");
+    //        //}
+    //    }
+    //    finally
+    //    {
+    //        if (sender is RadListView rlv)
+    //            rlv.EndItemSwipe();
+    //    }
+    //}
 
-    private void DeleteSwipeButton_Clicked(object sender, EventArgs e)
-    {
-        try
-        {
-            // Performed by command now
-            //if (sender is Button { BindingContext: MonitoredAccount account })
-            //{
-            //    ViewModelLocator.MonitoredAccounts.RemoveAccount(account);
-            //}
-        }
-        finally
-        {
-            if (sender is RadListView rlv)
-                rlv.EndItemSwipe();
-        }
-    }
+    //private void DeleteSwipeButton_Clicked(object sender, EventArgs e)
+    //{
+    //    try
+    //    {
+    //        // Performed by command now
+    //        //if (sender is Button { BindingContext: MonitoredAccount account })
+    //        //{
+    //        //    ViewModelLocator.MonitoredAccounts.RemoveAccount(account);
+    //        //}
+    //    }
+    //    finally
+    //    {
+    //        if (sender is RadListView rlv)
+    //            rlv.EndItemSwipe();
+    //    }
+    //}
 
     private void ToggleAddAccountOverlay(bool show = true)
     {
@@ -127,70 +122,70 @@ public partial class MonitoredAccountsPage
         ToggleAddAccountOverlay(false);
     }
 
-    private async void AccountsListView_OnRefreshRequested(object sender, PullToRefreshRequestedEventArgs e)
-    {
-        try
-        {
-            if (!(BindingContext as MonitoredAccountsViewModel).HasAccounts)
-                return;
+    //private async void AccountsListView_OnRefreshRequested(object sender, PullToRefreshRequestedEventArgs e)
+    //{
+    //    try
+    //    {
+    //        if (!(BindingContext as MonitoredAccountsViewModel).HasAccounts)
+    //            return;
 
-            await (BindingContext as MonitoredAccountsViewModel).FindAllAccountsBreachesAsync();
+    //        await (BindingContext as MonitoredAccountsViewModel).FindAllAccountsBreachesAsync();
 
-            //if first time, hide tip and persist via settings
-            //if (AccountRefreshTip.IsVisible)
-            //{
-            //    await AccountRefreshTip.FadeTo(0, 500, Easing.CubicInOut);
+    //        //if first time, hide tip and persist via settings
+    //        //if (AccountRefreshTip.IsVisible)
+    //        //{
+    //        //    await AccountRefreshTip.FadeTo(0, 500, Easing.CubicInOut);
 
-            //    AccountRefreshTip.IsVisible = false;
-            //    Settings.AccountRefreshShown = true;
-            //}
-        }
-        finally
-        {
-            if (sender is RadListView rlv)
-                rlv.EndRefresh();
-        }
-    }
+    //        //    AccountRefreshTip.IsVisible = false;
+    //        //    Settings.AccountRefreshShown = true;
+    //        //}
+    //    }
+    //    finally
+    //    {
+    //        if (sender is RadListView rlv)
+    //            rlv.EndRefresh();
+    //    }
+    //}
 
-    private async void AccountsListView_OnItemSwipeCompleted(object sender, ItemSwipeCompletedEventArgs e)
-    {
-        if (e.Item is not MonitoredAccount account) 
-            return;
+    //private async void AccountsListView_OnItemSwipeCompleted(object sender, ItemSwipeCompletedEventArgs e)
+    //{
+    //    if (e.Item is not MonitoredAccount account) 
+    //        return;
 
-        if (e.Offset > 201)
-        {
-            var lastCount = account.Breaches.Count;
+    //    if (e.Offset > 201)
+    //    {
+    //        var lastCount = account.Breaches.Count;
 
-            await (BindingContext as MonitoredAccountsViewModel).UpdateBreachesForAccountAsync(account);
+    //        await (BindingContext as MonitoredAccountsViewModel).UpdateBreachesForAccountAsync(account);
 
-            if (account.Breaches.Count > lastCount)
-            {
-                await (BindingContext as MonitoredAccountsViewModel).Sa
+    //        if (account.Breaches.Count > lastCount)
+    //        {
+    //            await (BindingContext as MonitoredAccountsViewModel).SaveAccountsAsync();
 
-                await Shell.Current.DisplayAlert("New breaches have been detected", "Alert", "close");
-            }
-        }
-        else if (e.Offset < -200)
-        {
-            await (BindingContext as MonitoredAccountsViewModel).RemoveAccountAsync(account);
-        }
+    //            await Shell.Current.DisplayAlert("New breaches have been detected", "Alert", "close");
+    //        }
+    //    }
+    //    else if (e.Offset < -200)
+    //    {
+    //        await (BindingContext as MonitoredAccountsViewModel).RemoveAccountAsync(account);
+    //    }
 
-        if (sender is RadListView rlv)
-            rlv.EndRefresh();
-    }
+    //    if (sender is RadListView rlv)
+    //        rlv.EndRefresh();
+    //}
 
-    private async void AccountsListView_OnItemTapped(object sender, ItemTapEventArgs e)
-    {
-        if (sender is RadListView { IsSwipingInProgress: true })
-            return;
+    //private async void AccountsListView_OnItemTapped(object sender, ItemTapEventArgs e)
+    //{
+    //    if (sender is RadListView { IsSwipingInProgress: true })
+    //        return;
 
-        if (e?.Item is MonitoredAccount account)
-        {
-            (BindingContext as MonitoredAccountsViewModel).SelectedAccount = account;
+    //    if (e?.Item is MonitoredAccount account)
+    //    {
+    //        (BindingContext as MonitoredAccountsViewModel).SelectedAccount = account;
 
-            await Shell.Current.GoToAsync("accountdetails");
-        }
-    }
+    //        await Shell.Current.GoToAsync("accountdetails");
+    //    }
+    //}
 
     //private async void RefreshTipCheckBox_OnIsCheckedChanged(object sender, CheckedChangedEventArgs e)
     //{

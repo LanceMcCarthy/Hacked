@@ -1,9 +1,9 @@
-﻿using Hacked.Core.Models;
-using Hacked.Maui.ViewModels;
+﻿using Hacked.Core.Common;
+using Hacked.Core.Models;
 
 namespace Hacked.Maui.Views;
 
-public partial class PageBase : ContentPage, IQueryAttributable
+public class PageBase : ContentPage, IQueryAttributable
 {
     public MonitoredAccount SelectedAccount { get; private set; }
 
