@@ -10,7 +10,7 @@ public partial class AccountDetailsPage
     {
         InitializeComponent();
         _viewModel = vm;
-        this.BindingContext = _viewModel;
+        BindingContext = _viewModel;
     }
 
     protected override void OnNavigatedTo(NavigatedToEventArgs args)

@@ -72,25 +72,6 @@
     <PackageReference Include="WinUIEx" Version="1.8.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <MauiXaml Update="Views\AboutPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="Views\AccountDetailsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="Views\BreachDetailsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="Views\MonitoredAccountsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-    <MauiXaml Update="Views\SettingsPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </MauiXaml>
-  </ItemGroup>
-
-
   <!-- ******** PUBLISHING Android ********
     dotnet publish -f:net6.0-android -c:Release
     I can replace some or all of the XML defined items with CLI params 

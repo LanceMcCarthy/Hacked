@@ -30,7 +30,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         RemoveAccountCommand = new AsyncCommand<MonitoredAccount>(RemoveAccountAsync);
         FindAllAccountBreachesCommand = new AsyncCommand(FindAllAccountsBreachesAsync);
         GoToSettingsCommand = new AsyncCommand(GoToSettingsAsync);
-        ViewDetailsCommand = new AsyncCommand<MonitoredAccount>(ViewDetailsAsync);
+        ViewDetailsCommand = new AsyncCommand<MonitoredAccount>(GoToAccountDetailsAsync);
         RefreshAccountCommand = new AsyncCommand<MonitoredAccount>((a) => UpdateBreachesForAccountAsync(a, false));
         CellTapCommand = new AsyncCommand<object>(DataGridCellTappedAsync);
         FindSelectedAccountBreachesCommand = new AsyncCommand(
@@ -114,7 +114,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
     public async Task<MonitoredAccount> AddAccountAsync(string address)
     {
-        MonitoredAccount account;
+        MonitoredAccount account = null;
 
         try
         {
@@ -151,7 +151,6 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         catch (Exception ex)
         {
             WeakReferenceMessenger.Default.Send(new MessagingCenterError { Caller = "AddAccountAsync", Exception = ex });
-            return null;
         }
         finally
         {
@@ -368,11 +367,11 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         await Shell.Current.GoToAsync("/Settings");
     }
 
-    private async Task ViewDetailsAsync(MonitoredAccount account)
+    private async Task GoToAccountDetailsAsync(MonitoredAccount account)
     {
         SelectedAccount = account;
 
-        await Shell.Current.GoToAsync("/AccountDetails", new Dictionary<string, object>()
+        await Shell.Current.GoToAsync("/AccountDetails", new Dictionary<string, object>
         {
             {"SelectedAccount", account}
         });
@@ -382,12 +381,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
     {
         if (parameter is DataGridCellInfo { Item: MonitoredAccount account })
         {
-            SelectedAccount = account;
-
-            await Shell.Current.GoToAsync("/AccountDetails", new Dictionary<string, object>()
-            {
-                {"SelectedAccount", account}
-            });
+            await GoToAccountDetailsAsync(account);
         }
     }
 
