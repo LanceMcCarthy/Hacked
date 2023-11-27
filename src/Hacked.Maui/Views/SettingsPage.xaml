@@ -13,7 +13,9 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Label Text="Some Settings Here" />
-
+        <VerticalStackLayout Padding="10" Spacing="5">
+            <telerik:RadButton Text="Import Backup" Command="{Binding ImportCommand}"/>
+            <telerik:RadButton Text="Export Backup" Command="{Binding ExportCommand}"/>
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>
