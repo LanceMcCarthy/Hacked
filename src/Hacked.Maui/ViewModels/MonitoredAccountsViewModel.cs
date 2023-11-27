@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net;
 using Hacked.Core.Common;
+using Hacked.Maui.Services;
 using Telerik.Maui.Controls.Compatibility.DataGrid;
 
 namespace Hacked.Maui.ViewModels;
@@ -17,6 +18,7 @@ public class MonitoredAccountsViewModel : ViewModelBase
     #region fields
 
     private IPwndBreachService _apiService;
+    private AccountsService _accountsService;
 
     private ObservableCollection<MonitoredAccount> _accounts;
     private ObservableCollection<CategoricalChartData> _accountTotalsChartData;
@@ -28,9 +30,10 @@ public class MonitoredAccountsViewModel : ViewModelBase
 
     #endregion
     
-    public MonitoredAccountsViewModel(IPwndBreachService srv)
+    public MonitoredAccountsViewModel(IPwndBreachService srv, AccountsService accountsService)
     {
         _apiService = srv;
+        _accountsService = accountsService;
 
         InitCommands();
 
@@ -150,7 +153,8 @@ public class MonitoredAccountsViewModel : ViewModelBase
  
             Accounts.Add(account);
 
-            SaveAccounts();
+            //SaveAccounts();
+            await _accountsService.SaveAccountsAsync();
                 
             SelectedAccount = Accounts.LastOrDefault();
 
@@ -170,12 +174,12 @@ public class MonitoredAccountsViewModel : ViewModelBase
         }
     }
 
-    public Task RemoveAccountAsync(MonitoredAccount account)
+    public async Task RemoveAccountAsync(MonitoredAccount account)
     {
         if (account == null)
         {
             Debug.WriteLine("Account to remove is null", "RemoveAccount");
-            return Task.FromException(new NullReferenceException("Account to remove is null"));
+            App.ShowExceptionMessage("RemoveAccount", new NullReferenceException("Account to remove is null"));
         }
 
         try
@@ -199,23 +203,20 @@ public class MonitoredAccountsViewModel : ViewModelBase
                 SelectedAccount = null;
             }
 
-            SaveAccounts();
-            
+            //SaveAccounts();
+            await _accountsService.SaveAccountsAsync();
 
             HasAccounts = Accounts.Count > 0;
         }
         catch (Exception ex)
         {
             App.ShowExceptionMessage("RemoveAccount", ex);
-            return Task.FromException(ex);
         }
         finally
         {
             IsBusy = false;
             IsBusyMessage = "";
         }
-
-        return Task.CompletedTask;
     }
 
     public async Task FindAllAccountsBreachesAsync()
@@ -225,7 +226,8 @@ public class MonitoredAccountsViewModel : ViewModelBase
             await UpdateBreachesForAccountAsync(monitoredAccount, false);
         }
 
-        SaveAccounts();
+        //SaveAccounts();
+        await _accountsService.SaveAccountsAsync();
     }
 
     public async Task UpdateBreachesForAccountAsync(MonitoredAccount account, bool showSuccessMessage = true)
@@ -291,16 +293,14 @@ public class MonitoredAccountsViewModel : ViewModelBase
 
     #region File Operation Methods
 
-    public void SaveAccounts()
+    public void SaveAccounts2()
     {
         IsBusy = true;
         IsBusyMessage = "saving accounts to file...";
 
         try
         {
-            var json = JsonConvert.SerializeObject(_accounts);
-            
-            Hacked.Maui.Common.Extensions.FileExtensions.SaveTextToFile(json, "AccountsJsonData.txt");
+            _accountsService.SaveAccountsAsync().RunSynchronously();
 
             Debug.WriteLine($"--- {_accounts.Count} Accounts Saved ---");
         }
@@ -323,15 +323,13 @@ public class MonitoredAccountsViewModel : ViewModelBase
             IsBusy = true;
             IsBusyMessage = "loading accounts from file...";
 
-            var json = FileExtensions.LoadTextFromFile("AccountsJsonData.txt");
+            var savedAccounts = _accountsService.LoadAccountsAsync().Result;
 
-            if (string.IsNullOrEmpty(json))
+            if (savedAccounts == null)
             {
                 Debug.WriteLine("Accounts json file not found");
                 return new ObservableCollection<MonitoredAccount>();
             }
-                
-            var savedAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
 
             AreAccountsLoaded = true;
 
