@@ -51,32 +51,30 @@ namespace Hacked.Maui
             // App services
             builder.Services.AddSingleton<IPwndBreachService, BeenPwnedService>();
             builder.Services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
-            builder.Services.AddSingleton<AccountsService>();
+            builder.Services.AddSingleton<IAccountsService, AccountsService>();
 
             // View models
-            builder.Services.AddSingleton<AboutViewModel>();
             builder.Services.AddSingleton<MonitoredAccountsViewModel>();
-            builder.Services.AddSingleton<SettingsViewModel>();
-            
             builder.Services.AddTransient<SettingsViewModel>();
+            builder.Services.AddTransient<AboutViewModel>();
 
             return builder;
         }
 
         public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
         {
-            builder.Services.AddTransient<AboutPage>();
+            builder.Services.AddSingleton<MonitoredAccountsPage>();
             builder.Services.AddTransient<AccountDetailsPage>();
-            builder.Services.AddTransient<MonitoredAccountsPage>();
             builder.Services.AddTransient<SettingsPage>();
+            builder.Services.AddTransient<AboutPage>();
 
             return builder;
         }
 
         public static MauiAppBuilder RegisterViewModels(this MauiAppBuilder builder)
         {
-            builder.Services.AddTransient<AboutViewModel>();
             builder.Services.AddSingleton<MonitoredAccountsViewModel>();
+            builder.Services.AddTransient<AboutViewModel>();
             builder.Services.AddTransient<SettingsViewModel>();
 
             return builder;
