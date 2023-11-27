@@ -13,13 +13,12 @@ namespace Hacked.Maui.ViewModels;
 
 public class MonitoredAccountsViewModel : PageViewModelBase
 {
-    private IPwndBreachService _apiService;
-    private AccountsService _accountsService;
+    private readonly IPwndBreachService _apiService;
+    private readonly AccountsService _accountsService;
 
-    private ObservableCollection<MonitoredAccount> _accounts;
     private ObservableCollection<CategoricalChartData> _accountTotalsChartData;
-    private Breach _selectedBreach;
     private MonitoredAccount _selectedAccount;
+    private Breach _selectedBreach;
     private bool _areAccountsLoaded;
     private bool _hasAccounts;
     private int _newBreachesTotal;
@@ -29,6 +28,12 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         _apiService = srv;
         _accountsService = accountsService;
 
+        RemoveAccountCommand = new AsyncCommand<MonitoredAccount>(RemoveAccountAsync);
+        FindAllAccountBreachesCommand = new AsyncCommand(FindAllAccountsBreachesAsync);
+        GoToSettingsCommand = new AsyncCommand(GoToSettingsAsync);
+        ViewDetailsCommand = new AsyncCommand<MonitoredAccount>(ViewDetailsAsync);
+        RefreshAccountCommand = new AsyncCommand<MonitoredAccount>((a) => UpdateBreachesForAccountAsync(a, false));
+        CellTapCommand = new AsyncCommand<object>(DataGridCellTappedAsync);
         FindSelectedAccountBreachesCommand = new AsyncCommand(
             () => UpdateBreachesForAccountAsync(SelectedAccount),
             () => SelectedAccount != null,
@@ -40,14 +45,10 @@ public class MonitoredAccountsViewModel : PageViewModelBase
                 }
             });
 
-        RemoveAccountCommand = new AsyncCommand<MonitoredAccount>(RemoveAccountAsync);
-        FindAllAccountBreachesCommand = new AsyncCommand(FindAllAccountsBreachesAsync);
-        GoToSettingsCommand = new AsyncCommand(GoToSettingsAsync);
-        ViewDetailsCommand = new AsyncCommand<MonitoredAccount>(ViewDetailsAsync);
-        RefreshAccountCommand = new AsyncCommand<MonitoredAccount>((a) => UpdateBreachesForAccountAsync(a, false));
-        CellTapCommand = new AsyncCommand<object>(DataGridCellTappedAsync);
-
-        Accounts.CollectionChanged += (s, e) => HasAccounts = Accounts.Count > 0;
+        Accounts.CollectionChanged += (s, e) =>
+        {
+            HasAccounts = Accounts.Count > 0;
+        };
     }
 
     #region Properties
@@ -60,16 +61,16 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         set => SetProperty(ref _accountTotalsChartData, value);
     }
 
-    public Breach SelectedBreach
-    {
-        get => _selectedBreach;
-        set => SetProperty(ref _selectedBreach, value);
-    }
-
     public MonitoredAccount SelectedAccount
     {
         get => _selectedAccount;
         set => SetProperty(ref _selectedAccount, value);
+    }
+
+    public Breach SelectedBreach
+    {
+        get => _selectedBreach;
+        set => SetProperty(ref _selectedBreach, value);
     }
 
     public bool AreAccountsLoaded
@@ -147,22 +148,20 @@ public class MonitoredAccountsViewModel : PageViewModelBase
             }
             finally
             {
+                await _accountsService.SaveAccountsAsync();
+
                 IsBusy = false;
                 IsBusyMessage = "";
 
                 account.IsUpdating = false;
                 account.LastUpdated = DateTime.Now;
+
+                Accounts.Add(account);
+
+                SelectedAccount = Accounts.LastOrDefault();
+
+                HasAccounts = Accounts.Count > 0;
             }
-
-
-            Accounts.Add(account);
-
-            //SaveAccounts();
-            await _accountsService.SaveAccountsAsync();
-
-            SelectedAccount = Accounts.LastOrDefault();
-
-            HasAccounts = Accounts.Count > 0;
 
             return account;
         }
@@ -173,6 +172,8 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         }
         finally
         {
+            UpdateStatistics();
+
             IsBusy = false;
             IsBusyMessage = "";
         }
@@ -222,6 +223,8 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         }
         finally
         {
+            UpdateStatistics();
+
             IsBusy = false;
             IsBusyMessage = "";
         }
@@ -229,12 +232,19 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
     public async Task FindAllAccountsBreachesAsync()
     {
-        foreach (var monitoredAccount in Accounts)
+        try
         {
-            await UpdateBreachesForAccountAsync(monitoredAccount, false);
-        }
+            foreach (var monitoredAccount in Accounts)
+            {
+                await UpdateBreachesForAccountAsync(monitoredAccount, false);
+            }
 
-        await _accountsService.SaveAccountsAsync();
+            await _accountsService.SaveAccountsAsync();
+        }
+        finally
+        {
+            UpdateStatistics();
+        }
     }
 
     public async Task UpdateBreachesForAccountAsync(MonitoredAccount account, bool showSuccessMessage = true)
@@ -295,6 +305,8 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         }
         finally
         {
+            UpdateStatistics();
+
             IsBusy = false;
             IsBusyMessage = "";
             account.IsUpdating = false;
@@ -302,44 +314,27 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         }
     }
 
-    public async Task SaveAccountsAsync()
+    public void UpdateStatistics()
     {
-        IsBusy = true;
-        IsBusyMessage = "saving accounts to file...";
+        AccountTotalsChartData.Clear();
 
-        try
+        var groupedAccounts = this.Accounts.GroupBy(a => a.Address).ToList();
+
+        foreach (var account in groupedAccounts)
         {
-            await _accountsService.SaveAccountsAsync();
+            var category = account.Key;
+            var count = account.Sum(a => a.Breaches.Count);
 
-            Debug.WriteLine($"--- {_accounts.Count} Accounts Saved ---");
+            AccountTotalsChartData.Add(new CategoricalChartData
+            {
+                Category = category,
+                Value = count
+            });
+
+            Debug.WriteLine($"GroupByAccountTotals = Category: {category}, Count: {count}");
         }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"*****Accounts json file not saved***** Error: {ex.Message}");
-            WeakReferenceMessenger.Default.Send(new MessagingCenterError{ Caller = "SaveAccountsAsync", Exception = ex });
-        }
-        finally
-        {
-            IsBusy = false;
-            IsBusyMessage = "";
-        }
-    }
 
-    public async Task LoadAccountsAsync()
-    {
-        IsBusy = true;
-        IsBusyMessage = "loading accounts from file...";
-
-        await _accountsService.LoadAccountsAsync();
-
-        AreAccountsLoaded = true;
-
-        Debug.WriteLine($"--- {Accounts?.Count} accounts loaded from json file ---");
-
-        HasAccounts = Accounts?.Count > 0;
-
-        IsBusy = false;
-        IsBusyMessage = "";
+        NewBreachesTotal = Accounts.Sum(a => a.NewBreachCount);
     }
 
     #endregion
@@ -348,17 +343,34 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
     public override async void OnAppearing()
     {
-        await LoadAccountsAsync();
+        try
+        {
+            IsBusy = true;
+            IsBusyMessage = "loading accounts from file...";
 
-        if(Accounts.Any())
-            Accounts.Clear();
+            await _accountsService.LoadAccountsAsync();
 
-        HasAccounts = Accounts.Any();
+            AreAccountsLoaded = true;
 
-        if (HasAccounts)
-            SelectedAccount = Accounts.FirstOrDefault();
+            Debug.WriteLine($"--- {Accounts?.Count} accounts loaded from json file ---");
 
-        UpdateStatistics();
+            HasAccounts = Accounts?.Count > 0;
+
+            if (HasAccounts)
+                SelectedAccount = Accounts?.FirstOrDefault();
+
+            UpdateStatistics();
+        }
+        catch (Exception ex)
+        {
+            WeakReferenceMessenger.Default.Send(new MessagingCenterError{ Caller = "OnAppearing", Exception = ex });
+        }
+        finally
+        {
+            IsBusy = false;
+            IsBusyMessage = "";
+
+        }
     }
 
     private async Task GoToSettingsAsync()
@@ -391,30 +403,8 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
     #endregion
 
+
     #region Statistic Methods
-
-    public void UpdateStatistics()
-    {
-        AccountTotalsChartData.Clear();
-
-        var groupedAccounts = this.Accounts.GroupBy(a => a.Address).ToList();
-
-        foreach (var account in groupedAccounts)
-        {
-            var category = account.Key;
-            var count = account.Sum(a => a.Breaches.Count);
-
-            AccountTotalsChartData.Add(new CategoricalChartData
-            {
-                Category = category,
-                Value = count
-            });
-
-            Debug.WriteLine($"GroupByAccountTotals = Category: {category}, Count: {count}");
-        }
-
-        NewBreachesTotal = Accounts.Sum(a => a.NewBreachCount);
-    }
 
     #endregion
 }
