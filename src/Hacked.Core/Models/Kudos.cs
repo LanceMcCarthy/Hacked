@@ -1,43 +1,42 @@
 ﻿using CommonHelpers.Common;
 
-namespace Hacked.Core.Models
+namespace Hacked.Core.Models;
+
+public class Kudos : BindableBase
 {
-    public class Kudos : BindableBase
+    private string title;
+    private string storeId;
+    private string imageUrl;
+    private string price;
+    private KudoCategory category;
+
+    public string Title
     {
-        private string title;
-        private string storeId;
-        private string imageUrl;
-        private string price;
-        private KudoCategory category;
+        get => title;
+        set => SetProperty(ref title, value);
+    }
 
-        public string Title
-        {
-            get => title;
-            set => SetProperty(ref title, value);
-        }
+    public string StoreId
+    {
+        get => storeId;
+        set => SetProperty(ref storeId, value);
+    }
 
-        public string StoreId
-        {
-            get => storeId;
-            set => SetProperty(ref storeId, value);
-        }
+    public string ImageUrl
+    {
+        get => imageUrl;
+        set => SetProperty(ref imageUrl, value);
+    }
 
-        public string ImageUrl
-        {
-            get => imageUrl;
-            set => SetProperty(ref imageUrl, value);
-        }
+    public string Price
+    {
+        get => price;
+        set => SetProperty(ref price, value);
+    }
 
-        public string Price
-        {
-            get => price;
-            set => SetProperty(ref price, value);
-        }
-
-        public KudoCategory Category
-        {
-            get => category;
-            set => SetProperty(ref category, value);
-        }
+    public KudoCategory Category
+    {
+        get => category;
+        set => SetProperty(ref category, value);
     }
 }

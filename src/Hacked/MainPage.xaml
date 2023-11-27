@@ -8,7 +8,6 @@
       xmlns:tkControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
       xmlns:controls="using:Microsoft.UI.Xaml.Controls"
       xmlns:animations="using:Microsoft.Toolkit.Uwp.UI.Animations"
-      xmlns:ui1="using:VungleSDK.UI"
       xmlns:viewModels="using:Hacked.ViewModels"
       xmlns:models="using:Hacked.Core.Models"
       xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
@@ -327,8 +326,7 @@
                               ItemsSource="{Binding Accounts}"
                               SelectedItem="{x:Bind ViewModel.SelectedAccount, Mode=TwoWay}"
                               SelectionChanged="AccountsListView_OnSelectionChanged"
-                              ui:VisualExtensions.NormalizedCenterPoint="0.5, 0.5"
-                              animations:Implicit.ShowAnimations="{StaticResource CommonShowAnimations}">
+                              ui:VisualExtensions.NormalizedCenterPoint="0.5, 0.5">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Setter Property="Padding"
@@ -404,8 +402,7 @@
                                             Command="{Binding DataContext.RemoveAccountCommand, ElementName=Page}"
                                             CommandParameter="{Binding}"
                                             IsEnabled="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}">
-                                        <SymbolIcon Foreground="White"
-                                                    Symbol="Delete" />
+                                        <SymbolIcon Symbol="Delete" />
                                     </Button>
                                 </Grid>
                             </DataTemplate>
@@ -427,29 +424,28 @@
                         </Grid.Resources>
 
                         <StackPanel>
-                            <Button Margin="5"
+                            <Button Margin="10,5,10,5"
                                     HorizontalAlignment="Stretch"
                                     Click="AddAccountButton_Click"
                                     Background="{ThemeResource SystemControlBackgroundAccentBrush}"
-                                    Content="Add Account"/>
+                                    Content="add account"/>
 
                             <Border Background="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                     Height="2"
-                                    Margin="5" />
+                                    Margin="10,5,10,5" />
 
                             <Button x:Name="KudosButton"
-                                    Content="Kudos (NEW)"
+                                    Content="kudos"
                                     Command="{Binding ShowKudosCommand}"
-                                    Foreground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                                    Foreground="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                     HorizontalAlignment="Stretch"
-                                    Margin="3"/>
+                                    Margin="10,5,10,5"/>
 
-                            <Button x:Name="PlayAdButton"
-                                    IsEnabled="False"
+                            <!--<Button x:Name="PlayAdButton"
+                                    Margin="10,5,10,5"
                                     HorizontalAlignment="Stretch"
                                     Background="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                     BorderBrush="{ThemeResource AppBarBackgroundThemeBrush}"
-                                    Margin="5"
                                     Click="PlayAdButton_OnClick">
                                 <TextBlock HorizontalTextAlignment="Center">
                                     <Run Text="Want to help support this free app?"
@@ -459,23 +455,24 @@
                                     <Run Text="Click here to play an ad!"
                                          FontWeight="SemiBold" />
                                 </TextBlock>
-                            </Button>
+                            </Button>-->
 
                             <Border Background="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                     Height="2"
-                                    Margin="5" />
+                                    Margin="10,5,10,5"/>
 
                             <Button x:Name="BackupRestoreButton"
-                                    Margin="5,5,5,10"
+                                    Margin="10,5,10,5"
                                     HorizontalAlignment="Stretch"
+                                    Foreground="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                     Content="export | import">
                                 <Button.Flyout>
                                     <Flyout x:Name="BackupRestoreButtonFlyout">
                                         <Grid MaxWidth="325">
                                             <StackPanel HorizontalAlignment="Left">
                                                 <TextBlock FontWeight="Bold"
-                                                           Style="{StaticResource SubtitleTextBlockStyle}"
-                                                           Text="Backup and Restore" 
+                                                           Text="Backup and Restore"
+                                                           Foreground="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                                            HorizontalAlignment="Center"
                                                            Margin="0,0,0,10"/>
                                                 <TextBlock Text="Export your Monitored Accounts list to a backup file."
@@ -501,7 +498,8 @@
                             </Button>
 
                             <Button x:Name="AboutButton"
-                                    Margin="5"
+                                    Margin="10,5,10,10"
+                                    Foreground="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                     HorizontalAlignment="Stretch"
                                     Content="about | contact us | review | feedback">
                                 <Button.Flyout>
@@ -540,10 +538,10 @@
                                                            Text="Json.NET © 2016 Newtonsoft" />
                                                 <TextBlock HorizontalAlignment="Left"
                                                            FontSize="12"
-                                                           Text="Telerik UI for UWP © 2020 Progress" />
+                                                           Text="Progress© Telerik™️ UI for UWP v2023 " />
                                                 <TextBlock HorizontalAlignment="Left"
                                                            FontSize="12"
-                                                           Text="Data from HaveibeenPwned by Troy Hunt" />
+                                                           Text="HaveibeenPwned API data from Troy Hunt" />
 
                                                 <TextBlock MaxWidth="320"
                                                            Margin="0,10,0,10"
@@ -559,16 +557,16 @@
                                                         HorizontalAlignment="Stretch"
                                                         Click="ContactUsButton_OnClick"
                                                         Margin="0,10,0,0"
-                                                        Content="contact us" />
+                                                        Content="📨 contact us 📨" />
 
                                                 <Button x:Name="ReviewButton"
                                                         Margin="0,10,0,0"
                                                         HorizontalAlignment="Stretch"
                                                         Click="ReviewButton_OnClickButton_OnClick"
-                                                        Content="rate this app" />
+                                                        Content="😍 leave a store rating 😍" />
 
                                                 <Button x:Name="FeedbackHubButton"
-                                                        Content="Leave feedback in FeedbackHub"
+                                                        Content="submit feedback in FeedbackHub"
                                                         Visibility="Visible"
                                                         HorizontalAlignment="Stretch"
                                                         Click="FeedbackHubButton_OnClick"
@@ -702,8 +700,14 @@
                                        TextWrapping="Wrap" />
                             <TextBlock HorizontalAlignment="Center"
                                        Foreground="White"
-                                       Text="To add an account, open the pane and select 'add account'."
+                                       Text="Add your first account to keep an eye on."
+                                       Margin="10,0"
                                        TextWrapping="Wrap" />
+                            <Button Margin="10"
+                                    HorizontalAlignment="Stretch"
+                                    Click="AddAccountButton_Click"
+                                    Foreground="{ThemeResource SystemControlBackgroundAccentBrush}"
+                                    Content="add first account"/>
                         </StackPanel>
                     </Grid>
 
@@ -712,6 +716,7 @@
                         <tkControls:AdaptiveGridView x:Name="BreachesListView"
                                                      ItemsSource="{Binding SelectedAccount.Breaches}"
                                                      ItemTemplate="{StaticResource BreachesSquareItemTemplate}"
+                                                     Visibility="{Binding HasAccounts, Converter={StaticResource BoolToVisibilityConverter}}"
                                                      SelectionMode="None"
                                                      ItemHeight="250"
                                                      DesiredWidth="300">
@@ -777,11 +782,9 @@
                                                 Command="{x:Bind ViewModel.FindSelectedAccountBreachCommand}"
                                                 IsEnabled="{Binding SelectedAccount.IsUpdating, Converter={StaticResource InvertBoolConverter}}"
                                                 Visibility="{Binding SelectedAccount, Converter={StaticResource NullToVisibilityConverter}}"
-                                                Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
                                                 Margin="0,5,0,0">
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="Refresh Now"
-                                                           Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
                                                            FontWeight="SemiBold" />
                                             </StackPanel>
                                         </Button>
@@ -863,11 +866,11 @@
                         <TextBlock Text="New:"
                                    FontWeight="Bold" />
                         <TextBlock x:Name="NoticeFeaturesTextBlock"
-                                   Text="This release has several new features and improvements" />
+                                   Text="This text will be updated on launch" TextWrapping="WrapWholeWords" />
                         <TextBlock Text="Fixes:"
                                    FontWeight="Bold" />
                         <TextBlock x:Name="NoticeFixesTextBlock"
-                                   Text="There were a few minor fixes in this release." />
+                                   Text="This text will be updated on launch" TextWrapping="WrapWholeWords" />
                         <TextBlock Margin="0,10,0,0"
                                    Text="Contact us if you have any questions or concerns."
                                    TextWrapping="Wrap" />
@@ -877,22 +880,11 @@
         </Grid>
 
         <customControls:KudosControl x:Name="KudosCtrl"
-                                     PlayAdRequested="KudoAdRequested"
                                      DataContext="{Binding}"
                                      Visibility="{Binding IsKudoSelectorOpen, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}}"
                                      VerticalAlignment="Stretch"
                                      HorizontalAlignment="Stretch"
                                      Grid.Row="1" />
-
-        <ui1:VungleAdControl x:Name="VungleAd1"
-                             AppID="5e347706c28ba7001748f549"
-                             Placement="MAININTERSTITIAL-8569070"
-                             Placements="MAININTERSTITIAL-8569070, KUDOSAD-0259168"
-                             ApiEndpoint="https://ads.api.vungle.com"
-                             IsHitTestVisible="False"
-                             Grid.Row="1"
-                             OnAdStart="VungleAd1_Start"
-                             OnAdEnd="VungleAd1_End" />
 
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="WindowStates">
