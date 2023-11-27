@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Hacked.Maui.Views.AboutPage"
-             xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
-             xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
-             x:DataType="vms:AboutViewModel"
-             Title="About">
+<views:PageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                x:Class="Hacked.Maui.Views.AboutPage"
+                xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
+                xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
+                xmlns:views="clr-namespace:Hacked.Maui.Views"
+                x:DataType="vms:AboutViewModel"
+                Title="About">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -83,4 +84,4 @@
                              CornerRadius="5" />
         </VerticalStackLayout>
     </Grid>
-</ContentPage>
+</views:PageBase>

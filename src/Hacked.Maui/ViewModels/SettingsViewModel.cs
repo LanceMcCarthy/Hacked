@@ -1,7 +1,4 @@
 ﻿using CommonHelpers.Common;
-using Hacked.Core.Models;
-using Newtonsoft.Json;
-using System.Collections.ObjectModel;
 using Hacked.Maui.Services;
 
 namespace Hacked.Maui.ViewModels;
