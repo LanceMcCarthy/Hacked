@@ -17,8 +17,6 @@ public class SettingsViewModel : ViewModelBase
         ExportCommand = new Command(ExportAccounts);
     }
 
-    public string AppVersion => "1.0";
-
     public Command ImportCommand { get; set; }
     
     public Command ExportCommand { get; set; }
