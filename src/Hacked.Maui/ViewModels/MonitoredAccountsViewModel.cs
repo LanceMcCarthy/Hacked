@@ -15,7 +15,6 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 {
     private readonly IPwndBreachService _apiService;
     private readonly AccountsService _accountsService;
-
     private ObservableCollection<CategoricalChartData> _accountTotalsChartData;
     private MonitoredAccount _selectedAccount;
     private Breach _selectedBreach;
@@ -115,6 +114,8 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
     public async Task<MonitoredAccount> AddAccountAsync(string address)
     {
+        MonitoredAccount account;
+
         try
         {
             if (string.IsNullOrEmpty(address))
@@ -123,47 +124,29 @@ public class MonitoredAccountsViewModel : PageViewModelBase
             IsBusy = true;
             IsBusyMessage = "Adding monitored account...";
 
-            var account = new MonitoredAccount
+            account = new MonitoredAccount
             {
                 Address = address,
                 Breaches = new(),
                 IsUpdating = true
             };
 
-            try
+            IsBusyMessage = $"Checking {account.Address} for breaches...";
+
+            var result = await _apiService.CheckForBreachesAsync(account);
+
+            foreach (var breach in result)
             {
-                IsBusyMessage = $"Checking {account.Address} for breaches...";
-
-                var result = await _apiService.CheckForBreachesAsync(account);
-
-                foreach (var breach in result)
-                {
-                    breach.IsNew = true;
-                    account.Breaches.Add(breach);
-                }
-            }
-            catch (Exception ex)
-            {
-                WeakReferenceMessenger.Default.Send(new MessagingCenterError{ Caller = "AddAccountAsync", Exception = ex });
-            }
-            finally
-            {
-                await _accountsService.SaveAccountsAsync();
-
-                IsBusy = false;
-                IsBusyMessage = "";
-
-                account.IsUpdating = false;
-                account.LastUpdated = DateTime.Now;
-
-                Accounts.Add(account);
-
-                SelectedAccount = Accounts.LastOrDefault();
-
-                HasAccounts = Accounts.Count > 0;
+                breach.IsNew = true;
+                account.Breaches.Add(breach);
             }
 
-            return account;
+            account.IsUpdating = false;
+            account.LastUpdated = DateTime.Now;
+
+            Accounts.Add(account);
+
+            await _accountsService.SaveAccountsAsync();
         }
         catch (Exception ex)
         {
@@ -172,11 +155,17 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         }
         finally
         {
+            SelectedAccount = Accounts.LastOrDefault();
+
+            HasAccounts = Accounts.Count > 0;
+
             UpdateStatistics();
 
             IsBusy = false;
             IsBusyMessage = "";
         }
+
+        return account;
     }
 
     public async Task RemoveAccountAsync(MonitoredAccount account)
@@ -239,6 +228,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
                 await UpdateBreachesForAccountAsync(monitoredAccount, false);
             }
 
+            // wait until all accounts are updated before saving
             await _accountsService.SaveAccountsAsync();
         }
         finally
@@ -339,7 +329,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
     #endregion
 
-    #region Navigation Methods
+    #region Navigation
 
     public override async void OnAppearing()
     {
@@ -400,11 +390,6 @@ public class MonitoredAccountsViewModel : PageViewModelBase
             });
         }
     }
-
-    #endregion
-
-
-    #region Statistic Methods
 
     #endregion
 }
