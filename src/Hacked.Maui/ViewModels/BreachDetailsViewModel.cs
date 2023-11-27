@@ -9,7 +9,6 @@ public class BreachDetailsViewModel : ViewModelBase
 
     public BreachDetailsViewModel()
     {
-        
     }
 
     public Breach SelectedBreach
