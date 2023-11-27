@@ -30,9 +30,6 @@ namespace Hacked.Maui
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
-                .RegisterServices()
-                .RegisterViews()
-                .RegisterViewModels()
                 .UseTelerik()
                 .ConfigureFonts(fonts =>
                 {
@@ -42,43 +39,29 @@ namespace Hacked.Maui
                     fonts.AddFont("fa-solid-900.ttf", "Font Awesome 6 Free Regular");
                 })
                 .RegisterLifecycleEvents();
-            
-            return builder.Build();
-        }
 
-        public static MauiAppBuilder RegisterServices(this MauiAppBuilder builder)
-        {
-            // App services
             builder.Services.AddSingleton<IPwndBreachService, BeenPwnedService>();
             builder.Services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
             builder.Services.AddSingleton<IAccountsService, AccountsService>();
 
-            // View models
             builder.Services.AddSingleton<MonitoredAccountsViewModel>();
-            builder.Services.AddTransient<SettingsViewModel>();
-            builder.Services.AddTransient<AboutViewModel>();
-
-            return builder;
-        }
-
-        public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
-        {
             builder.Services.AddSingleton<MonitoredAccountsPage>();
+
+            builder.Services.AddTransient<AccountDetailsViewModel>();
             builder.Services.AddTransient<AccountDetailsPage>();
+
+            builder.Services.AddTransient<BreachDetailsViewModel>();
+            builder.Services.AddTransient<BreachDetailsPage>();
+
+            builder.Services.AddTransient<SettingsViewModel>();
             builder.Services.AddTransient<SettingsPage>();
+
+            builder.Services.AddTransient<AboutViewModel>();
             builder.Services.AddTransient<AboutPage>();
 
-            return builder;
+            return builder.Build();
         }
 
-        public static MauiAppBuilder RegisterViewModels(this MauiAppBuilder builder)
-        {
-            builder.Services.AddSingleton<MonitoredAccountsViewModel>();
-            builder.Services.AddTransient<AboutViewModel>();
-            builder.Services.AddTransient<SettingsViewModel>();
-
-            return builder;
-        }
 
         public static MauiAppBuilder RegisterLifecycleEvents(this MauiAppBuilder builder)
         {
