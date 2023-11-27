@@ -2,13 +2,8 @@ using Hacked.Maui.ViewModels;
 
 namespace Hacked.Maui.Views;
 
-public partial class AccountDetailsPage : ContentPage
+public partial class AccountDetailsPage
 {
-	public AccountDetailsPage()
-	{
-		InitializeComponent();
-	}
-
 	public AccountDetailsPage(MonitoredAccountsViewModel vm)
     {
         InitializeComponent();

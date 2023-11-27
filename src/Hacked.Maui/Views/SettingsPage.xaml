@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Hacked.Maui.Views.SettingsPage"
-             xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
-             xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
-             x:DataType="vms:SettingsViewModel"
-             Title="Settings">
+<views:PageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+          x:Class="Hacked.Maui.Views.SettingsPage"
+          xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
+          xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
+          xmlns:views="clr-namespace:Hacked.Maui.Views"
+          x:DataType="vms:SettingsViewModel"
+          Title="Settings">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -18,4 +19,4 @@
             <telerik:RadButton Text="Export Backup" Command="{Binding ExportCommand}"/>
         </VerticalStackLayout>
     </Grid>
-</ContentPage>
+</views:PageBase>

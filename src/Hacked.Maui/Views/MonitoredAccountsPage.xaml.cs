@@ -9,7 +9,7 @@ using Telerik.Maui.Controls.Compatibility.DataControls.ListView;
 
 namespace Hacked.Maui.Views;
 
-public partial class MonitoredAccountsPage : ContentPage
+public partial class MonitoredAccountsPage
 {
     public MonitoredAccountsPage()
     {
@@ -165,7 +165,7 @@ public partial class MonitoredAccountsPage : ContentPage
 
             if (account.Breaches.Count > lastCount)
             {
-                (BindingContext as MonitoredAccountsViewModel).SaveAccounts();
+                await (BindingContext as MonitoredAccountsViewModel).Sa
 
                 await Shell.Current.DisplayAlert("New breaches have been detected", "Alert", "close");
             }
