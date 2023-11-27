@@ -3,96 +3,95 @@ using System.Collections.Generic;
 using CommonHelpers.Common;
 using Newtonsoft.Json;
 
-namespace Hacked.Core.Models
+namespace Hacked.Core.Models;
+
+public class Breach : BindableBase
 {
-    public class Breach : BindableBase
+    // **** API members ******
+
+    [JsonProperty("Name")]
+    public string Name { get; set; }
+
+    [JsonProperty("Title")]
+    public string Title { get; set; }
+
+    [JsonProperty("Domain")]
+    public string Domain { get; set; }
+
+    [JsonProperty("BreachDate")]
+    public DateTime? BreachDate { get; set; }
+
+    [JsonProperty("AddedDate")]
+    public string AddedDate { get; set; }
+
+    [JsonProperty("ModifiedDate")]
+    public string ModifiedDate { get; set; }
+
+    [JsonProperty("PwnCount")]
+    public long PwnCount { get; set; }
+
+    [JsonProperty("Description")]
+    public string Description { get; set; }
+
+    [JsonProperty("DataClasses")]
+    public List<string> DataClasses { get; set; }
+
+    [JsonProperty("IsVerified")]
+    public bool IsVerified { get; set; }
+
+    [JsonProperty("IsFabricated")]
+    public bool IsFabricated { get; set; }
+
+    [JsonProperty("IsSensitive")]
+    public bool IsSensitive { get; set; }
+
+    [JsonProperty("IsRetired")]
+    public bool IsRetired { get; set; }
+
+    [JsonProperty("IsSpamList")]
+    public bool IsSpamList { get; set; }
+
+    [JsonProperty("LogoPath")]
+    public Uri LogoPath { get; set; }
+
+    // ***** App specific members *****
+
+    private bool isSelected;
+    private bool isNew;
+
+    public bool IsSelected
     {
-        // **** API members ******
-
-        [JsonProperty("Name")]
-        public string Name { get; set; }
-
-        [JsonProperty("Title")]
-        public string Title { get; set; }
-
-        [JsonProperty("Domain")]
-        public string Domain { get; set; }
-
-        [JsonProperty("BreachDate")]
-        public DateTime? BreachDate { get; set; }
-
-        [JsonProperty("AddedDate")]
-        public string AddedDate { get; set; }
-
-        [JsonProperty("ModifiedDate")]
-        public string ModifiedDate { get; set; }
-
-        [JsonProperty("PwnCount")]
-        public long PwnCount { get; set; }
-
-        [JsonProperty("Description")]
-        public string Description { get; set; }
-
-        [JsonProperty("DataClasses")]
-        public List<string> DataClasses { get; set; }
-
-        [JsonProperty("IsVerified")]
-        public bool IsVerified { get; set; }
-
-        [JsonProperty("IsFabricated")]
-        public bool IsFabricated { get; set; }
-
-        [JsonProperty("IsSensitive")]
-        public bool IsSensitive { get; set; }
-
-        [JsonProperty("IsRetired")]
-        public bool IsRetired { get; set; }
-
-        [JsonProperty("IsSpamList")]
-        public bool IsSpamList { get; set; }
-
-        [JsonProperty("LogoPath")]
-        public Uri LogoPath { get; set; }
-
-        // ***** App specific members *****
-
-        private bool isSelected;
-        private bool isNew;
-
-        public bool IsSelected
-        {
-            get => isSelected;
-            set => SetProperty(ref isSelected, value);
-        }
-
-        public bool IsNew
-        {
-            get => isNew;
-            set => SetProperty(ref isNew, value);
-        }
-
-        public string Id => Title;
-        
-        public override bool Equals(object obj)
-        {
-            var otherBreach = obj as Breach;
-
-            // Note - sometimes this method gets passed a string[], just use base.Equals instead 
-            if (otherBreach == null)
-                return base.Equals(obj);
-
-            try
-            {
-                return Title.ToLowerInvariant().Equals(otherBreach?.Title?.ToLowerInvariant());
-            }
-            catch
-            {
-                return Title.ToLowerInvariant() == otherBreach?.Title?.ToLowerInvariant();
-            }
-        }
-
-        public override int GetHashCode() => Title?.GetHashCode() ?? base.GetHashCode();
+        get => isSelected;
+        set => SetProperty(ref isSelected, value);
     }
+
+    public bool IsNew
+    {
+        get => isNew;
+        set => SetProperty(ref isNew, value);
+    }
+
+    public string Id => Title;
+
+    public override bool Equals(object obj)
+    {
+        var otherBreach = obj as Breach;
+
+        // Note - sometimes this method gets passed a string[], just use base.Equals instead 
+        if (otherBreach == null)
+            return base.Equals(obj);
+
+        try
+        {
+            return Title.ToLowerInvariant().Equals(otherBreach?.Title?.ToLowerInvariant());
+        }
+        catch
+        {
+            return Title.ToLowerInvariant() == otherBreach?.Title?.ToLowerInvariant();
+        }
+    }
+
+    public override int GetHashCode() => Title?.GetHashCode() ?? base.GetHashCode();
 }
 
 /* 
