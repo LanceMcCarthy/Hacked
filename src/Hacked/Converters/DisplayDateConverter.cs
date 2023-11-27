@@ -1,46 +1,45 @@
 ﻿using System;
 using Windows.UI.Xaml.Data;
 
-namespace Hacked.Converters
+namespace Hacked.Converters;
+
+public class DisplayDateConverter : IValueConverter
 {
-    public class DisplayDateConverter : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, string language)
     {
-        public object Convert(object value, Type targetType, object parameter, string language)
+        try
         {
-            try
+            switch (value)
             {
-                if (value is string dateString)
-                {
+                case string dateString:
                     DateTime.TryParse(dateString, out var outDate);
 
                     return outDate.ToString("d");
-                }
-
-                if (value is DateTime dDate)
-                {
+                case DateTime dDate:
                     return dDate.ToString("d");
-                }
+                default:
+                    try
+                    {
+                        return ((DateTime?)value).Value.ToString("d");
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
 
-                try
-                {
-                    return ((DateTime?)value).Value.ToString("d");
-                }
-                catch
-                {
-                    // ignored
-                }
+                    break;
             }
-            catch
-            {
-                // ignored
-            }
-
-            return value;
         }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        catch
         {
-            throw new NotImplementedException();
+            // ignored
         }
+
+        return value;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    {
+        throw new NotImplementedException();
     }
 }

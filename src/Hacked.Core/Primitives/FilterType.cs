@@ -1,8 +1,7 @@
-﻿namespace Hacked.Core.Primitives
+﻿namespace Hacked.Core.Primitives;
+
+public enum FilterType
 {
-    public enum FilterType
-    {
-        Name,
-        DataStolen
-    }
+    Name,
+    DataStolen
 }

@@ -1,54 +1,48 @@
-﻿using System;
+﻿using Microsoft.AppCenter.Analytics;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Store;
-using Windows.Foundation.Metadata;
 using Windows.Services.Store;
-using Hacked.Core.Common;
-using Microsoft.AppCenter.Analytics;
 
-namespace Hacked.Helpers
+namespace Hacked.Helpers;
+
+public static class StoreHelpers
 {
-    public static class StoreHelpers
+    public static async Task<bool> PurchaseAsync(string productId)
     {
-        public static async Task<bool> PurchaseAsync(string productId)
+        var purchaseStatus = false;
+
+        try
         {
-            var purchaseStatus = false;
+            var context = StoreContext.GetDefault();
 
-            try
-            {
-                var context = StoreContext.GetDefault();
+            var result = await context.RequestPurchaseAsync(productId);
 
-                var result = await context.RequestPurchaseAsync(productId);
-
-                Analytics.TrackEvent("PurchaseAdUnlockAsync", new Dictionary<string, string>()
+            Analytics.TrackEvent("PurchaseAdUnlockAsync", new Dictionary<string, string>()
                 {
                     {"Purchase Result", result.Status.ToString("G")}
                 });
 
-                switch (result.Status)
-                {
-                    case StorePurchaseStatus.Succeeded:
-                    case StorePurchaseStatus.AlreadyPurchased:
-                        purchaseStatus = true;
-                        break;
-                    case StorePurchaseStatus.NotPurchased:
-                    case StorePurchaseStatus.NetworkError:
-                    case StorePurchaseStatus.ServerError:
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-            catch (Exception ex)
+            switch (result.Status)
             {
-                DisplayMessageHelpers.ShowExceptionMessageOnUiThread($"PurchaseAsync_{productId}", ex);
-                purchaseStatus = false;
+                case StorePurchaseStatus.Succeeded:
+                case StorePurchaseStatus.AlreadyPurchased:
+                    purchaseStatus = true;
+                    break;
+                case StorePurchaseStatus.NotPurchased:
+                case StorePurchaseStatus.NetworkError:
+                case StorePurchaseStatus.ServerError:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
-            
-            return purchaseStatus;
         }
+        catch (Exception ex)
+        {
+            DisplayMessageHelpers.ShowExceptionMessageOnUiThread($"PurchaseAsync_{productId}", ex);
+            purchaseStatus = false;
+        }
+
+        return purchaseStatus;
     }
 }

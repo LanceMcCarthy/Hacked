@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Net;
 
-namespace Hacked.Core.Common
+namespace Hacked.Core.Common;
+
+public class PwnedApiException : Exception
 {
-    public class PwnedApiException : Exception
-    {
-        public PwnedApiException(string message) 
-            : base (message) { }
-        
-        public HttpStatusCode StatusCode { get; set; }
-    }
+    public PwnedApiException(string message)
+        : base(message) { }
+
+    public HttpStatusCode StatusCode { get; set; }
 }

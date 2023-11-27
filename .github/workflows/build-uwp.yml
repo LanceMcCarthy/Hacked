@@ -1,0 +1,44 @@
+name: Build UWP
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/Hacked/**/*'
+      - 'src/Hacked.BackgroundTasks/**/*'
+      - '.github/workflows/build-uwp.yml'
+
+env:
+  SOLUTION_PATH: 'src/Hacked_Uwp.sln'
+  PROJECT_PATH: 'src/Hacked/Hacked.csproj'
+  NUGETCONFIG_PATH: 'src/nuget.config'
+  Configuration: Debug
+  TargetPlatform: x64
+  BuildMode: CI
+  AppxBundle: Never
+  AppxPackageSigningEnabled: False
+  TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
+  TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }}
+
+jobs:
+  windows-build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.1.3
+      with:
+        msbuild-architecture: x64
+      
+    - name: NuGet Restore UWP Project
+      run: nuget restore ${{ env.SOLUTION_PATH }} -ConfigFile ${{ env.NUGETCONFIG_PATH }}
+    
+    - name: Build UWP Solution
+      run: msbuild ${{ env.SOLUTION_PATH }} /p:Configuration=${{ env.Configuration }} /p:Platform=${{ env.TargetPlatform }} /p:UapAppxPackageBuildMode=${{ env.BuildMode }} /p:AppxBundle=${{ env.AppxBundle }} /p:AppxPackageSigningEnabled=${{ env.AppxPackageSigningEnabled }}
