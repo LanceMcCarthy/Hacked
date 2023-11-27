@@ -12,9 +12,27 @@
     <!-- Display name -->
     <ApplicationTitle>Hacked?</ApplicationTitle>
 
-    <!-- App Identifier -->
-    <!-- moved ApplicationId to separate section below -->
-    <!-- moved ApplicationIdGuid to separate section below -->
+    <!-- Important App Identifiers -->
+    <!-- Windows -->
+    <ApplicationId Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">com.lancelotsoftware.HackedApp</ApplicationId>
+    <ApplicationIdGuid Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
+
+    <!-- MacCatalyst -->
+    <ApplicationId Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">com.lancelotsoftware.HackedApp</ApplicationId>
+    <ApplicationIdGuid Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
+
+    <!-- iOS -->
+    <ApplicationId Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">com.lancelotsoftware.HackedApp</ApplicationId>
+    <ApplicationIdGuid Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
+    <ProvisioningType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">manual</ProvisioningType>
+    <CodesignKey Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
+
+    <!-- Android -->
+    <ApplicationId Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">com.lancelotsoftware.hacked</ApplicationId>
+    <ApplicationIdGuid Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
+    <ProvisioningType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">manual</ProvisioningType>
+    <CodesignKey Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
+
 
     <!-- Versions -->
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -28,43 +46,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- App Icon -->
     <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
-
-    <!-- Splash Screen -->
     <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
-
-    <!-- Images -->
     <MauiImage Include="Resources\Images\*" />
     <MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
-
-    <!-- Custom Fonts -->
     <MauiFont Include="Resources\Fonts\*" />
-
-    <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
     <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
-  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">
-    <ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
-    <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
-  </PropertyGroup>
-  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">
-    <ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
-    <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
-  </PropertyGroup>
-  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
-    <ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
-    <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
-    <ProvisioningType>manual</ProvisioningType>
-    <CodesignKey>Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
-  </PropertyGroup>
-  <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
-    <ApplicationId>com.lancelotsoftware.hacked</ApplicationId>
-    <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
-    <ProvisioningType>manual</ProvisioningType>
-    <CodesignKey>Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
-  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
+    <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
@@ -80,9 +73,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
-    <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
+    <MauiXaml Update="Views\AboutPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Views\AccountDetailsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Views\BreachDetailsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Views\MonitoredAccountsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Views\SettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
   </ItemGroup>
+
 
   <!-- ******** PUBLISHING Android ********
     dotnet publish -f:net6.0-android -c:Release
