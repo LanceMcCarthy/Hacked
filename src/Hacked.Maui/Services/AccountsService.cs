@@ -2,11 +2,12 @@
 using System.Diagnostics;
 using Hacked.Core.Comparers;
 using Hacked.Core.Models;
+using Hacked.Services.Interfaces;
 using Newtonsoft.Json;
 
 namespace Hacked.Maui.Services;
 
-public class AccountsService
+public class AccountsService : IAccountsService
 {
     public ObservableCollection<MonitoredAccount> CurrentAccounts { get; set; }
 
@@ -27,7 +28,7 @@ public class AccountsService
         }
     }
 
-    public async Task<ObservableCollection<MonitoredAccount>> LoadAccountsAsync()
+    public async Task LoadAccountsAsync()
     {
         try
         {
@@ -36,27 +37,21 @@ public class AccountsService
             if (string.IsNullOrEmpty(json))
             {
                 Debug.WriteLine("Accounts json file not found");
-                return new ObservableCollection<MonitoredAccount>();
+                return;
             }
                 
             var savedAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
             
             Debug.WriteLine($"--- {savedAccounts?.Count} accounts loaded from json file ---");
-
-            this.CurrentAccounts = savedAccounts;
-            
-            return savedAccounts;
         }
         catch (FileNotFoundException)
         {
             Debug.WriteLine("Accounts json file not found");
-            return null;
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"*****Accounts json file not loaded***** Error: {ex.Message}");
             App.ShowExceptionMessage("LoadAccountsAsync", ex);
-            return null;
         }
     }
 
