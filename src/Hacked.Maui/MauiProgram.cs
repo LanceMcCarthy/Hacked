@@ -1,4 +1,5 @@
-﻿using Hacked.Maui.ViewModels;
+﻿using Hacked.Maui.Services;
+using Hacked.Maui.ViewModels;
 using Hacked.Maui.Views;
 using Hacked.Services.Apis;
 using Microsoft.Maui.LifecycleEvents;
@@ -50,6 +51,7 @@ namespace Hacked.Maui
             // App services
             builder.Services.AddSingleton<IPwndBreachService, BeenPwnedService>();
             builder.Services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
+            builder.Services.AddSingleton<AccountsService>();
 
             // View models
             builder.Services.AddSingleton<AboutViewModel>();
