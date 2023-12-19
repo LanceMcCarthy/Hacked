@@ -2,9 +2,9 @@
 using Hacked.Maui.ViewModels;
 using Hacked.Maui.Views;
 using Hacked.Services.Apis;
+using Hacked.Services.Interfaces;
 using Microsoft.Maui.LifecycleEvents;
 using Telerik.Maui.Controls.Compatibility;
-using Hacked.Services.Interfaces;
 
 #if WINDOWS10_0_17763_0_OR_GREATER
 using Hacked.Maui.Platforms.Windows;

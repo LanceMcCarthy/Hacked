@@ -1,11 +1,11 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using Hacked.Core.Common;
 using Hacked.Core.Comparers;
 using Hacked.Core.Models;
 using Hacked.Services.Interfaces;
 using Newtonsoft.Json;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace Hacked.Maui.Services;
 
@@ -24,10 +24,10 @@ public class AccountsService : IAccountsService
         { DevicePlatform.Unknown, HackedFileExtension }
     });
 
-    public AccountsService()
-    {
-        //_accountsFilePath = Path.Join(FileSystem.Current.AppDataDirectory, "AccountsJsonData.hked");
-    }
+    //public AccountsService()
+    //{
+    //    _accountsFilePath = Path.Join(FileSystem.Current.AppDataDirectory, "AccountsJsonData.hked");
+    //}
 
     public ObservableCollection<MonitoredAccount> CurrentAccounts { get; set; } = new();
 
