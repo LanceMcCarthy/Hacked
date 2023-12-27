@@ -14,7 +14,7 @@ namespace Hacked.Maui.ViewModels;
 public class MonitoredAccountsViewModel : PageViewModelBase
 {
     private readonly IPwndBreachService _apiService;
-    private readonly AccountsService _accountsService;
+    private readonly IAccountsService _accountsService;
     private ObservableCollection<CategoricalChartData> _accountTotalsChartData;
     private MonitoredAccount _selectedAccount;
     private Breach _selectedBreach;
@@ -22,7 +22,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
     private bool _hasAccounts;
     private int _newBreachesTotal;
 
-    public MonitoredAccountsViewModel(IPwndBreachService srv, AccountsService accountsService)
+    public MonitoredAccountsViewModel(IPwndBreachService srv, IAccountsService accountsService)
     {
         _apiService = srv;
         _accountsService = accountsService;

@@ -13,10 +13,10 @@ namespace Hacked.Maui.ViewModels;
 public class AccountDetailsViewModel : ViewModelBase
 {
     private readonly IPwndBreachService _apiService;
-    private readonly AccountsService _accountsService;
+    private readonly IAccountsService _accountsService;
     private MonitoredAccount _selectedAccount;
 
-    public AccountDetailsViewModel(IPwndBreachService srv, AccountsService accountsService)
+    public AccountDetailsViewModel(IPwndBreachService srv, IAccountsService accountsService)
     {
         _apiService = srv;
         _accountsService = accountsService;
