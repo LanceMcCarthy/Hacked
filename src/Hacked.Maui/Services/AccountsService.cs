@@ -11,8 +11,8 @@ namespace Hacked.Maui.Services;
 
 public class AccountsService : IAccountsService
 {
-    private static readonly string AccountsFilePath = Path.Join(FileSystem.Current.AppDataDirectory, "AccountsJsonData.hked");
-    private static readonly string[] HackedFileExtension = { ".hked" };
+    private readonly string _accountsFilePath = Path.Join(FileSystem.Current.AppDataDirectory, "AccountsJsonData.hked");
+    private static readonly string[] HackedFileExtension = [".hked"];
 
     private static readonly FilePickerFileType PickerTypes = new(new Dictionary<DevicePlatform, IEnumerable<string>>
     {
@@ -24,10 +24,9 @@ public class AccountsService : IAccountsService
         { DevicePlatform.Unknown, HackedFileExtension }
     });
 
-    //public AccountsService()
-    //{
-    //    _accountsFilePath = Path.Join(FileSystem.Current.AppDataDirectory, "AccountsJsonData.hked");
-    //}
+    public AccountsService()
+    {
+    }
 
     public ObservableCollection<MonitoredAccount> CurrentAccounts { get; set; } = new();
 
@@ -36,8 +35,8 @@ public class AccountsService : IAccountsService
         try
         {
             var json = JsonConvert.SerializeObject(CurrentAccounts);
-            
-            await File.WriteAllTextAsync(json, AccountsFilePath);
+
+            await File.WriteAllTextAsync(json, _accountsFilePath);
 
             Debug.WriteLine($"--- {CurrentAccounts.Count} Accounts Saved ---");
         }
@@ -56,17 +55,18 @@ public class AccountsService : IAccountsService
     {
         try
         {
-            var json = await File.ReadAllTextAsync(AccountsFilePath);
+            if (File.Exists(_accountsFilePath))
+            {
+                var json = await File.ReadAllTextAsync(_accountsFilePath);
 
-            if (string.IsNullOrEmpty(json))
+                var savedAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
+
+                Debug.WriteLine($"--- {savedAccounts?.Count} accounts loaded from json file ---");
+            }
+            else
             {
                 Debug.WriteLine("Accounts json file not found");
-                return;
             }
-                
-            var savedAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
-            
-            Debug.WriteLine($"--- {savedAccounts?.Count} accounts loaded from json file ---");
         }
         catch (FileNotFoundException)
         {
@@ -95,7 +95,7 @@ public class AccountsService : IAccountsService
                 PickerTitle = "Select backup file",
                 FileTypes = PickerTypes
             });
-        
+
             var json = await File.ReadAllTextAsync(result.FullPath);
 
             backupFileAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
@@ -147,7 +147,7 @@ public class AccountsService : IAccountsService
             var directory = Path.GetDirectoryName(result.FullPath);
             var fileName = $"AccountsBackup_{DateTime.Now.ToFileTimeUtc()}.hked";
             var savePath = Path.Join(directory, fileName);
-        
+
             var json = JsonConvert.SerializeObject(CurrentAccounts);
 
             await File.WriteAllTextAsync(savePath, json);

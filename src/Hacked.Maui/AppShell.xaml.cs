@@ -32,16 +32,16 @@ namespace Hacked.Maui
             {
                 case MessagingCenterAlert msa:
                     await this.DisplayAlert(msa.Title, msa.Message, msa.Cancel);
-                    msa.OnCompleted();
+                    msa?.OnCompleted();
                     break;
                 case MessagingCenterQuestion msq:
                 {
                     var result = await this.DisplayAlert(msq.Title, msq.Message, msq.Okay, msq.Cancel);
 
                     if (result)
-                        msq.OnOkay();
+                        msq?.OnOkay();
                     else
-                        msq.OnCancel();
+                        msq?.OnCancel();
 
                     break;
                 }

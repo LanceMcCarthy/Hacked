@@ -2,14 +2,15 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Hacked.Core.Common;
 using Hacked.Maui.Services;
+using Hacked.Services.Interfaces;
 
 namespace Hacked.Maui.ViewModels;
 
 public class SettingsViewModel : ViewModelBase
 {
-    private readonly AccountsService _accountsService;
+    private readonly IAccountsService _accountsService;
 
-    public SettingsViewModel(AccountsService accountsService)
+    public SettingsViewModel(IAccountsService accountsService)
     {
         _accountsService = accountsService;
 

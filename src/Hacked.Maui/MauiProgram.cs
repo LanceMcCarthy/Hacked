@@ -53,11 +53,11 @@ namespace Hacked.Maui
             builder.Services.AddTransient<BreachDetailsViewModel>();
             builder.Services.AddTransient<BreachDetailsPage>();
 
-            builder.Services.AddTransient<SettingsViewModel>();
-            builder.Services.AddTransient<SettingsPage>();
+            builder.Services.AddSingleton<SettingsViewModel>();
+            builder.Services.AddSingleton<SettingsPage>();
 
-            builder.Services.AddTransient<AboutViewModel>();
-            builder.Services.AddTransient<AboutPage>();
+            builder.Services.AddSingleton<AboutViewModel>();
+            builder.Services.AddSingleton<AboutPage>();
 
             return builder.Build();
         }
