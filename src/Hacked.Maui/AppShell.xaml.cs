@@ -2,6 +2,7 @@
 using Hacked.Core.Common;
 using Hacked.Core.Interfaces;
 using Hacked.Maui.Views;
+using Microsoft.VisualBasic;
 
 namespace Hacked.Maui
 {
@@ -32,16 +33,18 @@ namespace Hacked.Maui
             {
                 case MessagingCenterAlert msa:
                     await this.DisplayAlert(msa.Title, msa.Message, msa.Cancel);
-                    msa?.OnCompleted();
+                    msa.OnCompleted?.Invoke();
                     break;
                 case MessagingCenterQuestion msq:
                 {
                     var result = await this.DisplayAlert(msq.Title, msq.Message, msq.Okay, msq.Cancel);
 
                     if (result)
-                        msq?.OnOkay();
+                        msq.OnOkay?.Invoke();
                     else
-                        msq?.OnCancel();
+                    {
+                        msq.OnCancel?.Invoke();
+                    }
 
                     break;
                 }
@@ -57,9 +60,6 @@ namespace Hacked.Maui
                 }
             }
         }
-
-        
-        
 
         //private void TapGestureRecognizer_Tapped(object sender, EventArgs e)
         //{
