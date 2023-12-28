@@ -136,9 +136,9 @@
                     <telerik:RadEntry x:Name="EmailEntry"
                                       Completed="AddAccount_OnCompleted"
                                       Keyboard="Email"
-                                      Placeholder="email address, username or phone number"
+                                      Placeholder="Enter an email address, username or phone number"
                                       TextChanged="EmailEntry_OnTextChanged"
-                                      WidthRequest="400" />
+                                      HorizontalOptions="Center"/>
 
                     <telerik:RadButton x:Name="AddAccountButton"
                                        Text="add account"
