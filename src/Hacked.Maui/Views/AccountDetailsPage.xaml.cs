@@ -9,17 +9,13 @@ public partial class AccountDetailsPage
     public AccountDetailsPage(AccountDetailsViewModel vm)
     {
         InitializeComponent();
-        _viewModel = vm;
-        BindingContext = _viewModel;
+        BindingContext = _viewModel = vm;
     }
 
     protected override void OnNavigatedTo(NavigatedToEventArgs args)
     {
         base.OnNavigatedTo(args);
 
-        if (_viewModel.SelectedAccount == null)
-        {
-            _viewModel.SelectedAccount = this.SelectedAccount;
-        }
+        _viewModel.SelectedAccount ??= this.SelectedAccount;
     }
 }
