@@ -2,67 +2,72 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Hacked.Core.Models;
 
 public class MonitoredAccount : BindableBase
 {
-    private string userId;
-    private string id;
-    private bool isSelected;
-    private string address;
-    private DateTime lastUpdated;
-    private ObservableCollection<Breach> breaches;
-    private bool isUpdating;
-    private bool hasNewBreaches;
+    private string _userId;
+    private string _id;
+    private bool _isSelected;
+    private string _address;
+    private DateTime _lastUpdated;
+    private ObservableCollection<Breach> _breaches;
+    private bool _isUpdating;
+    private bool _hasNewBreaches;
 
     public string UserId
     {
-        get => userId;
-        set => SetProperty(ref userId, value);
+        get => _userId;
+        set => SetProperty(ref _userId, value);
     }
 
     public string Id
     {
-        get => id;
-        set => SetProperty(ref id, value);
-    }
-
-    public bool IsSelected
-    {
-        get => isSelected;
-        set => SetProperty(ref isSelected, value);
+        get => _id;
+        set => SetProperty(ref _id, value);
     }
 
     public string Address
     {
-        get => address;
-        set => SetProperty(ref address, value);
+        get => _address;
+        set => SetProperty(ref _address, value);
     }
 
     public DateTime LastUpdated
     {
-        get => lastUpdated;
-        set => SetProperty(ref lastUpdated, value);
+        get => _lastUpdated;
+        set => SetProperty(ref _lastUpdated, value);
     }
 
     public ObservableCollection<Breach> Breaches
     {
-        get => breaches ??= new ObservableCollection<Breach>();
-        set => SetProperty(ref breaches, value);
+        get => _breaches ??= new ObservableCollection<Breach>();
+        set => SetProperty(ref _breaches, value);
     }
 
+    [JsonIgnore]
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set => SetProperty(ref _isSelected, value);
+    }
+
+    [JsonIgnore]
     public bool IsUpdating
     {
-        get => isUpdating;
-        set => SetProperty(ref isUpdating, value);
+        get => _isUpdating;
+        set => SetProperty(ref _isUpdating, value);
     }
 
+    [JsonIgnore]
     public int NewBreachCount => Breaches.Count(b => b.IsNew);
 
+    [JsonIgnore]
     public bool HasNewBreaches
     {
-        get => hasNewBreaches = NewBreachCount > 0;
-        set => SetProperty(ref hasNewBreaches, value);
+        get => _hasNewBreaches = NewBreachCount > 0;
+        set => SetProperty(ref _hasNewBreaches, value);
     }
 }

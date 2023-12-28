@@ -5,7 +5,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using Hacked.Core.Common;
 using Hacked.Core.Models;
 using Hacked.Maui.Common.Commands;
-using Hacked.Maui.Services;
 using Hacked.Services.Interfaces;
 
 namespace Hacked.Maui.ViewModels;
@@ -42,6 +41,7 @@ public class AccountDetailsViewModel : ViewModelBase
 
         IsBusy = true;
         IsBusyMessage = $"Checking {account.Address} for breaches...";
+
         account.IsUpdating = true;
 
         try
@@ -59,6 +59,8 @@ public class AccountDetailsViewModel : ViewModelBase
 
             //replace old list with new one
             account.Breaches = result;
+
+            account.LastUpdated = DateTime.Now;
 
             await _accountsService.SaveAccountsAsync();
         }
@@ -91,8 +93,8 @@ public class AccountDetailsViewModel : ViewModelBase
         {
             IsBusy = false;
             IsBusyMessage = "";
+
             account.IsUpdating = false;
-            account.LastUpdated = DateTime.Now;
         }
     }
 }
