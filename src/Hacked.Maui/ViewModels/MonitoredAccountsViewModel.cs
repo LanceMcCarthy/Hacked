@@ -2,7 +2,6 @@
 using Hacked.Core.Common;
 using Hacked.Core.Models;
 using Hacked.Maui.Common.Commands;
-using Hacked.Maui.Services;
 using Hacked.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -167,55 +166,67 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         return account;
     }
 
-    public async Task RemoveAccountAsync(MonitoredAccount account)
+    public Task RemoveAccountAsync(MonitoredAccount account)
     {
         if (account == null)
         {
             Debug.WriteLine("Account to remove is null", "RemoveAccount");
+
             WeakReferenceMessenger.Default.Send(new MessagingCenterError
             {
                 Caller = "RemoveAccount",
                 Exception = new NullReferenceException("This account is not in the list, so it does not need to be removed.")
             });
+
+            return Task.CompletedTask;
         }
 
-        try
+        WeakReferenceMessenger.Default.Send(new MessagingCenterQuestion
         {
-            IsBusy = true;
-            IsBusyMessage = $"removing {account.Address}";
-
-            //check to see if I need to change the SelectedAccount after deleting
-            var wasSelectedAccount = SelectedAccount == account;
-
-            if (Accounts.Contains(account))
-                Accounts.Remove(account);
-
-            if (Accounts.Any())
+            Message = "Are you sure you want to remove this monitored account?",
+            Okay = "yes, remove it",
+            OnOkay = (async () =>
             {
-                if (wasSelectedAccount)
-                    SelectedAccount = Accounts.LastOrDefault();
-            }
-            else
-            {
-                SelectedAccount = null;
-            }
+                try
+                {
+                    IsBusy = true;
+                    IsBusyMessage = $"removing {account.Address}";
 
-            //SaveAccounts();
-            await _accountsService.SaveAccountsAsync();
+                    //check to see if I need to change the SelectedAccount after deleting
+                    var wasSelectedAccount = SelectedAccount == account;
 
-            HasAccounts = Accounts.Count > 0;
-        }
-        catch (Exception ex)
-        {
-            WeakReferenceMessenger.Default.Send(new MessagingCenterError{ Caller = "RemoveAccount", Exception = ex });
-        }
-        finally
-        {
-            UpdateStatistics();
+                    if (Accounts.Contains(account))
+                        Accounts.Remove(account);
 
-            IsBusy = false;
-            IsBusyMessage = "";
-        }
+                    if (Accounts.Any())
+                    {
+                        if (wasSelectedAccount)
+                            SelectedAccount = Accounts.LastOrDefault();
+                    }
+                    else
+                    {
+                        SelectedAccount = null;
+                    }
+
+                    await _accountsService.SaveAccountsAsync();
+
+                    HasAccounts = Accounts.Count > 0;
+                }
+                catch (Exception ex)
+                {
+                    WeakReferenceMessenger.Default.Send(new MessagingCenterError{ Caller = "RemoveAccount", Exception = ex });
+                }
+                finally
+                {
+                    UpdateStatistics();
+
+                    IsBusy = false;
+                    IsBusyMessage = "";
+                }
+            })
+        });
+
+        return Task.CompletedTask;
     }
 
     public async Task FindAllAccountsBreachesAsync()
@@ -227,7 +238,6 @@ public class MonitoredAccountsViewModel : PageViewModelBase
                 await UpdateBreachesForAccountAsync(monitoredAccount, false);
             }
 
-            // wait until all accounts are updated before saving
             await _accountsService.SaveAccountsAsync();
         }
         finally
@@ -379,8 +389,11 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
     private async Task DataGridCellTappedAsync(object parameter)
     {
-        if (parameter is DataGridCellInfo { Item: MonitoredAccount account })
+        if (parameter is DataGridCellInfo { Item: MonitoredAccount account } info)
         {
+            if (info.Column.HeaderText == "Options")
+                return;
+
             await GoToAccountDetailsAsync(account);
         }
     }

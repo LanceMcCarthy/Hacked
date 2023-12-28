@@ -20,59 +20,57 @@
                              SelectionMode="None"
                              SelectedItem="{Binding SelectedAccount}"
                              AutoGenerateColumns="False"
-                             ShowColumnFooters="True">
+                             ShowColumnFooters="True"
+                             Loaded="MonitoredAccountDataGrid_OnLoaded">
             <telerik:RadDataGrid.Commands>
                 <commands:CustomDataGridCommand Id="CellTap"
                                                 Command="{Binding CellTapCommand}" />
             </telerik:RadDataGrid.Commands>
             <telerik:RadDataGrid.Columns>
                 <telerik:DataGridTemplateColumn HeaderText="Options"
-                                                SizeMode="Fixed"
-                                                Width="160">
+                                                SizeMode="Auto">
                     <telerik:DataGridTemplateColumn.CellContentTemplate>
                         <DataTemplate x:DataType="models:MonitoredAccount">
                             <Grid ColumnDefinitions="*,*"
-                                  ColumnSpacing="5">
-                                <HorizontalStackLayout Padding="5"
-                                                       Spacing="5">
-                                    <telerik:RadButton Text="{x:Static res:IconFont.InfoCircle}"
+                                  ColumnSpacing="5"
+                                  Padding="5">
+                                <!--<telerik:RadButton Text="{x:Static res:IconFont.InfoCircle}"
                                                        Style="{StaticResource FontAwesomeLabelStyle}"
                                                        Command="{Binding BindingContext.ViewDetailsCommand, Source={x:Reference MonitoredAccountDataGrid}}"
                                                        CommandParameter="{Binding}"
-                                                       HorizontalOptions="Fill" />
-                                    <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
-                                                       Style="{StaticResource FontAwesomeLabelStyle}"
-                                                       Command="{Binding BindingContext.RefreshAccountCommand, Source={x:Reference MonitoredAccountDataGrid}}"
-                                                       CommandParameter="{Binding}"
-                                                       HorizontalOptions="Fill" />
-                                    <telerik:RadButton Text="{x:Static res:IconFont.Trash}"
-                                                       Style="{StaticResource FontAwesomeLabelStyle}"
-                                                       Command="{Binding BindingContext.RemoveAccountCommand, Source={x:Reference MonitoredAccountDataGrid}}"
-                                                       CommandParameter="{Binding}"
-                                                       HorizontalOptions="Fill" />
-                                </HorizontalStackLayout>
+                                                       HorizontalOptions="Fill" />-->
 
-                                <!--<telerik:RadBorder IsVisible="{Binding IsUpdating}"
-                                                   InputTransparent="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}"
-                                                   BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}">
-                                    <Label Text="Refreshing..."
-                                           HorizontalOptions="Center"
-                                           VerticalOptions="Center" />
-                                </telerik:RadBorder>-->
+                                <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
+                                                   Style="{StaticResource FontAwesomeLabelStyle}"
+                                                   Command="{Binding BindingContext.RefreshAccountCommand, Source={x:Reference MonitoredAccountDataGrid}}"
+                                                   CommandParameter="{Binding}"
+                                                   HorizontalOptions="Fill" 
+                                                   Grid.Column="0"
+                                                   Padding="0"/>
+                                <telerik:RadButton Text="{x:Static res:IconFont.Trash}"
+                                                   Style="{StaticResource FontAwesomeLabelStyle}"
+                                                   Command="{Binding BindingContext.RemoveAccountCommand, Source={x:Reference MonitoredAccountDataGrid}}"
+                                                   CommandParameter="{Binding}"
+                                                   HorizontalOptions="Fill" 
+                                                   Grid.Column="1"
+                                                   Padding="0"/>
 
                                 <telerik:RadBusyIndicator IsBusy="{Binding IsUpdating}"
-                                                          BackgroundColor="Green"
-                                                          AnimationContentColor="White"
+                                                          IsVisible="{Binding IsUpdating}"
+                                                          BackgroundColor="{StaticResource LightTranslucent}"
+                                                          AnimationContentColor="{StaticResource Primary}"
                                                           InputTransparent="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}"
                                                           HorizontalOptions="Fill"
                                                           VerticalOptions="Fill"
-                                                          AnimationType="Animation5" />
+                                                          AnimationType="Animation5" 
+                                                          Grid.ColumnSpan="2" />
                             </Grid>
                         </DataTemplate>
                     </telerik:DataGridTemplateColumn.CellContentTemplate>
                 </telerik:DataGridTemplateColumn>
 
-                <telerik:DataGridTextColumn PropertyName="Address"
+                <telerik:DataGridTextColumn x:Name="AddressColumn"
+                                            PropertyName="Address"
                                             HeaderText="Account">
                     <telerik:DataGridTextColumn.AggregateDescriptors>
                         <telerik:PropertyAggregateDescriptor PropertyName="Address"
@@ -81,8 +79,10 @@
                     </telerik:DataGridTextColumn.AggregateDescriptors>
                 </telerik:DataGridTextColumn>
 
-                <telerik:DataGridTextColumn PropertyName="Breaches.Count"
+                <telerik:DataGridTextColumn x:Name="BreachCountColumn"
+                                            PropertyName="Breaches.Count"
                                             HeaderText="Breaches">
+                    <!-- Workaround in DataGrid.Loaded event
                     <telerik:DataGridTextColumn.AggregateDescriptors>
                         <telerik:PropertyAggregateDescriptor PropertyName="Breaches.Count"
                                                              Function="Sum"
@@ -90,33 +90,28 @@
                         <telerik:PropertyAggregateDescriptor PropertyName="Breaches.Count"
                                                              Function="Average"
                                                              Caption="Average per account: " />
-                    </telerik:DataGridTextColumn.AggregateDescriptors>
+                    </telerik:DataGridTextColumn.AggregateDescriptors>-->
                 </telerik:DataGridTextColumn>
-
-                <!--<telerik:DataGridTemplateColumn HeaderText="Breaches">
-                    <telerik:DataGridTemplateColumn.CellContentTemplate>
-                        <DataTemplate>
-                            <Label Text="{Binding Breaches.Count}"
-                                   Margin="0, 5, 0, 5"
-                                   HorizontalOptions="Center"
-                                   VerticalTextAlignment="Center" />
-                        </DataTemplate>
-                    </telerik:DataGridTemplateColumn.CellContentTemplate>
-                </telerik:DataGridTemplateColumn>-->
 
                 <telerik:DataGridDateColumn PropertyName="LastUpdated"
                                             HeaderText="LastUpdated"
-                                            CellContentFormat="{}{0: ddd-d-MMM-yyyy}" />
+                                            CellContentFormat="{}{0:g}" />
 
                 <telerik:DataGridBooleanColumn PropertyName="HasNewBreaches"
                                                HeaderText="New Breaches?" />
 
-                <telerik:DataGridBooleanColumn PropertyName="NewBreachCount"
-                                               HeaderText="New Breach Count" />
+                <telerik:DataGridNumericalColumn PropertyName="NewBreachCount"
+                                            HeaderText="New Breach Count" >
+                    <telerik:DataGridNumericalColumn.AggregateDescriptors>
+                        <telerik:PropertyAggregateDescriptor PropertyName="NewBreachCount"
+                                                             Function="Count"
+                                                             Caption="Total: " />
+                    </telerik:DataGridNumericalColumn.AggregateDescriptors>
+                </telerik:DataGridNumericalColumn>
             </telerik:RadDataGrid.Columns>
         </telerik:RadDataGrid>
 
-        <telerik:RadButton x:Name="AddAccountModalButton_Desktop"
+        <telerik:RadButton x:Name="ShowAddAccountOverlay"
                            Text="add an account"
                            CornerRadius="5"
                            Margin="10"
@@ -128,44 +123,30 @@
                            IsVisible="False"
                            CornerRadius="6"
                            Padding="10">
-            <!--BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"-->
 
             <Grid>
                 <VerticalStackLayout Margin="20"
                                      Spacing="10"
                                      Padding="20">
-                    <Label Text="Enter an account to monitor" />
-                    <!--TextColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"-->
+                    <Label Text="Add an account"
+                           HorizontalOptions="Center"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}"/>
 
                     <telerik:RadEntry x:Name="EmailEntry"
-                                      Completed="EmailEntry_OnCompleted"
+                                      Completed="AddAccount_OnCompleted"
                                       Keyboard="Email"
-                                      Placeholder="enter email address or username"
+                                      Placeholder="email address, username or phone number"
                                       TextChanged="EmailEntry_OnTextChanged"
-                                      WidthRequest="700" />
-                    <!--PlaceholderColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Primary}}"
-                        TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"-->
+                                      WidthRequest="400" />
 
                     <telerik:RadButton x:Name="AddAccountButton"
                                        Text="add account"
-                                       Clicked="AddAccount_OnClicked">
-                        <!--<telerik:RadButton.Triggers>
-                                <Trigger TargetType="telerik:RadButton"
-                                         Property="IsEnabled"
-                                         Value="True">
-                                    <Setter Property="TextColor"
-                                            Value="Green" />
-                                </Trigger>
-                            </telerik:RadButton.Triggers>-->
-                    </telerik:RadButton>
+                                       Clicked="AddAccount_OnCompleted"/>
 
                     <telerik:RadButton x:Name="CancelButton"
                                        Clicked="CancelButton_OnClicked"
                                        Text="cancel" />
-                    <!--TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}"-->
-
                 </VerticalStackLayout>
 
                 <telerik:RadBusyIndicator IsVisible="{Binding IsBusy}"
