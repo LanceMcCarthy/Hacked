@@ -1,6 +1,4 @@
-using Hacked.Core.Models;
 using Hacked.Maui.ViewModels;
-using Telerik.Maui.Controls;
 
 namespace Hacked.Maui.Views;
 
@@ -19,46 +17,5 @@ public partial class BreachDetailsPage
         base.OnNavigatedTo(args);
 
         _viewModel.SelectedBreach ??= this.SelectedBreach;
-
-        //ArrangeLayout();
     }
-
-    //private void ArrangeLayout()
-    //{
-
-    //    if (BindingContext is not Breach breach) 
-    //        return;
-
-    //    if (!breach.DataClasses.Any())
-    //        return;
-
-    //    WrapLayout.Children.Clear();
-
-    //    var darkColor = Color.FromArgb("#3E8EED");
-    //    var lightColor = Colors.White;
-
-
-
-    //    foreach (var dataClass in breach.DataClasses)
-    //    {
-    //        var label = new Label
-    //        {
-    //            Text = dataClass
-    //        };
-
-    //        //label.SetAppThemeColor(Label.TextColorProperty, lightColor, darkColor);
-
-    //        var border = new RadBorder
-    //        {
-    //            Content = label,
-    //            Padding = new Thickness(5, 1.5, 5, 2),
-    //            CornerRadius = new Thickness(2),
-    //            Margin = new Thickness(0,0,5,0)
-    //        };
-
-    //        border.SetAppThemeColor(RadBorder.BackgroundColorProperty, darkColor, lightColor);
-                
-    //        WrapLayout.Children.Add(border);
-    //    }
-    //}
 }
