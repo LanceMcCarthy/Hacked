@@ -24,26 +24,41 @@
               Margin="10">
             <VerticalStackLayout HorizontalOptions="Center"
                                  VerticalOptions="Center">
-                <StackLayout Orientation="Horizontal"
-                             HorizontalOptions="Center">
-                    <Image x:Name="RedGear"
-                           HeightRequest="80"
-                           WidthRequest="80"
-                           Source="GearRed100.png" />
-                    <Image x:Name="GreenGear"
-                           HeightRequest="80"
-                           WidthRequest="80"
+                <HorizontalStackLayout HorizontalOptions="Center">
+                    <Image x:Name="Gear1">
+                        <Image.Source>
+                            <FontImageSource FontFamily="Font Awesome 6 Free Regular" 
+                                             Glyph="&#xf013;" 
+                                             Color="#998C62"
+                                             FontAutoScalingEnabled="True" 
+                                             Size="72"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="Gear2"
                            Rotation="22.5"
-                           Source="GearGreen100.png"
-                           Margin="-10,0,-10,0" />
-                    <Image x:Name="BlueGear"
-                           HeightRequest="80"
-                           WidthRequest="80"
-                           Source="GearBlue100.png" />
-                </StackLayout>
+                           Margin="-5,40,-5,0">
+                        <Image.Source>
+                            <FontImageSource FontFamily="Font Awesome 6 Free Regular" 
+                                             Glyph="&#xf013;" 
+                                             Color="#D9BA55" 
+                                             FontAutoScalingEnabled="True" 
+                                             Size="72"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="Gear3">
+                        <Image.Source>
+                            <FontImageSource FontFamily="Font Awesome 6 Free Regular" 
+                                             Glyph="&#xf013;" 
+                                             Color="#5F6484"
+                                             FontAutoScalingEnabled="True" 
+                                             Size="72"/>
+                        </Image.Source>
+                    </Image>
+                </HorizontalStackLayout>
                 <Label FontSize="24"
                        HorizontalOptions="Center"
-                       Text="Lancelot Software, LLC" />
+                       Text="Lancelot Software" 
+                       FontFamily="OpenSansSemibold"/>
             </VerticalStackLayout>
         </Grid>
 
@@ -53,15 +68,14 @@
             <Label FontAttributes="Bold"
                    Text="Hacked?" />
 
-            <StackLayout Orientation="Horizontal"
-                         Spacing="5">
+            <HorizontalStackLayout Spacing="5">
                 <Label Text="v"
                        FontSize="Small" />
                 <Label Text="{Binding AppVersion}"
                        FontSize="Small" />
-                <Label Text="© 2016-2021 Lancelot Software"
+                <Label Text="© 2016-2024 Lancelot Software"
                        FontSize="Small" />
-            </StackLayout>
+            </HorizontalStackLayout>
 
             <Label FontAttributes="Bold"
                    Text="Credits" />
@@ -73,7 +87,8 @@
 
         <VerticalStackLayout Grid.Row="3"
                              Margin="10,0,10,10"
-                             VerticalOptions="End">
+                             VerticalOptions="End"
+                             Spacing="10">
             <telerik:RadButton x:Name="ContactUsButton"
                              Clicked="ContactUsButton_OnClick"
                              Text="contact us"
