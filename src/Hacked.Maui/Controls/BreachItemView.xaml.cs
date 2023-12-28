@@ -26,24 +26,15 @@ public partial class BreachItemView : ContentView
 
         foreach (var dataClass in breach.DataClasses)
         {
-            var label = new Label
+            WrapLayout.Children.Add(new RadBorder
             {
-                Text = dataClass
-            };
-
-            label.SetAppThemeColor(Label.TextColorProperty, lightColor, darkColor);
-
-            var border = new RadBorder
-            {
-                Content = label,
-                Padding = new Thickness(5, 1.5, 5, 2),
-                CornerRadius = new Thickness(2),
-                Margin = new Thickness(0,0,5,0)
-            };
-
-            border.SetAppThemeColor(RadBorder.BackgroundColorProperty, darkColor, lightColor);
-                
-            WrapLayout.Children.Add(border);
+                Style = (Style)this.Resources["DataClassBorderStyle"],
+                Content = new Label
+                {
+                    Style = (Style)this.Resources["DataClassLabelStyle"],
+                    Text = dataClass
+                }
+            });
         }
     }
 }

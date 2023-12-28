@@ -11,11 +11,9 @@
                 x:DataType="vms:AccountDetailsViewModel"
                 Title="Account Details">
 
-    <Grid Padding="10"
-          RowDefinitions="Auto,*"
-          RowSpacing="10">
+    <Grid RowDefinitions="Auto,*">
 
-        <Grid>
+        <Grid BackgroundColor="{StaticResource Tertiary}">
             <!--<controls:ImageCollage AssociatedAccount="{Binding SelectedAccount}" />-->
             
             <VerticalStackLayout Spacing="5"
@@ -45,18 +43,8 @@
                              ItemsSource="{Binding SelectedAccount.Breaches}"
                              IsItemsReorderEnabled="False"
                              SelectionMode="None"
+                             Margin="10,0,10,0"
                              Grid.Row="1">
-            <!--<telerik:RadListView.ItemStyle>
-                <telerik:ListViewItemStyle BorderColor="{StaticResource Primary}"
-                                       BorderWidth="1"
-                                       BorderLocation="All"/>
-            </telerik:RadListView.ItemStyle>
-            <telerik:RadListView.SelectedItemStyle>
-                <telerik:ListViewItemStyle BorderColor="{StaticResource Primary}"
-                                       BackgroundColor="{StaticResource Primary}"
-                                       BorderWidth="1"
-                                       BorderLocation="All" />
-            </telerik:RadListView.SelectedItemStyle>-->
             <telerik:RadListView.ItemTemplate>
                 <DataTemplate x:DataType="models:Breach">
                     <telerik:ListViewTemplateCell>

@@ -6,7 +6,31 @@
              x:Class="Hacked.Maui.Controls.BreachItemView"
              x:DataType="models:Breach">
 
-    <telerik:RadBorder Background="{StaticResource Blue300Accent}"
+    <ContentView.Resources>
+        <Style x:Key="DataClassBorderStyle" 
+               TargetType="telerik:RadBorder">
+            <Setter Property="Padding"
+                    Value="5,1.5,5,2" />
+            <Setter Property="CornerRadius"
+                    Value="5" />
+            <Setter Property="Margin"
+                    Value="0,0,5,5" />
+            <Setter Property="BackgroundColor"
+                    Value="{StaticResource Primary}" />
+        </Style>
+        <Style x:Key="DataClassLabelStyle" 
+               TargetType="Label">
+            <Setter Property="HorizontalOptions"
+                    Value="Center" />
+            <Setter Property="Margin"
+                    Value="2" />
+            <Setter Property="TextColor"
+                    Value="{StaticResource Secondary}" />
+        </Style>
+
+    </ContentView.Resources>
+
+    <telerik:RadBorder Background="{StaticResource Gray100}"
                        Padding="5"
                        CornerRadius="5">
         <Grid ColumnDefinitions="Auto, *"
@@ -27,24 +51,18 @@
                 <Label Text="{Binding BreachDate, StringFormat='Breached on: {0}'}" />
                 <Label Text="{Binding PwnCount, StringFormat='Accounts breached: {0}'}" />
                 <Label Text="Fabricated!"
-                       IsVisible="{Binding IsFabricated}"  />
+                       IsVisible="{Binding IsFabricated}" />
                 <Label Text="Sensitive!"
                        FontAttributes="Bold"
                        IsVisible="{Binding IsSensitive}" />
                 <Label Text="Verified!"
                        IsVisible="{Binding IsVerified}" />
-                <Label Text="Retired!" 
-                       IsVisible="{Binding IsRetired}"/>
+                <Label Text="Retired!"
+                       IsVisible="{Binding IsRetired}" />
                 <Label Text="Spam List!"
                        IsVisible="{Binding IsSpamList}" />
             </VerticalStackLayout>
 
-            <!--<telerik:RadItemsControl ItemsSource="{Binding DataClasses}"
-                                 ItemTemplate="{StaticResource BreachClassItemTemplate}"
-                                 InputTransparent="True"
-                                 Margin="0,5,5,5"
-                                 Grid.Row="1"
-                                 Grid.Column="0" />-->
             <telerik:RadWrapLayout x:Name="WrapLayout"
                                    Orientation="Horizontal"
                                    InputTransparent="True"
