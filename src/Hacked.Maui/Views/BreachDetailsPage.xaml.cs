@@ -18,23 +18,21 @@ public partial class BreachDetailsPage
     {
         base.OnNavigatedTo(args);
 
-        // this.SelectedBreach is a navigation parameter defined in PageBase
-        if (_viewModel.SelectedBreach == null)
-        {
-            _viewModel.SelectedBreach = this.SelectedBreach;
-            //ArrangeLayout();
-        }
+        _viewModel.SelectedBreach ??= this.SelectedBreach;
+
+        //ArrangeLayout();
     }
 
     //private void ArrangeLayout()
     //{
-    //    WrapLayout.Children.Clear();
 
     //    if (BindingContext is not Breach breach) 
     //        return;
 
     //    if (!breach.DataClasses.Any())
     //        return;
+
+    //    WrapLayout.Children.Clear();
 
     //    var darkColor = Color.FromArgb("#3E8EED");
     //    var lightColor = Colors.White;
