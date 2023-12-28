@@ -36,7 +36,7 @@ public class AccountsService : IAccountsService
         {
             var json = JsonConvert.SerializeObject(CurrentAccounts);
 
-            await File.WriteAllTextAsync(json, _accountsFilePath);
+            await File.WriteAllTextAsync(_accountsFilePath, json);
 
             Debug.WriteLine($"--- {CurrentAccounts.Count} Accounts Saved ---");
         }
