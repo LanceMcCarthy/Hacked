@@ -70,7 +70,8 @@
 
             <HorizontalStackLayout Spacing="5">
                 <Label Text="v"
-                       FontSize="Small" />
+                       FontSize="Small"
+                       Margin="0,0,-4,0"/>
                 <Label Text="{Binding AppVersion}"
                        FontSize="Small" />
                 <Label Text="© 2016-2024 Lancelot Software"
