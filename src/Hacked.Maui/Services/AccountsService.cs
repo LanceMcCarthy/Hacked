@@ -11,17 +11,17 @@ namespace Hacked.Maui.Services;
 
 public class AccountsService : IAccountsService
 {
-    private readonly string _accountsFilePath = Path.Join(FileSystem.Current.AppDataDirectory, "AccountsJsonData.hked");
-    private static readonly string[] HackedFileExtension = [".hked"];
+    private readonly string _accountsFilePath = Path.Join(FileSystem.Current.AppDataDirectory, "AccountsJsonData.json");
+    private static readonly string[] HackedExportFileExtension = [".hked"];
 
     private static readonly FilePickerFileType PickerTypes = new(new Dictionary<DevicePlatform, IEnumerable<string>>
     {
-        { DevicePlatform.iOS, HackedFileExtension },
-        { DevicePlatform.Android, HackedFileExtension },
-        { DevicePlatform.WinUI, HackedFileExtension },
-        { DevicePlatform.Tizen, HackedFileExtension },
-        { DevicePlatform.macOS, HackedFileExtension },
-        { DevicePlatform.Unknown, HackedFileExtension }
+        { DevicePlatform.iOS, HackedExportFileExtension },
+        { DevicePlatform.Android, HackedExportFileExtension },
+        { DevicePlatform.WinUI, HackedExportFileExtension },
+        { DevicePlatform.Tizen, HackedExportFileExtension },
+        { DevicePlatform.macOS, HackedExportFileExtension },
+        { DevicePlatform.Unknown, HackedExportFileExtension }
     });
 
     public AccountsService()
@@ -55,18 +55,23 @@ public class AccountsService : IAccountsService
     {
         try
         {
-            if (File.Exists(_accountsFilePath))
+            if (!File.Exists(_accountsFilePath))
             {
-                var json = await File.ReadAllTextAsync(_accountsFilePath);
-
-                var savedAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
-
-                Debug.WriteLine($"--- {savedAccounts?.Count} accounts loaded from json file ---");
+                Debug.WriteLine("Accounts json file not found, creating a new one.");
+                return;
             }
-            else
-            {
-                Debug.WriteLine("Accounts json file not found");
-            }
+
+            var json = await File.ReadAllTextAsync(_accountsFilePath);
+
+            var savedAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
+
+            if(CurrentAccounts.Any())
+                CurrentAccounts.Clear();
+
+            foreach (var account in savedAccounts)
+                CurrentAccounts.Add(account);
+
+            Debug.WriteLine($"--- {savedAccounts?.Count} accounts loaded from json file ---");
         }
         catch (FileNotFoundException)
         {
@@ -76,11 +81,7 @@ public class AccountsService : IAccountsService
         {
             Debug.WriteLine($"*****Accounts json file not loaded***** Error: {ex.Message}");
 
-            WeakReferenceMessenger.Default.Send(new MessagingCenterError
-            {
-                Caller = "LoadAccountsAsync",
-                Exception = ex
-            });
+            WeakReferenceMessenger.Default.Send(new MessagingCenterError{ Caller = "LoadAccountsAsync", Exception = ex });
         }
     }
 
