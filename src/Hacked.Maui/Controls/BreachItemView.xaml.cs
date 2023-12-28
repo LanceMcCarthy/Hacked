@@ -5,36 +5,41 @@ namespace Hacked.Maui.Controls;
 
 public partial class BreachItemView : ContentView
 {
-	public BreachItemView()
-	{
-		InitializeComponent();
-        BindingContextChanged += BreachItemView_BindingContextChanged;
-	}
-
-    private void BreachItemView_BindingContextChanged(object sender, EventArgs e)
+    public BreachItemView()
     {
-        WrapLayout.Children.Clear();
+        InitializeComponent();
+        BindingContextChanged += BreachItemView_BindingContextChanged;
+    }
 
-        if (BindingContext is not Breach breach) 
+    private async void BreachItemView_BindingContextChanged(object sender, EventArgs e)
+    {
+        if (BindingContext is not Breach breach || breach.DataClasses.Count == 0)
             return;
 
-        if (!breach.DataClasses.Any())
-            return;
-
-        var darkColor = Color.FromArgb("#3E8EED");
-        var lightColor = Colors.White;
-
-        foreach (var dataClass in breach.DataClasses)
+        await Task.Run(() =>
         {
-            WrapLayout.Children.Add(new RadBorder
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                Style = (Style)this.Resources["DataClassBorderStyle"],
-                Content = new Label
-                {
-                    Style = (Style)this.Resources["DataClassLabelStyle"],
-                    Text = dataClass
-                }
+                if (WrapLayout.Children.Count > 0)
+                    WrapLayout.Children.Clear();
             });
-        }
+
+            foreach (var dataClass in breach.DataClasses)
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    WrapLayout.Children.Add(new RadBorder
+                    {
+                        Style = (Style)this.Resources["DataClassBorderStyle"],
+                        Content = new Label
+                        {
+                            Style = (Style)this.Resources["DataClassLabelStyle"],
+                            Text = dataClass
+                        }
+                    });
+                });
+
+            }
+        });
     }
 }

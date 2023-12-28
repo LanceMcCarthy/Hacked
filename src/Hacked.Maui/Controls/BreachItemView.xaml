@@ -48,19 +48,22 @@
                                  Grid.Column="1">
                 <Label Text="{Binding Name}"
                        FontAttributes="Bold" />
-                <Label Text="{Binding BreachDate, StringFormat='Breached on: {0}'}" />
+                <Label Text="{Binding BreachDate, StringFormat='Breached on: {0:d}'}" />
                 <Label Text="{Binding PwnCount, StringFormat='Accounts breached: {0}'}" />
                 <Label Text="Fabricated!"
                        IsVisible="{Binding IsFabricated}" />
                 <Label Text="Sensitive!"
-                       FontAttributes="Bold"
-                       IsVisible="{Binding IsSensitive}" />
+                       IsVisible="{Binding IsSensitive}"
+                       FontAttributes="Bold" />
                 <Label Text="Verified!"
-                       IsVisible="{Binding IsVerified}" />
+                       IsVisible="{Binding IsVerified}"
+                       FontAttributes="Bold" />
                 <Label Text="Retired!"
-                       IsVisible="{Binding IsRetired}" />
+                       IsVisible="{Binding IsRetired}"
+                       FontAttributes="Bold" />
                 <Label Text="Spam List!"
-                       IsVisible="{Binding IsSpamList}" />
+                       IsVisible="{Binding IsSpamList}"
+                       FontAttributes="Bold" />
             </VerticalStackLayout>
 
             <telerik:RadWrapLayout x:Name="WrapLayout"
