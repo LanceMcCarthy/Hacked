@@ -4,30 +4,9 @@
                 xmlns:views="clr-namespace:Hacked.Maui.Views"
                 xmlns:viewModels="clr-namespace:Hacked.Maui.ViewModels"
                 xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
-                xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
-                xmlns:controls="clr-namespace:Hacked.Maui.Controls"
                 x:Class="Hacked.Maui.Views.BreachDetailsPage"
                 x:DataType="viewModels:BreachDetailsViewModel"
                 Title="Breach Details">
-
-    <views:PageBase.Resources>
-        <Style x:Key="DefaultBorderStyle"
-               TargetType="telerik:RadBorder">
-            <Setter Property="BorderColor"
-                    Value="Gray" />
-            <Setter Property="BorderThickness"
-                    Value="1" />
-            <Setter Property="Margin"
-                    Value="2" />
-        </Style>
-        <Style x:Key="DefaultLabelStyle"
-               TargetType="Label">
-            <Setter Property="HorizontalOptions"
-                    Value="Center" />
-            <Setter Property="Margin"
-                    Value="2" />
-        </Style>
-    </views:PageBase.Resources>
 
     <Grid RowDefinitions="Auto, Auto, *"
           ColumnDefinitions="Auto, *"
@@ -91,35 +70,5 @@
                 </DataTemplate>
             </telerik:RadItemsControl.ItemTemplate>
         </telerik:RadItemsControl>
-
-        <!--<telerik:RadWrapLayout Orientation="Horizontal"
-                               Grid.Row="1">
-            <telerik:RadBorder Style="{StaticResource DefaultBorderStyle}"
-                               WidthRequest="100">
-                <Label Text="Item 1"
-                       HorizontalOptions="Center"
-                       Margin="2" />
-            </telerik:RadBorder>
-            <telerik:RadBorder Style="{StaticResource DefaultBorderStyle}"
-                               WidthRequest="120">
-                <Label Text="Item 2"
-                       Style="{StaticResource DefaultLabelStyle}" />
-            </telerik:RadBorder>
-            <telerik:RadBorder Style="{StaticResource DefaultBorderStyle}"
-                               WidthRequest="140">
-                <Label Text="Item 3"
-                       Style="{StaticResource DefaultLabelStyle}" />
-            </telerik:RadBorder>
-            <telerik:RadBorder Style="{StaticResource DefaultBorderStyle}"
-                               WidthRequest="160">
-                <Label Text="Item 4"
-                       Style="{StaticResource DefaultLabelStyle}" />
-            </telerik:RadBorder>
-            <telerik:RadBorder Style="{StaticResource DefaultBorderStyle}"
-                               WidthRequest="200">
-                <Label Text="Item 5"
-                       Style="{StaticResource DefaultLabelStyle}" />
-            </telerik:RadBorder>
-        </telerik:RadWrapLayout>-->
     </Grid>
 </views:PageBase>

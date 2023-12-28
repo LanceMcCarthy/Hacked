@@ -6,30 +6,6 @@
              x:Class="Hacked.Maui.Controls.BreachItemView"
              x:DataType="models:Breach">
 
-    <ContentView.Resources>
-        <Style x:Key="DataClassBorderStyle" 
-               TargetType="telerik:RadBorder">
-            <Setter Property="Padding"
-                    Value="5,1.5,5,2" />
-            <Setter Property="CornerRadius"
-                    Value="5" />
-            <Setter Property="Margin"
-                    Value="0,0,5,5" />
-            <Setter Property="BackgroundColor"
-                    Value="{StaticResource Primary}" />
-        </Style>
-        <Style x:Key="DataClassLabelStyle" 
-               TargetType="Label">
-            <Setter Property="HorizontalOptions"
-                    Value="Center" />
-            <Setter Property="Margin"
-                    Value="2" />
-            <Setter Property="TextColor"
-                    Value="{StaticResource Secondary}" />
-        </Style>
-
-    </ContentView.Resources>
-
     <telerik:RadBorder Background="{StaticResource Gray100}"
                        Padding="5"
                        CornerRadius="5">

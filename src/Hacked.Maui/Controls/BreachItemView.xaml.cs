@@ -30,10 +30,10 @@ public partial class BreachItemView : ContentView
                 {
                     WrapLayout.Children.Add(new RadBorder
                     {
-                        Style = (Style)this.Resources["DataClassBorderStyle"],
+                        Style = (Style)Application.Current?.Resources["DataClassBorderStyle"],
                         Content = new Label
                         {
-                            Style = (Style)this.Resources["DataClassLabelStyle"],
+                            Style = (Style)Application.Current?.Resources["DataClassLabelStyle"],
                             Text = dataClass
                         }
                     });
