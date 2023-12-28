@@ -11,8 +11,7 @@ public partial class BreachDetailsPage
 	public BreachDetailsPage(BreachDetailsViewModel vm)
 	{
 		InitializeComponent();
-        _viewModel = vm;
-        this.BindingContext = _viewModel;
+        this.BindingContext = _viewModel = vm;
 	}
 
     protected override void OnNavigatedTo(NavigatedToEventArgs args)
