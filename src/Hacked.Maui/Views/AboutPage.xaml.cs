@@ -21,9 +21,9 @@ public partial class AboutPage
 
     private void StartAnimations()
     {
-        Gear1.RotateTo(1440, 18000, Easing.SinInOut);
-        Gear2.RotateTo(-1440, 18000, Easing.SinInOut);
-        Gear3.RotateTo(1440, 18000, Easing.SinInOut);
+        Gear1.RotateTo(1440, 18000, Easing.CubicInOut);
+        Gear2.RotateTo(-1440, 18000, Easing.CubicInOut);
+        Gear3.RotateTo(1440, 18000, Easing.CubicInOut);
     }
 
     private async void ContactUsButton_OnClick(object sender, EventArgs e)
@@ -45,9 +45,4 @@ public partial class AboutPage
             Cancel = "OK"
         });
     }
-
-    //private void CloseModalButton_OnClicked(object sender, EventArgs e)
-    //{
-    //    Navigation.PopModalAsync();
-    //}
 }
