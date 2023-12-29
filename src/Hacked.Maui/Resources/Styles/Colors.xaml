@@ -8,6 +8,7 @@
 
     <!-- https://color.adobe.com/create/color-wheel/ -->
     <Color x:Key="Primary">#413654</Color>
+    <Color x:Key="PrimaryHighContrast">#322E47</Color>
     <Color x:Key="Secondary">#DFD8F7</Color>
     <Color x:Key="Tertiary">#A68CD4</Color>
     <Color x:Key="Complimentary1">#C1D48C</Color>
@@ -51,17 +52,4 @@
     <Color x:Key="Blue100Accent">#3E8EED</Color>
     <Color x:Key="Blue200Accent">#72ACF1</Color>
     <Color x:Key="Blue300Accent">#A7CBF6</Color>
-
-    
-    <!-- Legacy resources
-    <Color x:Key="ThemeBackgroundColor">#f2fffd</Color>
-    <Color x:Key="ThemeTextLightColor">#a5a6a6</Color>
-    <Color x:Key="ThemeTextColor">#6d6d6d</Color>
-    <Color x:Key="ThemeTextDarkColor">#2b2b2b</Color>
-    <Color x:Key="ThemeAccentBrightColor">#13d2e4</Color>
-    <Color x:Key="ThemeAccentLightColor">#009acd</Color>
-    <Color x:Key="ThemeAccentColor">#005dac</Color>
-    <Color x:Key="ThemeAccentDarkColor">#002d87</Color>-->
-
-
 </ResourceDictionary>
