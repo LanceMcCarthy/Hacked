@@ -14,19 +14,37 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <VerticalStackLayout Padding="10" 
-                             Spacing="5" 
-                             HorizontalOptions="Center"
-                             VerticalOptions="Center">
+        <VerticalStackLayout Padding="10">
             <Label Text="Backups"
                    FontSize="18" 
-                   HorizontalOptions="Center"/>
-            <telerik:RadButton Text="Import Backup" 
-                               Command="{Binding ImportCommand}"
-                               FontFamily="Raleway"/>
+                   FontFamily="Raleway"/>
+            
+            <HorizontalStackLayout Spacing="10"
+                                   Margin="0,20,0,0">
+                <telerik:RadButton Text="Import Backup" 
+                                   Command="{Binding ImportCommand}"
+                                   FontFamily="Raleway"/>
+                <telerik:RadCheckBox IsChecked="{Binding RefreshDuringImport, Mode=TwoWay}"
+                                     CheckedColor="{StaticResource PrimaryHighContrast}"
+                                     CheckedSymbolColor="{StaticResource Secondary}"/>
+                <Label Text="Update breaches"
+                       VerticalOptions="Center"
+                       FontFamily="Raleway"/>
+            </HorizontalStackLayout>
+
             <telerik:RadButton Text="Export Backup" 
                                Command="{Binding ExportCommand}"
-                               FontFamily="Raleway"/>
+                               FontFamily="Raleway"
+                               HorizontalOptions="Start"
+                               Margin="0,20,0,0"/>
         </VerticalStackLayout>
+
+        <telerik:RadBusyIndicator IsVisible="{Binding IsBusy}"
+                                  IsBusy="{Binding IsBusy}"
+                                  AnimationType="Animation3"
+                                  BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
+                                  AnimationContentColor="{StaticResource Primary}" 
+                                  Grid.RowSpan="2"
+                                  Grid.Row="0"/>
     </Grid>
 </views:PageBase>
