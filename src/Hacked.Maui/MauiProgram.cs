@@ -1,12 +1,15 @@
-﻿using Hacked.Maui.ViewModels;
+﻿using Hacked.Maui.Services;
+using Hacked.Maui.ViewModels;
 using Hacked.Maui.Views;
 using Hacked.Services.Apis;
+using Hacked.Services.Interfaces;
 using Microsoft.Maui.LifecycleEvents;
 using Telerik.Maui.Controls.Compatibility;
-using Hacked.Services.Interfaces;
 
 #if WINDOWS10_0_17763_0_OR_GREATER
-using Hacked.Maui.Platforms.Windows;
+using Microsoft.UI.Composition.SystemBackdrops;
+using Microsoft.UI.Xaml.Media;
+using WinUIEx;
 
 #elif MACCATALYST
 using AppKit;
@@ -20,92 +23,73 @@ using UIKit;
 // nothing special here, yet
 #endif
 
-namespace Hacked.Maui
+namespace Hacked.Maui;
+
+public static class MauiProgram
 {
-    public static class MauiProgram
+    public static MauiApp CreateMauiApp()
     {
-        public static MauiApp CreateMauiApp()
-        {
-            var builder = MauiApp.CreateBuilder();
-            builder
-                .UseMauiApp<App>()
-                .RegisterServices()
-                .RegisterViews()
-                .RegisterViewModels()
-                .UseTelerik()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                    fonts.AddFont("telerikfontexamples.ttf", "telerikfontexamples");
-                    fonts.AddFont("fa-solid-900.ttf", "Font Awesome 6 Free Regular");
-                })
-                .RegisterLifecycleEvents();
-            
-            return builder.Build();
-        }
-
-        public static MauiAppBuilder RegisterServices(this MauiAppBuilder builder)
-        {
-            // App services
-            builder.Services.AddSingleton<IPwndBreachService, BeenPwnedService>();
-            builder.Services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
-
-            // View models
-            builder.Services.AddSingleton<AboutViewModel>();
-            builder.Services.AddSingleton<MonitoredAccountsViewModel>();
-            builder.Services.AddSingleton<SettingsViewModel>();
-            
-            builder.Services.AddTransient<SettingsViewModel>();
-
-            return builder;
-        }
-
-        public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
-        {
-            builder.Services.AddTransient<AboutPage>();
-            builder.Services.AddTransient<AccountDetailsPage>();
-            builder.Services.AddTransient<MonitoredAccountsPage>();
-            builder.Services.AddTransient<SettingsPage>();
-
-            return builder;
-        }
-
-        public static MauiAppBuilder RegisterViewModels(this MauiAppBuilder builder)
-        {
-            builder.Services.AddTransient<AboutViewModel>();
-            builder.Services.AddSingleton<MonitoredAccountsViewModel>();
-            builder.Services.AddTransient<SettingsViewModel>();
-
-            return builder;
-        }
-
-        public static MauiAppBuilder RegisterLifecycleEvents(this MauiAppBuilder builder)
-        {
-            builder.ConfigureLifecycleEvents(events =>
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
+            .UseTelerik()
+            .ConfigureFonts(fonts =>
             {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                fonts.AddFont("Raleway-Regular.ttf", "Raleway");
+                fonts.AddFont("telerikfontexamples.ttf", "telerikfontexamples");
+                fonts.AddFont("fa-solid-900.ttf", "Font Awesome 6 Free Regular");
+            })
+            .RegisterLifecycleEvents();
+
+        builder.Services.AddSingleton<IPwndBreachService, BeenPwnedService>();
+        builder.Services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
+        builder.Services.AddSingleton<IAccountsService, AccountsService>();
+
+        builder.Services.AddSingleton<MonitoredAccountsViewModel>();
+        builder.Services.AddSingleton<MonitoredAccountsPage>();
+
+        builder.Services.AddTransient<AccountDetailsViewModel>();
+        builder.Services.AddTransient<AccountDetailsPage>();
+
+        builder.Services.AddTransient<BreachDetailsViewModel>();
+        builder.Services.AddTransient<BreachDetailsPage>();
+
+        builder.Services.AddSingleton<SettingsViewModel>();
+        builder.Services.AddSingleton<SettingsPage>();
+
+        builder.Services.AddSingleton<AboutViewModel>();
+        builder.Services.AddSingleton<AboutPage>();
+
+        return builder.Build();
+    }
+
+    public static MauiAppBuilder RegisterLifecycleEvents(this MauiAppBuilder builder)
+    {
+        builder.ConfigureLifecycleEvents(events =>
+        {
 #if WINDOWS10_0_17763_0_OR_GREATER
-                
-                events.AddWindows(wndLifeCycleBuilder =>
+
+            events.AddWindows(wndLifeCycleBuilder =>
+            {
+                wndLifeCycleBuilder.OnWindowCreated(window =>
                 {
-                    wndLifeCycleBuilder.OnWindowCreated(window =>
-                    {
-                        //const int width = 1920;
-                        //const int height = 1080;
-                        //const int x = 3440 / 2 - width / 2;
-                        //const int y = 1440 / 2 - height / 2;
-                        //window.MoveAndResize(x, y, width, height);
+                    //const int width = 1920;
+                    //const int height = 1080;
+                    //const int x = 3440 / 2 - width / 2;
+                    //const int y = 1440 / 2 - height / 2;
+                    //window.MoveAndResize(x, y, width, height);
 
-                        var manager = WinUIEx.WindowManager.Get(window);
-                        manager.PersistenceId = "MainWindowPersistanceId";
-                        manager.MinWidth = 640;
-                        manager.MinHeight = 480;
+                    var manager = WinUIEx.WindowManager.Get(window);
+                    manager.PersistenceId = "MainWindowPersistanceId";
+                    manager.MinWidth = 640;
+                    manager.MinHeight = 480;
 
-                        // *** For Mica or Acrylic support ** //
-                        window.TryMicaOrAcrylic();
-                    });
+                    window.SystemBackdrop = new MicaBackdrop { Kind = MicaKind.BaseAlt };
                 });
-                
+            });
+
 #elif MACCATALYST
                 
                 events.AddiOS(wndLifeCycleBuilder =>
@@ -121,9 +105,8 @@ namespace Hacked.Maui
 
                 });
 #endif
-            });
+        });
 
-            return builder;
-        }
+        return builder;
     }
 }

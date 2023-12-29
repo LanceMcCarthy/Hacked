@@ -2,16 +2,20 @@ using Hacked.Maui.ViewModels;
 
 namespace Hacked.Maui.Views;
 
-public partial class AccountDetailsPage : ContentPage
+public partial class AccountDetailsPage
 {
-	public AccountDetailsPage()
-	{
-		InitializeComponent();
-	}
+    private readonly AccountDetailsViewModel _viewModel;
 
-	public AccountDetailsPage(MonitoredAccountsViewModel vm)
+    public AccountDetailsPage(AccountDetailsViewModel vm)
     {
         InitializeComponent();
-        this.BindingContext = vm;
+        BindingContext = _viewModel = vm;
+    }
+
+    protected override void OnNavigatedTo(NavigatedToEventArgs args)
+    {
+        base.OnNavigatedTo(args);
+
+        _viewModel.SelectedAccount ??= this.SelectedAccount;
     }
 }
