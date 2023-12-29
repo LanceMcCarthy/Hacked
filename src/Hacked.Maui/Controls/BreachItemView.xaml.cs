@@ -5,45 +5,41 @@ namespace Hacked.Maui.Controls;
 
 public partial class BreachItemView : ContentView
 {
-	public BreachItemView()
-	{
-		InitializeComponent();
-        BindingContextChanged += BreachItemView_BindingContextChanged;
-	}
-
-    private void BreachItemView_BindingContextChanged(object sender, EventArgs e)
+    public BreachItemView()
     {
-        WrapLayout.Children.Clear();
+        InitializeComponent();
+        BindingContextChanged += BreachItemView_BindingContextChanged;
+    }
 
-        if (BindingContext is not Breach breach) 
+    private async void BreachItemView_BindingContextChanged(object sender, EventArgs e)
+    {
+        if (BindingContext is not Breach breach || breach.DataClasses.Count == 0)
             return;
 
-        if (!breach.DataClasses.Any())
-            return;
-
-        var darkColor = Color.FromArgb("#3E8EED");
-        var lightColor = Colors.White;
-
-        foreach (var dataClass in breach.DataClasses)
+        await Task.Run(() =>
         {
-            var label = new Label
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                Text = dataClass
-            };
+                if (WrapLayout.Children.Count > 0)
+                    WrapLayout.Children.Clear();
+            });
 
-            label.SetAppThemeColor(Label.TextColorProperty, lightColor, darkColor);
-
-            var border = new RadBorder
+            foreach (var dataClass in breach.DataClasses)
             {
-                Content = label,
-                Padding = new Thickness(5, 1.5, 5, 2),
-                CornerRadius = new Thickness(2),
-                Margin = new Thickness(0,0,5,0)
-            };
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    WrapLayout.Children.Add(new RadBorder
+                    {
+                        Style = (Style)Application.Current?.Resources["DataClassBorderStyle"],
+                        Content = new Label
+                        {
+                            Style = (Style)Application.Current?.Resources["DataClassLabelStyle"],
+                            Text = dataClass
+                        }
+                    });
+                });
 
-            border.SetAppThemeColor(RadBorder.BackgroundColorProperty, darkColor, lightColor);
-                
-            WrapLayout.Children.Add(border);
-        }
+            }
+        });
     }
 }

@@ -14,31 +14,35 @@ public partial class ImageCollage : ContentView
 
     private static void OnAssociatedAccountChanged(BindableObject bindable, object oldvalue, object newvalue)
     {
-        if (bindable is ImageCollage self)
+        if (bindable is not ImageCollage self) 
+            return;
+
+        switch (newvalue)
         {
-            if (newvalue == null)
+            case null:
+                self.WrapLayout.Children.Clear();
+                break;
+            case MonitoredAccount acct when !acct.Breaches.Any():
+                return;
+            case MonitoredAccount acct:
             {
                 self.WrapLayout.Children.Clear();
-            }
 
-            if (newvalue is MonitoredAccount acct)
-            {
-                if (!acct.Breaches.Any())
-                    return;
-                
                 for (var i = 0; i < acct.Breaches.Count; i++)
                 {
                     // No more than 8
                     if (i == 9)
                         break;
 
-                    var img = new Image
+                    self.WrapLayout.Children.Add(new Image
                     {
-                        Source = new UriImageSource { Uri = acct.Breaches[i].LogoPath }
-                    };
-                    
-                    self.WrapLayout.Children.Add(img);
+                        Source = new UriImageSource { Uri = acct.Breaches[i].LogoPath },
+                        WidthRequest = 75,
+                        HeightRequest = 75
+                    });
                 }
+
+                break;
             }
         }
     }

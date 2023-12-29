@@ -31,8 +31,7 @@
     <!-- DataTemplates -->
 
     <DataTemplate x:Key="BreachClassItemTemplate">
-        <Label Text="{Binding}"
-               Margin="0,0,5,0" />
+            <Label Text="{Binding}" />
     </DataTemplate>
 
     <!-- TODO switch to using this resource when template design is complete
@@ -220,7 +219,7 @@
     <Style x:Key="FontAwesomeLabelStyle"
            TargetType="Label">
         <Setter Property="FontFamily"
-                Value="Font Awesome 6 Free Regular"/>
+                Value="Font Awesome 6 Free Regular" />
     </Style>
 
 

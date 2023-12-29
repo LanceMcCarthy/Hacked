@@ -1,68 +1,75 @@
-﻿using CommonHelpers.Common;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Hacked.Core.Common;
 using Hacked.Core.Models;
 using Hacked.Maui.Common.Commands;
-using Hacked.Maui.Common.Extensions;
 using Hacked.Services.Interfaces;
-using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net;
-using Hacked.Core.Common;
 using Telerik.Maui.Controls.Compatibility.DataGrid;
 
 namespace Hacked.Maui.ViewModels;
 
-public class MonitoredAccountsViewModel : ViewModelBase
+public class MonitoredAccountsViewModel : PageViewModelBase
 {
-    #region fields
-
-    private IPwndBreachService _apiService;
-
-    private ObservableCollection<MonitoredAccount> _accounts;
+    private readonly IPwndBreachService _apiService;
+    private readonly IAccountsService _accountsService;
     private ObservableCollection<CategoricalChartData> _accountTotalsChartData;
-    private Breach _selectedBreach;
     private MonitoredAccount _selectedAccount;
+    private Breach _selectedBreach;
     private bool _areAccountsLoaded;
     private bool _hasAccounts;
     private int _newBreachesTotal;
 
-    #endregion
-    
-    public MonitoredAccountsViewModel(IPwndBreachService srv)
+    public MonitoredAccountsViewModel(IPwndBreachService srv, IAccountsService accountsService)
     {
         _apiService = srv;
+        _accountsService = accountsService;
 
-        InitCommands();
+        RemoveAccountCommand = new AsyncCommand<MonitoredAccount>(RemoveAccountAsync);
+        FindAllAccountBreachesCommand = new AsyncCommand(FindAllAccountsBreachesAsync);
+        GoToSettingsCommand = new AsyncCommand(GoToSettingsAsync);
+        ViewDetailsCommand = new AsyncCommand<MonitoredAccount>(GoToAccountDetailsAsync);
+        RefreshAccountCommand = new AsyncCommand<MonitoredAccount>((a) => UpdateBreachesForAccountAsync(a, showSuccessMessage:false, saveUpdate:true));
+        CellTapCommand = new AsyncCommand<object>(DataGridCellTappedAsync);
+        FindSelectedAccountBreachesCommand = new AsyncCommand(
+            () => UpdateBreachesForAccountAsync(SelectedAccount, showSuccessMessage:true, saveUpdate:true),
+            () => SelectedAccount != null,
+            ex =>
+            {
+                if (ex.Message.Contains("404") || ex.Message.Contains("net_http_message_not_success_statuscode"))
+                {
+                    SelectedAccount.Breaches = new();
+                }
+            });
+        ClearNewBreachesCommand = new AsyncCommand<MonitoredAccount>(ClearNewBreachesAsync);
 
-        InitData();
-            
-        Accounts.CollectionChanged += (s,e) => HasAccounts = Accounts.Count > 0;
+        Accounts.CollectionChanged += (s, e) =>
+        {
+            HasAccounts = Accounts.Count > 0;
+        };
     }
 
     #region Properties
 
-    public ObservableCollection<MonitoredAccount> Accounts
-    {
-        get => _accounts ??= new ObservableCollection<MonitoredAccount>();
-        set => SetProperty(ref _accounts, value);
-    }
+    public ObservableCollection<MonitoredAccount> Accounts => _accountsService.CurrentAccounts;
 
     public ObservableCollection<CategoricalChartData> AccountTotalsChartData
     {
-        get => _accountTotalsChartData ??= new ObservableCollection<CategoricalChartData>();
+        get => _accountTotalsChartData ??= new();
         set => SetProperty(ref _accountTotalsChartData, value);
-    }
-
-    public Breach SelectedBreach
-    {
-        get => _selectedBreach;
-        set => SetProperty(ref _selectedBreach, value);
     }
 
     public MonitoredAccount SelectedAccount
     {
         get => _selectedAccount;
         set => SetProperty(ref _selectedAccount, value);
+    }
+
+    public Breach SelectedBreach
+    {
+        get => _selectedBreach;
+        set => SetProperty(ref _selectedBreach, value);
     }
 
     public bool AreAccountsLoaded
@@ -76,7 +83,7 @@ public class MonitoredAccountsViewModel : ViewModelBase
         get => _hasAccounts;
         set => SetProperty(ref _hasAccounts, value);
     }
-        
+
     public int NewBreachesTotal
     {
         get => _newBreachesTotal;
@@ -101,12 +108,16 @@ public class MonitoredAccountsViewModel : ViewModelBase
 
     public AsyncCommand<object> CellTapCommand { get; set; }
 
+    public AsyncCommand<MonitoredAccount> ClearNewBreachesCommand { get; set; }
+
     #endregion
 
-    #region Account Management Methods
-        
+    #region Methods
+
     public async Task<MonitoredAccount> AddAccountAsync(string address)
     {
+        MonitoredAccount account = null;
+
         try
         {
             if (string.IsNullOrEmpty(address))
@@ -114,60 +125,48 @@ public class MonitoredAccountsViewModel : ViewModelBase
 
             IsBusy = true;
             IsBusyMessage = "Adding monitored account...";
-            
-            var account = new MonitoredAccount
+
+            account = new MonitoredAccount
             {
                 Address = address,
-                Breaches = new ObservableCollection<Breach>(),
+                Breaches = new(),
                 IsUpdating = true
             };
 
-            try
-            {
-                IsBusyMessage = $"Checking {account.Address} for breaches...";
+            IsBusyMessage = $"Checking {account.Address} for breaches...";
 
-                var result = await _apiService.CheckForBreachesAsync(account);
+            var result = await _apiService.CheckForBreachesAsync(account);
 
-                foreach (var breach in result)
-                {
-                    breach.IsNew = true;
-                    account.Breaches.Add(breach);
-                }
-            }
-            catch (Exception ex)
+            foreach (var breach in result)
             {
-                App.ShowExceptionMessage("AddAccountAsync", ex);
-            }
-            finally
-            {
-                IsBusy = false;
-                IsBusyMessage = "";
-
-                account.IsUpdating = false;
-                account.LastUpdated = DateTime.Now;
+                breach.IsNew = true;
+                account.Breaches.Add(breach);
             }
 
- 
+            account.IsUpdating = false;
+            account.LastUpdated = DateTime.Now;
+
             Accounts.Add(account);
 
-            SaveAccounts();
-                
+            await _accountsService.SaveAccountsAsync();
+        }
+        catch (Exception ex)
+        {
+            WeakReferenceMessenger.Default.Send(new MessagingCenterError { Caller = "AddAccountAsync", Exception = ex });
+        }
+        finally
+        {
             SelectedAccount = Accounts.LastOrDefault();
 
             HasAccounts = Accounts.Count > 0;
 
-            return account;
-        }
-        catch (Exception ex)
-        {
-            App.ShowExceptionMessage("AddAccountAsync", ex);
-            return null;
-        }
-        finally
-        {
+            UpdateStatistics();
+
             IsBusy = false;
             IsBusyMessage = "";
         }
+
+        return account;
     }
 
     public Task RemoveAccountAsync(MonitoredAccount account)
@@ -175,60 +174,83 @@ public class MonitoredAccountsViewModel : ViewModelBase
         if (account == null)
         {
             Debug.WriteLine("Account to remove is null", "RemoveAccount");
-            return Task.FromException(new NullReferenceException("Account to remove is null"));
-        }
 
-        try
-        {
-            IsBusy = true;
-            IsBusyMessage = $"removing {account.Address}";
-
-            //check to see if I need to change the SelectedAccount after deleting
-            var wasSelectedAccount = SelectedAccount == account;
-
-            if (Accounts.Contains(account))
-                Accounts.Remove(account);
-
-            if (Accounts.Any())
+            WeakReferenceMessenger.Default.Send(new MessagingCenterError
             {
-                if (wasSelectedAccount)
-                    SelectedAccount = Accounts.LastOrDefault();
-            }
-            else
+                Caller = "RemoveAccount",
+                Exception = new NullReferenceException("This account is not in the list, so it does not need to be removed.")
+            });
+
+            return Task.CompletedTask;
+        }
+
+        WeakReferenceMessenger.Default.Send(new MessagingCenterQuestion
+        {
+            Message = "Are you sure you want to remove this monitored account?",
+            Okay = "yes, remove it",
+            Cancel = "cancel",
+            OnOkay = async () =>
             {
-                SelectedAccount = null;
+                try
+                {
+                    IsBusy = true;
+                    IsBusyMessage = $"removing {account.Address}";
+
+                    //check to see if I need to change the SelectedAccount after deleting
+                    var wasSelectedAccount = SelectedAccount == account;
+
+                    if (Accounts.Contains(account))
+                        Accounts.Remove(account);
+
+                    if (Accounts.Any())
+                    {
+                        if (wasSelectedAccount)
+                            SelectedAccount = Accounts.LastOrDefault();
+                    }
+                    else
+                    {
+                        SelectedAccount = null;
+                    }
+
+                    await _accountsService.SaveAccountsAsync();
+
+                    HasAccounts = Accounts.Count > 0;
+                }
+                catch (Exception ex)
+                {
+                    WeakReferenceMessenger.Default.Send(new MessagingCenterError{ Caller = "RemoveAccount", Exception = ex });
+                }
+                finally
+                {
+                    UpdateStatistics();
+
+                    IsBusy = false;
+                    IsBusyMessage = "";
+                }
             }
-
-            SaveAccounts();
-            
-
-            HasAccounts = Accounts.Count > 0;
-        }
-        catch (Exception ex)
-        {
-            App.ShowExceptionMessage("RemoveAccount", ex);
-            return Task.FromException(ex);
-        }
-        finally
-        {
-            IsBusy = false;
-            IsBusyMessage = "";
-        }
+        });
 
         return Task.CompletedTask;
     }
 
     public async Task FindAllAccountsBreachesAsync()
     {
-        foreach (var monitoredAccount in Accounts)
+        try
         {
-            await UpdateBreachesForAccountAsync(monitoredAccount, false);
-        }
+            foreach (var monitoredAccount in Accounts)
+            {
+                await UpdateBreachesForAccountAsync(monitoredAccount, showSuccessMessage: false, saveUpdate: false);
+            }
 
-        SaveAccounts();
+            await _accountsService.SaveAccountsAsync();
+        }
+        finally
+        {
+            UpdateStatistics();
+        }
     }
 
-    public async Task UpdateBreachesForAccountAsync(MonitoredAccount account, bool showSuccessMessage = true)
+    public async Task UpdateBreachesForAccountAsync(MonitoredAccount account, bool showSuccessMessage = true, bool saveUpdate = true)
     {
         if (account == null)
         {
@@ -238,6 +260,7 @@ public class MonitoredAccountsViewModel : ViewModelBase
 
         IsBusy = true;
         IsBusyMessage = $"Checking {account.Address} for breaches...";
+
         account.IsUpdating = true;
 
         try
@@ -253,152 +276,55 @@ public class MonitoredAccountsViewModel : ViewModelBase
                 }
             }
 
-            //replace old list with new one
+            // Performance improvement, replace old list with new one instead of clear+add
             account.Breaches = result;
+
+            account.IsUpdating = false;
+            account.LastUpdated = DateTime.Now;
+
+            if(saveUpdate)
+                await _accountsService.SaveAccountsAsync();
         }
         catch (PwnedApiException ex)
         {
             switch (ex.StatusCode)
             {
                 case HttpStatusCode.NotFound when showSuccessMessage:
-                    App.ShowMessage("Good news", $"No breaches found for {account.Address}.");
-                    account.Breaches = new ObservableCollection<Breach>();
+                    account.Breaches = new();
+
+                    WeakReferenceMessenger.Default.Send(new MessagingCenterAlert
+                    {
+                        Title = "Good news",
+                        Message = $"No breaches found for {account.Address}.",
+                        Cancel = "OK"
+                    });
                     break;
                 case HttpStatusCode.NotFound:
-                    account.Breaches = new ObservableCollection<Breach>();
+                    account.Breaches = new();
                     break;
                 case HttpStatusCode.Forbidden:
-                {
-                    App.ShowExceptionMessage("UpdateBreachesForAccountAsync", ex);
-                    break;
-                }
+                    {
+                        WeakReferenceMessenger.Default.Send(new MessagingCenterError{ Caller = "UpdateBreachesForAccountAsync", Exception = ex });
+                        break;
+                    }
             }
         }
         catch (Exception ex)
         {
-            App.ShowExceptionMessage("UpdateBreachesForAccountAsync", ex);
+            WeakReferenceMessenger.Default.Send(new MessagingCenterError{ Caller = "UpdateBreachesForAccountAsync", Exception = ex });
         }
         finally
         {
-            IsBusy = false;
-            IsBusyMessage = "";
-            account.IsUpdating = false;
-            account.LastUpdated = DateTime.Now;
-        }
-    }
-    
-    #endregion
+            UpdateStatistics();
 
-    #region File Operation Methods
-
-    public void SaveAccounts()
-    {
-        IsBusy = true;
-        IsBusyMessage = "saving accounts to file...";
-
-        try
-        {
-            var json = JsonConvert.SerializeObject(_accounts);
-            
-            Hacked.Maui.Common.Extensions.FileExtensions.SaveTextToFile(json, "AccountsJsonData.txt");
-
-            Debug.WriteLine($"--- {_accounts.Count} Accounts Saved ---");
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"*****Accounts json file not saved***** Error: {ex.Message}");
-            App.ShowExceptionMessage("SaveAccountsAsync", ex);
-        }
-        finally
-        {
             IsBusy = false;
             IsBusyMessage = "";
         }
     }
-
-    public ObservableCollection<MonitoredAccount> LoadAccounts()
-    {
-        try
-        {
-            IsBusy = true;
-            IsBusyMessage = "loading accounts from file...";
-
-            var json = FileExtensions.LoadTextFromFile("AccountsJsonData.txt");
-
-            if (string.IsNullOrEmpty(json))
-            {
-                Debug.WriteLine("Accounts json file not found");
-                return new ObservableCollection<MonitoredAccount>();
-            }
-                
-            var savedAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
-
-            AreAccountsLoaded = true;
-
-            Debug.WriteLine($"--- {savedAccounts?.Count} accounts loaded from json file ---");
-
-            HasAccounts = savedAccounts?.Count > 0;
-
-            return savedAccounts;
-
-        }
-        catch (FileNotFoundException)
-        {
-            Debug.WriteLine("Accounts json file not found");
-            return new ObservableCollection<MonitoredAccount>();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"*****Accounts json file not loaded***** Error: {ex.Message}");
-            App.ShowExceptionMessage("LoadAccountsAsync", ex);
-            return new ObservableCollection<MonitoredAccount>();
-        }
-        finally
-        {
-            IsBusy = false;
-            IsBusyMessage = "";
-        }
-    }
-    
-    #endregion
-
-    #region Navigation Methods
-
-    private async Task GoToSettingsAsync()
-    {
-        await Shell.Current.GoToAsync("/Settings");
-    }
-        
-    private async Task ViewDetailsAsync(MonitoredAccount account)
-    {
-        SelectedAccount = account;
-
-        await Shell.Current.GoToAsync("/AccountDetails");
-    }
-
-    private async Task DataGridCellTappedAsync(object parameter)
-    {
-        if (parameter is DataGridCellInfo {Item: MonitoredAccount account})
-        {
-            SelectedAccount = account;
-            
-            await Shell.Current.GoToAsync("/AccountDetails");
-        }
-    }
-    
-    #endregion
-
-    #region Statistic Methods
 
     public void UpdateStatistics()
     {
-        AccountTotalsChartData = GroupByAccountTotals();
-        NewBreachesTotal = Accounts.Sum(a => a.NewBreachCount);
-    }
-
-    private ObservableCollection<CategoricalChartData> GroupByAccountTotals()
-    {
-        var list = new ObservableCollection<CategoricalChartData>();
+        AccountTotalsChartData.Clear();
 
         var groupedAccounts = this.Accounts.GroupBy(a => a.Address).ToList();
 
@@ -407,65 +333,103 @@ public class MonitoredAccountsViewModel : ViewModelBase
             var category = account.Key;
             var count = account.Sum(a => a.Breaches.Count);
 
-            Debug.WriteLine($"GroupByAccountTotals = Category: {category}, Count: {count}");
-
-            list.Add(new CategoricalChartData
+            AccountTotalsChartData.Add(new CategoricalChartData
             {
                 Category = category,
                 Value = count
             });
+
+            Debug.WriteLine($"GroupByAccountTotals = Category: {category}, Count: {count}");
         }
 
-        return list;
+        NewBreachesTotal = Accounts.Sum(a => a.NewBreachCount);
     }
 
     #endregion
 
-    #region Initialization Methods
+    #region Navigation
 
-    private void InitCommands()
+    public override async void OnAppearing()
     {
-        FindSelectedAccountBreachesCommand = new AsyncCommand(
-            () => UpdateBreachesForAccountAsync(SelectedAccount), 
-            () => SelectedAccount != null,
-            ex =>
-            {
-                if (ex.Message.Contains("404") || ex.Message.Contains("net_http_message_not_success_statuscode"))
-                {
-                    SelectedAccount.Breaches = new ObservableCollection<Breach>();
-                }
-            });
+        try
+        {
+            IsBusy = true;
+            IsBusyMessage = "loading accounts from file...";
 
-        RemoveAccountCommand = new AsyncCommand<MonitoredAccount>(RemoveAccountAsync);
+            await _accountsService.LoadAccountsAsync();
 
-        FindAllAccountBreachesCommand = new AsyncCommand(FindAllAccountsBreachesAsync);
+            AreAccountsLoaded = true;
 
-        GoToSettingsCommand = new AsyncCommand(GoToSettingsAsync);
+            Debug.WriteLine($"--- {Accounts?.Count} accounts loaded from json file ---");
 
-        ViewDetailsCommand = new AsyncCommand<MonitoredAccount>(ViewDetailsAsync);
+            HasAccounts = Accounts?.Count > 0;
 
-        RefreshAccountCommand= new AsyncCommand<MonitoredAccount>((a)=>UpdateBreachesForAccountAsync(a, false));
+            if (HasAccounts)
+                SelectedAccount = Accounts?.FirstOrDefault();
 
-        CellTapCommand= new AsyncCommand<object>(DataGridCellTappedAsync);
+            UpdateStatistics();
+        }
+        catch (Exception ex)
+        {
+            WeakReferenceMessenger.Default.Send(new MessagingCenterError{ Caller = "OnAppearing", Exception = ex });
+        }
+        finally
+        {
+            IsBusy = false;
+            IsBusyMessage = "";
+
+        }
     }
 
-    private void InitData()
+    private static async Task GoToSettingsAsync()
     {
-        // Add loaded accounts instead of replacing entire collection
-        Accounts.Clear();
+        await Shell.Current.GoToAsync("/Settings");
+    }
 
-        foreach (var loadedAccount in LoadAccounts())
-            Accounts.Add(loadedAccount);
+    private async Task GoToAccountDetailsAsync(MonitoredAccount account)
+    {
+        SelectedAccount = account;
 
-        // Once accounts are loaded, update stats
-        UpdateStatistics();
+        await Shell.Current.GoToAsync("/AccountDetails", new Dictionary<string, object>
+        {
+            {"SelectedAccount", account}
+        });
+    }
 
-        // Check for any
-        HasAccounts = Accounts.Any();
+    private Task ClearNewBreachesAsync(MonitoredAccount account)
+    {
+        WeakReferenceMessenger.Default.Send(new MessagingCenterQuestion
+        {
+            Title = "Clear New Breaches?",
+            Message = "Remove the flag from new breaches.",
+            Okay = "yes",
+            OnOkay = async () =>
+            {
+                foreach (var breach in account.Breaches)
+                {
+                    if (breach.IsNew)
+                        breach.IsNew = false;
+                }
 
-        // Select first if there are any
-        if (HasAccounts)
-            SelectedAccount = Accounts.FirstOrDefault();
+                account.NewBreachCount = 0;
+                account.HasNewBreaches = false;
+
+                await _accountsService.SaveAccountsAsync();
+            }
+        });
+
+        return Task.CompletedTask;
+    }
+
+    private async Task DataGridCellTappedAsync(object parameter)
+    {
+        if (parameter is DataGridCellInfo { Item: MonitoredAccount account } info)
+        {
+            if (info.Column.HeaderText == "Options")
+                return;
+
+            await GoToAccountDetailsAsync(account);
+        }
     }
 
     #endregion
