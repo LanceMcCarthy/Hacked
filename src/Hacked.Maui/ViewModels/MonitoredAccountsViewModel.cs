@@ -30,10 +30,10 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         FindAllAccountBreachesCommand = new AsyncCommand(FindAllAccountsBreachesAsync);
         GoToSettingsCommand = new AsyncCommand(GoToSettingsAsync);
         ViewDetailsCommand = new AsyncCommand<MonitoredAccount>(GoToAccountDetailsAsync);
-        RefreshAccountCommand = new AsyncCommand<MonitoredAccount>((a) => UpdateBreachesForAccountAsync(a, false));
+        RefreshAccountCommand = new AsyncCommand<MonitoredAccount>((a) => UpdateBreachesForAccountAsync(a, showSuccessMessage:false, saveUpdate:true));
         CellTapCommand = new AsyncCommand<object>(DataGridCellTappedAsync);
         FindSelectedAccountBreachesCommand = new AsyncCommand(
-            () => UpdateBreachesForAccountAsync(SelectedAccount),
+            () => UpdateBreachesForAccountAsync(SelectedAccount, showSuccessMessage:true, saveUpdate:true),
             () => SelectedAccount != null,
             ex =>
             {
@@ -235,7 +235,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         {
             foreach (var monitoredAccount in Accounts)
             {
-                await UpdateBreachesForAccountAsync(monitoredAccount, false);
+                await UpdateBreachesForAccountAsync(monitoredAccount, showSuccessMessage: false, saveUpdate: false);
             }
 
             await _accountsService.SaveAccountsAsync();
@@ -246,7 +246,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         }
     }
 
-    public async Task UpdateBreachesForAccountAsync(MonitoredAccount account, bool showSuccessMessage = true)
+    public async Task UpdateBreachesForAccountAsync(MonitoredAccount account, bool showSuccessMessage = true, bool saveUpdate = true)
     {
         if (account == null)
         {
@@ -256,6 +256,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
         IsBusy = true;
         IsBusyMessage = $"Checking {account.Address} for breaches...";
+
         account.IsUpdating = true;
 
         try
@@ -271,8 +272,14 @@ public class MonitoredAccountsViewModel : PageViewModelBase
                 }
             }
 
-            //replace old list with new one
+            // Performance improvement, replace old list with new one instead of clear+add
             account.Breaches = result;
+
+            account.IsUpdating = false;
+            account.LastUpdated = DateTime.Now;
+
+            if(saveUpdate)
+                await _accountsService.SaveAccountsAsync();
         }
         catch (PwnedApiException ex)
         {
@@ -308,8 +315,6 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
             IsBusy = false;
             IsBusyMessage = "";
-            account.IsUpdating = false;
-            account.LastUpdated = DateTime.Now;
         }
     }
 
