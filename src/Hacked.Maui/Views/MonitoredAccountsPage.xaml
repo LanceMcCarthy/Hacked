@@ -8,7 +8,6 @@
                 xmlns:commands="clr-namespace:Hacked.Maui.Common.Commands"
                 xmlns:res="clr-namespace:Hacked.Maui.Resources"
                 xmlns:views="clr-namespace:Hacked.Maui.Views"
-                xmlns:controls="using:Hacked.Maui.Controls"
                 x:DataType="vms:MonitoredAccountsViewModel"
                 Title="Monitored Accounts">
 
@@ -28,11 +27,11 @@
                                              Padding="10"
                                              HorizontalOptions="Start">
                             <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}"
-                                   TextColor="{StaticResource Primary}"/>
+                                   TextColor="{StaticResource PrimaryHighContrast}"/>
                             <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:g}'}"
-                                   TextColor="{StaticResource Primary}"/>
+                                   TextColor="{StaticResource PrimaryHighContrast}"/>
                             <telerik:RadButton BackgroundColor="{StaticResource Tertiary}" 
-                                               TextColor="{StaticResource Primary}"
+                                               TextColor="{StaticResource PrimaryHighContrast}"
                                                Text="More Details..."
                                                Command="{Binding BindingContext.ViewDetailsCommand, Source={x:Reference MonitoredAccountDataGrid}}"
                                                CommandParameter="{Binding}"
@@ -177,7 +176,8 @@
                            CornerRadius="5"
                            Margin="10"
                            Clicked="AddAccountPopup_Clicked"
-                           Grid.Row="2" />
+                           Grid.Row="2" 
+                           FontFamily="Raleway"/>
 
         <telerik:RadBorder x:Name="AddAccountOverlayBorder"
                            BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource DarkTranslucent}}"
