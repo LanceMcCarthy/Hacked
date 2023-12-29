@@ -6,10 +6,11 @@ using Hacked.Services.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Net;
 
 namespace Hacked.Maui.Services;
 
-public class AccountsService : IAccountsService
+public class AccountsService(IPwndBreachService _apiService) : IAccountsService
 {
     private readonly string _accountsFilePath = Path.Join(FileSystem.Current.AppDataDirectory, "AccountsJsonData.json");
     private static readonly string[] HackedExportFileExtension = [".hked"];
@@ -23,10 +24,6 @@ public class AccountsService : IAccountsService
         { DevicePlatform.macOS, HackedExportFileExtension },
         { DevicePlatform.Unknown, HackedExportFileExtension }
     });
-
-    public AccountsService()
-    {
-    }
 
     public ObservableCollection<MonitoredAccount> CurrentAccounts { get; set; } = new();
 
@@ -85,7 +82,7 @@ public class AccountsService : IAccountsService
         }
     }
 
-    public async Task<Tuple<bool, string>> ImportBackupAsync()
+    public async Task<Tuple<bool, string>> ImportBackupAsync(bool updateBreaches)
     {
         try
         {
@@ -111,6 +108,24 @@ public class AccountsService : IAccountsService
 
             foreach (var acct in accountsToAdd)
             {
+                if (updateBreaches)
+                {
+                    var importUpdateResult = await _apiService.CheckForBreachesAsync(acct);
+
+                    //compare old list against new list to see if anything is new
+                    foreach (var breach in importUpdateResult)
+                    {
+                        if (!acct.Breaches.Contains(breach))
+                        {
+                            breach.IsNew = true;
+                        }
+                    }
+
+                    acct.Breaches = importUpdateResult;
+                    acct.IsUpdating = false;
+                    acct.LastUpdated = DateTime.Now;
+                }
+
                 CurrentAccounts.Add(acct);
             }
 

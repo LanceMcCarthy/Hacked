@@ -13,7 +13,7 @@ public interface IAccountsService
 
     Task LoadAccountsAsync();
 
-    Task<Tuple<bool, string>> ImportBackupAsync();
+    Task<Tuple<bool, string>> ImportBackupAsync(bool updateBreaches);
 
     Task<Tuple<bool, string>> ExportBackupAsync();
 }
