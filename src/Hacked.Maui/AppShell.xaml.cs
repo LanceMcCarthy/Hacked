@@ -32,7 +32,9 @@ public partial class AppShell : Shell
                     var result = await this.DisplayAlert(msq.Title, msq.Message, msq.Okay, msq.Cancel);
 
                     if (result)
+                    {
                         msq.OnOkay?.Invoke();
+                    }
                     else
                     {
                         msq.OnCancel?.Invoke();

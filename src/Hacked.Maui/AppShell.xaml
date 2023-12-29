@@ -23,6 +23,7 @@
                       x:DataType="viewModels:MonitoredAccountsViewModel"
                       Route="MonitoredAccounts"/>
     </FlyoutItem>
+
     <FlyoutItem x:Name="SettingsFlyoutItem"
                 Route="settings"
                 Title="Settings">
@@ -37,6 +38,7 @@
                       x:DataType="viewModels:SettingsViewModel"
                       Route="Settings" />
     </FlyoutItem>
+
     <FlyoutItem x:Name="AboutFlyoutItem"
                 Title="About">
         <FlyoutItem.Icon>
