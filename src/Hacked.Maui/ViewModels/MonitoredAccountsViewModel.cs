@@ -185,7 +185,8 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         {
             Message = "Are you sure you want to remove this monitored account?",
             Okay = "yes, remove it",
-            OnOkay = (async () =>
+            Cancel = "cancel",
+            OnOkay = async () =>
             {
                 try
                 {
@@ -223,7 +224,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
                     IsBusy = false;
                     IsBusyMessage = "";
                 }
-            })
+            }
         });
 
         return Task.CompletedTask;
