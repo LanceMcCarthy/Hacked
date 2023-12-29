@@ -15,6 +15,7 @@ public class MonitoredAccount : BindableBase
     private DateTime _lastUpdated;
     private ObservableCollection<Breach> _breaches;
     private bool _isUpdating;
+    private int _newBreachCount;
     private bool _hasNewBreaches;
 
     public string UserId
@@ -62,7 +63,19 @@ public class MonitoredAccount : BindableBase
     }
 
     [JsonIgnore]
-    public int NewBreachCount => Breaches.Count(b => b.IsNew);
+    public int NewBreachCount
+    {
+        get
+        {
+            if (_newBreachCount == 0)
+            {
+                _newBreachCount = Breaches.Count(b => b.IsNew);
+            }
+            
+            return _newBreachCount;
+        }
+        set => SetProperty(ref _newBreachCount, value);
+    }
 
     [JsonIgnore]
     public bool HasNewBreaches

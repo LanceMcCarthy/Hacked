@@ -26,16 +26,34 @@
                         <VerticalStackLayout Spacing="5"
                                              Padding="10"
                                              HorizontalOptions="Start">
-                            <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}"
+                            <Label Text="{Binding LastUpdated, StringFormat='Updated: {0:g}'}"
                                    TextColor="{StaticResource PrimaryHighContrast}"/>
-                            <Label Text="{Binding LastUpdated, StringFormat='Last Updated: {0:g}'}"
-                                   TextColor="{StaticResource PrimaryHighContrast}"/>
-                            <telerik:RadButton BackgroundColor="{StaticResource Tertiary}" 
-                                               TextColor="{StaticResource PrimaryHighContrast}"
-                                               Text="More Details..."
-                                               Command="{Binding BindingContext.ViewDetailsCommand, Source={x:Reference MonitoredAccountDataGrid}}"
-                                               CommandParameter="{Binding}"
-                                               CornerRadius="5"/>
+
+                            <HorizontalStackLayout Spacing="5">
+                                <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}"
+                                       TextColor="{StaticResource PrimaryHighContrast}"/>
+                                <Label Text="{Binding NewBreachCount, StringFormat='({0} new)'}"
+                                       TextColor="{StaticResource PrimaryHighContrast}"
+                                       IsVisible="{Binding HasNewBreaches}"/>
+                            </HorizontalStackLayout>
+                            
+                            <HorizontalStackLayout Spacing="5"
+                                                   HorizontalOptions="Start"
+                                                   VerticalOptions="End"
+                                                   Margin="0,10,0,0">
+                                <telerik:RadButton BackgroundColor="{StaticResource Tertiary}" 
+                                                   TextColor="{StaticResource PrimaryHighContrast}"
+                                                   Text="more details..."
+                                                   Command="{Binding BindingContext.ViewDetailsCommand, Source={x:Reference MonitoredAccountDataGrid}}"
+                                                   CommandParameter="{Binding}"
+                                                   CornerRadius="5"/>
+                                <telerik:RadButton BackgroundColor="{StaticResource Complimentary1}" 
+                                                   TextColor="{StaticResource PrimaryHighContrast}"
+                                                   Text="clear new"
+                                                   Command="{Binding BindingContext.ClearNewBreachesCommand, Source={x:Reference MonitoredAccountDataGrid}}"
+                                                   CommandParameter="{Binding}"
+                                                   CornerRadius="5"/>
+                            </HorizontalStackLayout>
                         </VerticalStackLayout>
 
                         <telerik:RadListView x:Name="BreachesListView"
@@ -52,7 +70,7 @@
                             <telerik:RadListView.ItemTemplate>
                                 <DataTemplate x:DataType="models:Breach">
                                     <telerik:ListViewTemplateCell>
-                                        <telerik:RadBorder Background="{StaticResource Gray100}"
+                                        <telerik:RadBorder Background="{StaticResource White}"
                                                            Padding="5"
                                                            CornerRadius="5"
                                                            HeightRequest="100">
@@ -74,6 +92,16 @@
                                                     <Label Text="{Binding PwnCount, StringFormat='Accounts: {0}'}" />
                                                     <Label Text="{Binding DataClasses.Count, StringFormat='Data types: {0}'}" />
                                                 </VerticalStackLayout>
+
+                                                <Label Text="{x:Static res:IconFont.ExclamationTriangle}"
+                                                       TextColor="{StaticResource Complimentary1}"
+                                                       Style="{StaticResource FontAwesomeLabelStyle}"
+                                                       IsVisible="{Binding IsNew}"
+                                                       HorizontalOptions="End"
+                                                       VerticalOptions="Start"
+                                                       Margin="5"
+                                                       FontSize="18"
+                                                       Grid.Column="1"/>
                                             </Grid>
                                         </telerik:RadBorder>
                                     </telerik:ListViewTemplateCell>

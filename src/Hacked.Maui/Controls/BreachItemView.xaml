@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
              xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
+             xmlns:res="using:Hacked.Maui.Resources"
              x:Class="Hacked.Maui.Controls.BreachItemView"
              x:DataType="models:Breach">
 
@@ -41,6 +42,16 @@
                        IsVisible="{Binding IsSpamList}"
                        FontAttributes="Bold" />
             </VerticalStackLayout>
+
+            <Label Text="{x:Static res:IconFont.ExclamationTriangle}"
+                   TextColor="Red"
+                   Style="{StaticResource FontAwesomeLabelStyle}"
+                   IsVisible="{Binding IsNew}"
+                   HorizontalOptions="End"
+                   VerticalOptions="Start"
+                   Margin="5"
+                   FontSize="22"
+                   Grid.Column="1"/>
 
             <telerik:RadWrapLayout x:Name="WrapLayout"
                                    Orientation="Horizontal"

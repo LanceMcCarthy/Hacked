@@ -21,6 +21,7 @@ public class AccountDetailsViewModel : ViewModelBase
         _accountsService = accountsService;
 
         RefreshAccountCommand = new AsyncCommand<MonitoredAccount>(UpdateBreachesForAccountAsync);
+        ClearNewBreachesCommand = new AsyncCommand<MonitoredAccount>(ClearNewBreachesAsync);
     }
 
     public MonitoredAccount SelectedAccount
@@ -30,6 +31,8 @@ public class AccountDetailsViewModel : ViewModelBase
     }
 
     public AsyncCommand<MonitoredAccount> RefreshAccountCommand { get; set; }
+
+    public AsyncCommand<MonitoredAccount> ClearNewBreachesCommand { get; set; }
 
     public async Task UpdateBreachesForAccountAsync(MonitoredAccount account)
     {
@@ -93,8 +96,33 @@ public class AccountDetailsViewModel : ViewModelBase
         {
             IsBusy = false;
             IsBusyMessage = "";
-
+            
             account.IsUpdating = false;
         }
+    }
+
+    private Task ClearNewBreachesAsync(MonitoredAccount account)
+    {
+        WeakReferenceMessenger.Default.Send(new MessagingCenterQuestion
+        {
+            Title = "Clear New Breaches?",
+            Message = "Remove the flag from new breaches.",
+            Okay = "yes",
+            OnOkay = async () =>
+            {
+                foreach (var breach in account.Breaches)
+                {
+                    if (breach.IsNew)
+                        breach.IsNew = false;
+                }
+
+                account.NewBreachCount = 0;
+                account.HasNewBreaches = false;
+
+                await _accountsService.SaveAccountsAsync();
+            }
+        });
+
+        return Task.CompletedTask;
     }
 }

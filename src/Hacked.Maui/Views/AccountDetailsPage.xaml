@@ -77,14 +77,24 @@
             </telerik:RadListView.LayoutDefinition>
         </telerik:RadListView>
 
-        <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
-                           Style="{StaticResource FontAwesomeLabelStyle}"
-                           Command="{Binding RefreshAccountCommand}"
-                           CommandParameter="{Binding SelectedAccount}"
-                           IsEnabled="{Binding SelectedAccount.IsUpdating, Converter={StaticResource InvertBoolConverter}}"
-                           VerticalOptions="{OnIdiom Default=Start, Phone=End, Desktop=Center, Tablet=Center, TV=Start}"
-                           HorizontalOptions="End"
-                           Margin="10" />
+        <VerticalStackLayout VerticalOptions="{OnIdiom Default=Start, Phone=End, Desktop=Center, Tablet=Center, TV=Start}"
+                             Spacing="5"
+                             Padding="10"
+                             HorizontalOptions="End">
+            <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
+                               Style="{StaticResource FontAwesomeLabelStyle}"
+                               Command="{Binding RefreshAccountCommand}"
+                               CommandParameter="{Binding SelectedAccount}"
+                               IsEnabled="{Binding SelectedAccount.IsUpdating, Converter={StaticResource InvertBoolConverter}}"
+                               Margin="0,0,10,0" />
+
+            <telerik:RadButton Text="{x:Static res:IconFont.ExclamationTriangle}"
+                               Style="{StaticResource FontAwesomeLabelStyle}"
+                               Command="{Binding ClearNewBreachesCommand}"
+                               CommandParameter="{Binding SelectedAccount}"
+                               IsVisible="{Binding SelectedAccount.HasNewBreaches}"
+                               Margin="0,0,10,0" />
+        </VerticalStackLayout>
 
         <telerik:RadBusyIndicator IsVisible="{Binding SelectedAccount.IsUpdating}"
                                   IsBusy="{Binding SelectedAccount.IsUpdating}"
