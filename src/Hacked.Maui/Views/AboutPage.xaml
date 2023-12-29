@@ -5,6 +5,7 @@
                 xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
                 xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
                 xmlns:views="clr-namespace:Hacked.Maui.Views"
+                xmlns:res="using:Hacked.Maui.Resources"
                 x:DataType="vms:AboutViewModel"
                 Title="About">
 
@@ -28,8 +29,8 @@
                     <Image x:Name="Gear1">
                         <Image.Source>
                             <FontImageSource FontFamily="Font Awesome 6 Free Regular" 
-                                             Glyph="&#xf013;" 
-                                             Color="#998C62"
+                                             Glyph="{x:Static res:IconFont.Gear}" 
+                                             Color="{StaticResource Primary}"
                                              FontAutoScalingEnabled="True" 
                                              Size="72"/>
                         </Image.Source>
@@ -39,8 +40,8 @@
                            Margin="-5,40,-5,0">
                         <Image.Source>
                             <FontImageSource FontFamily="Font Awesome 6 Free Regular" 
-                                             Glyph="&#xf013;" 
-                                             Color="#D9BA55" 
+                                             Glyph="{x:Static res:IconFont.Gear}" 
+                                             Color="{StaticResource Complimentary1}" 
                                              FontAutoScalingEnabled="True" 
                                              Size="72"/>
                         </Image.Source>
@@ -48,8 +49,8 @@
                     <Image x:Name="Gear3">
                         <Image.Source>
                             <FontImageSource FontFamily="Font Awesome 6 Free Regular" 
-                                             Glyph="&#xf013;" 
-                                             Color="#5F6484"
+                                             Glyph="{x:Static res:IconFont.Gear}" 
+                                             Color="{StaticResource Complimentary2}"
                                              FontAutoScalingEnabled="True" 
                                              Size="72"/>
                         </Image.Source>
@@ -58,7 +59,8 @@
                 <Label FontSize="24"
                        HorizontalOptions="Center"
                        Text="Lancelot Software" 
-                       FontFamily="OpenSansSemibold"/>
+                       FontFamily="Raleway"
+                       FontAttributes="Bold"/>
             </VerticalStackLayout>
         </Grid>
 
@@ -70,20 +72,15 @@
 
             <HorizontalStackLayout Spacing="5">
                 <Label Text="v"
-                       FontSize="Small"
                        Margin="0,0,-4,0"/>
-                <Label Text="{Binding AppVersion}"
-                       FontSize="Small" />
-                <Label Text="© 2016-2024 Lancelot Software"
-                       FontSize="Small" />
+                <Label Text="{Binding AppVersion}"/>
+                <Label Text="© 2016-2024 Lancelot Software"/>
             </HorizontalStackLayout>
 
             <Label FontAttributes="Bold"
                    Text="Credits" />
-            <Label Text="Json.NET © 2016 Newtonsoft"
-                   FontSize="Small" />
-            <Label Text="Data from Haveibeenpwned by Troy Hunt"
-                   FontSize="Small" />
+            <Label Text="Json.NET © 2016 Newtonsoft" />
+            <Label Text="Data from Haveibeenpwned by Troy Hunt"/>
         </VerticalStackLayout>
 
         <VerticalStackLayout Grid.Row="3"
@@ -93,11 +90,13 @@
             <telerik:RadButton x:Name="ContactUsButton"
                              Clicked="ContactUsButton_OnClick"
                              Text="contact us"
-                             CornerRadius="5"/>
+                             CornerRadius="5"
+                             FontFamily="Raleway"/>
             <telerik:RadButton x:Name="ReviewButton"
                              Clicked="ReviewButton_OnClickButton_OnClick"
                              Text="rate this app"
-                             CornerRadius="5" />
+                             CornerRadius="5" 
+                             FontFamily="Raleway"/>
         </VerticalStackLayout>
     </Grid>
 </views:PageBase>

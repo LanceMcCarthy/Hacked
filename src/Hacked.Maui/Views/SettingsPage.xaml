@@ -14,9 +14,19 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <VerticalStackLayout Padding="10" Spacing="5">
-            <telerik:RadButton Text="Import Backup" Command="{Binding ImportCommand}"/>
-            <telerik:RadButton Text="Export Backup" Command="{Binding ExportCommand}"/>
+        <VerticalStackLayout Padding="10" 
+                             Spacing="5" 
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center">
+            <Label Text="Backups"
+                   FontSize="18" 
+                   HorizontalOptions="Center"/>
+            <telerik:RadButton Text="Import Backup" 
+                               Command="{Binding ImportCommand}"
+                               FontFamily="Raleway"/>
+            <telerik:RadButton Text="Export Backup" 
+                               Command="{Binding ExportCommand}"
+                               FontFamily="Raleway"/>
         </VerticalStackLayout>
     </Grid>
 </views:PageBase>
