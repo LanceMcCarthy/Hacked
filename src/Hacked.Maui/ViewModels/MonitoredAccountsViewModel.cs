@@ -42,6 +42,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
                     SelectedAccount.Breaches = new();
                 }
             });
+        ClearNewBreachesCommand = new AsyncCommand<MonitoredAccount>(ClearNewBreachesAsync);
 
         Accounts.CollectionChanged += (s, e) =>
         {
@@ -106,6 +107,8 @@ public class MonitoredAccountsViewModel : PageViewModelBase
     public AsyncCommand<MonitoredAccount> RefreshAccountCommand { get; set; }
 
     public AsyncCommand<object> CellTapCommand { get; set; }
+
+    public AsyncCommand<MonitoredAccount> ClearNewBreachesCommand { get; set; }
 
     #endregion
 
@@ -378,7 +381,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         }
     }
 
-    private async Task GoToSettingsAsync()
+    private static async Task GoToSettingsAsync()
     {
         await Shell.Current.GoToAsync("/Settings");
     }
@@ -391,6 +394,31 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         {
             {"SelectedAccount", account}
         });
+    }
+
+    private Task ClearNewBreachesAsync(MonitoredAccount account)
+    {
+        WeakReferenceMessenger.Default.Send(new MessagingCenterQuestion
+        {
+            Title = "Clear New Breaches?",
+            Message = "Remove the flag from new breaches.",
+            Okay = "yes",
+            OnOkay = async () =>
+            {
+                foreach (var breach in account.Breaches)
+                {
+                    if (breach.IsNew)
+                        breach.IsNew = false;
+                }
+
+                account.NewBreachCount = 0;
+                account.HasNewBreaches = false;
+
+                await _accountsService.SaveAccountsAsync();
+            }
+        });
+
+        return Task.CompletedTask;
     }
 
     private async Task DataGridCellTappedAsync(object parameter)
