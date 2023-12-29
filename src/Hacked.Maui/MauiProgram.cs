@@ -7,7 +7,8 @@ using Microsoft.Maui.LifecycleEvents;
 using Telerik.Maui.Controls.Compatibility;
 
 #if WINDOWS10_0_17763_0_OR_GREATER
-using Hacked.Maui.Platforms.Windows;
+using Microsoft.UI.Composition.SystemBackdrops;
+using Microsoft.UI.Xaml.Media;
 
 #elif MACCATALYST
 using AppKit;
@@ -35,6 +36,7 @@ public static class MauiProgram
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+                fonts.AddFont("Raleway-Regular.ttf", "Raleway");
                 fonts.AddFont("telerikfontexamples.ttf", "telerikfontexamples");
                 fonts.AddFont("fa-solid-900.ttf", "Font Awesome 6 Free Regular");
             })
@@ -62,7 +64,6 @@ public static class MauiProgram
         return builder.Build();
     }
 
-
     public static MauiAppBuilder RegisterLifecycleEvents(this MauiAppBuilder builder)
     {
         builder.ConfigureLifecycleEvents(events =>
@@ -73,19 +74,12 @@ public static class MauiProgram
             {
                 wndLifeCycleBuilder.OnWindowCreated(window =>
                 {
-                    //const int width = 1920;
-                    //const int height = 1080;
-                    //const int x = 3440 / 2 - width / 2;
-                    //const int y = 1440 / 2 - height / 2;
-                    //window.MoveAndResize(x, y, width, height);
-
                     var manager = WinUIEx.WindowManager.Get(window);
                     manager.PersistenceId = "MainWindowPersistanceId";
                     manager.MinWidth = 640;
                     manager.MinHeight = 480;
 
-                    // *** For Mica or Acrylic support ** //
-                    window.TryMicaOrAcrylic();
+                    window.SystemBackdrop = new MicaBackdrop { Kind = MicaKind.BaseAlt };
                 });
             });
 
