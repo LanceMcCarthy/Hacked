@@ -12,19 +12,21 @@ namespace Hacked.Maui.ViewModels;
 
 public class MonitoredAccountsViewModel : PageViewModelBase
 {
-    private readonly IPwndBreachService _apiService;
-    private readonly IAccountsService _accountsService;
-    private ObservableCollection<CategoricalChartData> _accountTotalsChartData;
-    private MonitoredAccount _selectedAccount;
-    private Breach _selectedBreach;
-    private bool _areAccountsLoaded;
-    private bool _hasAccounts;
-    private int _newBreachesTotal;
+    private readonly IPwndBreachService apiService;
+    private readonly IAccountsService accountsService;
+    private ObservableCollection<CategoricalChartData> accountTotalsChartData;
+    private MonitoredAccount selectedAccount;
+    private Breach selectedBreach;
+    private bool areAccountsLoaded;
+    private bool hasAccounts;
+    private int newBreachesTotal;
+    private bool isOverlayVisible;
+    private bool isAddEnabled;
 
-    public MonitoredAccountsViewModel(IPwndBreachService srv, IAccountsService accountsService)
+    public MonitoredAccountsViewModel(IPwndBreachService srv, IAccountsService accService)
     {
-        _apiService = srv;
-        _accountsService = accountsService;
+        apiService = srv;
+        accountsService = accService;
 
         RemoveAccountCommand = new AsyncCommand<MonitoredAccount>(RemoveAccountAsync);
         FindAllAccountBreachesCommand = new AsyncCommand(FindAllAccountsBreachesAsync);
@@ -43,51 +45,68 @@ public class MonitoredAccountsViewModel : PageViewModelBase
                 }
             });
         ClearNewBreachesCommand = new AsyncCommand<MonitoredAccount>(ClearNewBreachesAsync);
+        AddPendingItemCommand = new Command(InvokeAddPendingItem);
+        RemovePendingItemCommand = new Command<PendingAccount>(InvokeRemovePendingItem);
+        AddAccountsCommand = new AsyncCommand(InvokeAddAccounts);
+        CancelAddAccountsCommand = new Command(InvokeCancelAddAccounts);
+        ToggleOverlayCommand = new Command(InvokeToggleOverlay);
 
-        Accounts.CollectionChanged += (s, e) =>
-        {
-            HasAccounts = Accounts.Count > 0;
-        };
+        PendingAdditions.CollectionChanged += (s, e) => { IsAddEnabled = PendingAdditions.Count > 0; };
+        Accounts.CollectionChanged += (s, e) => { HasAccounts = Accounts.Count > 0; };
     }
 
     #region Properties
 
-    public ObservableCollection<MonitoredAccount> Accounts => _accountsService.CurrentAccounts;
+    public ObservableCollection<MonitoredAccount> Accounts => accountsService.CurrentAccounts;
 
     public ObservableCollection<CategoricalChartData> AccountTotalsChartData
     {
-        get => _accountTotalsChartData ??= new();
-        set => SetProperty(ref _accountTotalsChartData, value);
+        get => accountTotalsChartData ??= new();
+        set => SetProperty(ref accountTotalsChartData, value);
     }
+
+    public ObservableCollection<PendingAccount> PendingAdditions { get; } = [new PendingAccount()];
 
     public MonitoredAccount SelectedAccount
     {
-        get => _selectedAccount;
-        set => SetProperty(ref _selectedAccount, value);
+        get => selectedAccount;
+        set => SetProperty(ref selectedAccount, value);
     }
 
     public Breach SelectedBreach
     {
-        get => _selectedBreach;
-        set => SetProperty(ref _selectedBreach, value);
+        get => selectedBreach;
+        set => SetProperty(ref selectedBreach, value);
     }
 
     public bool AreAccountsLoaded
     {
-        get => _areAccountsLoaded;
-        set => SetProperty(ref _areAccountsLoaded, value);
+        get => areAccountsLoaded;
+        set => SetProperty(ref areAccountsLoaded, value);
     }
 
     public bool HasAccounts
     {
-        get => _hasAccounts;
-        set => SetProperty(ref _hasAccounts, value);
+        get => hasAccounts;
+        set => SetProperty(ref hasAccounts, value);
     }
 
     public int NewBreachesTotal
     {
-        get => _newBreachesTotal;
-        set => SetProperty(ref _newBreachesTotal, value);
+        get => newBreachesTotal;
+        set => SetProperty(ref newBreachesTotal, value);
+    }
+
+    public bool IsOverlayVisible
+    {
+        get => isOverlayVisible;
+        set => SetProperty(ref isOverlayVisible, value);
+    }
+
+    public bool IsAddEnabled
+    {
+        get => isAddEnabled;
+        set => SetProperty(ref isAddEnabled, value);
     }
 
     #endregion
@@ -109,6 +128,16 @@ public class MonitoredAccountsViewModel : PageViewModelBase
     public AsyncCommand<object> CellTapCommand { get; set; }
 
     public AsyncCommand<MonitoredAccount> ClearNewBreachesCommand { get; set; }
+
+    public Command AddPendingItemCommand { get; set; }
+
+    public Command RemovePendingItemCommand { get; set; }
+    
+    public Command ToggleOverlayCommand { get; set; }
+
+    public AsyncCommand AddAccountsCommand { get; set; }
+
+    public Command CancelAddAccountsCommand { get; set; }
 
     #endregion
 
@@ -135,7 +164,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
             IsBusyMessage = $"Checking {account.Address} for breaches...";
 
-            var result = await _apiService.CheckForBreachesAsync(account);
+            var result = await apiService.CheckForBreachesAsync(account);
 
             foreach (var breach in result)
             {
@@ -148,7 +177,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
             Accounts.Add(account);
 
-            await _accountsService.SaveAccountsAsync();
+            await accountsService.SaveAccountsAsync();
         }
         catch (Exception ex)
         {
@@ -212,7 +241,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
                         SelectedAccount = null;
                     }
 
-                    await _accountsService.SaveAccountsAsync();
+                    await accountsService.SaveAccountsAsync();
 
                     HasAccounts = Accounts.Count > 0;
                 }
@@ -242,7 +271,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
                 await UpdateBreachesForAccountAsync(monitoredAccount, showSuccessMessage: false, saveUpdate: false);
             }
 
-            await _accountsService.SaveAccountsAsync();
+            await accountsService.SaveAccountsAsync();
         }
         finally
         {
@@ -265,7 +294,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
         try
         {
-            var result = await _apiService.CheckForBreachesAsync(account);
+            var result = await apiService.CheckForBreachesAsync(account);
 
             //compare old list against new list to see if anything is new
             foreach (var breach in result)
@@ -283,7 +312,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
             account.LastUpdated = DateTime.Now;
 
             if(saveUpdate)
-                await _accountsService.SaveAccountsAsync();
+                await accountsService.SaveAccountsAsync();
         }
         catch (PwnedApiException ex)
         {
@@ -345,6 +374,62 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         NewBreachesTotal = Accounts.Sum(a => a.NewBreachCount);
     }
 
+    private void InvokeAddPendingItem()
+    {
+        PendingAdditions.Add(new PendingAccount());
+    }
+
+    private void InvokeRemovePendingItem(PendingAccount item)
+    {
+        item.IsFocused = false;
+        PendingAdditions.Remove(item);
+    }
+
+    private async Task InvokeAddAccounts()
+    {
+        IsBusy = true;
+
+        var emptyItems = PendingAdditions.Where(i => i.Address == string.Empty);
+
+        foreach (var emptyItem in emptyItems)
+        {
+            PendingAdditions.Remove(emptyItem);
+        }
+
+        foreach (var addition in PendingAdditions)
+        {
+            IsBusyMessage = $"adding {addition.Address}...";
+
+            addition.AddSuccessful = await AddAccountAsync(addition.Address) != null;
+        }
+
+        IsBusyMessage = string.Empty;
+        IsBusy = false;
+
+        var failedItems = PendingAdditions.Where(i => i.AddSuccessful == false).Select(i => i.Address).ToList();
+
+        if (failedItems.Count > 0)
+        {
+            await Shell.Current.DisplayAlert("Done!", $"The operation completed, but some items were not added: {string.Join(", ", failedItems)}.", "ok");
+        }
+
+        IsOverlayVisible = false;
+    }
+
+    private void InvokeCancelAddAccounts()
+    {
+        IsOverlayVisible = false;
+
+        // reset the collection
+        PendingAdditions.Clear();
+        PendingAdditions.Add(new PendingAccount());
+    }
+
+    private void InvokeToggleOverlay()
+    {
+        IsOverlayVisible = !IsOverlayVisible;
+    }
+
     #endregion
 
     #region Navigation
@@ -356,7 +441,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
             IsBusy = true;
             IsBusyMessage = "loading accounts from file...";
 
-            await _accountsService.LoadAccountsAsync();
+            await accountsService.LoadAccountsAsync();
 
             AreAccountsLoaded = true;
 
@@ -414,7 +499,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
                 account.NewBreachCount = 0;
                 account.HasNewBreaches = false;
 
-                await _accountsService.SaveAccountsAsync();
+                await accountsService.SaveAccountsAsync();
             }
         });
 
