@@ -4,7 +4,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
 
     <Color x:Key="LightTranslucent">#CCFFFFFF</Color>
-    <Color x:Key="DarkTranslucent">#CC000000</Color>
+    <Color x:Key="DarkTranslucent">#99000000</Color>
 
     <!-- https://color.adobe.com/create/color-wheel/ -->
     <Color x:Key="Primary">#413654</Color>
