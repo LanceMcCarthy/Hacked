@@ -1,5 +1,5 @@
 ﻿using System.Windows.Input;
-using Telerik.Maui.Controls.Compatibility.DataGrid.Commands;
+using Telerik.Maui.Controls.DataGrid;
 
 namespace Hacked.Maui.Common.Commands;
 
