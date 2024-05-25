@@ -103,11 +103,11 @@
                         <VerticalStackLayout Spacing="5"
                                              Padding="10"
                                              HorizontalOptions="Start">
-                            <Label Text="{Binding LastUpdated, StringFormat='Updated: {0:g}'}"
+                            <Label Text="{Binding LastUpdated, StringFormat='Last Update: {0:g}'}"
                                    TextColor="{StaticResource PrimaryHighContrast}" />
 
                             <HorizontalStackLayout Spacing="5">
-                                <Label Text="{Binding Breaches.Count, StringFormat='Breach Count: {0}'}"
+                                <Label Text="{Binding Breaches.Count, StringFormat='Breaches: {0}'}"
                                        TextColor="{StaticResource PrimaryHighContrast}" />
                                 <Label Text="{Binding NewBreachCount, StringFormat='({0} new)'}"
                                        TextColor="{StaticResource PrimaryHighContrast}"
@@ -218,30 +218,22 @@
                       RowSpacing="10"
                       Margin="20">
 
-                    <Label Text="Add Account(s)"
-                           HorizontalOptions="Center"
+                    <Label Text="Account(s) to monitor:"
+                           HorizontalOptions="Start"
                            FontAttributes="Bold"
                            TextColor="{StaticResource Primary}"
                            Grid.Row="0"/>
 
-                    <telerik:RadButton x:Name="AddNewRowButton"
-                                       Text="+"
-                                       Command="{Binding BindingContext.AddPendingItemCommand, Source={x:Reference ThisPage}}"
-                                       TextColor="{StaticResource Primary}"
-                                       BorderColor="{StaticResource Primary}"
-                                       BackgroundColor="{StaticResource Secondary}"
-                                       WidthRequest="25"
-                                       HeightRequest="25"
-                                       BorderThickness="1"
-                                       HorizontalOptions="End"
-                                       Padding="5,0,5,0"
-                                       Grid.Row="1"/>
-                    
-                    <telerik:RadItemsControl x:Name="PendingAccountsView"
+                    <telerik:RadCollectionView x:Name="PendingAccountsView"
                                              ItemsSource="{Binding PendingAdditions}"
                                              BackgroundColor="Transparent"
-                                             Grid.Row="2">
-                        <telerik:RadItemsControl.ItemTemplate>
+                                             Grid.Row="1">
+                        <telerik:RadCollectionView.ItemViewStyle>
+                            <Style TargetType="telerik:RadCollectionViewItemView">
+                                <Setter Property="BorderThickness" Value="0" />
+                            </Style>
+                        </telerik:RadCollectionView.ItemViewStyle>
+                        <telerik:RadCollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:PendingAccount">
                                 <Grid ColumnDefinitions="*, Auto">
                                     <telerik:RadEntry Keyboard="Email"
@@ -263,12 +255,26 @@
                                                        VerticalOptions="Center"
                                                        Grid.Column="1"
                                                        Padding="5,0,5,0"
-                                                       Margin="0,5,0,0"/>
+                                                       Margin="5,5,0,0"/>
                                 </Grid>
                             </DataTemplate>
-                        </telerik:RadItemsControl.ItemTemplate>
-                    </telerik:RadItemsControl>
+                        </telerik:RadCollectionView.ItemTemplate>
+                    </telerik:RadCollectionView>
 
+                    <telerik:RadButton x:Name="AddNewRowButton"
+                                       Text="+"
+                                       Command="{Binding BindingContext.AddPendingItemCommand, Source={x:Reference ThisPage}}"
+                                       TextColor="{StaticResource Primary}"
+                                       BorderColor="{StaticResource Primary}"
+                                       BackgroundColor="{StaticResource Secondary}"
+                                       WidthRequest="25"
+                                       HeightRequest="25"
+                                       BorderThickness="1"
+                                       HorizontalOptions="End"
+                                       VerticalOptions="Start"
+                                       Padding="5,0,5,0"
+                                       Margin="0,10,0,10"
+                                       Grid.Row="2"/>
 
                     <telerik:RadButton x:Name="AddAccountButton"
                                        Text="add account(s)"
