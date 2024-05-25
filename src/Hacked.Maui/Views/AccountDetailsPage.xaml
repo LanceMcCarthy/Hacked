@@ -42,7 +42,7 @@
                 <Label Text="{Binding SelectedAccount.LastUpdated, StringFormat='Last Updated: {0:g}'}"
                        TextColor="{StaticResource Primary}"
                        HorizontalOptions="Center" 
-                       FontSize="16"/>
+                       FontSize="12"/>
             </VerticalStackLayout>
 
             <Grid IsVisible="{Binding SelectedAccount.IsUpdating}"

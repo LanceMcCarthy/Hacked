@@ -6,7 +6,7 @@ using Hacked.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net;
-using Telerik.Maui.Controls.Compatibility.DataGrid;
+using Telerik.Maui.Controls.DataGrid;
 
 namespace Hacked.Maui.ViewModels;
 
