@@ -1,7 +1,7 @@
 ﻿using Hacked.ViewModels;
-using Microsoft.AppCenter;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
+//using Microsoft.AppCenter;
+//using Microsoft.AppCenter.Analytics;
+//using Microsoft.AppCenter.Crashes;
 using Microsoft.Toolkit.Uwp.UI;
 using System;
 using Windows.ApplicationModel;
@@ -22,10 +22,10 @@ sealed partial class App : Application
         InitializeComponent();
         Suspending += OnSuspending;
 
-        AppCenter.Start(
-            "512602fa-5e3c-4e7e-b2ac-7f27af7bf073",
-            typeof(Analytics),
-            typeof(Crashes));
+        //AppCenter.Start(
+        //    "512602fa-5e3c-4e7e-b2ac-7f27af7bf073",
+        //    typeof(Analytics),
+        //    typeof(Crashes));
     }
 
     // Normal launch

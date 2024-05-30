@@ -5,8 +5,8 @@ using Hacked.Core.Comparers;
 using Hacked.Core.Models;
 using Hacked.Helpers;
 using Hacked.Services.Apis;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
+//using Microsoft.AppCenter.Analytics;
+//using Microsoft.AppCenter.Crashes;
 using Microsoft.Services.Store.Engagement;
 using Newtonsoft.Json;
 using System;
@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Foundation.Metadata;
@@ -325,10 +326,12 @@ public class MainViewModel : ViewModelBase
                 accountType = "unknown";
             }
 
-            Analytics.TrackEvent("Account Added", new Dictionary<string, string>
-                {
-                    { "Account Type", accountType }
-                });
+            StoreServicesCustomEventLogger.GetDefault().Log($"Account Added, Account Type: {accountType}");
+
+            //Analytics.TrackEvent("Account Added", new Dictionary<string, string>
+            //    {
+            //        { "Account Type", accountType }
+            //    });
 
             await SaveAccountsAsync();
 
@@ -351,7 +354,8 @@ public class MainViewModel : ViewModelBase
             if (Accounts.Contains(account))
             {
                 Accounts.Remove(account);
-                Analytics.TrackEvent("Account Removed");
+                //Analytics.TrackEvent("Account Removed");
+                StoreServicesCustomEventLogger.GetDefault().Log("Account Removed");
             }
 
             if (Accounts.Any())
@@ -439,10 +443,12 @@ public class MainViewModel : ViewModelBase
         {
             Debug.WriteLine("Accounts json file not found");
 
-            Crashes.TrackError(fnfex, new Dictionary<string, string>
-                {
-                    { "LoadAccountsAsync", $"{Constants.LocalAccountsFileName} not found." }
-                });
+            //StoreServicesCustomEventLogger.GetDefault().Log($"Crash {Constants.LocalAccountsFileName} not found.");
+
+            //Crashes.TrackError(fnfex, new Dictionary<string, string>
+            //    {
+            //        { "LoadAccountsAsync", $"{Constants.LocalAccountsFileName} not found." }
+            //    });
 
             return new ObservableCollection<MonitoredAccount>();
         }
@@ -463,7 +469,8 @@ public class MainViewModel : ViewModelBase
     {
         try
         {
-            Analytics.TrackEvent("Export Accounts");
+            StoreServicesCustomEventLogger.GetDefault().Log($"Export Accounts");
+            //Analytics.TrackEvent("Export Accounts");
 
             var savePicker = new FileSavePicker
             {
@@ -504,7 +511,6 @@ public class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Crashes.TrackError(ex);
             DisplayMessageHelpers.ShowExceptionMessageOnUiThread("CopyAccountsToRoamingStorageAsync", ex);
             return new Tuple<bool, string>(false, $"Error: {ex.Message}");
         }
@@ -555,7 +561,6 @@ public class MainViewModel : ViewModelBase
                 }
                 catch (Exception ex)
                 {
-                    Crashes.TrackError(ex);
                     Debug.WriteLine($"Import Deserialization failed: {ex.Message}");
                 }
 
@@ -590,7 +595,8 @@ public class MainViewModel : ViewModelBase
                     HasAccounts = false;
                 }
 
-                Analytics.TrackEvent("Accounts Restored from backup");
+                //Analytics.TrackEvent("Accounts Restored from backup");
+                StoreServicesCustomEventLogger.GetDefault().Log("Accounts Restored from backup");
 
                 return new Tuple<bool, string>(true, "Import Complete:\r\n\n" +
                                                      $"Accounts in file: {backupFileTotal}\n" +
@@ -605,8 +611,8 @@ public class MainViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            Crashes.TrackError(ex);
-            Debug.WriteLine($"ImportAccountsAsync Error: {ex.Message}");
+            //Crashes.TrackError(ex);
+            DisplayMessageHelpers.ShowExceptionMessageOnUiThread("Import Error", ex);
             return new Tuple<bool, string>(false, $"There was an error during import or file selection. Error: {ex.Message}");
         }
         finally
