@@ -1,9 +1,10 @@
 ﻿using Hacked.Core.Common;
-using Microsoft.AppCenter.Crashes;
+//using Microsoft.AppCenter.Crashes;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using Windows.UI.Popups;
+using Microsoft.Services.Store.Engagement;
 
 namespace Hacked.Helpers;
 
@@ -11,10 +12,12 @@ public static class DisplayMessageHelpers
 {
     public static async void ShowExceptionMessageOnUiThread(string callerName, Exception ex)
     {
-        Crashes.TrackError(ex, new Dictionary<string, string>
-            {
-                { "Caller Name", callerName }
-            });
+        StoreServicesCustomEventLogger.GetDefault().Log($"ExceptionMessageOnUiThread: {callerName}");
+
+        //Crashes.TrackError(ex, new Dictionary<string, string>
+        //    { 
+        //        { "Caller Name", callerName }
+        //    });
 
         await DispatcherTaskExtensions.CallOnUiThreadAsync(async () =>
         {
@@ -39,11 +42,11 @@ public static class DisplayMessageHelpers
         });
     }
 
-    public static async void ShowUserMessageOnUiThread(string message, string title)
-    {
-        await DispatcherTaskExtensions.CallOnUiThreadAsync(async () =>
-        {
-            await new MessageDialog(message, title).ShowAsync();
-        });
-    }
+    //public static async void ShowUserMessageOnUiThread(string message, string title)
+    //{
+    //    await DispatcherTaskExtensions.CallOnUiThreadAsync(async () =>
+    //    {
+    //        await new MessageDialog(message, title).ShowAsync();
+    //    });
+    //}
 }
