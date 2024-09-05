@@ -6,10 +6,6 @@ on:
 #    branches:
 #      - main
 
-defaults:
-  run:
-    shell: pwsh
-
 env:
   STEP_TIMEOUT_MINUTES: 60
 
@@ -18,40 +14,37 @@ jobs:
     name: Smoke Test (Debug Build of Hacked)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Install Dependencies
-        timeout-minutes: ${{ fromJSON(env.STEP_TIMEOUT_MINUTES) }}
-        uses: ".github/steps/install_dependencies"
+        timeout-minutes: ${{fromJSON(env.STEP_TIMEOUT_MINUTES)}}
+        uses: .github/steps/install_dependencies.github/steps/install_dependencies
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.3.1
+        uses: microsoft/setup-msbuild@v1.3.2
 
       - name: Build Hacked (Debug)
-        shell: pwsh
         run: msbuild src/Uno/Hacked/Hacked.csproj /r
 
   unit_test:
     name: Unit Tests
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Install Dependencies
-        timeout-minutes: ${{ fromJSON(env.STEP_TIMEOUT_MINUTES) }}
-        uses: "./.github/steps/install_dependencies"
+        timeout-minutes: ${{fromJSON(env.STEP_TIMEOUT_MINUTES)}}
+        uses: .github/steps/install_dependencies
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.3.1
+        uses: microsoft/setup-msbuild@v1.3.2
 
       - name: Build Hacked.Tests (Release)
-        shell: pwsh
         run: msbuild src/Uno//Hacked.Tests/Hacked.Tests.csproj /p:Configuration=Release /p:OverrideTargetFramework=net8.0 /r
 
       - name: Run Unit Tests
-        shell: pwsh
         run: dotnet test src/Uno//Hacked.Tests/Hacked.Tests.csproj --no-build -c Release --logger GitHubActions --blame-crash --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
