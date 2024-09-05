@@ -1,4 +1,4 @@
-﻿namespace Hacked.Presentation;
+namespace Hacked.Views;
 
 public sealed partial class MainPage : Page
 {

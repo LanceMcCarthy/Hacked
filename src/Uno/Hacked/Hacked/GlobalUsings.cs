@@ -1,10 +1,10 @@
-﻿global using System.Collections.Immutable;
+global using System.Collections.Immutable;
 global using CommunityToolkit.Mvvm.ComponentModel;
 global using CommunityToolkit.Mvvm.Input;
-global using Hacked.DataContracts;
 global using Hacked.DataContracts.Serialization;
 global using Hacked.Models;
-global using Hacked.Presentation;
+global using Hacked.Views;
+global using Hacked.ViewModels;
 global using Hacked.Services.Caching;
 global using Hacked.Services.Endpoints;
 global using Microsoft.Extensions.DependencyInjection;

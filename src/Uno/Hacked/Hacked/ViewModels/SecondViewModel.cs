@@ -1,4 +1,4 @@
-namespace Hacked.Presentation;
+namespace Hacked.ViewModels;
 
 public partial record SecondViewModel(Entity Entity)
 {

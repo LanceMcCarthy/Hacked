@@ -1,6 +1,7 @@
 using Refit;
 
 namespace Hacked.Services.Endpoints;
+
 [Headers("Content-Type: application/json")]
 public interface IApiClient
 {

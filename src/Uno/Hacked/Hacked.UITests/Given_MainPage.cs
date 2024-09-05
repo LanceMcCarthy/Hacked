@@ -13,10 +13,11 @@ public class Given_MainPage : TestBase
         // Add delay to allow for the splash screen to disappear
         await Task.Delay(5000);
 
-
         // Query for the SecondPageButton and then tap it
         Query xamlButton = q => q.All().Marked("SecondPageButton");
+
         App.WaitForElement(xamlButton);
+
         App.Tap(xamlButton);
 
         // Take a screenshot and add it to the test results

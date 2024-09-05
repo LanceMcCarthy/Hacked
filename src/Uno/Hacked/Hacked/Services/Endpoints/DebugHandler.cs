@@ -1,16 +1,10 @@
 namespace Hacked.Services.Endpoints;
 
-internal class DebugHttpHandler : DelegatingHandler
+internal class DebugHttpHandler(ILogger<DebugHttpHandler> logger, HttpMessageHandler? innerHandler = null) : DelegatingHandler(innerHandler ?? new HttpClientHandler())
 {
-    private readonly ILogger _logger;
+    private readonly ILogger _logger = logger;
 
-    public DebugHttpHandler(ILogger<DebugHttpHandler> logger, HttpMessageHandler? innerHandler = null)
-        : base(innerHandler ?? new HttpClientHandler())
-    {
-        _logger = logger;
-    }
-
-    protected async override Task<HttpResponseMessage> SendAsync(
+    protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
@@ -19,6 +13,7 @@ internal class DebugHttpHandler : DelegatingHandler
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogDebugMessage("Unsuccessful API Call");
+
             if (request.RequestUri is not null)
             {
                 _logger.LogDebugMessage($"{request.RequestUri} ({request.Method})");
@@ -29,7 +24,8 @@ internal class DebugHttpHandler : DelegatingHandler
                 _logger.LogDebugMessage($"{key}: {values}");
             }
 
-            var content = request.Content is not null ? await request.Content.ReadAsStringAsync() : null;
+            var content = request.Content is not null ? await request.Content.ReadAsStringAsync(cancellationToken) : null;
+
             if (!string.IsNullOrEmpty(content))
             {
                 _logger.LogDebugMessage(content);

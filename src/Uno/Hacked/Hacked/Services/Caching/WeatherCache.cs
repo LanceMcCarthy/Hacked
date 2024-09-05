@@ -1,27 +1,19 @@
 using System.Net;
 
 namespace Hacked.Services.Caching;
-public sealed class WeatherCache : IWeatherCache
+
+public sealed class WeatherCache(IApiClient api, ISerializer serializer, ILogger<WeatherCache> logger) : IWeatherCache
 {
-    private readonly IApiClient _api;
-    private readonly ISerializer _serializer;
-    private readonly ILogger _logger;
+    private readonly ILogger _logger = logger;
 
-    public WeatherCache(IApiClient api, ISerializer serializer, ILogger<WeatherCache> logger)
-    {
-        _api = api;
-        _serializer = serializer;
-        _logger = logger;
-    }
-
-    private bool IsConnected => NetworkInformation.GetInternetConnectionProfile().GetNetworkConnectivityLevel() == NetworkConnectivityLevel.InternetAccess;
+    private static bool IsConnected => NetworkInformation.GetInternetConnectionProfile().GetNetworkConnectivityLevel() == NetworkConnectivityLevel.InternetAccess;
 
     public async ValueTask<IImmutableList<WeatherForecast>> GetForecast(CancellationToken token)
     {
         var weatherText = await GetCachedWeather(token);
         if (!string.IsNullOrWhiteSpace(weatherText))
         {
-            return _serializer.FromString<ImmutableArray<WeatherForecast>>(weatherText);
+            return serializer.FromString<ImmutableArray<WeatherForecast>>(weatherText);
         }
 
         if (!IsConnected)
@@ -30,7 +22,7 @@ public sealed class WeatherCache : IWeatherCache
             throw new WebException("No internet connection", WebExceptionStatus.ConnectFailure);
         }
 
-        var response = await _api.GetWeather(token);
+        var response = await api.GetWeather(token);
 
         if (response.IsSuccessStatusCode && response.Content is not null)
         {
@@ -38,15 +30,16 @@ public sealed class WeatherCache : IWeatherCache
             await Save(weather, token);
             return weather;
         }
-        else if (response.Error is not null)
-        {
-            _logger.LogError(response.Error, "An error occurred while retrieving the latest Forecast.");
-            throw response.Error;
-        }
-        else
+
+        if (response.Error is null)
         {
             return ImmutableArray<WeatherForecast>.Empty;
         }
+
+        _logger.LogError(response.Error, "An error occurred while retrieving the latest Forecast.");
+
+        throw response.Error;
+
     }
 
     private static async ValueTask<StorageFile> GetFile(CreationCollisionOption option) =>
@@ -69,7 +62,7 @@ public sealed class WeatherCache : IWeatherCache
 
     private async ValueTask Save(IImmutableList<WeatherForecast> weather, CancellationToken token)
     {
-        var weatherText = _serializer.ToString(weather);
+        var weatherText = serializer.ToString(weather);
         var file = await GetFile(CreationCollisionOption.ReplaceExisting);
         await File.WriteAllTextAsync(file.Path, weatherText, token);
     }
