@@ -14,29 +14,30 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <VerticalStackLayout Padding="10">
-            <Label Text="Backups"
+        <VerticalStackLayout Padding="10" Spacing="10">
+            <Label Text="Monitored Account Backup"
                    FontSize="18" 
                    FontFamily="Raleway"/>
-            
-            <HorizontalStackLayout Spacing="10"
-                                   Margin="0,20,0,0">
-                <telerik:RadButton Text="Import Backup" 
-                                   Command="{Binding ImportCommand}"
-                                   FontFamily="Raleway"/>
-                <telerik:RadCheckBox IsChecked="{Binding RefreshDuringImport, Mode=TwoWay}"
-                                     CheckedColor="{StaticResource PrimaryHighContrast}"
-                                     CheckedSymbolColor="{StaticResource Secondary}"/>
-                <Label Text="Update breaches"
-                       VerticalOptions="Center"
-                       FontFamily="Raleway"/>
-            </HorizontalStackLayout>
-
-            <telerik:RadButton Text="Export Backup" 
+            <telerik:RadButton Text="Create Backup" 
                                Command="{Binding ExportCommand}"
                                FontFamily="Raleway"
                                HorizontalOptions="Start"
-                               Margin="0,20,0,0"/>
+                               WidthRequest="160"/>
+
+                <telerik:RadButton Text="Import Backup" 
+                                   Command="{Binding ImportCommand}"
+                                   FontFamily="Raleway"
+                                   HorizontalOptions="Start"
+                                   WidthRequest="160"/>
+            
+            <HorizontalStackLayout Spacing="10">
+                <telerik:RadCheckBox IsChecked="{Binding RefreshDuringImport, Mode=TwoWay}"
+                                     CheckedColor="{StaticResource PrimaryHighContrast}"
+                                     CheckedSymbolColor="{StaticResource Secondary}"/>
+                <Label Text="Update breaches after import"
+                       VerticalOptions="Center"
+                       FontFamily="Raleway"/>
+            </HorizontalStackLayout>
         </VerticalStackLayout>
 
         <telerik:RadBusyIndicator IsVisible="{Binding IsBusy}"

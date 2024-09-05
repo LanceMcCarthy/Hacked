@@ -6,7 +6,7 @@ using Hacked.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net;
-using Telerik.Maui.Controls.Compatibility.DataGrid;
+using Telerik.Maui.Controls.DataGrid;
 
 namespace Hacked.Maui.ViewModels;
 
@@ -389,18 +389,19 @@ public class MonitoredAccountsViewModel : PageViewModelBase
     {
         IsBusy = true;
 
-        var emptyItems = PendingAdditions.Where(i => i.Address == string.Empty);
-
-        foreach (var emptyItem in emptyItems)
-        {
-            PendingAdditions.Remove(emptyItem);
-        }
-
         foreach (var addition in PendingAdditions)
         {
+            if (string.IsNullOrEmpty(addition.Address))
+            {
+                continue;
+
+            }
+
             IsBusyMessage = $"adding {addition.Address}...";
 
-            addition.AddSuccessful = await AddAccountAsync(addition.Address) != null;
+            var result = await AddAccountAsync(addition.Address);
+
+            addition.AddSuccessful = result != null;
         }
 
         IsBusyMessage = string.Empty;
@@ -414,6 +415,8 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         }
 
         IsOverlayVisible = false;
+
+        PendingAdditions.Clear();
     }
 
     private void InvokeCancelAddAccounts()

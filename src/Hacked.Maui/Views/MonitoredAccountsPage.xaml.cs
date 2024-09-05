@@ -1,7 +1,7 @@
 #pragma warning disable CA1416
 
 using Hacked.Maui.ViewModels;
-using Telerik.Maui.Controls.Compatibility.Common.Data;
+using Telerik.Maui.Controls.Data;
 
 namespace Hacked.Maui.Views;
 
