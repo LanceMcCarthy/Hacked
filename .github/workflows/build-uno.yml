@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Dependencies
-        uses: LanceMcCarthy/InstallUnoDependencies@v1
+        uses: LanceMcCarthy/InstallUnoDependencies@v1.0.1
         timeout-minutes: ${{fromJSON(env.STEP_TIMEOUT_MINUTES)}}
 
       - name: Setup MSBuild
@@ -37,7 +37,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Dependencies
-        uses: LanceMcCarthy/InstallUnoDependencies@v1
+        uses: LanceMcCarthy/InstallUnoDependencies@v1.0.1
         timeout-minutes: ${{fromJSON(env.STEP_TIMEOUT_MINUTES)}}
 
       - name: Setup MSBuild
