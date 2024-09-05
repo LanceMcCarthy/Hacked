@@ -19,8 +19,8 @@ env:
   BuildMode: CI
   AppxBundle: Never
   AppxPackageSigningEnabled: False
-  TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
-  TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }}
+  TELERIK_USERNAME: ${{secrets.MyTelerikAccountUsername}}
+  TELERIK_PASSWORD: ${{secrets.MyTelerikAccountPassword}}
 
 jobs:
   windows-build:
@@ -28,17 +28,17 @@ jobs:
     
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     
     - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.1.3
+      uses: microsoft/setup-msbuild@v1.3.2
       with:
         msbuild-architecture: x64
       
     - name: NuGet Restore UWP Project
-      run: nuget restore ${{ env.SOLUTION_PATH }} -ConfigFile ${{ env.NUGETCONFIG_PATH }}
+      run: nuget restore ${{env.SOLUTION_PATH}} -ConfigFile ${{env.NUGETCONFIG_PATH}}
     
     - name: Build UWP Solution
-      run: msbuild ${{ env.SOLUTION_PATH }} /p:Configuration=${{ env.Configuration }} /p:Platform=${{ env.TargetPlatform }} /p:UapAppxPackageBuildMode=${{ env.BuildMode }} /p:AppxBundle=${{ env.AppxBundle }} /p:AppxPackageSigningEnabled=${{ env.AppxPackageSigningEnabled }}
+      run: msbuild ${{env.SOLUTION_PATH}} /p:Configuration=${{env.Configuration}} /p:Platform=${{env.TargetPlatform}} /p:UapAppxPackageBuildMode=${{env.BuildMode}} /p:AppxBundle=${{env.AppxBundle}} /p:AppxPackageSigningEnabled=${{env.AppxPackageSigningEnabled}}
