@@ -18,9 +18,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Dependencies
-        uses: LanceMcCarthy/InstallUnoDependencies@v1.0.2
-        timeout-minutes: ${{fromJSON(env.STEP_TIMEOUT_MINUTES)}}
+      # - name: Install Dependencies
+      #   uses: LanceMcCarthy/InstallUnoDependencies@v1.0.2
+      #   timeout-minutes: ${{fromJSON(env.STEP_TIMEOUT_MINUTES)}}
+
+      - name: Setup .NET ${{inputs.dotnet-version}}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3.2
@@ -36,9 +41,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Dependencies
-        uses: LanceMcCarthy/InstallUnoDependencies@v1.0.2
-        timeout-minutes: ${{fromJSON(env.STEP_TIMEOUT_MINUTES)}}
+      # - name: Install Dependencies
+      #   uses: LanceMcCarthy/InstallUnoDependencies@v1.0.2
+      #   timeout-minutes: ${{fromJSON(env.STEP_TIMEOUT_MINUTES)}}
+
+      - name: Setup .NET ${{inputs.dotnet-version}}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
       
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3.2
