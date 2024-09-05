@@ -1,7 +1,7 @@
-using System.Collections.Immutable;
 using System.Text.Json.Serialization;
 
 namespace Hacked.DataContracts.Serialization;
+
 /// <summary>
 /// Generated class for System.Text.Json Serialization
 /// </summary>

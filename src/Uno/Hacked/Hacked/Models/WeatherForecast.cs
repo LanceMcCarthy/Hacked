@@ -1,4 +1,4 @@
-namespace Hacked.DataContracts;
+namespace Hacked.Models;
 
 /// <summary>
 /// A Weather Forecast for a specific date

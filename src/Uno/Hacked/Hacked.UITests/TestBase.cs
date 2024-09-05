@@ -30,7 +30,7 @@ public class TestBase
         private set
         {
             _app = value;
-            Uno.UITest.Helpers.Queries.Helpers.App = value;
+            Helpers.App = value;
         }
     }
 
@@ -55,10 +55,10 @@ public class TestBase
         var fileInfo = App.Screenshot(title);
 
         var fileNameWithoutExt = Path.GetFileNameWithoutExtension(fileInfo.Name);
+
         if (fileNameWithoutExt != title && fileInfo.DirectoryName != null)
         {
-            var destFileName = Path
-                .Combine(fileInfo.DirectoryName, title + Path.GetExtension(fileInfo.Name));
+            var destFileName = Path.Combine(fileInfo.DirectoryName, title + Path.GetExtension(fileInfo.Name));
 
             if (File.Exists(destFileName))
             {

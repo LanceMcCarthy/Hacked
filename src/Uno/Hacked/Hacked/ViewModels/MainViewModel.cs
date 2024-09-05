@@ -1,4 +1,4 @@
-namespace Hacked.Presentation;
+namespace Hacked.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
@@ -15,7 +15,7 @@ public partial class MainViewModel : ObservableObject
         _navigator = navigator;
         Title = "Main";
         Title += $" - {localizer["ApplicationName"]}";
-        Title += $" - {appInfo?.Value?.Environment}";
+        Title += $" - {appInfo.Value.Environment}";
         GoToSecond = new AsyncRelayCommand(GoToSecondView);
     }
     public string? Title { get; }

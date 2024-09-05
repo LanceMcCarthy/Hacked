@@ -1,4 +1,7 @@
+using Hacked.ViewModels;
+using Hacked.Views;
 using Uno.Resizetizer;
+using MainViewModel = Hacked.ViewModels.MainViewModel;
 
 namespace Hacked;
 public partial class App : Application
@@ -15,7 +18,7 @@ public partial class App : Application
     protected Window? MainWindow { get; private set; }
     protected IHost? Host { get; private set; }
 
-    protected async override void OnLaunched(LaunchActivatedEventArgs args)
+    protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
         var builder = this.CreateBuilder(args)
             // Add navigation support for toolkit controls such as TabBar and NavigationView
@@ -29,10 +32,9 @@ public partial class App : Application
                 {
                     // Configure log levels for different categories of logging
                     logBuilder
-                        .SetMinimumLevel(
-                            context.HostingEnvironment.IsDevelopment() ?
-                                LogLevel.Information :
-                                LogLevel.Warning)
+                        .SetMinimumLevel(context.HostingEnvironment.IsDevelopment() 
+                            ? LogLevel.Information 
+                            : LogLevel.Warning)
 
                         // Default filters for core Uno Platform namespaces
                         .CoreLogLevel(LogLevel.Warning);
@@ -55,10 +57,9 @@ public partial class App : Application
                     //logBuilder.WebAssemblyLogLevel(LogLevel.Debug);
 
                 }, enableUnoLogging: true)
-                .UseConfiguration(configure: configBuilder =>
-                    configBuilder
-                        .EmbeddedSource<App>()
-                        .Section<AppConfig>()
+                .UseConfiguration(configure: configBuilder => configBuilder
+                    .EmbeddedSource<App>()
+                    .Section<AppConfig>()
                 )
                 // Enable localization (see appsettings.json for supported languages)
                 .UseLocalization()
@@ -76,8 +77,8 @@ public partial class App : Application
                     .AddRefitClient<IApiClient>(context))
                 .ConfigureServices((context, services) =>
                 {
-                    // TODO: Register your services
-                    //services.AddSingleton<IMyService, MyService>();
+                    // TODO: Register your services.
+                    // services.AddSingleton<IMyService, MyService>();
                 })
                 .UseNavigation(RegisterRoutes)
             );
