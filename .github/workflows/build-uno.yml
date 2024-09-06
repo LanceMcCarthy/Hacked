@@ -20,7 +20,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Dependencies
-        uses: LanceMcCarthy/InstallUnoDependencies@v1.0.2
+        uses: LanceMcCarthy/InstallUnoDependencies@v1
         timeout-minutes: ${{fromJSON(env.STEP_TIMEOUT_MINUTES)}}
 
       - name: Setup .NET ${{inputs.dotnet-version}}
@@ -43,7 +43,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install Dependencies
-        uses: LanceMcCarthy/InstallUnoDependencies@v1.0.2
+        uses: LanceMcCarthy/InstallUnoDependencies@v1
         timeout-minutes: ${{fromJSON(env.STEP_TIMEOUT_MINUTES)}}
 
       - name: Setup .NET ${{inputs.dotnet-version}}
