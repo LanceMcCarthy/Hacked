@@ -9,8 +9,8 @@ defaults:
 
 env:
   STEP_TIMEOUT_MINUTES: 60
-  TELERIK_USERNAME: ${{secrets.MyTelerikAccountUsername}}
-  TELERIK_PASSWORD: ${{secrets.MyTelerikAccountPassword}}
+  # TELERIK_USERNAME: ${{secrets.MyTelerikAccountUsername}}
+  # TELERIK_PASSWORD: ${{secrets.MyTelerikAccountPassword}}
 
 jobs:
   smoke_test:
@@ -33,8 +33,8 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3.2
       
-      - name: Remove Telerik server from package sources for Uno Platform builds
-        run: dotnet nuget remove source "Telerik" --configfile "src/nuget.config"
+      # - name: Remove Telerik server from package sources for Uno Platform builds
+      #   run: dotnet nuget remove source "Telerik" --configfile "src/nuget.config"
       
       - name: Build Hacked (Debug)
         run: msbuild src/Uno/Hacked/Hacked.csproj /r
@@ -59,8 +59,8 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3.2
       
-      - name: Remove Telerik server from package sources for Uno Platform builds
-        run: dotnet nuget remove source "Telerik" --configfile "src/nuget.config"
+      # - name: Remove Telerik server from package sources for Uno Platform builds
+      #   run: dotnet nuget remove source "Telerik" --configfile "src/nuget.config"
       
       - name: Build Hacked.Tests (Release)
         run: msbuild src/Uno/Hacked.Tests/Hacked.Tests.csproj /p:Configuration=Release /p:OverrideTargetFramework=net8.0 /r
