@@ -7,9 +7,6 @@ defaults:
   run:
     shell: pwsh
 
-env:
-  STEP_TIMEOUT_MINUTES: 60
-
 jobs:
   smoke_test:
     name: Smoke Test (Debug Build of Hacked)
@@ -21,13 +18,8 @@ jobs:
 
       - name: Install Dependencies
         uses: LanceMcCarthy/InstallUnoDependencies@v1
-        timeout-minutes: ${{fromJSON(env.STEP_TIMEOUT_MINUTES)}}
+        timeout-minutes: 30 # cancel if step takes longer than 30 minutes
 
-      - name: Setup .NET ${{inputs.dotnet-version}}
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-      
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3.2
       
@@ -44,13 +36,8 @@ jobs:
 
       - name: Install Dependencies
         uses: LanceMcCarthy/InstallUnoDependencies@v1
-        timeout-minutes: ${{fromJSON(env.STEP_TIMEOUT_MINUTES)}}
+        timeout-minutes: 30 # cancel if step takes longer than 30 minutes
 
-      - name: Setup .NET ${{inputs.dotnet-version}}
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-      
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3.2
       
