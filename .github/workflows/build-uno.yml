@@ -8,6 +8,8 @@ on:
 
 env:
   STEP_TIMEOUT_MINUTES: 60
+  TELERIK_PACKAGESOURCE_NAME: "Telerik"
+  NUGETCONFIG_PATH: "src/nuget.config"
 
 jobs:
   smoke_test:
@@ -26,9 +28,13 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-
+      
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3.2
+        
+      - name: Remove Telerik server from package sources for Uno Platform builds
+        shell: pwsh
+        run: dotnet nuget remove source ${{env.TELERIK_PACKAGESOURCE_NAME}} --configfile ${{env.NUGETCONFIG_PATH}}
 
       - name: Build Hacked (Debug)
         run: msbuild src/Uno/Hacked/Hacked.csproj /r
@@ -52,6 +58,10 @@ jobs:
       
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3.2
+        
+      - name: Remove Telerik server from package sources for Uno Platform builds
+        shell: pwsh
+        run: dotnet nuget remove source ${{env.TELERIK_PACKAGESOURCE_NAME}} --configfile ${{env.NUGETCONFIG_PATH}}
 
       - name: Build Hacked.Tests (Release)
         run: msbuild src/Uno//Hacked.Tests/Hacked.Tests.csproj /p:Configuration=Release /p:OverrideTargetFramework=net8.0 /r
