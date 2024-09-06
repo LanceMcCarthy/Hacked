@@ -9,7 +9,7 @@ defaults:
 
 jobs:
   smoke_test:
-    name: Smoke Test (Debug Build of Hacked)
+    name: Smoke Tests
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
