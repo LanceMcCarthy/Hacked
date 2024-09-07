@@ -13,6 +13,8 @@ on:
 env:
   SOLUTION_PATH: 'src/Hacked_Uwp.sln'
   PROJECT_PATH: 'src/Hacked/Hacked.csproj'
+  CORE_PROJECT_PATH: 'src/Hacked.Core/Hacked.Core.csproj'
+  SERVICES_PROJECT_PATH: 'src/Hacked.Services/Hacked.Services.csproj'
   Configuration: Debug
   TargetPlatform: x64
   BuildMode: CI
@@ -20,7 +22,7 @@ env:
   AppxPackageSigningEnabled: False
 
 jobs:
-  windows-build:
+  smoke-test-uwp:
     runs-on: windows-latest
     steps:
     - name: Checkout
@@ -37,7 +39,10 @@ jobs:
       run: dotnet nuget add source 'https://nuget.telerik.com/v3/index.json' -n "TelerikNuGetServer" -u ${{secrets.MyTelerikAccountUsername}} -p ${{secrets.MyTelerikAccountPassword}} --store-password-in-clear-text
 
     - name: Restore NuGet Packages
-      run: dotnet restore ${{env.PROJECT_PATH}}
+      run: |
+        dotnet restore ${{env.CORE_PROJECT_PATH}} -r win10-x64
+        dotnet restore ${{env.SERVICES_PROJECT_PATH}} -r win10-x64
+        dotnet restore ${{env.PROJECT_PATH}} -r win10-x64
 
     - name: Build UWP Solution
       run: msbuild ${{env.PROJECT_PATH}} /p:Configuration=${{env.Configuration}} /p:Platform=${{env.TargetPlatform}} /p:UapAppxPackageBuildMode=${{env.BuildMode}} /p:AppxBundle=${{env.AppxBundle}} /p:AppxPackageSigningEnabled=${{env.AppxPackageSigningEnabled}}
