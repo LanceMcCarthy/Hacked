@@ -413,5 +413,5 @@
     <MainPackageIdentityName>61469LanceLotSoftware.VSauceSupreme</MainPackageIdentityName>
     <MainPackageIdentityName>61469LanceLotSoftware.XKCDComicViewer</MainPackageIdentityName>
   </AccountPackageIdentityNames>
-  <PackageInfoList LandingUrl="https://developer.microsoft.com/dashboard/Application?appId=9NBLGGH6850J" />
+  <PackageInfoList LandingUrl="https://devcenterapi.dce.mp.microsoft.com/dashboard/Application?appId=9NBLGGH6850J" />
 </StoreAssociation>
