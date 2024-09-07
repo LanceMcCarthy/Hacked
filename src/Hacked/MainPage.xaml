@@ -465,16 +465,26 @@
                                     Margin="10,5,10,5"
                                     HorizontalAlignment="Stretch"
                                     Foreground="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
-                                    Content="export | import">
+                                    Content="refresh settings | export | import">
                                 <Button.Flyout>
                                     <Flyout x:Name="BackupRestoreButtonFlyout">
                                         <Grid MaxWidth="325">
                                             <StackPanel HorizontalAlignment="Left">
                                                 <TextBlock FontWeight="Bold"
-                                                           Text="Backup and Restore"
+                                                           Text="Refresh Settings"
                                                            Foreground="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                                            HorizontalAlignment="Center"
                                                            Margin="0,0,0,10"/>
+                                                <ComboBox Header="Refresh Delay (in seconds)" 
+                                                          ItemsSource="{Binding AvailableDelays}" 
+                                                          SelectedItem="{Binding RefreshDelay, Mode=TwoWay}"
+                                                          HorizontalAlignment="Stretch"
+                                                          Margin="5,0,5,20"/>
+                                                <TextBlock FontWeight="Bold"
+                                                           Text="Backup and Restore"
+                                                           Foreground="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
+                                                           HorizontalAlignment="Center"
+                                                           Margin="0,0,0,5"/>
                                                 <TextBlock Text="Export your Monitored Accounts list to a backup file."
                                                            Margin="0,10,0,0"
                                                            TextWrapping="Wrap"/>
