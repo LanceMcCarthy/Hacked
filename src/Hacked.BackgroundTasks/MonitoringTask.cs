@@ -82,6 +82,8 @@ public sealed class MonitoringTask : IBackgroundTask
                     }
 
                     account.LastUpdated = DateTime.Now;
+
+                    await Task.Delay(5000);
                 }
                 catch (PwnedApiException ex)
                 {

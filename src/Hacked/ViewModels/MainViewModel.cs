@@ -130,7 +130,7 @@ public class MainViewModel : ViewModelBase
         get
         {
             //return true;
-            if (roamingSettings != null && roamingSettings.Values.TryGetValue(Constants.AreAdsRemovedSettingsKey, out object val))
+            if (roamingSettings != null && roamingSettings.Values.TryGetValue(Constants.AreAdsRemovedSettingsKey, out var val))
             {
                 areAdsRemoved = (bool)val;
             }
@@ -156,6 +156,36 @@ public class MainViewModel : ViewModelBase
     {
         get => isKudoSelectorOpen;
         set => SetProperty(ref isKudoSelectorOpen, value);
+    }
+
+    public List<int> AvailableDelays { get; } = new List<int>() { 1, 2, 3, 4, 5 };
+
+    private int refreshDelay = 2;
+    public int RefreshDelay
+    {
+        get
+        {
+            if (roamingSettings == null)
+                return refreshDelay;
+
+            if (roamingSettings.Values.TryGetValue(Constants.RefreshDelaySettingsKey, out var val))
+            {
+                refreshDelay = (int)val;
+            }
+            else
+            {
+                roamingSettings.Values[Constants.RefreshDelaySettingsKey] = refreshDelay;
+            }
+
+            return refreshDelay;
+        }
+        set
+        {
+            if (roamingSettings != null)
+                roamingSettings.Values[Constants.RefreshDelaySettingsKey] = value;
+
+            SetProperty(ref refreshDelay, value);
+        }
     }
 
     #endregion
@@ -278,6 +308,8 @@ public class MainViewModel : ViewModelBase
         {
             monitoredAccount.Breaches = await CheckForBreachesAsync(monitoredAccount, false);
             monitoredAccount.LastUpdated = DateTime.Now;
+
+            await Task.Delay(RefreshDelay * 1000 + 100); // delay to avoid rate limiting
         }
 
         await SaveAccountsAsync();
