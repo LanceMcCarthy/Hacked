@@ -36,7 +36,7 @@ jobs:
     - name: Add Telerik NuGet Server
       run: dotnet nuget add source 'https://nuget.telerik.com/v3/index.json' -n "TelerikNuGetServer" -u ${{secrets.MyTelerikAccountUsername}} -p ${{secrets.MyTelerikAccountPassword}} --store-password-in-clear-text
 
-    - name: Add Telerik NuGet Server
+    - name: Restore NuGet Packages
       run: dotnet restore ${{env.SOLUTION_PATH}}
 
     - name: Build UWP Solution
