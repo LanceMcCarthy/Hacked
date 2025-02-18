@@ -34,7 +34,7 @@ jobs:
         dotnet-version: ${{env.sdk_version}}
 
     - name: Restore NuGet Packages
-      run: dotnet restore ${{env.SERVICES_PROJECT_PATH}} --configFile ${{env.NUGET_CONFIG_PATH}} 
+      run: dotnet restore ${{env.SERVICES_PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
 
     - name: Build Services
       run: dotnet build ${{env.SERVICES_PROJECT_PATH}} -c Debug --no-restore

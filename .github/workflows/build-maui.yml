@@ -56,7 +56,7 @@ jobs:
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
       - name: Add Telerik NuGet Server
-        run: dotnet restore ${{env.PROJECT_PATH}} --configFile ${{env.NUGET_CONFIG_PATH}} 
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
 
       - name: Build Maui WinUI project
         run: dotnet build ${{env.PROJECT_PATH}} -c Debug -f net8.0-windows10.0.19041.0
@@ -69,13 +69,13 @@ jobs:
       - name: Copy WinUI msix package
         run: Get-Childitem -Path ${{github.workspace}} -Include *.msix -File -Recurse | Copy-Item -Destination ${{env.WINDOWS_ARTIFACTS_PATH}}
 
-      - name: Publish build artifacts
-        uses: actions/upload-artifact@v4
-        with:     
-          name: "WinUI .NET MAUI artifacts" 
-          path: "${{env.WINDOWS_ARTIFACTS_PATH}}/*"
-          if-no-files-found: warn
-          retention-days: 60
+      # - name: Publish build artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:     
+      #     name: "WinUI .NET MAUI artifacts" 
+      #     path: "${{env.WINDOWS_ARTIFACTS_PATH}}/*"
+      #     if-no-files-found: warn
+      #     retention-days: 60
 
   build-macos:
     runs-on: macos-12
@@ -91,7 +91,7 @@ jobs:
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
       - name: Add Telerik NuGet Server
-        run: dotnet restore ${{env.PROJECT_PATH}} --configFile ${{env.NUGET_CONFIG_PATH}} 
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
 
       - name: Build MacCatalyst App
         run: |
@@ -107,23 +107,23 @@ jobs:
       - name: Copy MacOS packages
         run: Get-Childitem -Path ${{github.workspace}} -Include *.pkg -File -Recurse | Copy-Item -Destination ${{env.MACOS_ARTIFACTS_PATH}}
 
-      - name: Publish macOS build artifacts
-        uses: actions/upload-artifact@v4
-        with:     
-          name: "macOS artifacts" 
-          path: "${{env.MACOS_ARTIFACTS_PATH}}/*"
-          if-no-files-found: warn
-          retention-days: 60
+      # - name: Publish macOS build artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:     
+      #     name: "macOS artifacts" 
+      #     path: "${{env.MACOS_ARTIFACTS_PATH}}/*"
+      #     if-no-files-found: warn
+      #     retention-days: 60
   
   build-android:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
 
-      # - name: Decode the Keystore
-      #   run: |
-      #     $file_bytes = [System.Convert]::FromBase64String("${{secrets.ANDROID_SIGNING_KEYSTORE_BASE64}}")
-      #     [IO.File]::WriteAllBytes("${{secrets.ANDROID_SIGNING_KEYSTORE_FILENAME}}", $file_bytes)
+      - name: Decode the Keystore
+        run: |
+          $file_bytes = [System.Convert]::FromBase64String("${{secrets.ANDROID_SIGNING_KEYSTORE_BASE64}}")
+          [IO.File]::WriteAllBytes("${{secrets.ANDROID_SIGNING_KEYSTORE_FILENAME}}", $file_bytes)
 
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
@@ -139,13 +139,15 @@ jobs:
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
       - name: Add Telerik NuGet Server
-        run: dotnet restore ${{env.PROJECT_PATH}} --configFile ${{env.NUGET_CONFIG_PATH}} 
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
 
-      - name: Build MAUI Android
+      - name: Simple build MAUI Android
         run: |
           dotnet build ${{env.PROJECT_PATH}} -c Debug -f net8.0-android
-          # dotnet build ${{env.PROJECT_PATH}} -c Debug -f net8.0-android
-          # dotnet publish ${{env.PROJECT_PATH}} -c Release -f net8.0-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_SIGNING_KEYSTORE_FILENAME}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_STORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
+
+      # - name: Publish MAUI Android
+      #   run: |
+      #     dotnet publish ${{env.PROJECT_PATH}} -c Release -f net8.0-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_SIGNING_KEYSTORE_FILENAME}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_STORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
 
       - name: Create artifacts folder
         run: |
@@ -157,13 +159,13 @@ jobs:
            Get-Childitem -Path ${{github.workspace}} -Include *Signed.apk -File -Recurse | Copy-Item -Destination ${{env.ANDROID_ARTIFACTS_PATH}}
            Get-Childitem -Path ${{github.workspace}} -Include *Signed.aab -File -Recurse | Copy-Item -Destination ${{env.ANDROID_ARTIFACTS_PATH}}
 
-      - name: Publish Android build artifacts
-        uses: actions/upload-artifact@v3
-        with:     
-          name: "Android artifacts" 
-          path: "${{env.ANDROID_ARTIFACTS_PATH}}/*"
-          if-no-files-found: warn
-          retention-days: 60
+      # - name: Publish Android build artifacts
+      #   uses: actions/upload-artifact@v3
+      #   with:     
+      #     name: "Android artifacts" 
+      #     path: "${{env.ANDROID_ARTIFACTS_PATH}}/*"
+      #     if-no-files-found: warn
+      #     retention-days: 60
 
   build-ios:
     runs-on: macos-12
@@ -179,7 +181,7 @@ jobs:
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
       - name: Add Telerik NuGet Server
-        run: dotnet restore ${{env.PROJECT_PATH}} --configFile ${{env.NUGET_CONFIG_PATH}} 
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
 
       - name: Build iOS App
         shell: bash
@@ -195,10 +197,10 @@ jobs:
       - name: Copy iOS packages
         run: Get-Childitem -Path ${{github.workspace}} -Include *.app -File -Recurse | Copy-Item -Destination ${{env.IOS_ARTIFACTS_PATH}}
 
-      - name: Publish iOS build artifacts
-        uses: actions/upload-artifact@v4
-        with:     
-          name: "iOS artifacts" 
-          path: "${{env.IOS_ARTIFACTS_PATH}}/*"
-          if-no-files-found: warn
-          retention-days: 60
+      # - name: Publish iOS build artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:     
+      #     name: "iOS artifacts" 
+      #     path: "${{env.IOS_ARTIFACTS_PATH}}/*"
+      #     if-no-files-found: warn
+      #     retention-days: 60
