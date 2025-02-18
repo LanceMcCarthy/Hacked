@@ -23,10 +23,10 @@ public sealed partial class MainPage
 
             NoticeFeaturesTextBlock.Text =
                 "- Added 'Refresh Delay' setting to avoid getting rate limit error when refreshing all accounts at once." +
-                "- Now uses modern Fluent Design elements throughout the app; shadow, light and blur effects.\n";
+                "- Now uses modern Fluent Design elements throughout the app; shadow, light and blur effects.\n" +
+                "- General housekeeping and little tweaks.";
             NoticeFixesTextBlock.Text =
-                "- Removed annoying spell check for account entry.\n" +
-                "- Lots of little tweaks and improvements.\n";
+                "- Fixed a bug with the API that resulted in null results.\n";
 
             NoticeOverlay.Visibility = Visibility.Visible;
         }
