@@ -8,6 +8,10 @@ defaults:
     shell: pwsh
 env:
   target-platform: "all"
+  sdk_version: '9.0.x'
+  NUGET_CONFIG_PATH: 'src/nuget.config'
+  TELERIK_USERNAME: ${{secrets.MyTelerikAccountUsername}}
+  TELERIK_PASSWORD: ${{secrets.MyTelerikAccountPassword}}
 
 jobs:
   smoke_test:
@@ -21,10 +25,10 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: ${{env.sdk_version}}
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.3.2
+        uses: microsoft/setup-msbuild@v2
       
       - name: Install ${{env.target-platform}} Workloads
         run: |
@@ -45,19 +49,16 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: ${{env.sdk_version}}
 
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.3.2
+        uses: microsoft/setup-msbuild@v2
       
       - name: Install ${{env.target-platform}} Workloads
         run: |
           dotnet tool install -g uno.check
           uno-check -v --ci --non-interactive --fix --target ${{env.target-platform}} --skip vswin --skip vsmac --skip xcode --skip vswinworkloads --skip androidemulator --skip dotnetnewunotemplates
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.3.2
-      
       - name: Build Hacked.Tests (Release)
         run: msbuild src/Uno/Hacked.Tests/Hacked.Tests.csproj /p:Configuration=Release /p:OverrideTargetFramework=net8.0 /r
 
