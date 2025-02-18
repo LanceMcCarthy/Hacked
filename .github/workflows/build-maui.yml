@@ -32,6 +32,10 @@ env:
   ANDROID_ARTIFACTS_PATH: "artifacts_android"
   WINDOWS_ARTIFACTS_PATH: "artifacts_windows"
   PROJECT_PATH: "src/Hacked.Maui/Hacked.maui.csproj"
+  sdk_version: '9.0.x'
+  NUGET_CONFIG_PATH: 'src/nuget.config'
+  TELERIK_USERNAME: ${{secrets.MyTelerikAccountUsername}}
+  TELERIK_PASSWORD: ${{secrets.MyTelerikAccountPassword}}
 
 jobs:
   build-windows:
@@ -43,16 +47,16 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0'
+          dotnet-version: ${{env.sdk_version}}
 
       - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.3.2
+        uses: microsoft/setup-msbuild@v2
 
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
       - name: Add Telerik NuGet Server
-        run: dotnet nuget add source 'https://nuget.telerik.com/v3/index.json' -n "TelerikNuGetServer" -u ${{secrets.MyTelerikAccountUsername}} -p ${{secrets.MyTelerikAccountPassword}} --store-password-in-clear-text
+        run: dotnet restore ${{env.PROJECT_PATH}} --configFile ${{env.NUGET_CONFIG_PATH}} 
 
       - name: Build Maui WinUI project
         run: dotnet build ${{env.PROJECT_PATH}} -c Debug -f net8.0-windows10.0.19041.0
@@ -81,13 +85,13 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0'
+          dotnet-version: ${{env.sdk_version}}
 
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
       - name: Add Telerik NuGet Server
-        run: dotnet nuget add source 'https://nuget.telerik.com/v3/index.json' -n "TelerikNuGetServer" -u ${{secrets.MyTelerikAccountUsername}} -p ${{secrets.MyTelerikAccountPassword}} --store-password-in-clear-text
+        run: dotnet restore ${{env.PROJECT_PATH}} --configFile ${{env.NUGET_CONFIG_PATH}} 
 
       - name: Build MacCatalyst App
         run: |
@@ -124,7 +128,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: ${{env.sdk_version}}
 
       - uses: actions/setup-java@v4
         with:
@@ -135,7 +139,7 @@ jobs:
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
       - name: Add Telerik NuGet Server
-        run: dotnet nuget add source 'https://nuget.telerik.com/v3/index.json' -n "TelerikNuGetServer" -u ${{secrets.MyTelerikAccountUsername}} -p ${{secrets.MyTelerikAccountPassword}} --store-password-in-clear-text
+        run: dotnet restore ${{env.PROJECT_PATH}} --configFile ${{env.NUGET_CONFIG_PATH}} 
 
       - name: Build MAUI Android
         run: |
@@ -169,13 +173,13 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0'
+          dotnet-version: ${{env.sdk_version}}
 
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
       - name: Add Telerik NuGet Server
-        run: dotnet nuget add source 'https://nuget.telerik.com/v3/index.json' -n "TelerikNuGetServer" -u ${{secrets.MyTelerikAccountUsername}} -p ${{secrets.MyTelerikAccountPassword}} --store-password-in-clear-text
+        run: dotnet restore ${{env.PROJECT_PATH}} --configFile ${{env.NUGET_CONFIG_PATH}} 
 
       - name: Build iOS App
         shell: bash
