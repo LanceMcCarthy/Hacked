@@ -224,7 +224,7 @@ public class MainViewModel : ViewModelBase
 
     #endregion
 
-    #region methods
+    #region Methods
 
     public async Task InitializeApp()
     {
