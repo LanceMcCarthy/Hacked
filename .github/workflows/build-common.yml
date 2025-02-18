@@ -13,6 +13,10 @@ on:
 env:
   CORE_PROJECT_PATH: 'src/Hacked.Core/Hacked.Core.csproj'
   SERVICES_PROJECT_PATH: 'src/Hacked.Services/Hacked.Services.csproj'
+  sdk_version: '9.0.x'
+  NUGET_CONFIG_PATH: 'src/nuget.config'
+  TELERIK_USERNAME: ${{secrets.MyTelerikAccountUsername}}
+  TELERIK_PASSWORD: ${{secrets.MyTelerikAccountPassword}}
 
 jobs:
   smoke-test:
@@ -24,12 +28,13 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Add Telerik NuGet Server
-      run: dotnet nuget add source 'https://nuget.telerik.com/v3/index.json' -n "TelerikNuGetServer" -u ${{secrets.MyTelerikAccountUsername}} -p ${{secrets.MyTelerikAccountPassword}} --store-password-in-clear-text
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{env.sdk_version}}
 
     - name: Restore NuGet Packages
-      run: |
-        dotnet restore ${{env.SERVICES_PROJECT_PATH}} 
+      run: dotnet restore ${{env.SERVICES_PROJECT_PATH}} --configFile ${{env.NUGET_CONFIG_PATH}} 
 
     - name: Build Services
       run: dotnet build ${{env.SERVICES_PROJECT_PATH}} -c Debug --no-restore
