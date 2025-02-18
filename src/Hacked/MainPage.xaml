@@ -465,17 +465,17 @@
                                     Margin="10,5,10,5"
                                     HorizontalAlignment="Stretch"
                                     Foreground="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
-                                    Content="refresh settings | export | import">
+                                    Content="settings | export | import">
                                 <Button.Flyout>
                                     <Flyout x:Name="BackupRestoreButtonFlyout">
                                         <Grid MaxWidth="325">
                                             <StackPanel HorizontalAlignment="Left">
                                                 <TextBlock FontWeight="Bold"
-                                                           Text="Refresh Settings"
+                                                           Text="Refresh"
                                                            Foreground="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}"
                                                            HorizontalAlignment="Center"
                                                            Margin="0,0,0,10"/>
-                                                <ComboBox Header="Refresh Delay (in seconds)" 
+                                                <ComboBox Header="Refresh All Delay (in seconds)"
                                                           ItemsSource="{Binding AvailableDelays}" 
                                                           SelectedItem="{Binding RefreshDelay, Mode=TwoWay}"
                                                           HorizontalAlignment="Stretch"
