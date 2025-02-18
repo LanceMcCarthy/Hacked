@@ -51,4 +51,4 @@ jobs:
         dotnet restore ${{env.PROJECT_PATH}} -r win10-x64 --configfile ${{env.NUGET_CONFIG_PATH}} 
 
     - name: Build UWP Solution
-      run: msbuild ${{env.PROJECT_PATH}} /p:Configuration=${{env.Configuration}} /p:Platform=${{env.TargetPlatform}} /p:UapAppxPackageBuildMode=${{env.BuildMode}} /p:AppxBundle=${{env.AppxBundle}} /p:AppxPackageSigningEnabled=${{env.AppxPackageSigningEnabled}}
+      run: msbuild ${{env.PROJECT_PATH}} -restore /p:Configuration=${{env.Configuration}} /p:Platform=${{env.TargetPlatform}} /p:UapAppxPackageBuildMode=${{env.BuildMode}} /p:AppxBundle=${{env.AppxBundle}} /p:AppxPackageSigningEnabled=${{env.AppxPackageSigningEnabled}}
