@@ -58,7 +58,7 @@ jobs:
         run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
 
       - name: Build Maui WinUI project
-        run: dotnet build ${{env.PROJECT_PATH}} -c Debug -f net8.0-windows10.0.19041.0
+        run: dotnet build ${{env.PROJECT_PATH}} -c Debug -f net9.0-windows10.0.19041.0
 
       - name: Create artifacts folder
         run: |
@@ -94,7 +94,7 @@ jobs:
 
       - name: Build MacCatalyst App
         run: |
-          dotnet build ${{env.PROJECT_PATH}} -f net8.0-maccatalyst -c Debug -p:MtouchLink=SdkOnly
+          dotnet build ${{env.PROJECT_PATH}} -f net9.0-maccatalyst -c Debug -p:MtouchLink=SdkOnly
           # dotnet build ${{env.PROJECT_PATH}} -f net8.0-maccatalyst -c Release
           # dotnet publish ${{env.PROJECT_PATH}} -f net8.0-maccatalyst -c Release -p:BuildIpa=True 
 
@@ -146,7 +146,7 @@ jobs:
 
       # - name: Publish MAUI Android
       #   run: |
-      #     dotnet publish ${{env.PROJECT_PATH}} -c Release -f net8.0-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_SIGNING_KEYSTORE_FILENAME}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_STORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
+      #     dotnet publish ${{env.PROJECT_PATH}} -c Release -f net9.0-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_SIGNING_KEYSTORE_FILENAME}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_STORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
 
       - name: Create artifacts folder
         run: |
@@ -185,7 +185,7 @@ jobs:
       - name: Build iOS App
         shell: bash
         run: |
-          dotnet build ${{env.PROJECT_PATH}} -f net8.0-ios -c Debug -p:MtouchLink=SdkOnly
+          dotnet build ${{env.PROJECT_PATH}} -f net9.0-ios -c Debug -p:MtouchLink=SdkOnly
           # dotnet publish ${{env.PROJECT_PATH}} -f net8.0-ios -c Release -p:BuildIpa=True
 
       - name: Create artifacts folder
