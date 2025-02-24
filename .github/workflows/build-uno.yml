@@ -10,8 +10,7 @@ env:
   target-platform: "all"
   sdk_version: '9.0.x'
   NUGET_CONFIG_PATH: 'src/nuget.config'
-  TELERIK_USERNAME: ${{secrets.MyTelerikAccountUsername}}
-  TELERIK_PASSWORD: ${{secrets.MyTelerikAccountPassword}}
+  TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
 
 jobs:
   smoke_test:
