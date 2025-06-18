@@ -242,7 +242,8 @@
                                                       HorizontalOptions="Start"
                                                       BackgroundColor="{AppThemeBinding Light={StaticResource WhiteBrush}, Dark={StaticResource BlackBrush}}" 
                                                       telerik:EntryExtensions.CompletedCommand="{Binding BindingContext.AddPendingItemCommand, Source={x:Reference ThisPage}}"
-                                                      telerik:FocusElementHelper.IsFocused="{Binding IsFocused, Mode=TwoWay}"/>
+                                                      />
+                                                  <!--telerik:FocusElementHelper.IsFocused="{Binding IsFocused, Mode=TwoWay}"-->
                                     <telerik:RadButton Text="-"
                                                        Command="{Binding BindingContext.RemovePendingItemCommand, Source={x:Reference ThisPage}}"
                                                        CommandParameter="{Binding}"

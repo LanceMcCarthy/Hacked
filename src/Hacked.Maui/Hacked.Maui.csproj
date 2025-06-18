@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net9.0-android;net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
+    <TargetFrameworks>net9.0-android;net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
 		<RollForward>LatestMinor</RollForward>
 		<OutputType>Exe</OutputType>
@@ -38,6 +38,10 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)'=='net8.0-ios'">
+	  <CodesignKey>Apple Development: Created via API (F85G643H5K)</CodesignKey>
+	  <CodesignProvision>VS: com.lancelotsoftware.HackedApp Development</CodesignProvision>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
@@ -54,10 +58,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.40" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.2" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.6" />
 		<PackageReference Include="CommonHelpers" Version="1.4.1" />
-		<PackageReference Include="Telerik.UI.for.Maui" Version="10.0.0" />
+		<PackageReference Include="Telerik.Licensing" Version="1.6.7" />
+		<PackageReference Include="Telerik.UI.for.Maui" Version="11.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 	</ItemGroup>
 
