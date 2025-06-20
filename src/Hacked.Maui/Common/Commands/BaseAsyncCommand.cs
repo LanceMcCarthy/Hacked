@@ -1,4 +1,4 @@
-﻿using Hacked.Maui.Common.Exceptions;
+﻿using CommonHelpers.Maui.Events.Exceptions;
 using Hacked.Maui.Common.Extensions;
 using System.Windows.Input;
 
@@ -10,14 +10,6 @@ public class BaseAsyncCommand<TExecute, TCanExecute> : BaseCommand<TCanExecute>,
     readonly Action<Exception>? onException;
     readonly bool continueOnCapturedContext;
 
-    /// <summary>
-    /// Initializes a new instance of BaseAsyncCommand
-    /// </summary>
-    /// <param name="execute">The Function executed when Execute or ExecuteAsync is called. This does not check canExecute before executing and will execute even if canExecute is false</param>
-    /// <param name="canExecute">The Function that verifies whether or not AsyncCommand should execute.</param>
-    /// <param name="onException">If an exception is thrown in the Task, <c>onException</c> will execute. If onException is null, the exception will be re-thrown</param>
-    /// <param name="continueOnCapturedContext">If set to <c>true</c> continue on captured context; this will ensure that the Synchronization Context returns to the calling thread. If set to <c>false</c> continue on a different context; this will allow the Synchronization Context to continue on a different thread</param>
-    /// <param name="allowsMultipleExecutions"></param>
     private protected BaseAsyncCommand(
         Func<TExecute?, Task>? execute,
         Func<TCanExecute?, bool>? canExecute,
@@ -31,11 +23,6 @@ public class BaseAsyncCommand<TExecute, TCanExecute> : BaseCommand<TCanExecute>,
         this.continueOnCapturedContext = continueOnCapturedContext;
     }
 
-    /// <summary>
-    /// Converts `Func<Task>` to `Func<object, Task>`
-    /// </summary>
-    /// <param name="execute"></param>
-    /// <returns>The Execute parameter required for ICommand</returns>
     private protected static Func<object?, Task>? ConvertExecute(Func<Task>? execute)
     {
         if (execute == null)
@@ -44,11 +31,6 @@ public class BaseAsyncCommand<TExecute, TCanExecute> : BaseCommand<TCanExecute>,
         return _ => execute();
     }
 
-    /// <summary>
-    /// Converts `Func<bool>` to `Func<object, bool>`
-    /// </summary>
-    /// <param name="canExecute"></param>
-    /// <returns>The CanExecute parameter required for ICommand</returns>
     private protected static Func<object?, bool>? ConvertCanExecute(Func<bool>? canExecute)
     {
         if (canExecute == null)
@@ -57,11 +39,6 @@ public class BaseAsyncCommand<TExecute, TCanExecute> : BaseCommand<TCanExecute>,
         return _ => canExecute();
     }
 
-    /// <summary>
-    /// Executes the Command as a Task
-    /// </summary>
-    /// <returns>The executed Task</returns>
-    /// <param name="parameter">Data used by the command. If the command does not require data to be passed, this object can be set to null.</param>
     private protected async Task ExecuteAsync(TExecute? parameter)
     {
         ExecutionCount++;

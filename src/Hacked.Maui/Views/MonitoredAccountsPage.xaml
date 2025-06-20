@@ -11,7 +11,7 @@
                 x:DataType="vms:MonitoredAccountsViewModel"
                 Title="Monitored Accounts"
                 xmlns:android="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Microsoft.Maui.Controls"
-                xmlns:helpers="clr-namespace:Hacked.Maui.Helpers"
+                xmlns:commhelpers="clr-namespace:CommonHelpers.Maui.Helpers;assembly=CommonHelpers.Maui"
                 android:Application.WindowSoftInputModeAdjust="Resize"
                 x:Name="ThisPage">
 
@@ -243,7 +243,7 @@
                                                       HorizontalOptions="Start"
                                                       BackgroundColor="{AppThemeBinding Light={StaticResource WhiteBrush}, Dark={StaticResource BlackBrush}}" 
                                                       telerik:EntryExtensions.CompletedCommand="{Binding BindingContext.AddPendingItemCommand, Source={x:Reference ThisPage}}"
-                                                      helpers:FocusElementHelper.IsFocused="{Binding IsFocused, Mode=TwoWay}"/>
+                                                      commhelpers:FocusElementHelper.IsFocused="{Binding IsFocused, Mode=TwoWay}"/>
                                     <telerik:RadButton Text="-"
                                                        Command="{Binding BindingContext.RemovePendingItemCommand, Source={x:Reference ThisPage}}"
                                                        CommandParameter="{Binding}"
