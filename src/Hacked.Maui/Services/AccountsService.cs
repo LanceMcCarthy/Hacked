@@ -6,24 +6,24 @@ using Hacked.Services.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Net;
+//using System.Net;
 
 namespace Hacked.Maui.Services;
 
-public class AccountsService(IPwndBreachService _apiService) : IAccountsService
+public class AccountsService(IPwndBreachService apiService) : IAccountsService
 {
     private readonly string _accountsFilePath = Path.Join(FileSystem.Current.AppDataDirectory, "AccountsJsonData.json");
-    private static readonly string[] HackedExportFileExtension = [".hked"];
+    private static readonly string[] HackedExportFileExtension = [".json", ".hked"];
 
-    private static readonly FilePickerFileType PickerTypes = new(new Dictionary<DevicePlatform, IEnumerable<string>>
-    {
-        { DevicePlatform.iOS, HackedExportFileExtension },
-        { DevicePlatform.Android, HackedExportFileExtension },
-        { DevicePlatform.WinUI, HackedExportFileExtension },
-        { DevicePlatform.Tizen, HackedExportFileExtension },
-        { DevicePlatform.macOS, HackedExportFileExtension },
-        { DevicePlatform.Unknown, HackedExportFileExtension }
-    });
+    // private static readonly FilePickerFileType PickerTypes = new(new Dictionary<DevicePlatform, IEnumerable<string>>
+    // {
+    //     { DevicePlatform.iOS, HackedExportFileExtension },
+    //     { DevicePlatform.Android, HackedExportFileExtension },
+    //     { DevicePlatform.WinUI, HackedExportFileExtension },
+    //     { DevicePlatform.Tizen, HackedExportFileExtension },
+    //     { DevicePlatform.macOS, HackedExportFileExtension },
+    //     { DevicePlatform.Unknown, HackedExportFileExtension }
+    // });
 
     public ObservableCollection<MonitoredAccount> CurrentAccounts { get; set; } = new();
 
@@ -68,7 +68,7 @@ public class AccountsService(IPwndBreachService _apiService) : IAccountsService
             foreach (var account in savedAccounts)
                 CurrentAccounts.Add(account);
 
-            Debug.WriteLine($"--- {savedAccounts?.Count} accounts loaded from json file ---");
+            Debug.WriteLine($"--- {savedAccounts.Count} accounts loaded from json file ---");
         }
         catch (FileNotFoundException)
         {
@@ -86,17 +86,18 @@ public class AccountsService(IPwndBreachService _apiService) : IAccountsService
     {
         try
         {
-            ObservableCollection<MonitoredAccount> backupFileAccounts = null;
-
             var result = await FilePicker.Default.PickAsync(new()
             {
-                PickerTitle = "Select backup file",
-                FileTypes = PickerTypes
+                PickerTitle = "Select backup (.hked or .json)",
+                //FileTypes = PickerTypes
             });
+
+            if (result == null)
+                throw new FileLoadException();
 
             var json = await File.ReadAllTextAsync(result.FullPath);
 
-            backupFileAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
+            var backupFileAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
 
             var accountsToAdd = backupFileAccounts.Except(CurrentAccounts, new MonitoredAccountEqualityComparer()).ToList();
 
@@ -110,7 +111,7 @@ public class AccountsService(IPwndBreachService _apiService) : IAccountsService
             {
                 if (updateBreaches)
                 {
-                    var importUpdateResult = await _apiService.CheckForBreachesAsync(acct);
+                    var importUpdateResult = await apiService.CheckForBreachesAsync(acct);
 
                     //compare old list against new list to see if anything is new
                     foreach (var breach in importUpdateResult)
@@ -156,12 +157,15 @@ public class AccountsService(IPwndBreachService _apiService) : IAccountsService
             var result = await FilePicker.Default.PickAsync(new()
             {
                 PickerTitle = "Select directory",
-                FileTypes = PickerTypes
+                //FileTypes = PickerTypes
             });
+            
+            if(result == null)
+                throw new FileLoadException();
 
             // if it turns out to be a relative path, try 'new FileInfo(result.FullPath).Directory.FullName'
             var directory = Path.GetDirectoryName(result.FullPath);
-            var fileName = $"AccountsBackup_{DateTime.Now.ToFileTimeUtc()}.hked";
+            var fileName = $"AccountsBackup_{DateTime.Now.ToFileTimeUtc()}{HackedExportFileExtension[0]}";
             var savePath = Path.Join(directory, fileName);
 
             var json = JsonConvert.SerializeObject(CurrentAccounts);
