@@ -1,4 +1,4 @@
-﻿using Hacked.Maui.Common.Events;
+﻿using CommonHelpers.Maui.Events;
 using System.Reflection;
 
 namespace Hacked.Maui.Common.Commands;
@@ -22,7 +22,7 @@ public abstract class BaseCommand<TCanExecute>
     }
 
     /// <summary>
-    /// Occurs when changes occur that affect whether or not the command should execute
+    /// Occurs when changes occur that affect whether the command should execute
     /// </summary>
     public event EventHandler CanExecuteChanged
     {

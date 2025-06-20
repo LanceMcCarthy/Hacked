@@ -9,6 +9,8 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 
+		<MauiVersion>9.0.80</MauiVersion>
+
 		<!-- Display name -->
 		<ApplicationTitle>Hacked?</ApplicationTitle>
 		<!-- Version -->
@@ -58,9 +60,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+    <PackageReference Include="CommonHelpers.Maui" Version="0.5.1" />
     <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.6" />
-		<PackageReference Include="CommonHelpers" Version="1.4.1" />
+		<PackageReference Include="CommonHelpers" Version="1.5.0" />
+		<PackageReference Include="System.Private.Uri" Version="4.3.2" />
 		<PackageReference Include="Telerik.Licensing" Version="1.6.7" />
 		<PackageReference Include="Telerik.UI.for.Maui" Version="11.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
