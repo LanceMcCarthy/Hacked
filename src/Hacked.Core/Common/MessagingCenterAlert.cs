@@ -5,11 +5,11 @@ namespace Hacked.Core.Common;
 
 public class MessagingCenterAlert : IMessagingCenterItem
 {
-    public string Title { get; set; }
-        
-    public string Message { get; set; }
-        
-    public string Cancel { get; set; }
+    public string Title { get; set; } = "Title";
+
+    public string Message { get; set; } = "Message";
+
+    public string Cancel { get; set; } = "Cancel";
         
     public Action OnCompleted { get; set; }
 }
