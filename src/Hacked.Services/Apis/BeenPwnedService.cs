@@ -1,5 +1,5 @@
-﻿using Hacked.Core.Common;
-using Hacked.Core.Extensions;
+﻿using CommonHelpers.Extensions;
+using Hacked.Core.Common;
 using Hacked.Core.Models;
 using Hacked.Services.Interfaces;
 using Newtonsoft.Json;

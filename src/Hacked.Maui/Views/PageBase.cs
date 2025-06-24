@@ -1,4 +1,5 @@
-﻿using Hacked.Core.Common;
+﻿using CommonHelpers.Maui.Mvvm;
+using Hacked.Core.Common;
 using Hacked.Core.Models;
 
 namespace Hacked.Maui.Views;

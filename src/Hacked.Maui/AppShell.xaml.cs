@@ -1,6 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
-using Hacked.Core.Common;
-using Hacked.Core.Interfaces;
+﻿using CommonHelpers.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using Hacked.Maui.Views;
 
 namespace Hacked.Maui;
@@ -21,13 +20,15 @@ public partial class AppShell : Shell
 
     private async void HandleMessage(object r, IMessagingCenterItem m)
     {
-        switch (m)
+        try
         {
-            case MessagingCenterAlert msa:
-                await this.DisplayAlert(msa.Title, msa.Message, msa.Cancel);
-                msa.OnCompleted?.Invoke();
-                break;
-            case MessagingCenterQuestion msq:
+            switch (m)
+            {
+                case MessagingCenterAlert msa:
+                    await this.DisplayAlert(msa.Title, msa.Message, msa.Cancel);
+                    msa.OnCompleted?.Invoke();
+                    break;
+                case MessagingCenterQuestion msq:
                 {
                     var result = await this.DisplayAlert(msq.Title, msq.Message, msq.Okay, msq.Cancel);
 
@@ -42,7 +43,7 @@ public partial class AppShell : Shell
 
                     break;
                 }
-            case MessagingCenterError error:
+                case MessagingCenterError error:
                 {
                     var message = "An unexpected error has occurred. If this happens again, contact us at awesome.apps@outlook.com and share the error message below" +
                                   $"\r\n\n{error.Caller} Error:" +
@@ -52,6 +53,11 @@ public partial class AppShell : Shell
 
                     break;
                 }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
         }
     }
 }
