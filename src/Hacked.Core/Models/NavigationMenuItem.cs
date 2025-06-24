@@ -1,4 +1,6 @@
-﻿namespace Hacked.Maui.Models;
+﻿using System;
+
+namespace Hacked.Core.Models;
 
 public class NavigationMenuItem
 {

@@ -5,7 +5,7 @@
                 xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
                 xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
                 xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
-                xmlns:commands="clr-namespace:Hacked.Maui.Common.Commands"
+                xmlns:commands="clr-namespace:Hacked.Maui.Commands"
                 xmlns:res="clr-namespace:Hacked.Maui.Resources"
                 xmlns:views="clr-namespace:Hacked.Maui.Views"
                 x:DataType="vms:MonitoredAccountsViewModel"
