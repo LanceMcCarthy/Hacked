@@ -43,23 +43,22 @@ public static class MauiProgram
             })
             .RegisterLifecycleEvents();
 
+
         builder.Services.AddSingleton<IPwndBreachService, BeenPwnedService>();
         builder.Services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
         builder.Services.AddSingleton<IAccountsService, AccountsService>();
 
         builder.Services.AddSingleton<MonitoredAccountsViewModel>();
-        builder.Services.AddSingleton<MonitoredAccountsPage>();
-
         builder.Services.AddTransient<AccountDetailsViewModel>();
-        builder.Services.AddTransient<AccountDetailsPage>();
-
         builder.Services.AddTransient<BreachDetailsViewModel>();
-        builder.Services.AddTransient<BreachDetailsPage>();
-
         builder.Services.AddSingleton<SettingsViewModel>();
-        builder.Services.AddSingleton<SettingsPage>();
-
         builder.Services.AddSingleton<AboutViewModel>();
+
+        builder.Services.AddSingleton<AppShell>();
+        builder.Services.AddSingleton<MonitoredAccountsPage>();
+        builder.Services.AddTransient<AccountDetailsPage>();
+        builder.Services.AddTransient<BreachDetailsPage>();
+        builder.Services.AddSingleton<SettingsPage>();
         builder.Services.AddSingleton<AboutPage>();
 
         return builder.Build();
@@ -81,12 +80,14 @@ public static class MauiProgram
                     //const int y = 1440 / 2 - height / 2;
                     //window.MoveAndResize(x, y, width, height);
 
-                    var manager = WinUIEx.WindowManager.Get(window);
-                    manager.PersistenceId = "MainWindowPersistanceId";
-                    manager.MinWidth = 640;
-                    manager.MinHeight = 480;
+                    //var manager = WinUIEx.WindowManager.Get(window);
+                    //manager.PersistenceId = "HackedMauiId";
+                    //manager.MinWidth = 640;
+                    //manager.MinHeight = 480;
 
-                    window.SystemBackdrop = new MicaBackdrop { Kind = MicaKind.BaseAlt };
+                    window.CenterOnScreen(1024,768);
+
+                    window.SystemBackdrop = new MicaBackdrop { Kind = MicaKind.Base };
                 });
             });
 
