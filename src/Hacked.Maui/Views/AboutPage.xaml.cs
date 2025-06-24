@@ -1,3 +1,4 @@
+using CommonHelpers.Messaging;
 using CommunityToolkit.Mvvm.Messaging;
 using Hacked.Core.Common;
 using Hacked.Maui.ViewModels;
@@ -28,12 +29,23 @@ public partial class AboutPage
 
     private async void ContactUsButton_OnClick(object sender, EventArgs e)
     {
-        await Email.ComposeAsync(new EmailMessage
+        try
         {
-            Subject = $"Hacked App - Feedback {DeviceInfo.Platform}",
-            Body = "[enter your message here]",
-            To = ["awesome.apps@outlook.com"]
-        });
+            await Email.ComposeAsync(new EmailMessage
+            {
+                Subject = $"Hacked App - Feedback {DeviceInfo.Platform}",
+                Body = "[enter your message here]",
+                To = ["awesome.apps@outlook.com"]
+            });
+        }
+        catch (Exception ex)
+        {
+            WeakReferenceMessenger.Default.Send(new MessagingCenterError
+            {
+                Caller = "ContactUsButton_OnClick",
+                Exception = ex
+            });
+        }
     }
 
     private void ReviewButton_OnClickButton_OnClick(object sender, EventArgs e)

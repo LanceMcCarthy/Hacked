@@ -1,7 +1,7 @@
 ﻿using System.Windows.Input;
 using Telerik.Maui.Controls.DataGrid;
 
-namespace Hacked.Maui.Common.Commands;
+namespace Hacked.Maui.Commands;
 
 public class CustomDataGridCommand : DataGridCommand
 {

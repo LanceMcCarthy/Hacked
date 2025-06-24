@@ -1,6 +1,6 @@
 ﻿using CommonHelpers.Common;
+using CommonHelpers.Messaging;
 using CommunityToolkit.Mvvm.Messaging;
-using Hacked.Core.Common;
 using Hacked.Services.Interfaces;
 
 namespace Hacked.Maui.ViewModels;
@@ -30,50 +30,72 @@ public class SettingsViewModel : ViewModelBase
 
     private async void ImportAccounts()
     {
-        IsBusy = true;
-        IsBusyMessage = RefreshDuringImport? "Importing and refreshing..." : "Importing...";
-
-        var result = await _accountsService.ImportBackupAsync(RefreshDuringImport);
-
-        if (result.Item1)
+        try
         {
-            WeakReferenceMessenger.Default.Send(new MessagingCenterQuestion
+            IsBusy = true;
+            IsBusyMessage = RefreshDuringImport? "Importing and refreshing..." : "Importing...";
+
+            var result = await _accountsService.ImportBackupAsync(RefreshDuringImport);
+
+            if (result.Item1)
             {
-                Title = "Import successful!",
-                Message = "Any non-duplicate accounts have been added and will be visible on your Monitored Accounts page.",
-                Cancel = string.Empty
-            });
+                WeakReferenceMessenger.Default.Send(new MessagingCenterQuestion
+                {
+                    Title = "Import successful!",
+                    Message = "Any non-duplicate accounts have been added and will be visible on your Monitored Accounts page.",
+                    Cancel = string.Empty
+                });
+            }
+            else
+            {
+                WeakReferenceMessenger.Default.Send(new MessagingCenterError
+                {
+                    Caller = "Import Failed",
+                    Exception = new Exception(result.Item2)
+                });
+            }
+
+            IsBusy = false;
+            IsBusyMessage = string.Empty;
         }
-        else
+        catch (Exception ex)
         {
             WeakReferenceMessenger.Default.Send(new MessagingCenterError
             {
-                Caller = "Import Failed",
-                Exception = new Exception(result.Item2)
+                Caller = "Unexpected Failure during import.",
+                Exception = ex
             });
         }
-
-        IsBusy = false;
-        IsBusyMessage = string.Empty;
     }
 
     private async void ExportAccounts()
     {
-        var result = await _accountsService.ExportBackupAsync();
+        try
+        {
+            var result = await _accountsService.ExportBackupAsync();
 
-        if (result.Item1)
+            if (result.Item1)
+            {
+                WeakReferenceMessenger.Default.Send(new MessagingCenterError
+                {
+                    Caller = "Export Failed",
+                    Exception = new Exception(result.Item2)
+                });
+            }
+            else
+            {
+                WeakReferenceMessenger.Default.Send(new MessagingCenterAlert
+                {
+                    Message = "Export Successful!"
+                });
+            }
+        }
+        catch (Exception ex)
         {
             WeakReferenceMessenger.Default.Send(new MessagingCenterError
             {
-                Caller = "Export Failed",
-                Exception = new Exception(result.Item2)
-            });
-        }
-        else
-        {
-            WeakReferenceMessenger.Default.Send(new MessagingCenterAlert
-            {
-                Message = "Export Successful!"
+                Caller = "Unexpected Failure during export.",
+                Exception = ex
             });
         }
     }
