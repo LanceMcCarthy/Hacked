@@ -471,7 +471,7 @@ public class MainViewModel : ViewModelBase
 
             return new ObservableCollection<MonitoredAccount>();
         }
-        catch (FileNotFoundException fnfex)
+        catch (FileNotFoundException)
         {
             Debug.WriteLine("Accounts json file not found");
 
