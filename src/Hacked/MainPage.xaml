@@ -138,8 +138,8 @@
                 <Grid Background="{ThemeResource SystemControlAltLowAcrylicElementBrush}"
                       Padding="10,5,10,5">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
@@ -147,7 +147,9 @@
                                FontSize="22"
                                FontWeight="Bold"
                                Style="{StaticResource TitleTextBlockStyle}"
-                               VerticalAlignment="Center" />
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"
+                               TextWrapping="NoWrap" />
 
                     <Button Visibility="{Binding IsNew, Converter={StaticResource BoolToVisibilityConverter}}"
                             Background="Red"
