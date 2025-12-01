@@ -22,11 +22,14 @@ public sealed partial class MainPage
             NoticeTitle.Text = $"Updated! v.{ViewModel.AppVersion}";
 
             NoticeFeaturesTextBlock.Text =
-                "- Added 'Refresh Delay' setting to avoid getting rate limit error when refreshing all accounts at once." +
-                "- Now uses modern Fluent Design elements throughout the app; shadow, light and blur effects.\n" +
-                "- General housekeeping and little tweaks.";
+                "- Automatic dark theme support!\n" +
+                "- Use latest Windows 11 SDK, still Windows 10 compatible\n" +
+                "- Increased API allowance and background check to every 24 hours\n" +
+                "- General housekeeping, UI and themeing tweaks, and code cleanup.";
+
             NoticeFixesTextBlock.Text =
-                "- Fixed a bug with the API that resulted in null results.\n";
+                "- Fixed missing 'info' button when title is too long.\n" +
+                "- Fixed theme color problems. \n";
 
             NoticeOverlay.Visibility = Visibility.Visible;
         }

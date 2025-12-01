@@ -15,7 +15,7 @@ public class StringToUriConverter : IValueConverter
             return new Uri($"http://{value}", UriKind.RelativeOrAbsolute);
         }
 
-        return new Uri("https://bing.com");
+        return new Uri("https://dvlup.com");
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
