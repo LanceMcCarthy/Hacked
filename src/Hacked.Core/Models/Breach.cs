@@ -89,7 +89,7 @@ public class Breach : BindableBase
             {
                 return Title.ToLowerInvariant() == otherBreach.Title?.ToLowerInvariant();
             }
-            catch (Exception e)
+            catch
             {
                 return this.Equals(obj);
             }
