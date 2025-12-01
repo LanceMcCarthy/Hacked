@@ -25,6 +25,8 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Provider;
 using Windows.UI.Popups;
+using Windows.UI.ViewManagement;
+using Windows.UI.Xaml;
 
 namespace Hacked.ViewModels;
 
@@ -52,6 +54,7 @@ public class MainViewModel : ViewModelBase
     private DelegateCommand showKudosCommand;
     private bool isIapSubscriber = true;
     private bool isKudoSelectorOpen;
+    private int refreshDelay = 2;
 
     #endregion
 
@@ -160,7 +163,6 @@ public class MainViewModel : ViewModelBase
 
     public List<int> AvailableDelays { get; } = new List<int>() { 1, 2, 3, 4, 5 };
 
-    private int refreshDelay = 2;
     public int RefreshDelay
     {
         get

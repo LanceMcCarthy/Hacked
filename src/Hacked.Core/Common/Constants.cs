@@ -22,4 +22,5 @@ public static class Constants
     public const string SwipeTipShownKey = "SwipeTipShown";
     public const string AccountsRefreshTipShownKey = "AccountsRefreshTipShown";
     public const string AddAccountTipShownKey = "AddAccountTipShownShown";
+
 }
