@@ -113,10 +113,10 @@
                                     </Border>
 
                                     <Image Source="{Binding ImageUrl}"
-                                           Width="100"
-                                           Height="100" />
+                                           Width="120"
+                                           Height="120" />
 
-                                    <StackPanel Width="100">
+                                    <StackPanel Width="120">
                                         <TextBlock Text="{Binding Title}"
                                                    Foreground="{ThemeResource ApplicationPageBackgroundThemeBrush}"
                                                    FontWeight="SemiBold"
@@ -131,7 +131,7 @@
                     </GridView.ItemTemplate>
                 </GridView>
 
-                <Grid Background="{ThemeResource SystemControlBackgroundBaseMediumBrush}"
+                <Grid Background="{ThemeResource SettingsFlyoutBackgroundThemeBrush}"
                       Grid.Row="2">
                     <StackPanel Margin="20,10">
                         <TextBlock Text="What are 'Kudos'?"
