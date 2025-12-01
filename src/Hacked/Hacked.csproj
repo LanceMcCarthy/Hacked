@@ -284,7 +284,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommonHelpers">
-      <Version>1.4.1</Version>
+      <Version>1.5.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.14</Version>
@@ -311,7 +311,7 @@
       <Version>2.8.7</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.3</Version>
+      <Version>13.0.4</Version>
     </PackageReference>
     <PackageReference Include="PlatformSpecific.Analyzer">
       <Version>2.0.3</Version>
