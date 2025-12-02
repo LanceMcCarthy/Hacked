@@ -13,25 +13,27 @@ An application so you can be notified of any data breaches that included your pe
 
 ## Builds
 
-### Azure DevOps (primary)
+### Azure DevOps - Build Pipelines
 
-| Build Pipeline | Branch | Status |
-|----------------|--------|--------|
-| UWP Main | `main` | [![uwp main](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Main)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=49) |
-| UWP Preview | `release-preview` | [![uwp beta](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Beta)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=63) |
-| UWP Release | `release` | [![uwp release](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Release)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=48) |
-| Build MAUI | `main` | [![build maui](https://dev.azure.com/lance/Hacked/_apis/build/status/Build%20MAUI)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=75) |
-
-| Release Pipeline | Status |
-|------------------|--------|
-| UWP Prerelease      | ![Prerelease badge](https://vsrm.dev.azure.com/lance/_apis/public/Release/badge/162ec65c-f681-4f5b-9aca-227480581bf5/2/2) |
-| UWP Microsoft Store | ![Microsoft Store badge](https://vsrm.dev.azure.com/lance/_apis/public/Release/badge/162ec65c-f681-4f5b-9aca-227480581bf5/1/1) |
-
-### GitHub Actions
-
-| Branch | Common | MAUI   | UWP    |
+| Project | Main | Prerelease | Release |
 |--------|--------|--------|--------|
-| `main` | [![Common](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-common.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-common.yml) | [![MAUI](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml) | [![UWP](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-uwp.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-uwp.yml) |
+| UWP | [![uwp main](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Main)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=49) | [![uwp beta](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Beta)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=63) | [![uwp release](https://dev.azure.com/lance/Hacked/_apis/build/status/UWP%20Release)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=48) |
+| Maui | [![build maui](https://dev.azure.com/lance/Hacked/_apis/build/status/Build%20MAUI)](https://dev.azure.com/lance/Hacked/_build/latest?definitionId=75) |  |  |
+
+### Azure DevOps - Release Pipelines
+
+| Project | Prerelease | Microsoft Store
+|----------|--------|--------|
+| UWP | ![Prerelease badge](https://vsrm.dev.azure.com/lance/_apis/public/Release/badge/162ec65c-f681-4f5b-9aca-227480581bf5/2/2) | ![Microsoft Store badge](https://vsrm.dev.azure.com/lance/_apis/public/Release/badge/162ec65c-f681-4f5b-9aca-227480581bf5/1/1) |
+
+
+### GitHub Actions (experimental)
+
+| Project | Main | Prerelease | Release |
+|--------|--------|--------|--------|
+| Common | [![Build Common](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-common.yml/badge.svg?branch=main)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-common.yml) |  |  |
+| UWP | [![UWP](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-uwp.yml/badge.svg?branch=main)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-uwp.yml) |  |  |
+| Maui | [![MAUI](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml/badge.svg?branch=main)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml) |  |  |
 
 ## AppInstaller
 
