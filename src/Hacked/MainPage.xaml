@@ -809,7 +809,8 @@
                                                              Content="Mark all seen"
                                                              Visibility="{Binding SelectedAccount.HasNewBreaches, Converter={StaticResource BoolToVisibilityConverter}}"
                                                              Click="ClearNewHyperlinkButton_OnClick" 
-                                                             Foreground="{ThemeResource SystemControlBackgroundBaseHighBrush}" />
+                                                             Foreground="{ThemeResource SystemControlBackgroundBaseHighBrush}" 
+                                                             FontStyle="Italic" />
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal"
                                                     HorizontalAlignment="Center">
