@@ -285,7 +285,21 @@
         </Grid.RowDefinitions>
 
         <Grid MinHeight="32"
-              Background="{ThemeResource ContentDialogBackgroundThemeBrush}" />
+              Background="{ThemeResource AppBarBackgroundThemeBrush}" >
+            <StackPanel Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <TextBlock Text="Hacked?" 
+                           FontSize="16" 
+                           VerticalAlignment="Center" 
+                           Margin="10,0,0,0"/>
+                <TextBlock Foreground="Red"
+                           Text="⚠️ New Detection in Selected Account"
+                           Visibility="{Binding SelectedAccount.HasNewBreaches, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center" 
+                           Margin="10,0,0,0"/>
+            </StackPanel>
+        </Grid>
 
         <SplitView x:Name="RootSplitView"
                    PaneBackground="{ThemeResource SystemControlChromeHighAcrylicElementMediumBrush}"
@@ -307,7 +321,7 @@
                         <TextBlock Margin="0,0,0,0"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
-                                   FontSize="21.333"
+                                   FontSize="21"
                                    Text="Monitored Accounts" />
 
                         <Button x:Name="AllAccountsRefreshButton"
@@ -437,7 +451,7 @@
                                     Margin="10,5,10,5" />
 
                             <Button x:Name="KudosButton"
-                                    Content="kudos"
+                                    Content="kudos / donate"
                                     Command="{Binding ShowKudosCommand}"
                                     HorizontalAlignment="Stretch"
                                     Margin="10,5,10,5"/>
@@ -465,7 +479,7 @@
                             <Button x:Name="BackupRestoreButton"
                                     Margin="10,5,10,5"
                                     HorizontalAlignment="Stretch"
-                                    Content="settings | backup">
+                                    Content="settings &amp; backup">
                                 <Button.Flyout>
                                     <Flyout x:Name="BackupRestoreButtonFlyout">
                                         <Grid MaxWidth="425" Width="425">
@@ -640,7 +654,7 @@
                                  Grid.Column="1"
                                  TextChanged="FilterTextBox_OnTextChanged"
                                  InputScope="EmailNameOrAddress"
-                                 VerticalAlignment="Center" />
+                                 VerticalAlignment="Center"/>
 
                         <ToggleButton x:Name="FilterToggleButton"
                                       Grid.Column="2"
@@ -757,7 +771,7 @@
                                 <behaviors:QuickReturnHeaderBehavior />
                             </interactivity:Interaction.Behaviors>
                             <tkControls:AdaptiveGridView.Header>
-                                <Grid Background="{ThemeResource SystemControlAccentAcrylicElementAccentMediumHighBrush}">
+                                <Grid Background="{ThemeResource SystemControlAccentAcrylicWindowAccentMediumHighBrush}">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition Height="Auto" />
@@ -772,24 +786,19 @@
                                                TextWrapping="NoWrap"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"
-                                               Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
                                                Grid.Row="1" />
 
                                     <StackPanel Grid.Row="2"
                                                 Margin="0,0,0,10">
                                         <StackPanel Orientation="Horizontal"
                                                     HorizontalAlignment="Center">
-                                            <TextBlock Text="Breaches -"
-                                                       Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}" />
+                                            <TextBlock Text="Breaches -" />
                                             <TextBlock Text="Total:"
-                                                       Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
                                                        Margin="5,0,0,0" />
                                             <TextBlock Margin="5,0,0,0"
                                                        Text="{Binding SelectedAccount.Breaches.Count}"
-                                                       Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
                                                        FontWeight="SemiBold" />
                                             <TextBlock Text="| New:"
-                                                       Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
                                                        Margin="5,0,0,0" />
                                             <TextBlock Margin="5,0,0,0"
                                                        Foreground="{Binding SelectedAccount.HasNewBreaches, Converter={StaticResource BoolToBrushConverter}}"
@@ -797,17 +806,15 @@
                                                        FontWeight="SemiBold" />
                                             <HyperlinkButton x:Name="ClearNewHyperlinkButton"
                                                              Margin="10,-6,0,-6"
-                                                             Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
                                                              Content="Mark all seen"
                                                              Visibility="{Binding SelectedAccount.HasNewBreaches, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                             Click="ClearNewHyperlinkButton_OnClick" />
+                                                             Click="ClearNewHyperlinkButton_OnClick" 
+                                                             Foreground="{ThemeResource SystemControlBackgroundBaseHighBrush}" />
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal"
                                                     HorizontalAlignment="Center">
-                                            <TextBlock Text="Last Updated -"
-                                                       Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}" />
+                                            <TextBlock Text="Last Updated -"/>
                                             <TextBlock Margin="5,0,0,0"
-                                                       Foreground="{ThemeResource SystemControlBackgroundAltHighBrush}"
                                                        Text="{Binding SelectedAccount.LastUpdated}" />
                                         </StackPanel>
                                         <Button x:Name="SelectedAccountRefresh"
@@ -843,12 +850,12 @@
         </SplitView>
 
         <ToggleButton x:Name="TogglePaneButton"
-                      IsChecked="{Binding IsPaneOpen, ElementName=RootSplitView, Mode=TwoWay}"
-                      Style="{StaticResource SplitViewTogglePaneButtonStyle}"
-                      TabIndex="1"
-                      ToolTipService.ToolTip="Accounts"
-                      Unchecked="TogglePaneButton_Checked"
-                      Grid.Row="1" />
+                    IsChecked="{Binding IsPaneOpen, ElementName=RootSplitView, Mode=TwoWay}"
+                    Style="{StaticResource SplitViewTogglePaneButtonStyle}"
+                    TabIndex="1"
+                    ToolTipService.ToolTip="Accounts"
+                    Unchecked="TogglePaneButton_Checked"
+                    Grid.Row="1" />
 
         <customControls:AddAccount x:Name="AddAccountOverlay"
                                    DataContext="{Binding}"
