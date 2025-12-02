@@ -1,25 +1,48 @@
 ﻿<?xml version = "1.0" encoding = "UTF-8" ?>
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:Hacked.Maui"
+             xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
              xmlns:converters="clr-namespace:Hacked.Maui.Converters"
+             xmlns:commhelpconv="clr-namespace:CommonHelpers.Maui.Converters;assembly=CommonHelpers.Maui"
              x:Class="Hacked.Maui.App">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resources/Styles/Colors.xaml"/>
-                <ResourceDictionary Source="Resources/Styles/Styles.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
                 <ResourceDictionary Source="Resources/Styles/TelerikStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <converters:InvertBoolConverter x:Key="InvertBoolConverter" />
+            <commhelpconv:StringToUriConverter x:Key="StringToUriConverter" />
+            <commhelpconv:NullToBoolConverter x:Key="NullToBoolConverter" />
+            <commhelpconv:InvertBoolConverter x:Key="InvertBoolConverter" />
             <converters:DataClassesToStringConverter x:Key="DataClassesToStringConverter" />
             <converters:DisplayDateConverter x:Key="DisplayDateConverter" />
-            <converters:StringToUriConverter x:Key="StringToUriConverter" />
-            <converters:NullToBoolConverter x:Key="NullToBoolConverter" />
             <converters:AccountDetailsConverter x:Key="AccountDetailsConverter" />
             <converters:BreachTitleConverter x:Key="BreachTitleConverter" />
             <converters:BreachDetailsConverter x:Key="BreachDetailsConverter" />
+
+            <Style x:Key="DataClassBorderStyle"
+                   TargetType="telerik:RadBorder">
+                <Setter Property="Padding"
+                        Value="5,1.5,5,2" />
+                <Setter Property="CornerRadius"
+                        Value="5" />
+                <Setter Property="Margin"
+                        Value="0,0,5,5" />
+                <Setter Property="BackgroundColor"
+                        Value="{StaticResource Primary}" />
+            </Style>
+
+            <Style x:Key="DataClassLabelStyle"
+                   TargetType="Label">
+                <Setter Property="HorizontalOptions"
+                        Value="Center" />
+                <Setter Property="Margin"
+                        Value="2" />
+                <Setter Property="TextColor"
+                        Value="{StaticResource Secondary}" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

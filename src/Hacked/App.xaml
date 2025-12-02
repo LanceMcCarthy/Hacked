@@ -5,8 +5,7 @@
              xmlns:viewModels="using:Hacked.ViewModels"
              xmlns:animations="using:Microsoft.Toolkit.Uwp.UI.Animations"
              xmlns:primitives="using:Telerik.UI.Xaml.Controls.Primitives"
-             xmlns:tkControls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-             RequestedTheme="Light">
+             xmlns:tkControls="using:Microsoft.Toolkit.Uwp.UI.Controls">
 
     <Application.Resources>
         <ResourceDictionary>

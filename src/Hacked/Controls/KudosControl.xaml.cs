@@ -230,14 +230,14 @@ public sealed partial class KudosControl : UserControl
                     Price = "Free",
                     ImageUrl = "/Images/4starStar_Colored.png"
                 },
-                new()
-                {
-                    Title = "Remove Ads",
-                    Category = KudoCategory.Durable,
-                    StoreId = StoreIds.CoverApiFeeKudoStoreId,
-                    Price = "$0.99",
-                    ImageUrl = "/Images/RemoveAdKudo_Colored.png"
-                },
+                //new()
+                //{
+                //    Title = "Remove Ads",
+                //    Category = KudoCategory.Durable,
+                //    StoreId = StoreIds.CoverApiFeeKudoStoreId,
+                //    Price = "$0.99 (permanent)",
+                //    ImageUrl = "/Images/RemoveAdKudo_Colored.png"
+                //},
                 new()
                 {
                     Title = "Champion",
@@ -251,15 +251,15 @@ public sealed partial class KudosControl : UserControl
                     Title = "Coffee",
                     Category = KudoCategory.Consumable,
                     StoreId = StoreIds.CoffeeKudoStoreId,
-                    Price = "$2.49",
+                    Price = "$2.49 (one-time)",
                     ImageUrl = "/Images/CoffeeKudo_Colored.png"
                 },
                 new()
                 {
-                    Title = "Chip in for API Fee",
+                    Title = "Help with API Fee",
                     Category = KudoCategory.Consumable,
                     StoreId = StoreIds.CoverApiFeeKudoStoreId,
-                    Price = "$3.99",
+                    Price = "$3.99 (one-time)",
                     ImageUrl = "/Images/APIFeeKudo_Colored.png"
                 },
                 new()
@@ -267,7 +267,7 @@ public sealed partial class KudosControl : UserControl
                     Title = "Lunch",
                     Category = KudoCategory.Consumable,
                     StoreId = StoreIds.LunchKudoStoreId,
-                    Price = "$4.89",
+                    Price = "$4.89 (one-time)",
                     ImageUrl = "/Images/LunchKudo_Colored.png"
                 },
                 new()
@@ -275,7 +275,7 @@ public sealed partial class KudosControl : UserControl
                     Title = "Dinner",
                     Category = KudoCategory.Consumable,
                     StoreId = StoreIds.DinnerKudoStoreId,
-                    Price = "$19.49",
+                    Price = "$19.49 (one-time)",
                     ImageUrl = "/Images/DinnerKudo_Colored.png"
                 }
             };

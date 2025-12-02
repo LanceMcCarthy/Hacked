@@ -22,15 +22,14 @@ public sealed partial class MainPage
             NoticeTitle.Text = $"Updated! v.{ViewModel.AppVersion}";
 
             NoticeFeaturesTextBlock.Text =
-                "- Major: Add support for monitoring a phone number.\n" +
-                "- Major: Export and Import! You can now backup your accounts list to a small file.\n" +
-                "- Major: Upgraded API key, allows global access, no more restricted regions due to API abuse.\n" +
-                "- Upgraded UWP SDK version, with modernized UI controls (Windows 11).\n" +
-                "- More modernized Fluent Design elements throughout the app; shadow, light and blur effects.\n";
+                "- Automatic dark theme support!\n" +
+                "- Use latest Windows 11 SDK, still Windows 10 compatible\n" +
+                "- Increased API allowance and background check to every 24 hours\n" +
+                "- General housekeeping, UI and themeing tweaks, and code cleanup.";
+
             NoticeFixesTextBlock.Text =
-                "- Removed annoying spell check when adding new monitoring account.\n" +
-                "- Significantly faster UI loading times\n" +
-                "- Many more smaller improvements, too numerous to list here";
+                "- Fixed missing 'info' button when title is too long.\n" +
+                "- Fixed theme color problems. \n";
 
             NoticeOverlay.Visibility = Visibility.Visible;
         }

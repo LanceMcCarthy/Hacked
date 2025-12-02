@@ -9,6 +9,7 @@ public static class Constants
     // Settings Keys
     public const string AreAdsRemovedSettingsKey = "AreAdsRemoved";
     public const string MonitoringStatusTaskSettingsKey = "MonitoringTaskStatus";
+    public const string RefreshDelaySettingsKey = "RefreshDelay";
 
     // Background task names
     public const string MonitorTaskName = "MonitorTask";
@@ -21,4 +22,5 @@ public static class Constants
     public const string SwipeTipShownKey = "SwipeTipShown";
     public const string AccountsRefreshTipShownKey = "AccountsRefreshTipShown";
     public const string AddAccountTipShownKey = "AddAccountTipShownShown";
+
 }

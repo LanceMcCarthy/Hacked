@@ -1,5 +1,5 @@
-﻿using Hacked.Core.Common;
-using Hacked.Core.Extensions;
+﻿using CommonHelpers.Extensions;
+using Hacked.Core.Common;
 using Hacked.Core.Models;
 using Hacked.Services.Interfaces;
 using Newtonsoft.Json;
@@ -41,7 +41,12 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
     /// <returns>A collection of breaches</returns>
     public async Task<ObservableCollection<Breach>> CheckForBreachesAsync(MonitoredAccount account, bool truncateResponse = false)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, $"{HibpConstants.ApiRoute_BreachedAccount}/{account.Address}?truncateResponse={truncateResponse}");
+        // Needed to add in 2025.02.17 to handle a cloudflare issue not understanding "True" is the same as "true"
+        var truncate = "false";
+        if (truncateResponse)
+            truncate = "true";
+
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"{HibpConstants.ApiRoute_BreachedAccount}/{account.Address}?truncateResponse={truncate}");
 
         var retryCount = 0;
 

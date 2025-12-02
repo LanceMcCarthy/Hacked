@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Hacked.Maui.Views.SettingsPage"
-             xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
-             xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
-             x:DataType="vms:SettingsViewModel"
-             Title="Settings">
+<views:PageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+          xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+          x:Class="Hacked.Maui.Views.SettingsPage"
+          xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
+          xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
+          xmlns:views="clr-namespace:Hacked.Maui.Views"
+          x:DataType="vms:SettingsViewModel"
+          Title="Settings">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -13,7 +14,38 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Label Text="Some Settings Here" />
+        <VerticalStackLayout Padding="10" Spacing="10">
+            <Label Text="Monitored Account Backup"
+                   FontSize="18" 
+                   FontFamily="Raleway"/>
+            <telerik:RadButton Text="Create Backup" 
+                               Command="{Binding ExportCommand}"
+                               FontFamily="Raleway"
+                               HorizontalOptions="Start"
+                               WidthRequest="160"/>
 
+                <telerik:RadButton Text="Import Backup" 
+                                   Command="{Binding ImportCommand}"
+                                   FontFamily="Raleway"
+                                   HorizontalOptions="Start"
+                                   WidthRequest="160"/>
+            
+            <HorizontalStackLayout Spacing="10">
+                <telerik:RadCheckBox IsChecked="{Binding RefreshDuringImport, Mode=TwoWay}"
+                                     CheckedColor="{StaticResource PrimaryHighContrast}"
+                                     CheckedSymbolColor="{StaticResource Secondary}"/>
+                <Label Text="Update breaches after import"
+                       VerticalOptions="Center"
+                       FontFamily="Raleway"/>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+
+        <telerik:RadBusyIndicator IsVisible="{Binding IsBusy}"
+                                  IsBusy="{Binding IsBusy}"
+                                  AnimationType="Animation3"
+                                  BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
+                                  AnimationContentColor="{StaticResource Primary}" 
+                                  Grid.RowSpan="2"
+                                  Grid.Row="0"/>
     </Grid>
-</ContentPage>
+</views:PageBase>

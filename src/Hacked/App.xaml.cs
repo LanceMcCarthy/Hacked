@@ -1,17 +1,18 @@
 ﻿using Hacked.ViewModels;
-using Microsoft.AppCenter;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
 using Microsoft.Toolkit.Uwp.UI;
 using System;
-using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Core;
 using Windows.UI;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+//using Windows.ApplicationModel;
+//using Microsoft.AppCenter;
+//using Microsoft.AppCenter.Analytics;
+//using Microsoft.AppCenter.Crashes;
 
 namespace Hacked;
 
@@ -20,12 +21,12 @@ sealed partial class App : Application
     public App()
     {
         InitializeComponent();
-        Suspending += OnSuspending;
+        //Suspending += OnSuspending;
 
-        AppCenter.Start(
-            "512602fa-5e3c-4e7e-b2ac-7f27af7bf073",
-            typeof(Analytics),
-            typeof(Crashes));
+        //AppCenter.Start(
+        //    "512602fa-5e3c-4e7e-b2ac-7f27af7bf073",
+        //    typeof(Analytics),
+        //    typeof(Crashes));
     }
 
     // Normal launch
@@ -60,16 +61,17 @@ sealed partial class App : Application
 
     private Frame CreateRootFrame(ApplicationExecutionState previousExecutionState)
     {
-        if (!(Window.Current.Content is Frame rootFrame))
+        if (Window.Current.Content is not Frame rootFrame)
         {
             rootFrame = new Frame();
 
             rootFrame.NavigationFailed += OnNavigationFailed;
 
-            if (previousExecutionState == ApplicationExecutionState.Terminated)
-            {
-                //TODO: Load state from previously suspended application
-            }
+            // Not needed now that data is saved after every change
+            //if (previousExecutionState == ApplicationExecutionState.Terminated)
+            //{
+            //    //TODO: Load state from previously suspended application
+            //}
 
             Window.Current.Content = rootFrame;
         }
@@ -79,21 +81,22 @@ sealed partial class App : Application
 
         CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
         var titleBar = ApplicationView.GetForCurrentView().TitleBar;
+        titleBar.ButtonHoverForegroundColor = ((SolidColorBrush)Application.Current.Resources["AppBarBackgroundThemeBrush"]).Color;
+        titleBar.ButtonForegroundColor = ((SolidColorBrush)Application.Current.Resources["AppBarItemForegroundThemeBrush"]).Color;
         titleBar.ButtonBackgroundColor = Colors.Transparent;
-        titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
 
         return rootFrame;
     }
 
-    private void OnSuspending(object sender, SuspendingEventArgs e)
-    {
-        var deferral = e.SuspendingOperation.GetDeferral();
+    //private void OnSuspending(object sender, SuspendingEventArgs e)
+    //{
+    //    var deferral = e.SuspendingOperation.GetDeferral();
 
-        // No longer needed because accounts list is always saved.
-        //await ((Window.Current.Content as MainPage).DataContext as MainViewModel)?.SaveAccountsAsync();
+    //    // No longer needed because accounts list is always saved.
+    //    //await ((Window.Current.Content as MainPage).DataContext as MainViewModel)?.SaveAccountsAsync();
 
-        deferral.Complete();
-    }
+    //    deferral.Complete();
+    //}
 
     private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
     {

@@ -13,27 +13,27 @@ on:
 env:
   CORE_PROJECT_PATH: 'src/Hacked.Core/Hacked.Core.csproj'
   SERVICES_PROJECT_PATH: 'src/Hacked.Services/Hacked.Services.csproj'
-  NUGETCONFIG_PATH: "src/nuget.config"
-  TELERIK_USERNAME: ${{ secrets.MyTelerikAccountUsername }}
-  TELERIK_PASSWORD: ${{ secrets.MyTelerikAccountPassword }}
+  sdk_version: '9.0.x'
+  NUGET_CONFIG_PATH: 'src/nuget.config'
+  TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
 
 jobs:
-  windows-build:
+  smoke-test:
     runs-on: windows-latest
     
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v1.1.3
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
       with:
-        msbuild-architecture: x64
-      
-    - name: NuGet Restore
-      run: dotnet restore ${{ env.SERVICES_PROJECT_PATH }} --configfile ${{ env.NUGETCONFIG_PATH }}
-  
+        dotnet-version: ${{env.sdk_version}}
+
+    - name: Restore NuGet Packages
+      run: dotnet restore ${{env.SERVICES_PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
+
     - name: Build Services
-      run: msbuild ${{ env.SERVICES_PROJECT_PATH }} /p:Platform=x64 /p:Configuration=Debug
+      run: dotnet build ${{env.SERVICES_PROJECT_PATH}} -c Debug --no-restore

@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Hacked.Maui.Views.AccountDetailsPage"
-             xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
-             xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
-             xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
-             xmlns:res="clr-namespace:Hacked.Maui.Resources"
-             xmlns:controls="clr-namespace:Hacked.Maui.Controls">
+<views:PageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                x:Class="Hacked.Maui.Views.AccountDetailsPage"
+                xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
+                xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
+                xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
+                xmlns:res="clr-namespace:Hacked.Maui.Resources"
+                xmlns:controls="clr-namespace:Hacked.Maui.Controls"
+                xmlns:views="clr-namespace:Hacked.Maui.Views"
+                x:DataType="vms:AccountDetailsViewModel"
+                Title="Account Details">
 
-    <Grid Padding="10"
-          RowDefinitions="Auto,*"
-          RowSpacing="10">
+    <views:PageBase.Resources>
+        <telerik:ListViewLinearLayout x:Key="MobileLayout"
+                                      VerticalItemSpacing="5"
+                                      HorizontalItemSpacing="5" />
 
-        <Grid>
-            <!--<controls:ImageCollage AssociatedAccount="{Binding SelectedAccount}" />-->
+        <telerik:ListViewGridLayout x:Key="DesktopLayout"
+                                    SpanCount="3"
+                                    HorizontalItemSpacing="5"
+                                    VerticalItemSpacing="5" />
+    </views:PageBase.Resources>
+
+    <Grid RowDefinitions="Auto,*">
+        <Grid BackgroundColor="{StaticResource Secondary}">
+            <!--<controls:ImageCollage AssociatedAccount="{Binding SelectedAccount}"
+                                   Margin="5"/>-->
             
             <VerticalStackLayout Spacing="5"
                                  Padding="10,5"
@@ -21,12 +33,16 @@
                 <Label Text="{Binding SelectedAccount.Address}"
                        FontAttributes="Bold"
                        HorizontalOptions="Center"
-                       FontSize="Large"/>
+                       FontSize="22"
+                       TextColor="{StaticResource Primary}"/>
                 <Label Text="{Binding SelectedAccount.Breaches.Count, StringFormat='Breach Count: {0}'}"
+                       TextColor="{StaticResource Primary}"
                        HorizontalOptions="Center" 
-                       FontSize="Medium"/>
-                <Label Text="{Binding SelectedAccount.LastUpdated, StringFormat='Last Updated: {0:MM/dd/yyyy HH:mm:ss}'}"
-                       HorizontalOptions="Center" />
+                       FontSize="16"/>
+                <Label Text="{Binding SelectedAccount.LastUpdated, StringFormat='Last Updated: {0:g}'}"
+                       TextColor="{StaticResource Primary}"
+                       HorizontalOptions="Center" 
+                       FontSize="12"/>
             </VerticalStackLayout>
 
             <Grid IsVisible="{Binding SelectedAccount.IsUpdating}"
@@ -42,52 +58,43 @@
                              ItemsSource="{Binding SelectedAccount.Breaches}"
                              IsItemsReorderEnabled="False"
                              SelectionMode="None"
+                             Margin="10,0,10,0"
                              Grid.Row="1">
-            <!--<telerik:RadListView.ItemStyle>
-                <telerik:ListViewItemStyle BorderColor="{StaticResource Primary}"
-                                       BorderWidth="1"
-                                       BorderLocation="All"/>
-            </telerik:RadListView.ItemStyle>
-            <telerik:RadListView.SelectedItemStyle>
-                <telerik:ListViewItemStyle BorderColor="{StaticResource Primary}"
-                                       BackgroundColor="{StaticResource Primary}"
-                                       BorderWidth="1"
-                                       BorderLocation="All" />
-            </telerik:RadListView.SelectedItemStyle>-->
             <telerik:RadListView.ItemTemplate>
                 <DataTemplate x:DataType="models:Breach">
                     <telerik:ListViewTemplateCell>
-                        <controls:BreachItemView />
+                        <controls:BreachItemView MaximumHeightRequest="500"/>
                     </telerik:ListViewTemplateCell>
                 </DataTemplate>
             </telerik:RadListView.ItemTemplate>
             <telerik:RadListView.LayoutDefinition>
-                <OnPlatform x:TypeArguments="telerik:ListViewLayoutBase">
-                    <On Platform="iOS, Android">
-                        <On.Value>
-                            <telerik:ListViewLinearLayout VerticalItemSpacing="5"
-                                                          HorizontalItemSpacing="5" />
-                        </On.Value>
-                    </On>
-                    <On Platform="WinUI, MacCatalyst">
-                        <On.Value>
-                            <telerik:ListViewGridLayout SpanCount="3"
-                                                        HorizontalItemSpacing="5"
-                                                        VerticalItemSpacing="5" />
-                        </On.Value>
-                    </On>
-                </OnPlatform>
+                <OnIdiom x:TypeArguments="telerik:ListViewLayoutBase"
+                         Default="{StaticResource MobileLayout}"
+                         Phone="{StaticResource MobileLayout}"
+                         Desktop="{StaticResource DesktopLayout}"
+                         Tablet="{StaticResource DesktopLayout}"
+                         TV="{StaticResource DesktopLayout}"/>
             </telerik:RadListView.LayoutDefinition>
         </telerik:RadListView>
 
-        <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
-                           Style="{StaticResource FontAwesomeLabelStyle}"
-                           Command="{Binding RefreshAccountCommand}"
-                           CommandParameter="{Binding SelectedAccount}"
-                           IsEnabled="{Binding SelectedAccount.IsUpdating, Converter={StaticResource InvertBoolConverter}}"
-                           VerticalOptions="Start"
-                           HorizontalOptions="End"
-                           Margin="10" />
+        <VerticalStackLayout VerticalOptions="{OnIdiom Default=Start, Phone=End, Desktop=Center, Tablet=Center, TV=Start}"
+                             Spacing="5"
+                             Padding="10"
+                             HorizontalOptions="End">
+            <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
+                               Style="{StaticResource FontAwesomeLabelStyle}"
+                               Command="{Binding RefreshAccountCommand}"
+                               CommandParameter="{Binding SelectedAccount}"
+                               IsEnabled="{Binding SelectedAccount.IsUpdating, Converter={StaticResource InvertBoolConverter}}"
+                               Margin="0,0,10,0" />
+
+            <telerik:RadButton Text="{x:Static res:IconFont.ExclamationTriangle}"
+                               Style="{StaticResource FontAwesomeLabelStyle}"
+                               Command="{Binding ClearNewBreachesCommand}"
+                               CommandParameter="{Binding SelectedAccount}"
+                               IsVisible="{Binding SelectedAccount.HasNewBreaches}"
+                               Margin="0,0,10,0" />
+        </VerticalStackLayout>
 
         <telerik:RadBusyIndicator IsVisible="{Binding SelectedAccount.IsUpdating}"
                                   IsBusy="{Binding SelectedAccount.IsUpdating}"
@@ -96,4 +103,4 @@
                                   AnimationContentColor="{StaticResource Primary}" 
                                   Grid.RowSpan="2"/>
     </Grid>
-</ContentPage>
+</views:PageBase>

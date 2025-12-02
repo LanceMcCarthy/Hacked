@@ -1,4 +1,5 @@
-﻿using Microsoft.AppCenter.Analytics;
+﻿//using Microsoft.AppCenter.Analytics;
+using Microsoft.Services.Store.Engagement;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,10 +19,12 @@ public static class StoreHelpers
 
             var result = await context.RequestPurchaseAsync(productId);
 
-            Analytics.TrackEvent("PurchaseAdUnlockAsync", new Dictionary<string, string>()
-                {
-                    {"Purchase Result", result.Status.ToString("G")}
-                });
+            StoreServicesCustomEventLogger.GetDefault().Log($"PurchaseAdUnlockAsync Result: {result.Status:G}");
+
+            //Analytics.TrackEvent("PurchaseAdUnlockAsync", new Dictionary<string, string>()
+            //    {
+            //        {"Purchase Result", result.Status.ToString("G")}
+            //    });
 
             switch (result.Status)
             {

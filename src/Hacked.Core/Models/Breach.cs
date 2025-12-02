@@ -75,19 +75,25 @@ public class Breach : BindableBase
 
     public override bool Equals(object obj)
     {
-        var otherBreach = obj as Breach;
-
         // Note - sometimes this method gets passed a string[], just use base.Equals instead 
-        if (otherBreach == null)
+        if (obj is not Breach otherBreach)
             return base.Equals(obj);
 
         try
-        {
-            return Title.ToLowerInvariant().Equals(otherBreach?.Title?.ToLowerInvariant());
+        { 
+            return Title.ToLowerInvariant().Equals(otherBreach.Title?.ToLowerInvariant());
         }
         catch
         {
-            return Title.ToLowerInvariant() == otherBreach?.Title?.ToLowerInvariant();
+            try
+            {
+                return Title.ToLowerInvariant() == otherBreach.Title?.ToLowerInvariant();
+            }
+            catch
+            {
+                return this.Equals(obj);
+            }
+            
         }
     }
 
