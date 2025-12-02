@@ -12,15 +12,12 @@ on:
 
 env:
   SOLUTION_PATH: 'src/Hacked_Uwp.sln'
-  PROJECT_PATH: 'src/Hacked/Hacked.csproj'
-  CORE_PROJECT_PATH: 'src/Hacked.Core/Hacked.Core.csproj'
-  SERVICES_PROJECT_PATH: 'src/Hacked.Services/Hacked.Services.csproj'
   Configuration: Debug
   TargetPlatform: x64
   BuildMode: CI
   AppxBundle: Never
   AppxPackageSigningEnabled: False
-  sdk_version: '9.0.x'
+  DOTNET_SDK_VERSION: '10.0.x'
   NUGET_CONFIG_PATH: 'src/nuget.config'
   TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
 
@@ -36,18 +33,10 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{env.sdk_version}}
+        dotnet-version: ${{env.DOTNET_SDK_VERSION}}
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
-      with:
-        msbuild-architecture: x64
       
-    - name: Restore NuGet Packages
-      run: |
-        dotnet restore ${{env.CORE_PROJECT_PATH}} -r win10-x64 --configfile ${{env.NUGET_CONFIG_PATH}} 
-        dotnet restore ${{env.SERVICES_PROJECT_PATH}} -r win10-x64 --configfile ${{env.NUGET_CONFIG_PATH}} 
-        dotnet restore ${{env.PROJECT_PATH}} -r win10-x64 --configfile ${{env.NUGET_CONFIG_PATH}} 
-
     - name: Build UWP Solution
-      run: msbuild ${{env.PROJECT_PATH}} -restore /p:Configuration=${{env.Configuration}} /p:Platform=${{env.TargetPlatform}} /p:UapAppxPackageBuildMode=${{env.BuildMode}} /p:AppxBundle=${{env.AppxBundle}} /p:AppxPackageSigningEnabled=${{env.AppxPackageSigningEnabled}}
+      run: msbuild ${{env.SOLUTION_PATH}} -restore /p:Configuration=${{env.Configuration}} /p:Platform=${{env.TargetPlatform}} /p:UapAppxPackageBuildMode=${{env.BuildMode}} /p:AppxBundle=${{env.AppxBundle}} /p:AppxPackageSigningEnabled=${{env.AppxPackageSigningEnabled}}
