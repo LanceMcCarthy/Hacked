@@ -10,7 +10,7 @@ internal class BoolToBrushConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, string language)
     {
-        SolidColorBrush altForegroundBrush = Application.Current.Resources["SystemControlBackgroundAltHighBrush"] as SolidColorBrush;
+        var altForegroundBrush = Application.Current.Resources["SystemControlBackgroundBaseHighBrush"] as SolidColorBrush;
 
         if (altForegroundBrush == null)
             altForegroundBrush = new SolidColorBrush(Colors.Gold);
