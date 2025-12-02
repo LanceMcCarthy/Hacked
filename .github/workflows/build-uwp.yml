@@ -38,8 +38,5 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
 
-    # - name: Restore NuGet packages
-    #   run: nuget restore ${{env.SOLUTION_PATH}} -ConfigFile ${{env.NUGET_CONFIG_PATH}}
-
     - name: Build UWP Solution
       run: msbuild ${{env.SOLUTION_PATH}} /t:Restore /p:Configuration=${{env.Configuration}} /p:Platform=${{env.TargetPlatform}} /p:UapAppxPackageBuildMode=${{env.BuildMode}} /p:AppxBundle=${{env.AppxBundle}} /p:AppxPackageSigningEnabled=${{env.AppxPackageSigningEnabled}}
