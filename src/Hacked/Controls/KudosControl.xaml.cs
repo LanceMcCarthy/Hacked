@@ -14,6 +14,7 @@ using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using static System.Net.WebRequestMethods;
 
 namespace Hacked.Controls;
 
@@ -26,8 +27,8 @@ public sealed partial class KudosControl : UserControl
     {
         InitializeComponent();
 
-        Kudoses = LoadKudos();
-        KudosGridView.ItemsSource = Kudoses;
+        //Kudoses = LoadKudos();
+        //KudosGridView.ItemsSource = Kudoses;
     }
 
     #region Dependency Properties
@@ -45,35 +46,45 @@ public sealed partial class KudosControl : UserControl
 
     #region Event handlers
 
-    public async void KudosGridView_OnItemClick(object sender, ItemClickEventArgs e)
-    {
-        if (!(e.ClickedItem is Kudos kudo)) return;
+    //public async void KudosGridView_OnItemClick(object sender, ItemClickEventArgs e)
+    //{
+    //    if (!(e.ClickedItem is Kudos kudo)) return;
 
-        if (ApiInformation.IsTypePresent("Microsoft.Services.Store.Engagement.StoreServicesCustomEventLogger"))
-            StoreServicesCustomEventLogger.GetDefault().Log($"{kudo.Title} Kudos Item Selected");
+    //    if (ApiInformation.IsTypePresent("Microsoft.Services.Store.Engagement.StoreServicesCustomEventLogger"))
+    //        StoreServicesCustomEventLogger.GetDefault().Log($"{kudo.Title} Kudos Item Selected");
 
-        if (kudo.Category == KudoCategory.Consumable ||
-            kudo.Category == KudoCategory.Subscription ||
-            kudo.Category == KudoCategory.Durable)
-        {
-            await PurchaseKudosAsync(kudo.StoreId);
-        }
+    //    // UPDATE - Important Notice
+    //    // Failed store submission as donations cannot be through Microsoft Store
+    //    // We're navigating to buymeacoffee.com instead
+    //    if (kudo.StoreId == StoreIds.CoffeeKudoStoreId)
+    //    {
+    //        var uri = new Uri("https://buymeacoffee.com/dvluper", UriKind.Absolute);
+    //        await Launcher.LaunchUriAsync(new Uri("https://buymeacoffee.com/dvluper", UriKind.Absolute));
+    //        return;
+    //    }
 
-        if (kudo.Category == KudoCategory.Free)
-        {
-            if (kudo.Title == "Store Rating")
-            {
-                await ShowRatingReviewDialog();
-            }
+    //    if (kudo.Category == KudoCategory.Consumable ||
+    //        kudo.Category == KudoCategory.Subscription ||
+    //        kudo.Category == KudoCategory.Durable)
+    //    {
+    //        await PurchaseKudosAsync(kudo.StoreId);
+    //    }
 
-            if (kudo.Title == "Play Ad")
-            {
-                // Temporary value until I find something that can replace Vungle
-                var adPlacementId = "1234";
-                PlayAdRequested?.Invoke(this, new AdRequestedArgs(adPlacementId));
-            }
-        }
-    }
+    //    if (kudo.Category == KudoCategory.Free)
+    //    {
+    //        if (kudo.Title == "Store Rating")
+    //        {
+    //            await ShowRatingReviewDialog();
+    //        }
+
+    //        if (kudo.Title == "Play Ad")
+    //        {
+    //            // Temporary value until I find something that can replace Vungle
+    //            var adPlacementId = "1234";
+    //            PlayAdRequested?.Invoke(this, new AdRequestedArgs(adPlacementId));
+    //        }
+    //    }
+    //}
 
     #endregion
 
@@ -138,61 +149,61 @@ public sealed partial class KudosControl : UserControl
         }
     }
 
-    public async Task PurchaseKudosAsync(string storeId)
-    {
-        try
-        {
-            UpdateBusyMessage("in-app purchase in progress (you should see a separate window)...");
+    //public async Task PurchaseKudosAsync(string storeId)
+    //{
+    //    try
+    //    {
+    //        UpdateBusyMessage("in-app purchase in progress (you should see a separate window)...");
 
-            if (context == null)
-                context = StoreContext.GetDefault();
+    //        if (context == null)
+    //            context = StoreContext.GetDefault();
 
-            var result = await context.RequestPurchaseAsync(storeId);
+    //        var result = await context.RequestPurchaseAsync(storeId);
 
-            UpdateBusyMessage("action complete, reviewing result...");
+    //        UpdateBusyMessage("action complete, reviewing result...");
 
-            var extendedError = "";
+    //        var extendedError = "";
 
-            if (result.ExtendedError != null)
-                extendedError = result.ExtendedError.Message;
+    //        if (result.ExtendedError != null)
+    //            extendedError = result.ExtendedError.Message;
 
-            var resultMessage = "";
+    //        var resultMessage = "";
 
-            switch (result.Status)
-            {
-                case StorePurchaseStatus.AlreadyPurchased:
-                    resultMessage = "You have already purchased this kudos, thank you!";
-                    break;
-                case StorePurchaseStatus.Succeeded:
-                    resultMessage = "Kudos provided! Thank you for your support and help in keeping this app free.";
-                    break;
-                case StorePurchaseStatus.NotPurchased:
-                    resultMessage = "Kudos were not purchased. Don't worry, you were not charged for peeking ;)";
-                    break;
-                case StorePurchaseStatus.NetworkError:
-                    resultMessage = "The purchase was unsuccessful due to a network error.\r\n\nError:\r\n" + extendedError;
-                    break;
-                case StorePurchaseStatus.ServerError:
-                    resultMessage = "The purchase was unsuccessful due to a server error.\r\n\nError:\r\n" + extendedError;
-                    break;
-                default:
-                    resultMessage = "The purchase was unsuccessful due to an unknown error.\r\n\nError:\r\n" + extendedError;
-                    break;
-            }
+    //        switch (result.Status)
+    //        {
+    //            case StorePurchaseStatus.AlreadyPurchased:
+    //                resultMessage = "You have already purchased this kudos, thank you!";
+    //                break;
+    //            case StorePurchaseStatus.Succeeded:
+    //                resultMessage = "Kudos provided! Thank you for your support and help in keeping this app free.";
+    //                break;
+    //            case StorePurchaseStatus.NotPurchased:
+    //                resultMessage = "Kudos were not purchased. Don't worry, you were not charged for peeking ;)";
+    //                break;
+    //            case StorePurchaseStatus.NetworkError:
+    //                resultMessage = "The purchase was unsuccessful due to a network error.\r\n\nError:\r\n" + extendedError;
+    //                break;
+    //            case StorePurchaseStatus.ServerError:
+    //                resultMessage = "The purchase was unsuccessful due to a server error.\r\n\nError:\r\n" + extendedError;
+    //                break;
+    //            default:
+    //                resultMessage = "The purchase was unsuccessful due to an unknown error.\r\n\nError:\r\n" + extendedError;
+    //                break;
+    //        }
 
-            UpdateBusyMessage("action complete, showing result...");
+    //        UpdateBusyMessage("action complete, showing result...");
 
-            await new MessageDialog(resultMessage).ShowAsync();
-        }
-        catch (Exception ex)
-        {
-            DisplayMessageHelpers.ShowExceptionMessageOnUiThread("ShowRatingReviewDialog", ex);
-        }
-        finally
-        {
-            UpdateBusyMessage();
-        }
-    }
+    //        await new MessageDialog(resultMessage).ShowAsync();
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        DisplayMessageHelpers.ShowExceptionMessageOnUiThread("ShowRatingReviewDialog", ex);
+    //    }
+    //    finally
+    //    {
+    //        UpdateBusyMessage();
+    //    }
+    //}
 
     private void UpdateBusyMessage(string message = "")
     {
@@ -212,74 +223,84 @@ public sealed partial class KudosControl : UserControl
 
     #region Static Helpers
 
-    private static ObservableCollection<Kudos> LoadKudos()
-    {
-        return new ObservableCollection<Kudos>
-            {
-                //new Kudos
-                //{
-                //    Title = "Play Ad",
-                //    Category = KudoCategory.Free,
-                //    Price = "Free",
-                //    ImageUrl = "/Images/VideoAd_Colored.png"
-                //},
-                new()
-                {
-                    Title = "Store Rating",
-                    Category = KudoCategory.Free,
-                    Price = "Free",
-                    ImageUrl = "/Images/4starStar_Colored.png"
-                },
-                //new()
-                //{
-                //    Title = "Remove Ads",
-                //    Category = KudoCategory.Durable,
-                //    StoreId = StoreIds.CoverApiFeeKudoStoreId,
-                //    Price = "$0.99 (permanent)",
-                //    ImageUrl = "/Images/RemoveAdKudo_Colored.png"
-                //},
-                new()
-                {
-                    Title = "Champion",
-                    Category = KudoCategory.Subscription,
-                    StoreId = StoreIds.RecurringKudos1StoreId,
-                    Price = "$1.09 (month)",
-                    ImageUrl = "/Images/RecurringKudo_Colored.png"
-                },
-                new()
-                {
-                    Title = "Coffee",
-                    Category = KudoCategory.Consumable,
-                    StoreId = StoreIds.CoffeeKudoStoreId,
-                    Price = "$2.49 (one-time)",
-                    ImageUrl = "/Images/CoffeeKudo_Colored.png"
-                },
-                new()
-                {
-                    Title = "Help with API Fee",
-                    Category = KudoCategory.Consumable,
-                    StoreId = StoreIds.CoverApiFeeKudoStoreId,
-                    Price = "$3.99 (one-time)",
-                    ImageUrl = "/Images/APIFeeKudo_Colored.png"
-                },
-                new()
-                {
-                    Title = "Lunch",
-                    Category = KudoCategory.Consumable,
-                    StoreId = StoreIds.LunchKudoStoreId,
-                    Price = "$4.89 (one-time)",
-                    ImageUrl = "/Images/LunchKudo_Colored.png"
-                },
-                new()
-                {
-                    Title = "Dinner",
-                    Category = KudoCategory.Consumable,
-                    StoreId = StoreIds.DinnerKudoStoreId,
-                    Price = "$19.49 (one-time)",
-                    ImageUrl = "/Images/DinnerKudo_Colored.png"
-                }
-            };
-    }
+    //private static ObservableCollection<Kudos> LoadKudos()
+    //{
+    //    return new ObservableCollection<Kudos>
+    //    {
+    //        new Kudos
+    //        {
+    //            Title = "Play Ad",
+    //            Category = KudoCategory.Free,
+    //            Price = "Free",
+    //            ImageUrl = "/Images/VideoAd_Colored.png"
+    //        },
+    //        new()
+    //        {
+    //            Title = "Store Rating",
+    //            Category = KudoCategory.Free,
+    //            Price = "Free",
+    //            ImageUrl = "/Images/4starStar_Colored.png"
+    //        },
+    //        new()
+    //        {
+    //            Title = "Remove Ads",
+    //            Category = KudoCategory.Durable,
+    //            StoreId = StoreIds.CoverApiFeeKudoStoreId,
+    //            Price = "$0.99 (permanent)",
+    //            ImageUrl = "/Images/RemoveAdKudo_Colored.png"
+    //        },
+    //        new()
+    //        {
+    //            Title = "Champion",
+    //            Category = KudoCategory.Subscription,
+    //            StoreId = StoreIds.RecurringKudos1StoreId,
+    //            Price = "$1.09",
+    //            ImageUrl = "/Images/RecurringKudo_Colored.png"
+    //        },
+    //        new()
+    //        {
+    //            Title = "BuyMeACoffee.com",
+    //            Category = KudoCategory.Consumable,
+    //            StoreId = StoreIds.CoffeeKudoStoreId,
+    //            Price = "Any",
+    //            ImageUrl = "/Images/CoffeeKudo_Colored.png"
+    //        },
+    //        new()
+    //        {
+    //            Title = "API Fee",
+    //            Category = KudoCategory.Consumable,
+    //            StoreId = StoreIds.CoverApiFeeKudoStoreId,
+    //            Price = "$3.99",
+    //            ImageUrl = "/Images/APIFeeKudo_Colored.png"
+    //        },
+    //        new()
+    //        {
+    //            Title = "Lunch",
+    //            Category = KudoCategory.Consumable,
+    //            StoreId = StoreIds.LunchKudoStoreId,
+    //            Price = "$4.89 (one-time)",
+    //            ImageUrl = "/Images/LunchKudo_Colored.png"
+    //        },
+    //        new()
+    //        {
+    //            Title = "Dinner",
+    //            Category = KudoCategory.Consumable,
+    //            StoreId = StoreIds.DinnerKudoStoreId,
+    //            Price = "$19.49 (one-time)",
+    //            ImageUrl = "/Images/DinnerKudo_Colored.png"
+    //        }
+    //    };
+    //}
 
     #endregion
+
+    private async void Donate_Click(object sender, RoutedEventArgs e)
+    {
+        await Launcher.LaunchUriAsync(new Uri("https://buymeacoffee.com/dvluper", UriKind.Absolute));
+    }
+
+    private async void Rating_Click(object sender, RoutedEventArgs e)
+    {
+        await ShowRatingReviewDialog();
+    }
 }
