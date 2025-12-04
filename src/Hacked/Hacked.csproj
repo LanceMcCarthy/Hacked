@@ -210,6 +210,7 @@
     <Content Include="Assets\Wide310x150Logo.scale-125.png" />
     <Content Include="Assets\Wide310x150Logo.scale-150.png" />
     <Content Include="Assets\Wide310x150Logo.scale-400.png" />
+    <Content Include="Controls\donate.html" />
     <Content Include="Images\4starStar_Colored.png" />
     <Content Include="Images\4starStar.png" />
     <Content Include="Images\APIFeeKudo_Colored.png" />

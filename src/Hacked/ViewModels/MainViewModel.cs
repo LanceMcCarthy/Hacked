@@ -9,6 +9,7 @@ using Hacked.Services.Apis;
 //using Microsoft.AppCenter.Crashes;
 using Microsoft.Services.Store.Engagement;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,6 +25,7 @@ using Windows.Services.Store;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Provider;
+using Windows.System;
 using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
@@ -160,6 +162,8 @@ public class MainViewModel : ViewModelBase
         get => isKudoSelectorOpen;
         set => SetProperty(ref isKudoSelectorOpen, value);
     }
+
+    public Visibility SupportButtonVisibility { get; } = ApiInformation.IsTypePresent("Windows.Services.Store.StoreRequestHelper") ? Visibility.Visible : Visibility.Collapsed;
 
     public List<int> AvailableDelays { get; } = new List<int>() { 1, 2, 3, 4, 5 };
 
@@ -650,6 +654,85 @@ public class MainViewModel : ViewModelBase
             return new Tuple<bool, string>(false, $"There was an error during import or file selection. Error: {ex.Message}");
         }
         finally
+        {
+            IsBusy = false;
+            IsBusyMessage = "";
+        }
+    }
+
+    public async Task ShowRatingReviewDialog()
+    {
+        try
+        {
+            UpdateBusyMessage("rating and review in progress (you should see a separate window)...");
+
+            if (!ApiInformation.IsTypePresent("Windows.Services.Store.StoreRequestHelper"))
+            {
+                // Fallback for older versions
+                return;
+            }
+
+            var result = await StoreRequestHelper.SendRequestAsync(StoreContext.GetDefault(), 16, "");
+
+            UpdateBusyMessage("action complete, reviewing result...");
+
+            if (result.ExtendedError != null)
+                return;
+
+            var jsonObject = JObject.Parse(result.Response);
+            var status = jsonObject.SelectToken("status")?.ToString();
+
+            UpdateBusyMessage("action complete, showing result...");
+
+            if (status == "success")
+            {
+                await new MessageDialog("Thank you for taking the time to leave a rating! If you left 3 stars or lower, please let me know how I can improve the app (go to About page).", "Success").ShowAsync();
+            }
+            else if (status == "aborted")
+            {
+                var md = new MessageDialog("If you prefer not to leave a bad rating but still want to provide feedback, click the email button below. I work hard to make sure you have a great app experience and would love to hear from you.", "Review Aborted");
+
+                md.Commands.Add(new UICommand("send email"));
+                md.Commands.Add(new UICommand("not now"));
+
+                var mdResult = await md.ShowAsync();
+
+                if (mdResult.Label == "send email")
+                {
+                    var uri = new Uri($"mailto:awesome.apps@outlook.com?subject=Hacked%20Feedback&body=[write%20message%20here]", UriKind.Absolute);
+
+                    await Launcher.LaunchUriAsync(uri, new LauncherOptions
+                    {
+                        DesiredRemainingView = ViewSizePreference.UseHalf,
+                        DisplayApplicationPicker = true,
+                        PreferredApplicationPackageFamilyName = "microsoft.windowscommunicationsapps_8wekyb3d8bbwe",
+                        PreferredApplicationDisplayName = "Mail"
+                    });
+                }
+            }
+            else
+            {
+                await new MessageDialog($"The rating or review did not complete, here's what Windows had to say: {jsonObject.SelectToken("status")}.\r\n\nIf you meant to leave a review, try again. If this keeps happening, contact us and share the error code above.", "Rating or Review was not successful").ShowAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            DisplayMessageHelpers.ShowExceptionMessageOnUiThread("ShowRatingReviewDialog", ex);
+        }
+        finally
+        {
+            UpdateBusyMessage();
+        }
+    }
+
+    private void UpdateBusyMessage(string message = "")
+    {
+        if (!string.IsNullOrEmpty(message))
+        {
+            IsBusy = true;
+            IsBusyMessage = message;
+        }
+        else
         {
             IsBusy = false;
             IsBusyMessage = "";
