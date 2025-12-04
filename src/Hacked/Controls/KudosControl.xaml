@@ -6,6 +6,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:primitives="using:Telerik.UI.Xaml.Controls.Primitives"
              xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+             xmlns:foundation="using:Windows.Foundation"
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800">
@@ -43,49 +44,56 @@
 
                 <Grid Background="{ThemeResource SettingsFlyoutBackgroundThemeBrush}"
                       Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
                     <StackPanel Margin="10">
-                        <TextBlock Text="Option 1 - Leave a store rating, this helps significantly (takes ~10 seconds):"
+                        <TextBlock
                                    TextWrapping="Wrap"
                                    Foreground="{ThemeResource AppBarItemForegroundThemeBrush}"
-                                   Margin="0,10,0,0" />
-                        <Button Content="Leave a Store Rating ⭐⭐⭐⭐⭐"
+                                   Margin="0,10,0,0" ><Run FontWeight="Bold" Text="Option 1 - Leave a store rating ⭐⭐⭐⭐⭐"/><LineBreak/><Run Text="Leaving a 5-star review helps significantly, and it's really fast with the new mini-popup!"/></TextBlock>
+                        <Button Content="Leave a Store rating"
                                 HorizontalAlignment="Left"
                                 Margin="0,10,0,0"
                                 Click="Rating_Click" 
                                 Background="{ThemeResource SystemControlForegroundAccentBrush}" 
                                 Foreground="{ThemeResource SystemControlForegroundAltHighBrush}">
                         </Button>
-                        <TextBlock Text="Option 2 - Use my 'Buy Me a Coffee' page to donate $1 or more to help offset API fees:"
+                        <TextBlock
                                    TextWrapping="Wrap"
                                    Foreground="{ThemeResource AppBarItemForegroundThemeBrush}"
-                                   Margin="0,20,0,0" />
-                        <Button Content="Help with API fees 🔥"
+                                   Margin="0,20,0,0"><Run FontWeight="Bold" Text="Option 2. Help with API fees with contributing $1 or more 🔥"/><LineBreak/><Run Text="Microsoft does not support donations directly through the Store, but they do allow using a secure 3rd party payment processor of your choice."/></TextBlock>
+                        <Button Content="Use BuyMeACoffee.com"
                                 HorizontalAlignment="Left"
-                                Click="Donate_Click"
-                                Margin="0,10,0,20" 
+                                Click="DonateBmac_Click"
+                                Margin="0,10,0,0" 
                                 Background="{ThemeResource SystemControlForegroundAccentBrush}" 
                                 Foreground="{ThemeResource SystemControlForegroundAltHighBrush}"/>
+                        <Button Content="Use PayPal.com"
+                                HorizontalAlignment="Left"
+                                Click="DonatePaypal_Click"
+                                Margin="0,10,0,10" 
+                                Background="{ThemeResource SystemControlForegroundAccentBrush}" 
+                                Foreground="{ThemeResource SystemControlForegroundAltHighBrush}"/>
+                        
                         <Border Margin="0,10,0,0" 
                                 Background="{ThemeResource SystemControlBackgroundBaseLowBrush}" 
                                 CornerRadius="2">
                             <TextBlock TextWrapping="Wrap"
                                        Foreground="{ThemeResource AppBarItemForegroundThemeBrush}"
-                                       Margin="5" >
-                                <Run FontWeight="Bold" Text="Why?"/>
-                                <Run Text=" This app is free to use because we believe in people taking control over their digital life. However, is expensive to maintain, for example:"/>
-                                <Run Text=" "/>
-                                <LineBreak/>
-                                <Run Text=" "/>
-                                <LineBreak/>
-                                <Run Text=" "/>
-                                <Run Text="- I donate my time to build and fix bugs on nights and weekends 😻"/>
-                                <Run Text=" "/>
-                                <LineBreak/>
-                                <Run Text=" "/>
-                                <Run Text="- The API service is not free, I pay over $100 USD a month, out of pocket 😬"/><LineBreak/><Run Text=" "/><LineBreak/><Run Text=" "/><Run Text="If you would like to also show your support, these two options are available. I appreciate you, no matter which option you can use, thank you! 🙏"/>
-                            </TextBlock>
+                                       Margin="5" ><Run Text="Why?"/><Run Text=" "/><Run Text=" This app is free to use because we believe in people taking control over their digital life. However, is expensive to maintain, for example:"/><Run Text=" "/><Run Text=" "/><Run Text=" "/><LineBreak/><Run Text=" "/><Run Text=" "/><Run Text=" "/><LineBreak/><Run Text=" "/><Run Text=" "/><Run Text=" "/><Run Text="- I donate my time to build and fix bugs on nights and weekends 😻"/><Run Text=" "/><Run Text=" "/><Run Text=" "/><LineBreak/><Run Text=" "/><Run Text=" "/><Run Text=" "/><Run Text="- The API service is not free, I pay &gt;$100 USD a month out of pocket 😬"/><LineBreak/><Run Text=" "/><LineBreak/><Run Text=" "/><Run Text="If you would like to also show your support, these two options are available. I appreciate you, no matter which option you can use, thank you! 🙏"/></TextBlock>
                         </Border>
                     </StackPanel>
+
+                    <!--<WebView x:Name="PaypalView"
+                             Margin="0,0,0,0"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch" 
+                             Width="300"
+                             Visibility="Collapsed"
+                             Grid.Column="1"/>-->
                 </Grid>
 
                 <primitives:RadBusyIndicator x:Name="KudosBusyIndicator"

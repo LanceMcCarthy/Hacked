@@ -6,6 +6,8 @@ using Microsoft.Services.Store.Engagement;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using Windows.Foundation.Metadata;
 using Windows.Services.Store;
@@ -21,8 +23,8 @@ namespace Hacked.Controls;
 public sealed partial class KudosControl : UserControl
 {
     private StoreContext context;
-    public event EventHandler<AdRequestedArgs> PlayAdRequested;
-
+    //public event EventHandler<AdRequestedArgs> PlayAdRequested;
+    
     public KudosControl()
     {
         InitializeComponent();
@@ -42,56 +44,37 @@ public sealed partial class KudosControl : UserControl
         set => SetValue(KudosesProperty, value);
     }
 
-    #endregion
+    //public static readonly DependencyProperty DonateHtmlProperty = DependencyProperty.Register(
+    //    nameof(DonateHtml), typeof(string), typeof(KudosControl), new PropertyMetadata(default(string)));
 
-    #region Event handlers
-
-    //public async void KudosGridView_OnItemClick(object sender, ItemClickEventArgs e)
+    //public string DonateHtml
     //{
-    //    if (!(e.ClickedItem is Kudos kudo)) return;
-
-    //    if (ApiInformation.IsTypePresent("Microsoft.Services.Store.Engagement.StoreServicesCustomEventLogger"))
-    //        StoreServicesCustomEventLogger.GetDefault().Log($"{kudo.Title} Kudos Item Selected");
-
-    //    // UPDATE - Important Notice
-    //    // Failed store submission as donations cannot be through Microsoft Store
-    //    // We're navigating to buymeacoffee.com instead
-    //    if (kudo.StoreId == StoreIds.CoffeeKudoStoreId)
-    //    {
-    //        var uri = new Uri("https://buymeacoffee.com/dvluper", UriKind.Absolute);
-    //        await Launcher.LaunchUriAsync(new Uri("https://buymeacoffee.com/dvluper", UriKind.Absolute));
-    //        return;
-    //    }
-
-    //    if (kudo.Category == KudoCategory.Consumable ||
-    //        kudo.Category == KudoCategory.Subscription ||
-    //        kudo.Category == KudoCategory.Durable)
-    //    {
-    //        await PurchaseKudosAsync(kudo.StoreId);
-    //    }
-
-    //    if (kudo.Category == KudoCategory.Free)
-    //    {
-    //        if (kudo.Title == "Store Rating")
-    //        {
-    //            await ShowRatingReviewDialog();
-    //        }
-
-    //        if (kudo.Title == "Play Ad")
-    //        {
-    //            // Temporary value until I find something that can replace Vungle
-    //            var adPlacementId = "1234";
-    //            PlayAdRequested?.Invoke(this, new AdRequestedArgs(adPlacementId));
-    //        }
-    //    }
+    //    get => (string)GetValue(KudosesProperty);
+    //    set => SetValue(KudosesProperty, value);
     //}
 
     #endregion
 
-    #region Instance methods and events
+    #region Event handlers
 
-    public async Task ShowRatingReviewDialog()
+    private async void DonateBmac_Click(object sender, RoutedEventArgs e)
     {
+        await Launcher.LaunchUriAsync(new Uri("https://buymeacoffee.com/dvluper", UriKind.Absolute));
+    }
+
+    private async void DonatePaypal_Click(object sender, RoutedEventArgs e)
+    {
+        await Launcher.LaunchUriAsync(new Uri("https://www.paypal.com/donate/?business=C6WG3AGVUQG9J&no_recurring=0&item_name=The+Hacked?+app+relies+significantly+on+community+support+to+help+pay+for+API+fees.+Thank+you+for+any+help+you+can+provide%21&currency_code=USD", UriKind.Absolute));
+    }
+
+    private async void Rating_Click(object sender, RoutedEventArgs e)
+    {
+        if (!ApiInformation.IsTypePresent("Windows.Services.Store.StoreRequestHelper"))
+        {
+            await new MessageDialog("Unfortunately, your device doesn't have the new mini-popup yet but you can open the Microsoft Store and leave a rating there. Thank you for taking the time to leave a rating!", "Success").ShowAsync();
+            return;
+        }
+
         try
         {
             UpdateBusyMessage("rating and review in progress (you should see a separate window)...");
@@ -148,6 +131,51 @@ public sealed partial class KudosControl : UserControl
             UpdateBusyMessage();
         }
     }
+
+    //public async void KudosGridView_OnItemClick(object sender, ItemClickEventArgs e)
+    //{
+    //    if (!(e.ClickedItem is Kudos kudo)) return;
+
+    //    if (ApiInformation.IsTypePresent("Microsoft.Services.Store.Engagement.StoreServicesCustomEventLogger"))
+    //        StoreServicesCustomEventLogger.GetDefault().Log($"{kudo.Title} Kudos Item Selected");
+
+    //    // UPDATE - Important Notice
+    //    // Failed store submission as donations cannot be through Microsoft Store
+    //    // We're navigating to buymeacoffee.com instead
+    //    if (kudo.StoreId == StoreIds.CoffeeKudoStoreId)
+    //    {
+    //        var uri = new Uri("https://buymeacoffee.com/dvluper", UriKind.Absolute);
+    //        await Launcher.LaunchUriAsync(new Uri("https://buymeacoffee.com/dvluper", UriKind.Absolute));
+    //        return;
+    //    }
+
+    //    if (kudo.Category == KudoCategory.Consumable ||
+    //        kudo.Category == KudoCategory.Subscription ||
+    //        kudo.Category == KudoCategory.Durable)
+    //    {
+    //        await PurchaseKudosAsync(kudo.StoreId);
+    //    }
+
+    //    if (kudo.Category == KudoCategory.Free)
+    //    {
+    //        if (kudo.Title == "Store Rating")
+    //        {
+    //            await ShowRatingReviewDialog();
+    //        }
+
+    //        if (kudo.Title == "Play Ad")
+    //        {
+    //            // Temporary value until I find something that can replace Vungle
+    //            var adPlacementId = "1234";
+    //            PlayAdRequested?.Invoke(this, new AdRequestedArgs(adPlacementId));
+    //        }
+    //    }
+    //}
+
+    #endregion
+
+    #region Instance methods and events
+
 
     //public async Task PurchaseKudosAsync(string storeId)
     //{
@@ -293,14 +321,4 @@ public sealed partial class KudosControl : UserControl
     //}
 
     #endregion
-
-    private async void Donate_Click(object sender, RoutedEventArgs e)
-    {
-        await Launcher.LaunchUriAsync(new Uri("https://buymeacoffee.com/dvluper", UriKind.Absolute));
-    }
-
-    private async void Rating_Click(object sender, RoutedEventArgs e)
-    {
-        await ShowRatingReviewDialog();
-    }
 }
