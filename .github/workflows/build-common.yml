@@ -13,7 +13,7 @@ on:
 env:
   CORE_PROJECT_PATH: 'src/Hacked.Core/Hacked.Core.csproj'
   SERVICES_PROJECT_PATH: 'src/Hacked.Services/Hacked.Services.csproj'
-  sdk_version: '9.0.x'
+  sdk_version: '10.0.x'
   NUGET_CONFIG_PATH: 'src/nuget.config'
   TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
 
@@ -23,12 +23,12 @@ jobs:
     
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
     - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: ${{env.sdk_version}}
 
