@@ -30,7 +30,8 @@
 
     <!-- DataTemplates -->
 
-    <DataTemplate x:Key="BreachClassItemTemplate">
+    <DataTemplate x:Key="BreachClassItemTemplate"
+                  x:DataType="models:Breach">
             <Label Text="{Binding}" />
     </DataTemplate>
 
