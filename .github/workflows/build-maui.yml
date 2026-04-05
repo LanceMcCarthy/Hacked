@@ -44,7 +44,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v6
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{env.sdk_version}}
 
@@ -82,7 +82,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v6
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{env.sdk_version}}
 
@@ -125,7 +125,7 @@ jobs:
           [IO.File]::WriteAllBytes("${{secrets.ANDROID_SIGNING_KEYSTORE_FILENAME}}", $file_bytes)
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v6
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{env.sdk_version}}
 
@@ -172,7 +172,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v6
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{env.sdk_version}}
 
