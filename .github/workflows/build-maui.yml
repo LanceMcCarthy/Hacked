@@ -32,7 +32,8 @@ env:
   ANDROID_ARTIFACTS_PATH: "artifacts_android"
   WINDOWS_ARTIFACTS_PATH: "artifacts_windows"
   PROJECT_PATH: "src/Hacked.Maui/Hacked.maui.csproj"
-  sdk_version: '10.0.x'
+  SDK_VERSION: '10.0.x'
+  NET_TFM: 'net10.0'
   NUGET_CONFIG_PATH: 'src/nuget.config'
   TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
 
@@ -46,7 +47,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: ${{env.sdk_version}}
+          dotnet-version: ${{env.SDK_VERSION}}
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v3
@@ -58,7 +59,7 @@ jobs:
         run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
 
       - name: Build Maui WinUI project
-        run: dotnet build ${{env.PROJECT_PATH}} -c Debug -f net9.0-windows10.0.19041.0
+        run: dotnet build ${{env.PROJECT_PATH}} -c Debug -f ${{env.NET_TFM}}-windows10.0.19041.0
 
       - name: Create artifacts folder
         run: |
@@ -84,7 +85,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: ${{env.sdk_version}}
+          dotnet-version: ${{env.SDK_VERSION}}
 
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
@@ -94,9 +95,9 @@ jobs:
 
       - name: Build MacCatalyst App
         run: |
-          dotnet build ${{env.PROJECT_PATH}} -f net9.0-maccatalyst -c Debug -p:MtouchLink=SdkOnly
-          # dotnet build ${{env.PROJECT_PATH}} -f net8.0-maccatalyst -c Release
-          # dotnet publish ${{env.PROJECT_PATH}} -f net8.0-maccatalyst -c Release -p:BuildIpa=True 
+          dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-maccatalyst -c Debug -p:MtouchLink=SdkOnly
+          # dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-maccatalyst -c Release
+          # dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-maccatalyst -c Release -p:BuildIpa=True 
 
       - name: Create artifacts folder
         run: |
@@ -127,7 +128,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: ${{env.sdk_version}}
+          dotnet-version: ${{env.SDK_VERSION}}
 
       - uses: actions/setup-java@v5
         with:
@@ -142,11 +143,11 @@ jobs:
 
       - name: Simple build MAUI Android
         run: |
-          dotnet build ${{env.PROJECT_PATH}} -c Debug -f net8.0-android
+          dotnet build ${{env.PROJECT_PATH}} -c Debug -f ${{env.NET_TFM}}-android
 
       # - name: Publish MAUI Android
       #   run: |
-      #     dotnet publish ${{env.PROJECT_PATH}} -c Release -f net9.0-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_SIGNING_KEYSTORE_FILENAME}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_STORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
+      #     dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_SIGNING_KEYSTORE_FILENAME}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_STORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
 
       - name: Create artifacts folder
         run: |
@@ -174,7 +175,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: ${{env.sdk_version}}
+          dotnet-version: ${{env.SDK_VERSION}}
 
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
@@ -185,8 +186,8 @@ jobs:
       - name: Build iOS App
         shell: bash
         run: |
-          dotnet build ${{env.PROJECT_PATH}} -f net9.0-ios -c Debug -p:MtouchLink=SdkOnly
-          # dotnet publish ${{env.PROJECT_PATH}} -f net8.0-ios -c Release -p:BuildIpa=True
+          dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Debug -p:MtouchLink=SdkOnly
+          # dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Release -p:BuildIpa=True
 
       - name: Create artifacts folder
         run: |
