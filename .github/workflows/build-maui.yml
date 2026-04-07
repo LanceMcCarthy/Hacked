@@ -37,11 +37,30 @@ env:
   NUGET_CONFIG_PATH: 'src/nuget.config'
   TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
   XCODE_VERSION: '26.2'
+  APPLE_CODESIGN_KEY: "Apple Distribution: Lancelot Software (L25222N3C7)"
+  APPLE_APP_ID: "com.lancelotsoftware.HackedApp"
+  APPLE_CODESIGN_ENTITLEMENTS: "Platforms/MacCatalyst/Entitlements.plist"
 
 jobs:
+  shared-resources:
+    name: Create Shared Resources
+    runs-on: windows-latest
+    outputs:
+      app_version: ${{steps.version-creator.outputs.app_version}}
+    steps:
+    # Generates a version number using year.monthday.run_number.0 (e.g., 2024.824.1.0)
+    - name: Generate version number using date and run number
+      id: version-creator
+      run: |
+        $buildDay = Get-Date -Format "yyyy.Mdd"
+        $runNumber = "$env:GITHUB_RUN_NUMBER"
+        $ver = $buildDay + "." + $runNumber + ".0"
+        echo "app_version=$ver" >> $env:GITHUB_OUTPUT
+
   build-windows:
     runs-on: windows-latest
-
+    needs: shared-resources
+    if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
     steps:
       - uses: actions/checkout@v6
 
@@ -78,92 +97,10 @@ jobs:
       #     if-no-files-found: warn
       #     retention-days: 60
 
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: ${{env.XCODE_VERSION}}
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{env.SDK_VERSION}}
-
-      - name: Install MAUI Workloads
-        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
-
-      - name: Add Telerik NuGet Server
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
-
-      - name: Build MacCatalyst App
-        run: |
-          dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-maccatalyst -c Debug -p:MtouchLink=SdkOnly
-          # dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-maccatalyst -c Release
-          # dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-maccatalyst -c Release -p:BuildIpa=True 
-
-      - name: Create artifacts folder
-        run: |
-           cd ${{github.workspace}}
-           mkdir -p ${{env.MACOS_ARTIFACTS_PATH}}
- 
-      - name: Copy MacOS packages
-        run: Get-Childitem -Path ${{github.workspace}} -Include *.pkg -File -Recurse | Copy-Item -Destination ${{env.MACOS_ARTIFACTS_PATH}}
-
-      # - name: Publish macOS build artifacts
-      #   uses: actions/upload-artifact@v4
-      #   with:     
-      #     name: "macOS artifacts" 
-      #     path: "${{env.MACOS_ARTIFACTS_PATH}}/*"
-      #     if-no-files-found: warn
-      #     retention-days: 60
-
-  build-ios:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v6
-
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: ${{env.XCODE_VERSION}}
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{env.SDK_VERSION}}
-
-      - name: Install MAUI Workloads
-        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
-
-      - name: Add Telerik NuGet Server
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
-
-      - name: Build iOS App
-        shell: bash
-        run: |
-          dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Debug -p:MtouchLink=SdkOnly
-          # dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Release -p:BuildIpa=True
-
-      - name: Create artifacts folder
-        run: |
-           cd ${{github.workspace}}
-           mkdir -p ${{env.IOS_ARTIFACTS_PATH}}
-
-      - name: Copy iOS packages
-        run: Get-Childitem -Path ${{github.workspace}} -Include *.app -File -Recurse | Copy-Item -Destination ${{env.IOS_ARTIFACTS_PATH}}
-
-      # - name: Publish iOS build artifacts
-      #   uses: actions/upload-artifact@v4
-      #   with:     
-      #     name: "iOS artifacts" 
-      #     path: "${{env.IOS_ARTIFACTS_PATH}}/*"
-      #     if-no-files-found: warn
-      #     retention-days: 60
-  
   build-android:
     runs-on: windows-latest
+    needs: shared-resources
+    if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
     steps:
       - uses: actions/checkout@v6
 
@@ -213,3 +150,129 @@ jobs:
       #     path: "${{env.ANDROID_ARTIFACTS_PATH}}/*"
       #     if-no-files-found: warn
       #     retention-days: 60
+
+  build-macos:
+    name: Build MacCatalyst
+    needs: shared-resources
+    if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
+    runs-on: macos-26
+    strategy:
+      matrix:
+        RID: [maccatalyst-arm64, maccatalyst-x64]
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{env.XCODE_VERSION}}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{env.SDK_VERSION}}
+
+      - name: Install MAUI Workloads
+        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
+
+      - name: Add Telerik NuGet Server
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
+
+      - name: Build MacCatalyst App
+        run: |
+          dotnet build ${{env.PROJECT_PATH}} -c Release ${{env.NET_TFM}}-maccatalyst -p:RuntimeIdentifier=${{matrix.RID}} -p:PublishTrimmed=true -p:MtouchLink=SdkOnly
+
+      - name: Create artifacts folder
+        run: |
+           cd ${{github.workspace}}
+           mkdir -p ${{env.MACOS_ARTIFACTS_PATH}}
+ 
+      - name: Copy MacOS packages
+        run: Get-Childitem -Path ${{github.workspace}} -Include *.pkg -File -Recurse | Copy-Item -Destination ${{env.MACOS_ARTIFACTS_PATH}}
+
+      # - name: Publish macOS build artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:     
+      #     name: "macOS artifacts" 
+      #     path: "${{env.MACOS_ARTIFACTS_PATH}}/*"
+      #     if-no-files-found: warn
+      #     retention-days: 60
+
+  build-ios:
+    runs-on: macos-latest
+    needs: shared-resources
+    if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
+    env:
+      RID: ios-arm64
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{env.XCODE_VERSION}}
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{env.SDK_VERSION}}
+
+      - name: Install MAUI Workloads
+        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
+
+      - name: Add Telerik NuGet Server
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
+
+      - name: Build iOS App
+        shell: bash
+        run: |
+          dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Debug -p:PublishTrimmed=true -p:MtouchLink=SdkOnly -p:RuntimeIdentifier=${{env.RID}}
+          # dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Release -p:BuildIpa=True
+
+      # Docs https://github.com/Apple-Actions/import-codesign-certs
+      # - name: Import Code-Signing Certificates
+      #   uses: Apple-Actions/import-codesign-certs@v2
+      #   with:
+      #     p12-file-base64: "${{secrets.APPLE_DISTRIBUTION_CERT_BASE64}}"
+      #     p12-password: "${{secrets.APPLE_DISTRIBUTION_CERT_PASSWORD}}"
+
+      # Docs https://github.com/Apple-Actions/download-provisioning-profiles
+      # - uses: Apple-Actions/download-provisioning-profiles@v2
+      #   with:
+      #     profile-type: "${{env.APPLE_PROV_PROFILE_TYPE}}"
+      #     bundle-id: "${{env.APPLE_APP_ID}}"
+      #     issuer-id: "${{secrets.APPSTORE_API_ISSUER_ID}}"
+      #     api-key-id: "${{secrets.APPSTORE_API_KEY_ID}}"
+      #     api-private-key: "${{secrets.APPSTORE_API_PRIVATE_KEY}}"
+      #   env:
+      #     APPLE_PROV_PROFILE: "Hacked_AdHoc_Distribution"
+      #     APPLE_PROV_PROFILE_TYPE: "MAC_APP_STORE"
+
+      # Docs https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/publish-cli?view=net-maui-9.0
+      # - name: Build MAUI iOS project
+      #   run: |
+      #     dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -p:RuntimeIdentifier=${{env.RID}} -p:PublishTrimmed=true -p:MtouchLink=SdkOnly -p:ApplicationId=${{env.APP_ID}} -p:CodesignProvision=${{env.CODESIGN_PROV_PROFILE}} -p:CodesignKey=${{env.CODESIGN_KEY}}
+
+      # Docs https://github.com/Apple-Actions/upload-testflight-build
+      # - name: 'Upload app to TestFlight'
+      #   uses: apple-actions/upload-testflight-build@v1
+      #   with: 
+      #     app-path: "${{github.workspace}}/**/*.ipa" 
+      #     issuer-id: ${{secrets.APPSTORE_API_ISSUER_ID}}
+      #     api-key-id: "${{secrets.APPSTORE_API_KEY_ID}}"
+      #     api-private-key: "${{secrets.APPSTORE_API_PRIVATE_KEY}}"
+
+      - name: Create artifacts folder
+        run: |
+           cd ${{github.workspace}}
+           mkdir -p ${{env.IOS_ARTIFACTS_PATH}}
+
+      - name: Copy iOS packages
+        run: Get-Childitem -Path ${{github.workspace}} -Include *.app -File -Recurse | Copy-Item -Destination ${{env.IOS_ARTIFACTS_PATH}}
+
+      # - name: Publish iOS build artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:     
+      #     name: "iOS artifacts" 
+      #     path: "${{env.IOS_ARTIFACTS_PATH}}/*"
+      #     if-no-files-found: warn
+      #     retention-days: 60
+  
