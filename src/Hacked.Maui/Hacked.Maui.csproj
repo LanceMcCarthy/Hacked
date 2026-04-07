@@ -66,8 +66,6 @@
 		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
 		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
 		<RuntimeIdentifier>maccatalyst-x64</RuntimeIdentifier>
-		<CodesignKey>Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
-		<CodesignProvision>HackedApp_MacStore_2022.provisionprofile</CodesignProvision>
 	</PropertyGroup>
 
 	<!-- Windows - Standard Settings -->
