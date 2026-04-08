@@ -174,12 +174,12 @@ jobs:
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
-      - name: Restore MacCatalyst dependencies
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} -f ${{env.NET_TFM}}-maccatalyst -r ${{matrix.RID}}
+      - name: Add Telerik NuGet Server
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
       - name: Build MacCatalyst App
         run: |
-          dotnet build ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-maccatalyst -p:RuntimeIdentifier=${{matrix.RID}} -p:MtouchLink=SdkOnly --no-restore
+          dotnet build ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-maccatalyst -p:RuntimeIdentifier=${{matrix.RID}} -p:MtouchLink=SdkOnly
 
       - name: Create artifacts folder
         run: |
@@ -218,12 +218,12 @@ jobs:
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
-      - name: Restore iOS dependencies
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} -f ${{env.NET_TFM}}-ios -r ${{env.RID}}
+      - name: Add Telerik NuGet Server
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
       - name: Build iOS App
         run: |
-          dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Debug -p:MtouchLink=SdkOnly -p:RuntimeIdentifier=${{env.RID}} --no-restore
+          dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Debug -p:MtouchLink=SdkOnly -p:RuntimeIdentifier=${{env.RID}}
           # dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Release -p:BuildIpa=True
 
       # Docs https://github.com/Apple-Actions/import-codesign-certs
