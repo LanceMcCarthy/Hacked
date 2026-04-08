@@ -179,7 +179,7 @@ jobs:
 
       - name: Build MacCatalyst App
         run: |
-          dotnet build ${{env.PROJECT_PATH}} -c Release ${{env.NET_TFM}}-maccatalyst -p:RuntimeIdentifier=${{matrix.RID}} -p:PublishTrimmed=true -p:MtouchLink=SdkOnly
+          dotnet build ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-maccatalyst -p:RuntimeIdentifier=${{matrix.RID}} -p:MtouchLink=SdkOnly --no-restore
 
       - name: Create artifacts folder
         run: |
@@ -222,9 +222,8 @@ jobs:
         run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
 
       - name: Build iOS App
-        shell: bash
         run: |
-          dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Debug -p:PublishTrimmed=true -p:MtouchLink=SdkOnly -p:RuntimeIdentifier=${{env.RID}}
+          dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Debug -p:MtouchLink=SdkOnly -p:RuntimeIdentifier=${{env.RID}} --no-restore
           # dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Release -p:BuildIpa=True
 
       # Docs https://github.com/Apple-Actions/import-codesign-certs
