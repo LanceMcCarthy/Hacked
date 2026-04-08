@@ -174,8 +174,8 @@ jobs:
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
-      - name: Add Telerik NuGet Server
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
+      - name: Restore MacCatalyst dependencies
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} -f ${{env.NET_TFM}}-maccatalyst -r ${{matrix.RID}}
 
       - name: Build MacCatalyst App
         run: |
@@ -218,8 +218,8 @@ jobs:
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
-      - name: Add Telerik NuGet Server
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
+      - name: Restore iOS dependencies
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} -f ${{env.NET_TFM}}-ios -r ${{env.RID}}
 
       - name: Build iOS App
         run: |
