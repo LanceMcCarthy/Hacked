@@ -53,28 +53,26 @@
 		<PackageReference Include="WinUIEx" Version="2.9.0" />
 	</ItemGroup>
 
-	<!-- iOS - Standard Settings -->
+	<!-- iOS - Global Settings -->
 	<PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
-		<CodesignKey>Apple Development: Created via API (F85G643H5K)</CodesignKey>
-		<CodesignProvision>VS: com.lancelotsoftware.HackedApp Development</CodesignProvision>
 		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
 		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
     </PropertyGroup>
 
-	<!-- MacCatalyst - Standard Settings -->
+	<!-- MacCatalyst - Global Settings -->
 	<PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst'))">
 		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
 		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
 		<RuntimeIdentifier>maccatalyst-x64</RuntimeIdentifier>
 	</PropertyGroup>
 
-	<!-- Windows - Standard Settings -->
+	<!-- Windows - Global Settings -->
 	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
 		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
 	</PropertyGroup>
 
-	<!-- Android - Standard Settings -->
+	<!-- Android - Global Settings -->
 	<PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
 		<ApplicationId>com.lancelotsoftware.hacked</ApplicationId>
 		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
@@ -97,8 +95,8 @@
   <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
     <ProvisioningType>manual</ProvisioningType>
     <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
-    <CodesignKey>Apple Development: Lance McCarthy (AJ9XMDH9A2)</CodesignKey>
-    <CodesignProvision>Hacked_iOS_Development_2023.mobileprovision</CodesignProvision>
+	<CodesignKey>Apple Development: Created via API (F85G643H5K)</CodesignKey>
+	<CodesignProvision>VS: com.lancelotsoftware.HackedApp Development</CodesignProvision>
   </PropertyGroup>-->
 
 	<!-- Debug - Local iPhone 
