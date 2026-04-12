@@ -1,65 +1,102 @@
-name: Build Uno
+name: Uno Smoke Test
 
 on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+    paths:
+      - 'src/Uno/**'
+      - 'src/Hacked.Core/**'
+      - 'src/Hacked.Services/**'
+      - '.github/workflows/build-uno.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/Uno/**'
+      - 'src/Hacked.Core/**'
+      - 'src/Hacked.Services/**'
+      - '.github/workflows/build-uno.yml'
   workflow_dispatch:
 
-defaults:
-  run:
-    shell: pwsh
 env:
-  target-platform: "all"
-  sdk_version: '9.0.x'
-  NUGET_CONFIG_PATH: 'src/nuget.config'
-  TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
+  DOTNET_VERSION: '9.0.x'
+  NUGET_CONFIG: 'src/nuget.config'
+  TELERIK_NUGET_KEY: ${{ secrets.TELERIK_NUGET_KEY }}
 
 jobs:
-  smoke_test:
-    name: Smoke Tests
+  # Headless net9.0 target — validates all C# and XAML without any platform SDK.
+  # Runs on Linux for speed; no workloads required.
+  build-headless:
+    name: Build · net9.0 (headless)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore src/Uno/Hacked/Hacked.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
+
+      - name: Build
+        run: dotnet build src/Uno/Hacked/Hacked.csproj -c Debug -f net9.0 --no-restore --nologo
+
+  # Windows-specific target — validates WinUI/WinAppSDK-specific code paths.
+  # net9.0-windows is pre-supported on windows-latest without extra workloads.
+  build-windows:
+    name: Build · net9.0-windows
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
         with:
-          fetch-depth: 0
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{env.sdk_version}}
+      - name: Restore
+        run: dotnet restore src/Uno/Hacked/Hacked.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v3
-      
-      - name: Install ${{env.target-platform}} Workloads
-        run: |
-          dotnet tool install -g uno.check
-          uno-check -v --ci --non-interactive --fix --target ${{env.target-platform}} --skip vswin --skip vsmac --skip xcode --skip vswinworkloads --skip androidemulator --skip dotnetnewunotemplates
+      - name: Build
+        run: dotnet build src/Uno/Hacked/Hacked.csproj -c Debug -f net9.0-windows10.0.19041 --no-restore --nologo
 
-      - name: Build Hacked (Debug)
-        run: msbuild src/Uno/Hacked/Hacked.csproj /r
-
-  unit_test:
+  # Unit tests run on the fast net9.0 target — no platform SDK needed.
+  # The test project references only Hacked.Core and Hacked.Services directly.
+  unit-tests:
     name: Unit Tests
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    needs: build-headless
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
         with:
-          fetch-depth: 0
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v5
+      - name: Restore
+        run: dotnet restore src/Uno/Hacked.Tests/Hacked.Tests.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
+
+      - name: Test
+        run: >
+          dotnet test src/Uno/Hacked.Tests/Hacked.Tests.csproj
+          -c Release
+          --no-restore
+          --nologo
+          --logger GitHubActions
+          --logger "trx;LogFileName=test-results.trx"
+          --collect:"XPlat Code Coverage"
+          --
+          DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          dotnet-version: ${{env.sdk_version}}
+          name: test-results
+          path: '**/*.trx'
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v3
-      
-      - name: Install ${{env.target-platform}} Workloads
-        run: |
-          dotnet tool install -g uno.check
-          uno-check -v --ci --non-interactive --fix --target ${{env.target-platform}} --skip vswin --skip vsmac --skip xcode --skip vswinworkloads --skip androidemulator --skip dotnetnewunotemplates
-
-      - name: Build Hacked.Tests (Release)
-        run: msbuild src/Uno/Hacked.Tests/Hacked.Tests.csproj /p:Configuration=Release /p:OverrideTargetFramework=net8.0 /r
-
-      - name: Run Unit Tests
-        run: dotnet test src/Uno/Hacked.Tests/Hacked.Tests.csproj --no-build -c Release --logger GitHubActions --blame-crash --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
