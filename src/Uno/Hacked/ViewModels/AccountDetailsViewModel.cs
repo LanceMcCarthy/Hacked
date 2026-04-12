@@ -15,10 +15,10 @@ public partial class AccountDetailsViewModel : ObservableObject
 
     public AccountDetailsViewModel(MonitoredAccount account, INavigator navigator)
     {
-        _account = account;
+        Account = account;
         _navigator = navigator;
 
-        foreach (var breach in _account.Breaches)
+        foreach (var breach in Account.Breaches)
             FilteredBreaches.Add(breach);
     }
 
@@ -26,7 +26,7 @@ public partial class AccountDetailsViewModel : ObservableObject
     {
         FilteredBreaches.Clear();
         var filter = value?.Trim();
-        foreach (var breach in _account.Breaches)
+        foreach (var breach in Account.Breaches)
         {
             if (string.IsNullOrWhiteSpace(filter) ||
                 breach.Name.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
@@ -46,8 +46,8 @@ public partial class AccountDetailsViewModel : ObservableObject
     [RelayCommand]
     private void ClearNewFlags()
     {
-        foreach (var breach in _account.Breaches)
+        foreach (var breach in Account.Breaches)
             breach.IsNew = false;
-        _account.HasNewBreaches = false;
+        Account.HasNewBreaches = false;
     }
 }

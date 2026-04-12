@@ -40,7 +40,7 @@
             </NavigationViewItem>
             <NavigationViewItem Content="Password Check" Tag="PasswordCheck">
               <NavigationViewItem.Icon>
-                <SymbolIcon Symbol="Lock" />
+                <FontIcon Glyph="&#xE72E;" FontFamily="Segoe MDL2 Assets" />
               </NavigationViewItem.Icon>
             </NavigationViewItem>
             <NavigationViewItem Content="Settings" Tag="Settings">
