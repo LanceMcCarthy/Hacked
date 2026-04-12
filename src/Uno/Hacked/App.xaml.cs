@@ -1,3 +1,4 @@
+using Hacked.Models;
 using Hacked.Services;
 using Hacked.Services.Apis;
 using Hacked.Services.Interfaces;
@@ -51,7 +52,7 @@ public partial class App : Application
         MainWindow = builder.Window;
 
 #if DEBUG
-        MainWindow.EnableHotReload();
+        builder.Window.UseStudio();
 #endif
         MainWindow.SetWindowIcon();
 

@@ -9,16 +9,16 @@ public partial class BreachDetailsViewModel : ObservableObject
 
     public BreachDetailsViewModel(Breach breach, INavigator navigator)
     {
-        _breach = breach;
+        Breach = breach;
         _navigator = navigator;
     }
 
     [RelayCommand]
     private async Task OpenDomain()
     {
-        if (!string.IsNullOrWhiteSpace(_breach.Domain))
+        if (!string.IsNullOrWhiteSpace(Breach.Domain))
         {
-            var uri = new Uri($"https://{_breach.Domain}");
+            var uri = new Uri($"https://{Breach.Domain}");
             await Windows.System.Launcher.LaunchUriAsync(uri);
         }
     }
