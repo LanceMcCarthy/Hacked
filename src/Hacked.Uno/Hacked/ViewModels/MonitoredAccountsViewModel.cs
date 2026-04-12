@@ -11,8 +11,7 @@ public partial class MonitoredAccountsViewModel : ObservableObject
     private readonly INavigator _navigator;
     private readonly ILogger<MonitoredAccountsViewModel> _logger;
 
-    [ObservableProperty]
-    private ObservableCollection<MonitoredAccount> _accounts = new();
+    public ObservableCollection<MonitoredAccount> Accounts => _accountsService.CurrentAccounts;
 
     [ObservableProperty]
     private bool _isBusy;
@@ -33,6 +32,8 @@ public partial class MonitoredAccountsViewModel : ObservableObject
         _breachService = breachService;
         _navigator = navigator;
         _logger = logger;
+        Accounts.CollectionChanged += (_, _) => IsEmpty = Accounts.Count == 0;
+        IsEmpty = Accounts.Count == 0;
         _ = InitializeAsync();
     }
 
@@ -41,8 +42,6 @@ public partial class MonitoredAccountsViewModel : ObservableObject
         try
         {
             await _accountsService.LoadAccountsAsync();
-            Accounts = _accountsService.CurrentAccounts;
-            Accounts.CollectionChanged += (_, _) => IsEmpty = Accounts.Count == 0;
             IsEmpty = Accounts.Count == 0;
         }
         catch (Exception ex)
@@ -55,7 +54,6 @@ public partial class MonitoredAccountsViewModel : ObservableObject
     private void RemoveAccount(MonitoredAccount account)
     {
         Accounts.Remove(account);
-        _accountsService.CurrentAccounts.Remove(account);
         _ = _accountsService.SaveAccountsAsync();
     }
 
@@ -129,6 +127,8 @@ public partial class MonitoredAccountsViewModel : ObservableObject
     private async Task NavigateToAddAccount()
     {
         await _navigator.NavigateViewModelAsync<AddAccountViewModel>(this);
+        await _accountsService.LoadAccountsAsync();
+        IsEmpty = Accounts.Count == 0;
     }
 
     [RelayCommand]
