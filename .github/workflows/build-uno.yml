@@ -27,7 +27,8 @@ env:
 
 jobs:
   # Headless net9.0 target — validates all C# and XAML without any platform SDK.
-  # Runs on Linux for speed; no workloads required.
+  # Runs on Linux for speed. Restore is scoped to net9.0 to avoid needing
+  # Android/iOS/macCatalyst workloads that are not installed on the runner.
   build-headless:
     name: Build · net9.0 (headless)
     runs-on: ubuntu-latest
@@ -40,13 +41,13 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore
-        run: dotnet restore src/Uno/Hacked/Hacked.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
+        run: dotnet restore src/Uno/Hacked/Hacked.csproj -f net9.0 --configfile ${{ env.NUGET_CONFIG }} --nologo
 
       - name: Build
         run: dotnet build src/Uno/Hacked/Hacked.csproj -c Debug -f net9.0 --no-restore --nologo
 
   # Windows-specific target — validates WinUI/WinAppSDK-specific code paths.
-  # net9.0-windows is pre-supported on windows-latest without extra workloads.
+  # Restore is scoped to net9.0-windows to avoid needing mobile workloads.
   build-windows:
     name: Build · net9.0-windows
     runs-on: windows-latest
@@ -59,7 +60,7 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore
-        run: dotnet restore src/Uno/Hacked/Hacked.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
+        run: dotnet restore src/Uno/Hacked/Hacked.csproj -f net9.0-windows10.0.19041 --configfile ${{ env.NUGET_CONFIG }} --nologo
 
       - name: Build
         run: dotnet build src/Uno/Hacked/Hacked.csproj -c Debug -f net9.0-windows10.0.19041 --no-restore --nologo
