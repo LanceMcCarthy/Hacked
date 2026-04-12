@@ -1,10 +1,7 @@
 ﻿using CommonHelpers.Extensions;
 using Hacked.Core.Common;
 using Hacked.Services.Interfaces;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -26,62 +23,42 @@ public class PwnedPasswordService : IPwndPasswordService, IDisposable
         }
 
         client = new HttpClient(handler);
-        client.BaseAddress = new Uri(HibpConstants.HibpApiBaseAddress);
+        client.BaseAddress = new Uri(HibpConstants.PwnedPasswordsApiBaseAddress);
         client?.DefaultRequestHeaders.Add(HibpConstants.HibpUserAgentKey, HibpConstants.HibpUserAgentValue);
     }
 
     public async Task<string> CheckPasswordAsync(string password)
     {
-        // extension method from CommonHelpers.Extensions, uses SHA1Managed as required by HIBP API
-        var hashedPassword = password.Hash(); 
+        // HIBP k-anonymity model: hash with SHA-1, send only first 5 chars, compare suffixes in response
+        var hashedPassword = password.Hash().ToUpperInvariant();
+        var hashPrefix = hashedPassword.Substring(0, 5);
+        var hashSuffix = hashedPassword.Substring(5);
 
-        var shortHash = hashedPassword.Substring(0, 5);
-        
-        using var request = new HttpRequestMessage(HttpMethod.Get, $"{HibpConstants.ApiRoute_Range}/{shortHash}");
-
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"{HibpConstants.ApiRoute_Range}/{hashPrefix}");
         using var response = await client.SendAsync(request);
-        
-        var json = await response.Content.ReadAsStringAsync();
 
-        if (string.IsNullOrEmpty(json)) 
-            return "That password was not located in the database.";
+        if (!response.IsSuccessStatusCode)
+            return "Unable to check the password at this time. Please try again later.";
 
-        var allHashes = JsonConvert.DeserializeObject<List<string>>(json);
+        // Response is plain text: HASH_SUFFIX:COUNT per line (NOT JSON)
+        var responseText = await response.Content.ReadAsStringAsync();
 
-        if (allHashes == null) 
-            return "There was a problem deserializing the hashes.";
+        if (string.IsNullOrEmpty(responseText))
+            return "Good news — this password was not found in any known data breaches!";
 
-        // A dictionary to hold all data set matches (instead of only returning the first match)
-        var matchingHashes = new Dictionary<string, int>();
-
-        // Example response =>
-        // "74E73CDBD285D283E7401A044BF08220C75:257"
-        // The first part is the hashed pwd, ex: 74E73CDBD285D283E7401A044BF08220C75
-        // The second part is how many times it was found in the data set, ex: 257
-
-        // We split the string by ':' and check if the first part matches the hashed password, if it matches, add to the dictionary
-        foreach (var hashValSplit in allHashes
-                     .Select(hash => hash.Split(':'))
-                     .Where(hashValSplit => hashValSplit[0] == hashedPassword))
+        foreach (var line in responseText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries))
         {
-            if (int.TryParse(hashValSplit[1], out var count))
-            {
-                matchingHashes.Add(hashValSplit[0], count);
-            }
-            else
-            {
-                return "There was a problem parsing the count of occurrences.";
-            }
+            var colonIndex = line.IndexOf(':');
+            if (colonIndex < 0) continue;
+
+            var lineSuffix = line.Substring(0, colonIndex).Trim();
+            if (!lineSuffix.Equals(hashSuffix, StringComparison.OrdinalIgnoreCase)) continue;
+
+            if (int.TryParse(line.Substring(colonIndex + 1).Trim(), out var count))
+                return $"⚠️ This password has appeared {count:N0} time(s) in known data breaches. Please use a different password.";
         }
 
-        if (matchingHashes.Count == 0)
-            return "That password was not located in the database.";
-
-        var result = "The entered password has been identified in the database:\n";
-        foreach (var hash in matchingHashes) 
-            result += $"{hash.Key} - {hash.Value} times\n";
-        result += "Please consider using a different password.";
-        return result;
+        return "✅ Good news — this password was not found in any known data breaches!";
     }
     
     public void Dispose()
@@ -89,3 +66,4 @@ public class PwnedPasswordService : IPwndPasswordService, IDisposable
         client?.Dispose();
     }
 }
+

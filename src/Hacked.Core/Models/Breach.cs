@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using CommonHelpers.Common;
-using Newtonsoft.Json;
 
 namespace Hacked.Core.Models;
 
@@ -9,49 +9,49 @@ public class Breach : BindableBase
 {
     // **** API members ******
 
-    [JsonProperty("Name")]
+    [JsonPropertyName("Name")]
     public string Name { get; set; }
 
-    [JsonProperty("Title")]
+    [JsonPropertyName("Title")]
     public string Title { get; set; }
 
-    [JsonProperty("Domain")]
+    [JsonPropertyName("Domain")]
     public string Domain { get; set; }
 
-    [JsonProperty("BreachDate")]
+    [JsonPropertyName("BreachDate")]
     public DateTime? BreachDate { get; set; }
 
-    [JsonProperty("AddedDate")]
+    [JsonPropertyName("AddedDate")]
     public string AddedDate { get; set; }
 
-    [JsonProperty("ModifiedDate")]
+    [JsonPropertyName("ModifiedDate")]
     public string ModifiedDate { get; set; }
 
-    [JsonProperty("PwnCount")]
+    [JsonPropertyName("PwnCount")]
     public long PwnCount { get; set; }
 
-    [JsonProperty("Description")]
+    [JsonPropertyName("Description")]
     public string Description { get; set; }
 
-    [JsonProperty("DataClasses")]
+    [JsonPropertyName("DataClasses")]
     public List<string> DataClasses { get; set; }
 
-    [JsonProperty("IsVerified")]
+    [JsonPropertyName("IsVerified")]
     public bool IsVerified { get; set; }
 
-    [JsonProperty("IsFabricated")]
+    [JsonPropertyName("IsFabricated")]
     public bool IsFabricated { get; set; }
 
-    [JsonProperty("IsSensitive")]
+    [JsonPropertyName("IsSensitive")]
     public bool IsSensitive { get; set; }
 
-    [JsonProperty("IsRetired")]
+    [JsonPropertyName("IsRetired")]
     public bool IsRetired { get; set; }
 
-    [JsonProperty("IsSpamList")]
+    [JsonPropertyName("IsSpamList")]
     public bool IsSpamList { get; set; }
 
-    [JsonProperty("LogoPath")]
+    [JsonPropertyName("LogoPath")]
     public Uri LogoPath { get; set; }
 
     // ***** App specific members *****
@@ -59,6 +59,7 @@ public class Breach : BindableBase
     private bool isSelected;
     private bool isNew;
 
+    [JsonIgnore]
     public bool IsSelected
     {
         get => isSelected;
@@ -71,6 +72,7 @@ public class Breach : BindableBase
         set => SetProperty(ref isNew, value);
     }
 
+    [JsonIgnore]
     public string Id => Title;
 
     public override bool Equals(object obj)
