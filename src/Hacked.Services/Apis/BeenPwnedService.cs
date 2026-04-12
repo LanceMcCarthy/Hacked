@@ -2,12 +2,12 @@
 using Hacked.Core.Common;
 using Hacked.Core.Models;
 using Hacked.Services.Interfaces;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Hacked.Services.Apis;
@@ -15,6 +15,11 @@ namespace Hacked.Services.Apis;
 public class BeenPwnedService : IPwndBreachService, IDisposable
 {
     private readonly HttpClient client;
+
+    private static readonly JsonSerializerOptions s_jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     public BeenPwnedService(HttpClientHandler handler = null)
     {
@@ -64,7 +69,7 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
                 //200 = (GOOD response type, list of breaches available in body)
                 case HttpStatusCode.OK:
                     var json = await response.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
+                    return JsonSerializer.Deserialize<ObservableCollection<Breach>>(json, s_jsonOptions);
                 //400
                 case HttpStatusCode.BadRequest:
                     throw new PwnedApiException("Bad request — the account does not comply with an acceptable format (i.e. it's an empty string)") { StatusCode = response.StatusCode };
@@ -123,7 +128,7 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
                 case HttpStatusCode.OK:
                     var json = await response.Content.ReadAsStringAsync();
 
-                    return JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
+                    return JsonSerializer.Deserialize<ObservableCollection<Breach>>(json, s_jsonOptions);
                 //400
                 case HttpStatusCode.BadRequest:
                     throw new PwnedApiException("Bad request — the account does not comply with an acceptable format (i.e. it's an empty string)") { StatusCode = response.StatusCode };
@@ -157,7 +162,7 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
     }
 
     /// <summary>
-    /// A "data class" is an attribute of a record compromised in a breach. 
+    /// A "data class" is an attribute of a record compromised in a breach.
     /// For example, many breaches expose data classes such as "Email addresses" and "Passwords". 
     /// The values returned by this service are ordered alphabetically in a string array and will expand over time as new breaches expose previously unseen classes of data.
     /// </summary>
@@ -184,7 +189,7 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
                     // Getting DataClasses is a fast, but frequent operation. Make sure we're not intentionally overpowering the API (10 RPS)
                     await Task.Delay(TimeSpan.FromMilliseconds(500));
                     var json = await response.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<List<string>>(json);
+                    return JsonSerializer.Deserialize<List<string>>(json, s_jsonOptions);
                 //400
                 case HttpStatusCode.BadRequest:
                     throw new PwnedApiException("Bad request — the account does not comply with an acceptable format (i.e. it's an empty string)") { StatusCode = response.StatusCode };
@@ -246,7 +251,7 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
                 case HttpStatusCode.OK:
                     var json = await response.Content.ReadAsStringAsync();
 
-                    return JsonConvert.DeserializeObject<ObservableCollection<Breach>>(json);
+                    return JsonSerializer.Deserialize<ObservableCollection<Breach>>(json, s_jsonOptions);
                 //400
                 case HttpStatusCode.BadRequest:
                     throw new PwnedApiException("Bad request — the account does not comply with an acceptable format (i.e. it's an empty string)") { StatusCode = response.StatusCode };

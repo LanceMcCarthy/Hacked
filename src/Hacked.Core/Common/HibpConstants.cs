@@ -5,6 +5,7 @@ public static class HibpConstants
 {
     // HTTP Headers
     public const string HibpApiBaseAddress = "https://haveibeenpwned.com/api/v3/";
+    public const string PwnedPasswordsApiBaseAddress = "https://api.pwnedpasswords.com/";
     public const string HibpUserAgentKey = "User-Agent";
     public const string HibpUserAgentValue = "Hacked-for-Windows-Universal";
     public const string HibpApiHeaderKey = "hibp-api-key";
