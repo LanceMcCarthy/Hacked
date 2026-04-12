@@ -1,0 +1,67 @@
+<Page x:Class="Hacked.Views.BreachDetailsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:utu="using:Uno.Toolkit.UI"
+      mc:Ignorable="d"
+      Background="{ThemeResource BackgroundBrush}">
+  <Grid utu:SafeArea.Insets="VisibleBounds">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <utu:NavigationBar Content="{Binding Breach.Title}" Grid.Row="0">
+      <utu:NavigationBar.PrimaryCommands>
+        <AppBarButton Label="Visit Site"
+                      Command="{Binding OpenDomainCommand}">
+          <AppBarButton.Icon>
+            <SymbolIcon Symbol="Globe" />
+          </AppBarButton.Icon>
+        </AppBarButton>
+      </utu:NavigationBar.PrimaryCommands>
+    </utu:NavigationBar>
+
+    <ScrollViewer Grid.Row="1" Padding="16">
+      <StackPanel Spacing="12">
+        <Image Source="{Binding Breach.LogoPath}"
+               Height="64" Width="64"
+               HorizontalAlignment="Left"
+               Stretch="Uniform" />
+
+        <TextBlock Text="{Binding Breach.Title}" FontSize="22" FontWeight="Bold" />
+        <TextBlock Text="{Binding Breach.Domain}" FontSize="14" Opacity="0.7" />
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Breach Date:" FontWeight="SemiBold" />
+          <TextBlock Text="{Binding Breach.BreachDate}" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Accounts Affected:" FontWeight="SemiBold" />
+          <TextBlock Text="{Binding Breach.PwnCount}" />
+        </StackPanel>
+
+        <TextBlock Text="Description:" FontWeight="SemiBold" />
+        <TextBlock Text="{Binding Breach.Description}"
+                   TextWrapping="Wrap" />
+
+        <TextBlock Text="Data Exposed:" FontWeight="SemiBold" />
+        <ItemsControl ItemsSource="{Binding Breach.DataClasses}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding}" Margin="0,2" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,8,0,0">
+          <CheckBox Content="Verified" IsChecked="{Binding Breach.IsVerified}" IsEnabled="False" />
+          <CheckBox Content="Sensitive" IsChecked="{Binding Breach.IsSensitive}" IsEnabled="False" />
+          <CheckBox Content="Spam List" IsChecked="{Binding Breach.IsSpamList}" IsEnabled="False" />
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</Page>

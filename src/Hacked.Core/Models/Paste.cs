@@ -1,23 +1,24 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace Hacked.Core.Models;
 
 public class Paste
 {
-    [JsonProperty("Source")]
+    [JsonPropertyName("Source")]
     public string Source { get; set; }
 
-    [JsonProperty("Id")]
+    [JsonPropertyName("Id")]
     public string Id { get; set; }
 
-    [JsonProperty("Title", NullValueHandling = NullValueHandling.Ignore)]
+    [JsonPropertyName("Title")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string Title { get; set; }
 
-    [JsonProperty("Date")]
+    [JsonPropertyName("Date")]
     public DateTimeOffset Date { get; set; }
 
-    [JsonProperty("EmailCount")]
+    [JsonPropertyName("EmailCount")]
     public long EmailCount { get; set; }
 }
 

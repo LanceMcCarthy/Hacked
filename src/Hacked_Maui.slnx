@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Hacked.Core/Hacked.Core.csproj" />
+  <Project Path="Hacked.Maui/Hacked.Maui.csproj">
+    <Deploy />
+  </Project>
+  <Project Path="Hacked.Services/Hacked.Services.csproj" />
+</Solution>

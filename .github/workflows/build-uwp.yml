@@ -11,7 +11,7 @@ on:
       - '.github/workflows/build-uwp.yml'
 
 env:
-  SOLUTION_PATH: 'src/Hacked_Uwp.sln'
+  SOLUTION_PATH: 'src/Hacked_Uwp.slnx'
   Configuration: Debug
   TargetPlatform: x64
   BuildMode: CI

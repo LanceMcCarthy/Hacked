@@ -1,0 +1,66 @@
+<Page x:Class="Hacked.Views.SettingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:utu="using:Uno.Toolkit.UI"
+      xmlns:conv="using:Hacked.Converters"
+      mc:Ignorable="d"
+      Background="{ThemeResource BackgroundBrush}">
+  <Page.Resources>
+    <conv:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+  </Page.Resources>
+  <Grid utu:SafeArea.Insets="VisibleBounds">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <utu:NavigationBar Content="Settings" Grid.Row="0" />
+
+    <ScrollViewer Grid.Row="1">
+      <StackPanel Padding="20" Spacing="16">
+        <TextBlock Text="Data Management" FontWeight="Bold" FontSize="16" />
+
+        <Button Content="Export Account Backup"
+                Command="{Binding ExportAccountsCommand}"
+                HorizontalAlignment="Stretch" />
+
+        <TextBlock Text="{Binding ExportResult}"
+                   TextWrapping="Wrap"
+                   FontSize="12"
+                   Opacity="0.7" />
+
+        <TextBlock Text="Notifications" FontWeight="Bold" FontSize="16" Margin="0,8,0,0" />
+
+        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <ToggleSwitch Header="Enable Notifications"
+                        IsOn="{Binding NotificationsEnabled, Mode=TwoWay}" />
+          <TextBlock Text="● Active" FontSize="12" Foreground="Green" VerticalAlignment="Bottom" Margin="0,0,0,8"
+          Visibility="{Binding IsMonitoringActive, Converter={StaticResource BoolToVisibility}}" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Last background check:" FontSize="12" Opacity="0.7" />
+          <TextBlock Text="{Binding LastCheckTime}" FontSize="12" Opacity="0.7" />
+        </StackPanel>
+
+        <TextBlock Text="About" FontWeight="Bold" FontSize="16" Margin="0,8,0,0" />
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="App Version:" FontWeight="SemiBold" />
+          <TextBlock Text="{Binding AppVersion}" />
+        </StackPanel>
+
+        <Button Content="Visit HaveIBeenPwned.com"
+                Command="{Binding OpenHibpWebsiteCommand}"
+                HorizontalAlignment="Stretch" />
+
+        <TextBlock Text="This app uses the HaveIBeenPwned API to check if your accounts have been compromised in data breaches."
+                   TextWrapping="Wrap"
+                   FontSize="12"
+                   Opacity="0.7" />
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</Page>
