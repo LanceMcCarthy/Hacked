@@ -24,8 +24,12 @@ env:
 jobs:
   # ── macOS / macCatalyst ────────────────────────────────────────────────────
   build-macos:
-    name: macOS package (net9.0-maccatalyst)
+    name: macOS package (${{matrix.runtime}})
     runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [maccatalyst-x64, maccatalyst-arm64]
     env:
       TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
     steps:
@@ -53,6 +57,7 @@ jobs:
           dotnet restore src/Hacked.Uno/Hacked/Hacked.csproj
           --no-dependencies
           -p:TargetFramework=${{env.MACCATALYST_TFM}}
+          -r ${{matrix.runtime}}
           --configfile ${{env.NUGET_CONFIG}}
           --nologo
 
@@ -61,7 +66,7 @@ jobs:
           dotnet publish src/Hacked.Uno/Hacked/Hacked.csproj
           -c ${{env.BLD_CONFIG}}
           -f ${{env.MACCATALYST_TFM}}
-          -p:RuntimeIdentifier=maccatalyst-x64
+          -r ${{matrix.runtime}}
           -p:CodesignKey=""
           -p:CodesignProvision=""
           --no-restore
@@ -70,18 +75,18 @@ jobs:
       - name: Locate .app bundle
         id: find_app
         run: |
-          APP=$(find src/Hacked.Uno/Hacked/bin/Release/net9.0-maccatalyst -name "*.app" -maxdepth 3 | head -1)
+          APP=$(find src/Hacked.Uno/Hacked/bin/Release/net9.0-maccatalyst/${{matrix.runtime}} -name "*.app" -maxdepth 3 | head -1)
           echo "app_path=$APP" >> $GITHUB_OUTPUT
           echo "Found: $APP"
 
       - name: Zip .app for download
         run: |
           cd "$(dirname "${{steps.find_app.outputs.app_path}}")"
-          zip -r Hacked-macOS.zip "$(basename "${{steps.find_app.outputs.app_path}}")"
+          zip -r Hacked-macOS-${{matrix.runtime}}.zip "$(basename "${{steps.find_app.outputs.app_path}}")"
 
       - name: Upload macOS artifact
         uses: actions/upload-artifact@v4
         with:
-          name: hacked-macos
-          path: src/Hacked.Uno/Hacked/bin/Release/net9.0-maccatalyst/**/Hacked-macOS.zip
+          name: hacked-macos-${{matrix.runtime}}
+          path: src/Hacked.Uno/Hacked/bin/Release/net9.0-maccatalyst/${{matrix.runtime}}/**/Hacked-macOS-${{matrix.runtime}}.zip
           retention-days: 14
