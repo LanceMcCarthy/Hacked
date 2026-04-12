@@ -1,9 +1,10 @@
-﻿using CommonHelpers.Extensions;
-using Hacked.Core.Common;
+﻿using Hacked.Core.Common;
 using Hacked.Services.Interfaces;
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Hacked.Services.Apis;
@@ -29,8 +30,10 @@ public class PwnedPasswordService : IPwndPasswordService, IDisposable
 
     public async Task<string> CheckPasswordAsync(string password)
     {
-        // HIBP k-anonymity model: hash with SHA-1, send only first 5 chars, compare suffixes in response
-        var hashedPassword = password.Hash().ToUpperInvariant();
+        // HIBP k-anonymity model: compute hex SHA-1, send only first 5 chars, compare suffixes in response
+        using var sha1 = SHA1.Create();
+        var hashBytes = sha1.ComputeHash(Encoding.UTF8.GetBytes(password));
+        var hashedPassword = BitConverter.ToString(hashBytes).Replace("-", "").ToUpperInvariant();
         var hashPrefix = hashedPassword.Substring(0, 5);
         var hashSuffix = hashedPassword.Substring(5);
 
