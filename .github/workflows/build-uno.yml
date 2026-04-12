@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'src/Uno/**'
+      - 'src/Hacked.Uno/**'
       - 'src/Hacked.Core/**'
       - 'src/Hacked.Services/**'
       - '.github/workflows/build-uno.yml'
@@ -13,7 +13,7 @@ on:
     branches:
       - main
     paths:
-      - 'src/Uno/**'
+      - 'src/Hacked.Uno/**'
       - 'src/Hacked.Core/**'
       - 'src/Hacked.Services/**'
       - '.github/workflows/build-uno.yml'
@@ -53,21 +53,21 @@ jobs:
 
       - name: Restore Hacked (Windows TFM only)
         run: >
-          dotnet restore src/Uno/Hacked/Hacked.csproj
+          dotnet restore src/Hacked.Uno/Hacked/Hacked.csproj
           --no-dependencies
           -p:TargetFramework=net9.0-windows10.0.19041
           --configfile ${{env.NUGET_CONFIG}}
           --nologo
 
       - name: Build
-        run: dotnet build src/Uno/Hacked/Hacked.csproj -c ${{env.BLD_CONFIG}} -f ${{env.WINDOWS_TFM}} --no-restore --nologo
+        run: dotnet build src/Hacked.Uno/Hacked/Hacked.csproj -c ${{env.BLD_CONFIG}} -f ${{env.WINDOWS_TFM}} --no-restore --nologo
 
       - name: Restore tests
-        run: dotnet restore src/Uno/Hacked.Tests/Hacked.Tests.csproj --configfile ${{env.NUGET_CONFIG}} --nologo
+        run: dotnet restore src/Hacked.Uno/Hacked.Tests/Hacked.Tests.csproj --configfile ${{env.NUGET_CONFIG}} --nologo
 
       - name: Unit Tests
         run: >
-          dotnet test src/Uno/Hacked.Tests/Hacked.Tests.csproj
+          dotnet test src/Hacked.Uno/Hacked.Tests/Hacked.Tests.csproj
           -c Release
           --no-restore
           --nologo
@@ -112,25 +112,25 @@ jobs:
 
       - name: Restore Hacked (iOS TFM only)
         run: >
-          dotnet restore src/Uno/Hacked/Hacked.csproj
+          dotnet restore src/Hacked.Uno/Hacked/Hacked.csproj
           --no-dependencies
           -p:TargetFramework=${{env.IOS_TFM}}
           --configfile ${{env.NUGET_CONFIG}}
           --nologo
 
       - name: Build iOS
-        run: dotnet build src/Uno/Hacked/Hacked.csproj -c ${{env.BLD_CONFIG}} -f ${{env.IOS_TFM}} --no-restore --nologo
+        run: dotnet build src/Hacked.Uno/Hacked/Hacked.csproj -c ${{env.BLD_CONFIG}} -f ${{env.IOS_TFM}} --no-restore --nologo
 
       - name: Restore Hacked (macCatalyst TFM only)
         run: >
-          dotnet restore src/Uno/Hacked/Hacked.csproj
+          dotnet restore src/Hacked.Uno/Hacked/Hacked.csproj
           --no-dependencies
           -p:TargetFramework=${{env.MACCATALYST_TFM}}
           --configfile ${{env.NUGET_CONFIG}}
           --nologo
 
       - name: Build macCatalyst
-        run: dotnet build src/Uno/Hacked/Hacked.csproj -c ${{env.BLD_CONFIG}} -f ${{env.MACCATALYST_TFM}} --no-restore --nologo
+        run: dotnet build src/Hacked.Uno/Hacked/Hacked.csproj -c ${{env.BLD_CONFIG}} -f ${{env.MACCATALYST_TFM}} --no-restore --nologo
 
   # ── Mobile / Android ───────────────────────────────────────────────────────
   # Builds the Android target on a Linux runner.
@@ -157,12 +157,12 @@ jobs:
 
       - name: Restore Hacked (Android TFM only)
         run: >
-          dotnet restore src/Uno/Hacked/Hacked.csproj
+          dotnet restore src/Hacked.Uno/Hacked/Hacked.csproj
           --no-dependencies
           -p:TargetFramework=net9.0-android
           --configfile ${{env.NUGET_CONFIG}}
           --nologo
 
       - name: Build Android
-        run: dotnet build src/Uno/Hacked/Hacked.csproj -c ${{env.BLD_CONFIG}} -f ${{env.ANDROID_TFM}} --no-restore --nologo
+        run: dotnet build src/Hacked.Uno/Hacked/Hacked.csproj -c ${{env.BLD_CONFIG}} -f ${{env.ANDROID_TFM}} --no-restore --nologo
 

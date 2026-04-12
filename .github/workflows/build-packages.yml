@@ -38,7 +38,7 @@ jobs:
 
       - name: Restore Hacked (macCatalyst TFM only)
         run: >
-          dotnet restore src/Uno/Hacked/Hacked.csproj
+          dotnet restore src/Hacked.Uno/Hacked/Hacked.csproj
           --no-dependencies
           -p:TargetFramework=${{ env.MACCATALYST_TFM }}
           --configfile ${{ env.NUGET_CONFIG }}
@@ -46,7 +46,7 @@ jobs:
 
       - name: Publish macCatalyst
         run: >
-          dotnet publish src/Uno/Hacked/Hacked.csproj
+          dotnet publish src/Hacked.Uno/Hacked/Hacked.csproj
           -c ${{ env.BLD_CONFIG }}
           -f ${{ env.MACCATALYST_TFM }}
           -p:RuntimeIdentifier=maccatalyst-x64
@@ -58,7 +58,7 @@ jobs:
       - name: Locate .app bundle
         id: find_app
         run: |
-          APP=$(find src/Uno/Hacked/bin/Release/net9.0-maccatalyst -name "*.app" -maxdepth 3 | head -1)
+          APP=$(find src/Hacked.Uno/Hacked/bin/Release/net9.0-maccatalyst -name "*.app" -maxdepth 3 | head -1)
           echo "app_path=$APP" >> $GITHUB_OUTPUT
           echo "Found: $APP"
 
@@ -71,5 +71,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: hacked-macos
-          path: src/Uno/Hacked/bin/Release/net9.0-maccatalyst/**/Hacked-macOS.zip
+          path: src/Hacked.Uno/Hacked/bin/Release/net9.0-maccatalyst/**/Hacked-macOS.zip
           retention-days: 14
