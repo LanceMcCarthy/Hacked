@@ -41,7 +41,10 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore
-        run: dotnet restore src/Uno/Hacked/Hacked.csproj -p:TargetFramework=net9.0 --configfile ${{ env.NUGET_CONFIG }} --nologo
+        run: |
+          dotnet restore src/Hacked.Core/Hacked.Core.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
+          dotnet restore src/Hacked.Services/Hacked.Services.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
+          dotnet restore src/Uno/Hacked/Hacked.csproj -p:TargetFramework=net9.0 --configfile ${{ env.NUGET_CONFIG }} --nologo
 
       - name: Build
         run: dotnet build src/Uno/Hacked/Hacked.csproj -c Debug -f net9.0 --no-restore --nologo
@@ -60,7 +63,10 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: Restore
-        run: dotnet restore src/Uno/Hacked/Hacked.csproj -p:TargetFramework=net9.0-windows10.0.19041 --configfile ${{ env.NUGET_CONFIG }} --nologo
+        run: |
+          dotnet restore src/Hacked.Core/Hacked.Core.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
+          dotnet restore src/Hacked.Services/Hacked.Services.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
+          dotnet restore src/Uno/Hacked/Hacked.csproj -p:TargetFramework=net9.0-windows10.0.19041 --configfile ${{ env.NUGET_CONFIG }} --nologo
 
       - name: Build
         run: dotnet build src/Uno/Hacked/Hacked.csproj -c Debug -f net9.0-windows10.0.19041 --no-restore --nologo
