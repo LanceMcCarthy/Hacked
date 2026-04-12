@@ -15,7 +15,7 @@
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
     <!-- Package Publisher -->
-    <ApplicationPublisher>CN=Lance McCarthy, O=Lance McCarthy, L=Revere, S=Massachusetts, C=US</ApplicationPublisher>
+    <ApplicationPublisher>Lancelot Software, LLC</ApplicationPublisher>
     <!-- Package Description -->
     <Description>Hacked powered by Uno Platform.</Description>
     <!--

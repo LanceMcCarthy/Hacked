@@ -5,7 +5,9 @@
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap rescap">
 
-  <Identity />
+  <Identity Name="com.LancelotSoftware.Hacked"
+            Publisher='CN="Lancelot Software, LLC", O="Lancelot Software, LLC", L=NORTH BILLERICA, S=Massachusetts, C=US'
+            Version="1.0.0.1" />
   <Properties />
 
   <Dependencies>
