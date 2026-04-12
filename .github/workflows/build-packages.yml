@@ -22,10 +22,27 @@ env:
   ANDROID_TFM: 'net9.0-android'
 
 jobs:
+  shared-resources:
+    name: Create Shared Resources
+    runs-on: windows-latest
+    outputs:
+      app_version: ${{steps.version-creator.outputs.app_version}}
+    steps:
+    # Generates a version number using year.monthday.run_number.0 (e.g., 2024.824.1.0)
+    - name: Generate version number using date and run number
+      id: version-creator
+      run: |
+        $buildDay = Get-Date -Format "yyyy.Mdd"
+        $runNumber = "$env:GITHUB_RUN_NUMBER"
+        $ver = $buildDay + "." + $runNumber + ".0"
+        echo "app_version=$ver" >> $env:GITHUB_OUTPUT
+  
   # ── macOS / macCatalyst ────────────────────────────────────────────────────
   build-macos:
     name: macOS package (${{matrix.runtime}})
     runs-on: macos-latest
+    needs: shared-resources
+    if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
     strategy:
       fail-fast: false
       matrix:
@@ -67,6 +84,8 @@ jobs:
           -c ${{env.BLD_CONFIG}}
           -f ${{env.MACCATALYST_TFM}}
           -r ${{matrix.runtime}}
+          -p:Version=${{needs.shared-resources.outputs.app_version}}
+          -p:ApplicationDisplayVersion=${{needs.shared-resources.outputs.app_version}}
           -p:CodesignKey=""
           -p:CodesignProvision=""
           --no-restore
@@ -82,11 +101,75 @@ jobs:
       - name: Zip .app for download
         run: |
           cd "$(dirname "${{steps.find_app.outputs.app_path}}")"
-          zip -r Hacked-macOS-${{matrix.runtime}}.zip "$(basename "${{steps.find_app.outputs.app_path}}")"
+          zip -r Hacked-macOS-${{needs.shared-resources.outputs.app_version}}-${{matrix.runtime}}.zip "$(basename "${{steps.find_app.outputs.app_path}}")"
 
       - name: Upload macOS artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: hacked-macos-${{matrix.runtime}}
-          path: src/Hacked.Uno/Hacked/bin/Release/net9.0-maccatalyst/${{matrix.runtime}}/**/Hacked-macOS-${{matrix.runtime}}.zip
+          name: hacked-macos-${{needs.shared-resources.outputs.app_version}}-${{matrix.runtime}}
+          path: src/Hacked.Uno/Hacked/bin/Release/net9.0-maccatalyst/${{matrix.runtime}}/**/Hacked-macOS-${{needs.shared-resources.outputs.app_version}}-${{matrix.runtime}}.zip
           retention-days: 14
+
+  create-preview-release:
+    name: Create Preview Release
+    runs-on: ubuntu-latest
+    needs:
+      - shared-resources
+      - build-macos
+    if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hacked-macos-${{needs.shared-resources.outputs.app_version}}-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Create install README
+        run: |
+          cat << 'EOF' > release-assets/README-macOS-install.txt
+          Hacked macOS Preview Installation
+
+          1. Download the ZIP matching your Mac architecture:
+             - maccatalyst-arm64 for Apple Silicon (M1/M2/M3)
+             - maccatalyst-x64 for Intel Macs
+
+           2. Open the ZIP and drag Hacked.app to /Applications.
+
+           3. Remove the quarantine attribute (internet download flag):
+             xattr -dr com.apple.quarantine /Applications/Hacked.app
+
+           4. First launch (unsigned preview build):
+             - Right-click Hacked.app and select Open.
+             - Click Open again in the warning dialog.
+
+           5. If macOS blocks launch, open System Settings > Privacy & Security,
+             then allow the app and launch again.
+          EOF
+
+      - name: Create preview release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: preview-v${{needs.shared-resources.outputs.app_version}}
+          name: Hacked Preview v${{needs.shared-resources.outputs.app_version}}
+          prerelease: true
+          draft: false
+          generate_release_notes: false
+          body: |
+            Preview macOS package build for Hacked.
+
+            Included artifacts:
+            - macCatalyst arm64 package
+            - macCatalyst x64 package
+
+            Install quick steps:
+            1. Download the ZIP for your CPU architecture and copy Hacked.app to /Applications.
+            2. Remove the internet quarantine flag:
+               `xattr -dr com.apple.quarantine /Applications/Hacked.app`
+            3. Launch the app (right-click > Open on first launch if prompted).
+
+            See README-macOS-install.txt in release assets for full install steps.
+          files: |
+            release-assets/*.zip
+            release-assets/README-macOS-install.txt
