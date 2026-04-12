@@ -46,6 +46,12 @@ public partial class App : Application
                     services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
                     services.AddSingleton<IAccountsService, AccountsService>();
                     services.AddSingleton<ISettingsService, SettingsService>();
+
+                    // Background monitoring + notifications
+                    services.AddSingleton<INotificationService, NotificationService>();
+                    services.AddSingleton<BackgroundMonitorService>();
+                    services.AddSingleton<IBackgroundMonitorService>(sp => sp.GetRequiredService<BackgroundMonitorService>());
+                    services.AddHostedService(sp => sp.GetRequiredService<BackgroundMonitorService>());
                 })
                 .UseNavigation(RegisterRoutes)
             );
