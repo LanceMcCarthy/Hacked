@@ -2,5 +2,5 @@ namespace Hacked.Services;
 
 public interface INotificationService
 {
-    void ShowBreachNotification(string accountAddress, int newBreachCount);
+    Task ShowBreachNotificationAsync(string accountAddress, int newBreachCount);
 }

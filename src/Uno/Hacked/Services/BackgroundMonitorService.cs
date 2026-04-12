@@ -133,7 +133,7 @@ public class BackgroundMonitorService : IBackgroundMonitorService, IHostedServic
 
             if (newCount > 0 && _settingsService.NotificationsEnabled)
             {
-                _notificationService.ShowBreachNotification(account.Address, newCount);
+                await _notificationService.ShowBreachNotificationAsync(account.Address, newCount).ConfigureAwait(false);
             }
         }
         catch (Exception ex)
