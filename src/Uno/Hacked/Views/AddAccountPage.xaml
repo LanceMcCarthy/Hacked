@@ -1,0 +1,45 @@
+<Page x:Class="Hacked.Views.AddAccountPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:utu="using:Uno.Toolkit.UI"
+      mc:Ignorable="d"
+      Background="{ThemeResource BackgroundBrush}">
+  <Page.Resources>
+    <utu:BoolToVisibilityConverter x:Key="BoolToVisibility" />
+  </Page.Resources>
+
+  <Grid utu:SafeArea.Insets="VisibleBounds">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <utu:NavigationBar Content="Add Account" Grid.Row="0" />
+
+    <StackPanel Grid.Row="1" Padding="20" Spacing="16">
+      <TextBlock Text="Enter an email address to check for data breaches."
+                 TextWrapping="Wrap" />
+
+      <TextBox Header="Email Address"
+               Text="{Binding EmailAddress, Mode=TwoWay}"
+               PlaceholderText="you@example.com"
+               InputScope="EmailSmtpAddress" />
+
+      <Button Content="Check &amp; Add"
+              Command="{Binding AddAccountCommand}"
+              HorizontalAlignment="Stretch"
+              IsEnabled="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+
+      <TextBlock Text="{Binding StatusMessage}"
+                 TextWrapping="Wrap"
+                 Foreground="{ThemeResource ErrorBrush}" />
+
+      <ProgressRing IsActive="{Binding IsBusy}"
+                    Width="40" Height="40"
+                    HorizontalAlignment="Center"
+                    Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibility}}" />
+    </StackPanel>
+  </Grid>
+</Page>

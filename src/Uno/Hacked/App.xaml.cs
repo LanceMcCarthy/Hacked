@@ -1,3 +1,4 @@
+using Hacked.Services;
 using Hacked.Services.Apis;
 using Hacked.Services.Interfaces;
 using Hacked.ViewModels;
@@ -43,6 +44,7 @@ public partial class App : Application
                     services.AddSingleton<IPwndBreachService, BeenPwnedService>();
                     services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
                     services.AddSingleton<IAccountsService, AccountsService>();
+                    services.AddSingleton<ISettingsService, SettingsService>();
                 })
                 .UseNavigation(RegisterRoutes)
             );
@@ -59,11 +61,27 @@ public partial class App : Application
     private static void RegisterRoutes(IViewRegistry views, IRouteRegistry routes)
     {
         views.Register(
-            new ViewMap(ViewModel: typeof(ShellViewModel))
+            new ViewMap(ViewModel: typeof(ShellViewModel)),
+            new ViewMap<MonitoredAccountsPage, MonitoredAccountsViewModel>(),
+            new DataViewMap<AccountDetailsPage, AccountDetailsViewModel, MonitoredAccount>(),
+            new DataViewMap<BreachDetailsPage, BreachDetailsViewModel, Breach>(),
+            new ViewMap<AddAccountPage, AddAccountViewModel>(),
+            new ViewMap<PasswordCheckPage, PasswordCheckViewModel>(),
+            new ViewMap<SettingsPage, SettingsViewModel>()
         );
 
         routes.Register(
-            new RouteMap("", View: views.FindByViewModel<ShellViewModel>())
+            new RouteMap("", View: views.FindByViewModel<ShellViewModel>(),
+                Nested: new RouteMap[]
+                {
+                    new RouteMap("Accounts", View: views.FindByViewModel<MonitoredAccountsViewModel>(), IsDefault: true),
+                    new RouteMap("AddAccount", View: views.FindByViewModel<AddAccountViewModel>()),
+                    new RouteMap("AccountDetails", View: views.FindByViewModel<AccountDetailsViewModel>()),
+                    new RouteMap("BreachDetails", View: views.FindByViewModel<BreachDetailsViewModel>()),
+                    new RouteMap("PasswordCheck", View: views.FindByViewModel<PasswordCheckViewModel>()),
+                    new RouteMap("Settings", View: views.FindByViewModel<SettingsViewModel>()),
+                }
+            )
         );
     }
 }
