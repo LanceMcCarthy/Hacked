@@ -1,22 +1,22 @@
 name: Uno Smoke Test
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'src/Hacked.Uno/**'
-      - 'src/Hacked.Core/**'
-      - 'src/Hacked.Services/**'
-      - '.github/workflows/build-uno.yml'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'src/Hacked.Uno/**'
-      - 'src/Hacked.Core/**'
-      - 'src/Hacked.Services/**'
-      - '.github/workflows/build-uno.yml'
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'src/Hacked.Uno/**'
+  #     - 'src/Hacked.Core/**'
+  #     - 'src/Hacked.Services/**'
+  #     - '.github/workflows/build-uno.yml'
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'src/Hacked.Uno/**'
+  #     - 'src/Hacked.Core/**'
+  #     - 'src/Hacked.Services/**'
+  #     - '.github/workflows/build-uno.yml'
   workflow_dispatch:
 
 env:
