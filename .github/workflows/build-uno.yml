@@ -23,37 +23,16 @@ on:
 env:
   DOTNET_VERSION: '9.0.x'
   NUGET_CONFIG: 'src/nuget.config'
-  TELERIK_NUGET_KEY: ${{ secrets.TELERIK_NUGET_KEY }}
 
 jobs:
-  # Headless net9.0 target — validates all C# and XAML without any platform SDK.
-  # Runs on Linux for speed. Restore is scoped to net9.0 to avoid needing
-  # Android/iOS/macCatalyst workloads that are not installed on the runner.
-  build-headless:
-    name: Build · net9.0 (headless)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup .NET ${{ env.DOTNET_VERSION }}
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Restore
-        run: |
-          dotnet restore src/Hacked.Core/Hacked.Core.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
-          dotnet restore src/Hacked.Services/Hacked.Services.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
-          dotnet restore src/Uno/Hacked/Hacked.csproj -p:TargetFramework=net9.0 --configfile ${{ env.NUGET_CONFIG }} --nologo
-
-      - name: Build
-        run: dotnet build src/Uno/Hacked/Hacked.csproj -c Debug -f net9.0 --no-restore --nologo
-
-  # Windows-specific target — validates WinUI/WinAppSDK-specific code paths.
-  # Restore is scoped to net9.0-windows to avoid needing mobile workloads.
+  # ── Windows ────────────────────────────────────────────────────────────────
+  # Builds the WinUI target and runs unit tests.
+  # net9.0-windows needs no extra workloads on windows-latest.
   build-windows:
-    name: Build · net9.0-windows
+    name: Windows (net9.0-windows)
     runs-on: windows-latest
+    env:
+      TELERIK_NUGET_KEY: ${{ secrets.TELERIK_NUGET_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -62,33 +41,26 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Restore
+      - name: Restore shared libs
         run: |
           dotnet restore src/Hacked.Core/Hacked.Core.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
           dotnet restore src/Hacked.Services/Hacked.Services.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
-          dotnet restore src/Uno/Hacked/Hacked.csproj -p:TargetFramework=net9.0-windows10.0.19041 --configfile ${{ env.NUGET_CONFIG }} --nologo
+
+      - name: Restore Hacked (Windows TFM only)
+        run: >
+          dotnet restore src/Uno/Hacked/Hacked.csproj
+          --no-dependencies
+          -p:TargetFramework=net9.0-windows10.0.19041
+          --configfile ${{ env.NUGET_CONFIG }}
+          --nologo
 
       - name: Build
         run: dotnet build src/Uno/Hacked/Hacked.csproj -c Debug -f net9.0-windows10.0.19041 --no-restore --nologo
 
-  # Unit tests run on the fast net9.0 target — no platform SDK needed.
-  # The test project references only Hacked.Core and Hacked.Services directly.
-  unit-tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    needs: build-headless
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup .NET ${{ env.DOTNET_VERSION }}
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-
-      - name: Restore
+      - name: Restore tests
         run: dotnet restore src/Uno/Hacked.Tests/Hacked.Tests.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
 
-      - name: Test
+      - name: Unit Tests
         run: >
           dotnet test src/Uno/Hacked.Tests/Hacked.Tests.csproj
           -c Release
@@ -96,14 +68,92 @@ jobs:
           --nologo
           --logger GitHubActions
           --logger "trx;LogFileName=test-results.trx"
-          --collect:"XPlat Code Coverage"
-          --
-          DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-windows
           path: '**/*.trx'
+
+  # ── macOS ──────────────────────────────────────────────────────────────────
+  # Builds iOS and macCatalyst targets.
+  # Xcode is pre-installed on macos-latest; ios + maccatalyst workloads are
+  # installable only on macOS runners.
+  build-macos:
+    name: macOS (net9.0-ios / net9.0-maccatalyst)
+    runs-on: macos-latest
+    env:
+      TELERIK_NUGET_KEY: ${{ secrets.TELERIK_NUGET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install workloads
+        run: dotnet workload install ios maccatalyst --skip-sign-check
+
+      - name: Restore shared libs
+        run: |
+          dotnet restore src/Hacked.Core/Hacked.Core.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
+          dotnet restore src/Hacked.Services/Hacked.Services.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
+
+      - name: Restore Hacked (iOS TFM only)
+        run: >
+          dotnet restore src/Uno/Hacked/Hacked.csproj
+          --no-dependencies
+          -p:TargetFramework=net9.0-ios
+          --configfile ${{ env.NUGET_CONFIG }}
+          --nologo
+
+      - name: Build iOS
+        run: dotnet build src/Uno/Hacked/Hacked.csproj -c Debug -f net9.0-ios --no-restore --nologo
+
+      - name: Restore Hacked (macCatalyst TFM only)
+        run: >
+          dotnet restore src/Uno/Hacked/Hacked.csproj
+          --no-dependencies
+          -p:TargetFramework=net9.0-maccatalyst
+          --configfile ${{ env.NUGET_CONFIG }}
+          --nologo
+
+      - name: Build macCatalyst
+        run: dotnet build src/Uno/Hacked/Hacked.csproj -c Debug -f net9.0-maccatalyst --no-restore --nologo
+
+  # ── Mobile / Android ───────────────────────────────────────────────────────
+  # Builds the Android target on a Linux runner.
+  build-android:
+    name: Mobile (net9.0-android)
+    runs-on: ubuntu-latest
+    env:
+      TELERIK_NUGET_KEY: ${{ secrets.TELERIK_NUGET_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install workloads
+        run: dotnet workload install android --skip-sign-check
+
+      - name: Restore shared libs
+        run: |
+          dotnet restore src/Hacked.Core/Hacked.Core.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
+          dotnet restore src/Hacked.Services/Hacked.Services.csproj --configfile ${{ env.NUGET_CONFIG }} --nologo
+
+      - name: Restore Hacked (Android TFM only)
+        run: >
+          dotnet restore src/Uno/Hacked/Hacked.csproj
+          --no-dependencies
+          -p:TargetFramework=net9.0-android
+          --configfile ${{ env.NUGET_CONFIG }}
+          --nologo
+
+      - name: Build Android
+        run: dotnet build src/Uno/Hacked/Hacked.csproj -c Debug -f net9.0-android --no-restore --nologo
 
