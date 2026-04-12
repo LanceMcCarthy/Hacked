@@ -7,6 +7,7 @@ public partial class SettingsViewModel : ObservableObject
 {
     private readonly IAccountsService _accountsService;
     private readonly ISettingsService _settingsService;
+    private readonly IBackgroundMonitorService _backgroundMonitor;
 
     [ObservableProperty]
     private string _exportResult = string.Empty;
@@ -16,10 +17,20 @@ public partial class SettingsViewModel : ObservableObject
 
     public string AppVersion => "1.0";
 
-    public SettingsViewModel(IAccountsService accountsService, ISettingsService settingsService)
+    public bool IsMonitoringActive => _backgroundMonitor.IsMonitoring;
+
+    public string LastCheckTime => _settingsService.LastBackgroundCheck.HasValue
+        ? _settingsService.LastBackgroundCheck.Value.ToLocalTime().ToString("g")
+        : "Never";
+
+    public SettingsViewModel(
+        IAccountsService accountsService,
+        ISettingsService settingsService,
+        IBackgroundMonitorService backgroundMonitor)
     {
         _accountsService = accountsService;
         _settingsService = settingsService;
+        _backgroundMonitor = backgroundMonitor;
         _notificationsEnabled = _settingsService.NotificationsEnabled;
     }
 
