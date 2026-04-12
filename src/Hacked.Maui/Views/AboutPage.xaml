@@ -30,7 +30,7 @@
                         <Image.Source>
                             <FontImageSource FontFamily="Font Awesome 6 Free Regular" 
                                              Glyph="{x:Static res:IconFont.Gear}" 
-                                             Color="{StaticResource Primary}"
+                                             Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}"
                                              FontAutoScalingEnabled="True" 
                                              Size="72"/>
                         </Image.Source>
@@ -41,7 +41,7 @@
                         <Image.Source>
                             <FontImageSource FontFamily="Font Awesome 6 Free Regular" 
                                              Glyph="{x:Static res:IconFont.Gear}" 
-                                             Color="{StaticResource Complimentary1}" 
+                                             Color="{AppThemeBinding Light={StaticResource Complimentary1}, Dark={StaticResource Yellow200Accent}}" 
                                              FontAutoScalingEnabled="True" 
                                              Size="72"/>
                         </Image.Source>
@@ -50,7 +50,7 @@
                         <Image.Source>
                             <FontImageSource FontFamily="Font Awesome 6 Free Regular" 
                                              Glyph="{x:Static res:IconFont.Gear}" 
-                                             Color="{StaticResource Complimentary2}"
+                                             Color="{AppThemeBinding Light={StaticResource Complimentary2}, Dark={StaticResource Gray300}}"
                                              FontAutoScalingEnabled="True" 
                                              Size="72"/>
                         </Image.Source>

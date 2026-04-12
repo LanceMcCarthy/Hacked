@@ -32,8 +32,8 @@
             
             <HorizontalStackLayout Spacing="10">
                 <telerik:RadCheckBox IsChecked="{Binding RefreshDuringImport, Mode=TwoWay}"
-                                     CheckedColor="{StaticResource PrimaryHighContrast}"
-                                     CheckedSymbolColor="{StaticResource Secondary}"/>
+                                     CheckedColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray200}}"
+                                     CheckedSymbolColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray900}}"/>
                 <Label Text="Update breaches after import"
                        VerticalOptions="Center"
                        FontFamily="Raleway"/>
@@ -44,7 +44,7 @@
                                   IsBusy="{Binding IsBusy}"
                                   AnimationType="Animation3"
                                   BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
-                                  AnimationContentColor="{StaticResource Primary}" 
+                                  AnimationContentColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}" 
                                   Grid.RowSpan="2"
                                   Grid.Row="0"/>
     </Grid>

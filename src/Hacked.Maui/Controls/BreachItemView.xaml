@@ -7,7 +7,7 @@
              x:Class="Hacked.Maui.Controls.BreachItemView"
              x:DataType="models:Breach">
 
-    <telerik:RadBorder Background="{StaticResource Gray100}"
+       <telerik:RadBorder Background="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
                        Padding="5"
                        CornerRadius="5">
         <Grid ColumnDefinitions="Auto, *"
@@ -44,7 +44,7 @@
             </VerticalStackLayout>
 
             <Label Text="{x:Static res:IconFont.ExclamationTriangle}"
-                   TextColor="Red"
+                   TextColor="{AppThemeBinding Light=Red, Dark={StaticResource Yellow100Accent}}"
                    Style="{StaticResource FontAwesomeLabelStyle}"
                    IsVisible="{Binding IsNew}"
                    HorizontalOptions="End"

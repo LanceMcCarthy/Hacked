@@ -44,6 +44,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.51" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.5" />
 		<PackageReference Include="CommonHelpers" Version="1.5.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="Telerik.Licensing" Version="1.8.2" />
 		<PackageReference Include="Telerik.UI.for.Maui" Version="13.1.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
@@ -63,7 +64,7 @@
 	<PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst'))">
 		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
 		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
-		<RuntimeIdentifier>maccatalyst-x64</RuntimeIdentifier>
+		<RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<!-- Windows - Global Settings -->

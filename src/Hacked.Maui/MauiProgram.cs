@@ -46,7 +46,7 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<IPwndBreachService, BeenPwnedService>();
         builder.Services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
-        builder.Services.AddSingleton<IAccountsService, AccountsService>();
+        builder.Services.AddSingleton<IAccountsService, Hacked.Maui.Services.AccountsService>();
 
         builder.Services.AddSingleton<MonitoredAccountsViewModel>();
         builder.Services.AddTransient<AccountDetailsViewModel>();

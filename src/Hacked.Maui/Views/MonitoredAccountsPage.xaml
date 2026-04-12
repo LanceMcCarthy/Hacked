@@ -53,8 +53,8 @@
 
                                 <telerik:RadBusyIndicator IsBusy="{Binding IsUpdating}"
                                                           IsVisible="{Binding IsUpdating}"
-                                                          BackgroundColor="{StaticResource LightTranslucent}"
-                                                          AnimationContentColor="{StaticResource Primary}"
+                                                          BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
+                                                          AnimationContentColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}"
                                                           InputTransparent="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}"
                                                           HorizontalOptions="Fill"
                                                           VerticalOptions="Fill"
@@ -99,19 +99,19 @@
             </telerik:RadDataGrid.Columns>
             <telerik:RadDataGrid.RowDetailsTemplate>
                 <DataTemplate x:DataType="models:MonitoredAccount">
-                    <Grid BackgroundColor="{StaticResource Secondary}"
+                      <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray900}}"
                           ColumnDefinitions="Auto,*">
                         <VerticalStackLayout Spacing="5"
                                              Padding="10"
                                              HorizontalOptions="Start">
                             <Label Text="{Binding LastUpdated, StringFormat='Last Update: {0:g}'}"
-                                   TextColor="{StaticResource PrimaryHighContrast}" />
+                                TextColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
 
                             <HorizontalStackLayout Spacing="5">
                                 <Label Text="{Binding Breaches.Count, StringFormat='Breaches: {0}'}"
-                                       TextColor="{StaticResource PrimaryHighContrast}" />
+                                        TextColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
                                 <Label Text="{Binding NewBreachCount, StringFormat='({0} new)'}"
-                                       TextColor="{StaticResource PrimaryHighContrast}"
+                                        TextColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}"
                                        IsVisible="{Binding HasNewBreaches}" />
                             </HorizontalStackLayout>
 
@@ -120,13 +120,13 @@
                                                    VerticalOptions="End"
                                                    Margin="0,10,0,0">
                                 <telerik:RadButton BackgroundColor="{StaticResource Tertiary}"
-                                                   TextColor="{StaticResource PrimaryHighContrast}"
+                                                   TextColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}"
                                                    Text="more details..."
                                                    Command="{Binding BindingContext.ViewDetailsCommand, Source={x:Reference ThisPage}}"
                                                    CommandParameter="{Binding}"
                                                    CornerRadius="5" />
                                 <telerik:RadButton BackgroundColor="{StaticResource Complimentary1}"
-                                                   TextColor="{StaticResource PrimaryHighContrast}"
+                                                   TextColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray900}}"
                                                    Text="clear new"
                                                    Command="{Binding BindingContext.ClearNewBreachesCommand, Source={x:Reference ThisPage}}"
                                                    CommandParameter="{Binding}"
@@ -148,7 +148,7 @@
                             <telerik:RadListView.ItemTemplate>
                                 <DataTemplate x:DataType="models:Breach">
                                     <telerik:ListViewTemplateCell>
-                                        <telerik:RadBorder Background="{StaticResource White}"
+                                        <telerik:RadBorder Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
                                                            Padding="5"
                                                            CornerRadius="5"
                                                            HeightRequest="100">
@@ -172,7 +172,7 @@
                                                 </VerticalStackLayout>
 
                                                 <Label Text="{x:Static res:IconFont.ExclamationTriangle}"
-                                                       TextColor="{StaticResource Complimentary1}"
+                                                          TextColor="{AppThemeBinding Light={StaticResource Complimentary1}, Dark={StaticResource Yellow100Accent}}"
                                                        Style="{StaticResource FontAwesomeLabelStyle}"
                                                        IsVisible="{Binding IsNew}"
                                                        HorizontalOptions="End"
@@ -222,7 +222,7 @@
                     <Label Text="Account(s) to monitor:"
                            HorizontalOptions="Start"
                            FontAttributes="Bold"
-                           TextColor="{StaticResource Primary}"
+                              TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}"
                            Grid.Row="0"/>
 
                     <telerik:RadCollectionView x:Name="PendingAccountsView"
@@ -241,15 +241,17 @@
                                                       Placeholder="enter email/username/phone..."
                                                       Text="{Binding Address, Mode=TwoWay}"
                                                       HorizontalOptions="Start"
-                                                      BackgroundColor="{AppThemeBinding Light={StaticResource WhiteBrush}, Dark={StaticResource BlackBrush}}" 
+                                                      BackgroundColor="{AppThemeBinding Light={StaticResource WhiteBrush}, Dark={StaticResource BlackBrush}}"
+                                                      TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
+                                                      PlaceholderColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
                                                       telerik:EntryExtensions.CompletedCommand="{Binding BindingContext.AddPendingItemCommand, Source={x:Reference ThisPage}}"
                                                       commhelpers:FocusElementHelper.IsFocused="{Binding IsFocused, Mode=TwoWay}"/>
                                     <telerik:RadButton Text="-"
                                                        Command="{Binding BindingContext.RemovePendingItemCommand, Source={x:Reference ThisPage}}"
                                                        CommandParameter="{Binding}"
-                                                       TextColor="{StaticResource Primary}"
-                                                       BorderColor="{StaticResource Primary}"
-                                                       BackgroundColor="{StaticResource Secondary}"
+                                                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}"
+                                                       BorderColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}"
+                                                       BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray600}}"
                                                        BorderThickness="1"
                                                        WidthRequest="25"
                                                        HeightRequest="25"
@@ -265,9 +267,9 @@
                     <telerik:RadButton x:Name="AddNewRowButton"
                                        Text="+"
                                        Command="{Binding BindingContext.AddPendingItemCommand, Source={x:Reference ThisPage}}"
-                                       TextColor="{StaticResource Primary}"
-                                       BorderColor="{StaticResource Primary}"
-                                       BackgroundColor="{StaticResource Secondary}"
+                                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}"
+                                       BorderColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}"
+                                       BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray600}}"
                                        WidthRequest="25"
                                        HeightRequest="25"
                                        BorderThickness="1"

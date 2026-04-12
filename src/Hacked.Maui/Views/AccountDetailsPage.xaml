@@ -23,7 +23,7 @@
     </views:PageBase.Resources>
 
     <Grid RowDefinitions="Auto,*">
-        <Grid BackgroundColor="{StaticResource Secondary}">
+        <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray900}}">
             <!--<controls:ImageCollage AssociatedAccount="{Binding SelectedAccount}"
                                    Margin="5"/>-->
             
@@ -34,13 +34,13 @@
                        FontAttributes="Bold"
                        HorizontalOptions="Center"
                        FontSize="22"
-                       TextColor="{StaticResource Primary}"/>
+                      TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}"/>
                 <Label Text="{Binding SelectedAccount.Breaches.Count, StringFormat='Breach Count: {0}'}"
-                       TextColor="{StaticResource Primary}"
+                      TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}"
                        HorizontalOptions="Center" 
                        FontSize="16"/>
                 <Label Text="{Binding SelectedAccount.LastUpdated, StringFormat='Last Updated: {0:g}'}"
-                       TextColor="{StaticResource Primary}"
+                      TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}"
                        HorizontalOptions="Center" 
                        FontSize="12"/>
             </VerticalStackLayout>
@@ -100,7 +100,7 @@
                                   IsBusy="{Binding SelectedAccount.IsUpdating}"
                                   AnimationType="Animation3"
                                   BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
-                                  AnimationContentColor="{StaticResource Primary}" 
+                                  AnimationContentColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}" 
                                   Grid.RowSpan="2"/>
     </Grid>
 </views:PageBase>
