@@ -2,12 +2,8 @@ name: TruffleHog
 
 on:
   workflow_dispatch:
-  push:
-    - main
   pull_request:
     types: [opened, synchronize]
-#  schedule:
-#    - cron: "0 2 * * 1-5"
 
 jobs:
   scan:
