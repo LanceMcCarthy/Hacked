@@ -15,6 +15,78 @@
                 android:Application.WindowSoftInputModeAdjust="Resize"
                 x:Name="ThisPage">
 
+            <views:PageBase.Resources>
+            <Style x:Key="MonitoredAccountsGridHeaderStyle"
+                   TargetType="telerik:DataGridColumnHeaderAppearance">
+                <Setter Property="BackgroundColor"
+                    Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}" />
+                <Setter Property="HoverBackgroundColor"
+                    Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
+                <Setter Property="TextColor"
+                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
+                <Setter Property="BorderColor"
+                    Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}" />
+                <Setter Property="SortIndicatorColor"
+                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray200}}" />
+                <Setter Property="IndicatorColor"
+                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray200}}" />
+                <Setter Property="FilterIndicatorTextColor"
+                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray200}}" />
+                <Setter Property="FilterIndicatorActiveTextColor"
+                    Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Yellow100Accent}}" />
+            </Style>
+
+            <Style x:Key="MonitoredAccountsGroupHeaderStyle"
+                   TargetType="telerik:DataGridGroupHeaderAppearance">
+                <Setter Property="BackgroundColor"
+                    Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}" />
+                <Setter Property="BorderColor"
+                    Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}" />
+                <Setter Property="TextColor"
+                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
+                <Setter Property="AggregatesTextColor"
+                    Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
+                <Setter Property="ButtonTextColor"
+                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray200}}" />
+            </Style>
+
+            <Style x:Key="MonitoredAccountsGridTextCellStyle"
+                   TargetType="telerik:DataGridTextCellAppearance">
+                <Setter Property="TextColor"
+                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
+                <Setter Property="SelectedTextColor"
+                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
+                <Setter Property="HoverTextColor"
+                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource PrimaryHighContrast}}" />
+            </Style>
+
+            <Style x:Key="MonitoredAccountsGridToggleStyle"
+                   TargetType="telerik:DataGridToggleRowDetailsCellAppearance">
+                <Setter Property="ButtonTextColor"
+                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
+                <Setter Property="SelectedButtonTextColor"
+                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
+                <Setter Property="HoverButtonTextColor"
+                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource PrimaryHighContrast}}" />
+            </Style>
+
+            <Style x:Key="MonitoredAccountsGridRowStyle"
+                   TargetType="telerik:DataGridRowBackgroundAppearance">
+                <Setter Property="BackgroundColor"
+                    Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" />
+                <Setter Property="BorderColor"
+                    Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
+            </Style>
+
+            <Style x:Key="MonitoredAccountsGridAlternateRowStyle"
+                   TargetType="telerik:DataGridRowBackgroundAppearance">
+                <Setter Property="BackgroundColor"
+                    Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}" />
+                <Setter Property="BorderColor"
+                    Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
+            </Style>
+            </views:PageBase.Resources>
+
     <Grid RowDefinitions="*, Auto">
         <telerik:RadDataGrid x:Name="MonitoredAccountDataGrid"
                              ItemsSource="{Binding Accounts}"
@@ -22,14 +94,19 @@
                              SelectedItem="{Binding SelectedAccount}"
                              AutoGenerateColumns="False"
                              ShowColumnFooters="True"
+                             RowBackgroundStyle="{StaticResource MonitoredAccountsGridRowStyle}"
+                             AlternateRowBackgroundStyle="{StaticResource MonitoredAccountsGridAlternateRowStyle}"
+                             GridLinesColor="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
+                             BorderBrush="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
                              Loaded="MonitoredAccountDataGrid_OnLoaded">
             <telerik:RadDataGrid.Commands>
                 <commands:CustomDataGridCommand Id="CellTap"
                                                 Command="{Binding CellTapCommand}" />
             </telerik:RadDataGrid.Commands>
             <telerik:RadDataGrid.Columns>
-                <telerik:DataGridToggleRowDetailsColumn />
+                <telerik:DataGridToggleRowDetailsColumn CellContentStyle="{StaticResource MonitoredAccountsGridToggleStyle}" />
                 <telerik:DataGridTemplateColumn HeaderText="Options"
+                                HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
                                                 SizeMode="Auto">
                     <telerik:DataGridTemplateColumn.CellContentTemplate>
                         <DataTemplate x:DataType="models:MonitoredAccount">
@@ -66,6 +143,8 @@
                 </telerik:DataGridTemplateColumn>
                 <telerik:DataGridTextColumn x:Name="AddressColumn"
                                             PropertyName="Address"
+                                            HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                            CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                             HeaderText="Account">
                     <telerik:DataGridTextColumn.AggregateDescriptors>
                         <telerik:PropertyAggregateDescriptor PropertyName="Address"
@@ -75,6 +154,8 @@
                 </telerik:DataGridTextColumn>
                 <telerik:DataGridTextColumn x:Name="BreachCountColumn"
                                             PropertyName="Breaches.Count"
+                                            HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                            CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                             HeaderText="Breaches">
                     <!-- Workaround in DataGrid.Loaded event
                     <telerik:DataGridTextColumn.AggregateDescriptors>
@@ -84,11 +165,17 @@
                     </telerik:DataGridTextColumn.AggregateDescriptors>-->
                 </telerik:DataGridTextColumn>
                 <telerik:DataGridDateColumn PropertyName="LastUpdated"
+                                                                                        HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                                                                        CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                             HeaderText="LastUpdated"
                                             CellContentFormat="{}{0:g}" />
                 <telerik:DataGridBooleanColumn PropertyName="HasNewBreaches"
+                                                                                             HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                                                                             CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                                HeaderText="New Breaches?" />
                 <telerik:DataGridNumericalColumn PropertyName="NewBreachCount"
+                                                                                                 HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                                                                                 CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                                  HeaderText="New Breach Count">
                     <telerik:DataGridNumericalColumn.AggregateDescriptors>
                         <telerik:PropertyAggregateDescriptor PropertyName="NewBreachCount"

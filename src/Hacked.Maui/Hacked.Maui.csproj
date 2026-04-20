@@ -65,6 +65,8 @@
 		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
 		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
 		<RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
+		<!-- Local macOS dev often has newer Xcode than the currently pinned .NET mobile SDK. -->
+		<ValidateXcodeVersion>false</ValidateXcodeVersion>
 	</PropertyGroup>
 
 	<!-- Windows - Global Settings -->

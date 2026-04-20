@@ -66,10 +66,13 @@ public class AccountsService(IPwndBreachService apiService) : IAccountsService
             if(CurrentAccounts.Any())
                 CurrentAccounts.Clear();
 
-            foreach (var account in savedAccounts)
-                CurrentAccounts.Add(account);
+            if (savedAccounts != null)
+            {
+                foreach (var account in savedAccounts)
+                    CurrentAccounts.Add(account);
 
-            Debug.WriteLine($"--- {savedAccounts.Count} accounts loaded from json file ---");
+                Debug.WriteLine($"--- {savedAccounts.Count} accounts loaded from json file ---");
+            }
         }
         catch (FileNotFoundException)
         {
@@ -100,9 +103,9 @@ public class AccountsService(IPwndBreachService apiService) : IAccountsService
 
             var backupFileAccounts = JsonConvert.DeserializeObject<ObservableCollection<MonitoredAccount>>(json);
 
-            var accountsToAdd = backupFileAccounts.Except(CurrentAccounts, new MonitoredAccountEqualityComparer()).ToList();
+            var accountsToAdd = backupFileAccounts!.Except(CurrentAccounts, new MonitoredAccountEqualityComparer()).ToList();
 
-            var backupFileTotal = backupFileAccounts.Count;
+            var backupFileTotal = backupFileAccounts!.Count;
             var newTotal = accountsToAdd.Count;
             var existingTotal = backupFileTotal - newTotal;
 
@@ -151,7 +154,7 @@ public class AccountsService(IPwndBreachService apiService) : IAccountsService
     {
         try
         {
-            // Might have an issue with permissions on iOS/MacOS... will have to use cache directory instead (FileSystem.CacheDirectory)
+            // Might have an issue with permissions on iOS/macOS... will have to use cache directory instead (FileSystem.CacheDirectory)
             // https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/storage/file-picker?view=net-maui-8.0&tabs=android
             // https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/storage/file-system-helpers?view=net-maui-8.0&tabs=macios
 
