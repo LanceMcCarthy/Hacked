@@ -7,7 +7,7 @@
              x:Class="Hacked.Maui.Controls.BreachItemView"
              x:DataType="models:Breach">
 
-       <telerik:RadBorder Background="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+    <telerik:RadBorder Background="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
                        Padding="5"
                        CornerRadius="5">
         <Grid ColumnDefinitions="Auto, *"
@@ -53,13 +53,13 @@
                    FontSize="22"
                    Grid.Column="1"/>
 
-            <telerik:RadWrapLayout x:Name="WrapLayout"
-                                   Orientation="Horizontal"
-                                   InputTransparent="True"
-                                   Margin="0,5,5,5"
-                                   Grid.Row="1"
-                                   Grid.Column="0"
-                                   Grid.ColumnSpan="2" />
-        </Grid>
+        <telerik:RadWrapLayout x:Name="WrapLayout"
+                               Orientation="Horizontal"
+                               InputTransparent="True"
+                               Margin="0,5,5,5"
+                               Grid.Row="1"
+                               Grid.Column="0"
+                               Grid.ColumnSpan="2" />
+    </Grid>
     </telerik:RadBorder>
 </ContentView>
