@@ -413,7 +413,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
         if (failedItems.Count > 0)
         {
-            await Shell.Current.DisplayAlert("Done!", $"The operation completed, but some items were not added: {string.Join(", ", failedItems)}.", "ok");
+            await Shell.Current.DisplayAlertAsync("Done!", $"The operation completed, but some items were not added: {string.Join(", ", failedItems)}.", "ok");
         }
 
         IsOverlayVisible = false;
@@ -480,7 +480,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
     {
         SelectedAccount = account;
 
-        await Shell.Current.GoToAsync("/AccountDetails", new Dictionary<string, object>
+        await Shell.Current.GoToAsync("MonitoredAccounts/AccountDetails", new Dictionary<string, object>
         {
             {"SelectedAccount", account}
         });

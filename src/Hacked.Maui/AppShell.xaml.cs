@@ -25,12 +25,12 @@ public partial class AppShell : Shell
             switch (m)
             {
                 case MessagingCenterAlert msa:
-                    await this.DisplayAlert(msa.Title, msa.Message, msa.Cancel);
+                    await this.DisplayAlertAsync(msa.Title, msa.Message, msa.Cancel);
                     msa.OnCompleted?.Invoke();
                     break;
                 case MessagingCenterQuestion msq:
                 {
-                    var result = await this.DisplayAlert(msq.Title, msq.Message, msq.Okay, msq.Cancel);
+                    var result = await this.DisplayAlertAsync(msq.Title, msq.Message, msq.Okay, msq.Cancel);
 
                     if (result)
                     {
@@ -49,7 +49,7 @@ public partial class AppShell : Shell
                                   $"\r\n\n{error.Caller} Error:" +
                                   $"\r\n {error.Exception.Message}";
 
-                    await this.DisplayAlert(message, "Unexpected Error", "close");
+                    await this.DisplayAlertAsync("Unexpected Error", message, "close");
 
                     break;
                 }
