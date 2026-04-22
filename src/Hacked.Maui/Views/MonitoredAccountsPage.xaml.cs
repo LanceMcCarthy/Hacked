@@ -98,7 +98,7 @@ public partial class MonitoredAccountsPage
 
         vm.SelectedAccount = account;
 
-        await Shell.Current.GoToAsync("MonitoredAccounts/AccountDetails", new Dictionary<string, object>
+        await Shell.Current.GoToAsync("///MonitoredAccounts/AccountDetails", new Dictionary<string, object>
         {
             { "SelectedAccount", account }
         });
