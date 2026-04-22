@@ -220,64 +220,64 @@
                             </HorizontalStackLayout>
                         </VerticalStackLayout>
 
-                        <telerik:RadListView x:Name="BreachesListView"
-                                             ItemsSource="{Binding Breaches}"
-                                             IsItemsReorderEnabled="False"
-                                             SelectionMode="None"
-                                             Margin="10,0,0,0"
-                                             Grid.Column="1"
-                                             HeightRequest="220"
-                                             VerticalOptions="Start">
-                            <telerik:RadListView.ItemStyle>
-                                <telerik:ListViewItemStyle BackgroundColor="Transparent" />
-                            </telerik:RadListView.ItemStyle>
-                            <telerik:RadListView.ItemTemplate>
+                        <telerik:RadCollectionView x:Name="BreachesListView"
+                                                   ItemsSource="{Binding Breaches}"
+                                                   SelectionMode="None"
+                                                   Margin="10,0,0,0"
+                                                   Grid.Column="1"
+                                                   HeightRequest="220"
+                                                   VerticalOptions="Start">
+                            <telerik:RadCollectionView.ItemViewStyle>
+                                <Style TargetType="telerik:RadCollectionViewItemView">
+                                    <Setter Property="BackgroundColor" Value="Transparent" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                </Style>
+                            </telerik:RadCollectionView.ItemViewStyle>
+                            <telerik:RadCollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="models:Breach">
-                                    <telerik:ListViewTemplateCell>
-                                        <telerik:RadBorder Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
-                                                           Padding="5"
-                                                           CornerRadius="5"
-                                                           HeightRequest="100">
-                                            <Grid ColumnDefinitions="Auto, *"
-                                                  RowDefinitions="Auto, *">
-                                                <telerik:RadBorder WidthRequest="75"
-                                                                   HeightRequest="75"
-                                                                   CornerRadius="5"
-                                                                   Padding="10"
-                                                                   Margin="5"
-                                                                   BackgroundColor="{StaticResource DarkTranslucent}">
-                                                    <Image Source="{Binding LogoPath}" />
-                                                </telerik:RadBorder>
-                                                <VerticalStackLayout Margin="10,5,10,5"
-                                                                     Grid.Column="1">
-                                                    <Label Text="{Binding Name}"
-                                                           FontAttributes="Bold" />
-                                                    <Label Text="{Binding BreachDate, StringFormat='Breached: {0:d}'}" />
-                                                    <Label Text="{Binding PwnCount, StringFormat='Accounts: {0}'}" />
-                                                    <Label Text="{Binding DataClasses.Count, StringFormat='Data types: {0}'}" />
-                                                </VerticalStackLayout>
+                                    <telerik:RadBorder Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                                                       Padding="5"
+                                                       CornerRadius="5"
+                                                       HeightRequest="100">
+                                        <Grid ColumnDefinitions="Auto, *"
+                                              RowDefinitions="Auto, *">
+                                            <telerik:RadBorder WidthRequest="75"
+                                                               HeightRequest="75"
+                                                               CornerRadius="5"
+                                                               Padding="10"
+                                                               Margin="5"
+                                                               BackgroundColor="{StaticResource DarkTranslucent}">
+                                                <Image Source="{Binding LogoPath}" />
+                                            </telerik:RadBorder>
+                                            <VerticalStackLayout Margin="10,5,10,5"
+                                                                 Grid.Column="1">
+                                                <Label Text="{Binding Name}"
+                                                       FontAttributes="Bold" />
+                                                <Label Text="{Binding BreachDate, StringFormat='Breached: {0:d}'}" />
+                                                <Label Text="{Binding PwnCount, StringFormat='Accounts: {0}'}" />
+                                                <Label Text="{Binding DataClasses.Count, StringFormat='Data types: {0}'}" />
+                                            </VerticalStackLayout>
 
-                                                <Label Text="{x:Static res:IconFont.ExclamationTriangle}"
-                                                          TextColor="{AppThemeBinding Light={StaticResource Complimentary1}, Dark={StaticResource Yellow100Accent}}"
-                                                       Style="{StaticResource FontAwesomeLabelStyle}"
-                                                       IsVisible="{Binding IsNew}"
-                                                       HorizontalOptions="End"
-                                                       VerticalOptions="Start"
-                                                       Margin="5"
-                                                       FontSize="18"
-                                                       Grid.Column="1" />
-                                            </Grid>
-                                        </telerik:RadBorder>
-                                    </telerik:ListViewTemplateCell>
+                                            <Label Text="{x:Static res:IconFont.ExclamationTriangle}"
+                                                   TextColor="{AppThemeBinding Light={StaticResource Complimentary1}, Dark={StaticResource Yellow100Accent}}"
+                                                   Style="{StaticResource FontAwesomeLabelStyle}"
+                                                   IsVisible="{Binding IsNew}"
+                                                   HorizontalOptions="End"
+                                                   VerticalOptions="Start"
+                                                   Margin="5"
+                                                   FontSize="18"
+                                                   Grid.Column="1" />
+                                        </Grid>
+                                    </telerik:RadBorder>
                                 </DataTemplate>
-                            </telerik:RadListView.ItemTemplate>
-                            <telerik:RadListView.LayoutDefinition>
-                                <telerik:ListViewGridLayout Orientation="Horizontal"
-                                                            SpanCount="2"
-                                                            HorizontalItemSpacing="5"
-                                                            VerticalItemSpacing="5" />
-                            </telerik:RadListView.LayoutDefinition>
-                        </telerik:RadListView>
+                            </telerik:RadCollectionView.ItemTemplate>
+                            <telerik:RadCollectionView.ItemsLayout>
+                                <telerik:CollectionViewGridLayout Orientation="Horizontal"
+                                                                  SpanCount="2"
+                                                                  HorizontalItemSpacing="5"
+                                                                  VerticalItemSpacing="5" />
+                            </telerik:RadCollectionView.ItemsLayout>
+                        </telerik:RadCollectionView>
                     </Grid>
                 </DataTemplate>
             </telerik:RadDataGrid.RowDetailsTemplate>
@@ -388,5 +388,4 @@
             </telerik:RadBorder>
         </Grid>
     </Grid>
-</views:PageBase>
-    
+</views:PageBase>    
