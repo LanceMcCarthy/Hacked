@@ -1,6 +1,8 @@
 #pragma warning disable CA1416
 
+using Hacked.Core.Models;
 using Hacked.Maui.ViewModels;
+using Telerik.Maui.Controls;
 using Telerik.Maui.Controls.Data;
 using Telerik.Maui.Controls.DataGrid;
 
@@ -84,5 +86,33 @@ public partial class MonitoredAccountsPage
             }
         }
         return null;
+    }
+
+    private async void MoreDetailsButton_OnClicked(object? sender, EventArgs e)
+    {
+        if (sender is not RadButton { CommandParameter: MonitoredAccount account })
+            return;
+
+        if (BindingContext is not MonitoredAccountsViewModel vm)
+            return;
+
+        vm.SelectedAccount = account;
+
+        await Shell.Current.GoToAsync("MonitoredAccounts/AccountDetails", new Dictionary<string, object>
+        {
+            { "SelectedAccount", account }
+        });
+    }
+
+    private void ClearNewButton_OnClicked(object? sender, EventArgs e)
+    {
+        if (sender is not RadButton { CommandParameter: MonitoredAccount account })
+            return;
+
+        if (BindingContext is not MonitoredAccountsViewModel vm)
+            return;
+
+        if (vm.ClearNewBreachesCommand is System.Windows.Input.ICommand command && command.CanExecute(account))
+            command.Execute(account);
     }
 }

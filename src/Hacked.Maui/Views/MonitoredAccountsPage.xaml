@@ -208,14 +208,14 @@
                                 <telerik:RadButton BackgroundColor="{StaticResource Tertiary}"
                                                    TextColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}"
                                                    Text="more details..."
-                                                   Command="{Binding BindingContext.ViewDetailsCommand, Source={x:Reference ThisPage}}"
-                                                   CommandParameter="{Binding}"
+                                                   Clicked="MoreDetailsButton_OnClicked"
+                                                   CommandParameter="{Binding .}"
                                                    CornerRadius="5" />
                                 <telerik:RadButton BackgroundColor="{StaticResource Complimentary1}"
                                                    TextColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray900}}"
                                                    Text="clear new"
-                                                   Command="{Binding BindingContext.ClearNewBreachesCommand, Source={x:Reference ThisPage}}"
-                                                   CommandParameter="{Binding}"
+                                                   Clicked="ClearNewButton_OnClicked"
+                                                   CommandParameter="{Binding .}"
                                                    CornerRadius="5" />
                             </HorizontalStackLayout>
                         </VerticalStackLayout>
@@ -388,4 +388,4 @@
             </telerik:RadBorder>
         </Grid>
     </Grid>
-</views:PageBase>    
+</views:PageBase>

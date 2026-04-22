@@ -478,6 +478,9 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
     private async Task GoToAccountDetailsAsync(MonitoredAccount account)
     {
+        if (Debugger.IsAttached)
+            Debugger.Break();
+
         SelectedAccount = account;
 
         await Shell.Current.GoToAsync("MonitoredAccounts/AccountDetails", new Dictionary<string, object>
@@ -488,6 +491,9 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
     private Task ClearNewBreachesAsync(MonitoredAccount account)
     {
+        if (Debugger.IsAttached)
+            Debugger.Break();
+
         WeakReferenceMessenger.Default.Send(new MessagingCenterQuestion
         {
             Title = "Clear New Breaches?",
