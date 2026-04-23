@@ -45,6 +45,8 @@ public class SettingsViewModel : ViewModelBase
                     Message = "Any non-duplicate accounts have been added and will be visible on your Monitored Accounts page.",
                     Cancel = string.Empty
                 });
+
+                await Shell.Current.GoToAsync("///MonitoredAccounts");
             }
             else
             {

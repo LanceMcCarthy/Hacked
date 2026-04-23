@@ -1,11 +1,13 @@
 ﻿using CommonHelpers.Messaging;
 using CommunityToolkit.Mvvm.Messaging;
+using Hacked.Core.Common;
 using Hacked.Core.Comparers;
 using Hacked.Core.Models;
 using Hacked.Services.Interfaces;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Net;
 
 //using System.Net;
 
@@ -115,18 +117,26 @@ public class AccountsService(IPwndBreachService apiService) : IAccountsService
             {
                 if (updateBreaches)
                 {
-                    var importUpdateResult = await apiService.CheckForBreachesAsync(acct);
-
-                    //compare old list against new list to see if anything is new
-                    foreach (var breach in importUpdateResult)
+                    try
                     {
-                        if (!acct.Breaches.Contains(breach))
+                        var importUpdateResult = await apiService.CheckForBreachesAsync(acct);
+
+                        //compare old list against new list to see if anything is new
+                        foreach (var breach in importUpdateResult)
                         {
-                            breach.IsNew = true;
+                            if (!acct.Breaches.Contains(breach))
+                            {
+                                breach.IsNew = true;
+                            }
                         }
+
+                        acct.Breaches = importUpdateResult;
+                    }
+                    catch (PwnedApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        acct.Breaches = new();
                     }
 
-                    acct.Breaches = importUpdateResult;
                     acct.IsUpdating = false;
                     acct.LastUpdated = DateTime.Now;
                 }
