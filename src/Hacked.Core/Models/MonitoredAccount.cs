@@ -8,12 +8,12 @@ namespace Hacked.Core.Models;
 
 public class MonitoredAccount : BindableBase
 {
-    private string _userId;
-    private string _id;
+    private string _userId = string.Empty;
+    private string _id = string.Empty;
     private bool _isSelected;
-    private string _address;
+    private string _address = string.Empty;
     private DateTime _lastUpdated;
-    private ObservableCollection<Breach> _breaches;
+    private ObservableCollection<Breach> _breaches = new();
     private bool _isUpdating;
     private int _newBreachCount;
     private bool _hasNewBreaches;
@@ -44,7 +44,7 @@ public class MonitoredAccount : BindableBase
 
     public ObservableCollection<Breach> Breaches
     {
-        get => _breaches ??= new ObservableCollection<Breach>();
+        get => _breaches;
         set => SetProperty(ref _breaches, value);
     }
 
@@ -71,7 +71,7 @@ public class MonitoredAccount : BindableBase
             {
                 _newBreachCount = Breaches.Count(b => b.IsNew);
             }
-            
+
             return _newBreachCount;
         }
         set => SetProperty(ref _newBreachCount, value);

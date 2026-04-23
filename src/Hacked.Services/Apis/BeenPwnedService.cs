@@ -21,7 +21,7 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
         PropertyNameCaseInsensitive = true
     };
 
-    public BeenPwnedService(HttpClientHandler handler = null)
+    public BeenPwnedService(HttpClientHandler? handler = null)
     {
         if (handler == null)
         {
@@ -33,8 +33,8 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
 
         client = new HttpClient(handler);
         client.BaseAddress = new Uri(HibpConstants.HibpApiBaseAddress);
-        client?.DefaultRequestHeaders.Add(HibpConstants.HibpUserAgentKey, HibpConstants.HibpUserAgentValue);
-        client?.DefaultRequestHeaders.Add(HibpConstants.HibpApiHeaderKey, Secrets.HibpApiKey);
+        client.DefaultRequestHeaders.Add(HibpConstants.HibpUserAgentKey, HibpConstants.HibpUserAgentValue);
+        client.DefaultRequestHeaders.Add(HibpConstants.HibpApiHeaderKey, Secrets.HibpApiKey);
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
                 //200 = (GOOD response type, list of breaches available in body)
                 case HttpStatusCode.OK:
                     var json = await response.Content.ReadAsStringAsync();
-                    return JsonSerializer.Deserialize<ObservableCollection<Breach>>(json, s_jsonOptions);
+                    return JsonSerializer.Deserialize<ObservableCollection<Breach>>(json, s_jsonOptions) ?? new();
                 //400
                 case HttpStatusCode.BadRequest:
                     throw new PwnedApiException("Bad request — the account does not comply with an acceptable format (i.e. it's an empty string)") { StatusCode = response.StatusCode };
@@ -128,7 +128,7 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
                 case HttpStatusCode.OK:
                     var json = await response.Content.ReadAsStringAsync();
 
-                    return JsonSerializer.Deserialize<ObservableCollection<Breach>>(json, s_jsonOptions);
+                    return JsonSerializer.Deserialize<ObservableCollection<Breach>>(json, s_jsonOptions) ?? new();
                 //400
                 case HttpStatusCode.BadRequest:
                     throw new PwnedApiException("Bad request — the account does not comply with an acceptable format (i.e. it's an empty string)") { StatusCode = response.StatusCode };
@@ -189,7 +189,7 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
                     // Getting DataClasses is a fast, but frequent operation. Make sure we're not intentionally overpowering the API (10 RPS)
                     await Task.Delay(TimeSpan.FromMilliseconds(500));
                     var json = await response.Content.ReadAsStringAsync();
-                    return JsonSerializer.Deserialize<List<string>>(json, s_jsonOptions);
+                    return JsonSerializer.Deserialize<List<string>>(json, s_jsonOptions) ?? new();
                 //400
                 case HttpStatusCode.BadRequest:
                     throw new PwnedApiException("Bad request — the account does not comply with an acceptable format (i.e. it's an empty string)") { StatusCode = response.StatusCode };
@@ -251,7 +251,7 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
                 case HttpStatusCode.OK:
                     var json = await response.Content.ReadAsStringAsync();
 
-                    return JsonSerializer.Deserialize<ObservableCollection<Breach>>(json, s_jsonOptions);
+                    return JsonSerializer.Deserialize<ObservableCollection<Breach>>(json, s_jsonOptions) ?? new();
                 //400
                 case HttpStatusCode.BadRequest:
                     throw new PwnedApiException("Bad request — the account does not comply with an acceptable format (i.e. it's an empty string)") { StatusCode = response.StatusCode };
@@ -286,6 +286,6 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
 
     public void Dispose()
     {
-        client?.Dispose();
+        client.Dispose();
     }
 }

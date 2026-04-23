@@ -1,14 +1,15 @@
 ﻿using CommonHelpers.Common;
+using System;
 
 namespace Hacked.Core.Models;
 
 public class User : BindableBase
 {
-    private string id;
-    private string displayName;
+    private string id = string.Empty;
+    private string displayName = string.Empty;
     private bool hasNewBreaches;
-    private string[] addresses;
-    private string pushChannelId;
+    private string[] addresses = Array.Empty<string>();
+    private string pushChannelId = string.Empty;
 
     public string Id
     {

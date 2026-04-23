@@ -125,7 +125,7 @@ public class AccountsService : IAccountsService
         }
     }
 
-    private MonitoredAccount FindAccount(string address) 
+    private MonitoredAccount? FindAccount(string address) 
     {
         foreach (var account in CurrentAccounts)
             if (string.Equals(account.Address, address, StringComparison.OrdinalIgnoreCase))

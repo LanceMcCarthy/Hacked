@@ -6,11 +6,11 @@ public class HelpArticle : BindableBase
 {
     private bool isExpanded;
 
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
 
-    public string Summary { get; set; }
+    public string Summary { get; set; } = string.Empty;
 
-    public string ImageUrl { get; set; }
+    public string ImageUrl { get; set; } = string.Empty;
 
     public bool IsExpanded
     {

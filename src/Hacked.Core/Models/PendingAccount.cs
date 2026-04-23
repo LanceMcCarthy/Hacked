@@ -4,7 +4,7 @@ namespace Hacked.Core.Models;
 
 public class PendingAccount : BindableBase
 {
-    private string address;
+    private string address = string.Empty;
     private bool addSuccessful;
     private bool isFocused = true;
 

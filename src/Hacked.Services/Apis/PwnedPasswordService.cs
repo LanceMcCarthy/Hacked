@@ -13,7 +13,7 @@ public class PwnedPasswordService : IPwndPasswordService, IDisposable
 {
     private readonly HttpClient client;
 
-    public PwnedPasswordService(HttpClientHandler handler = null)
+    public PwnedPasswordService(HttpClientHandler? handler = null)
     {
         if (handler == null)
         {
@@ -25,7 +25,7 @@ public class PwnedPasswordService : IPwndPasswordService, IDisposable
 
         client = new HttpClient(handler);
         client.BaseAddress = new Uri(HibpConstants.PwnedPasswordsApiBaseAddress);
-        client?.DefaultRequestHeaders.Add(HibpConstants.HibpUserAgentKey, HibpConstants.HibpUserAgentValue);
+        client.DefaultRequestHeaders.Add(HibpConstants.HibpUserAgentKey, HibpConstants.HibpUserAgentValue);
     }
 
     public async Task<string> CheckPasswordAsync(string password)
@@ -66,7 +66,7 @@ public class PwnedPasswordService : IPwndPasswordService, IDisposable
     
     public void Dispose()
     {
-        client?.Dispose();
+        client.Dispose();
     }
 }
 

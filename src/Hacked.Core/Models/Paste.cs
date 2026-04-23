@@ -6,14 +6,14 @@ namespace Hacked.Core.Models;
 public class Paste
 {
     [JsonPropertyName("Source")]
-    public string Source { get; set; }
+    public string Source { get; set; } = string.Empty;
 
     [JsonPropertyName("Id")]
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
 
     [JsonPropertyName("Title")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     [JsonPropertyName("Date")]
     public DateTimeOffset Date { get; set; }

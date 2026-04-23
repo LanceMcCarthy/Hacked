@@ -4,7 +4,7 @@ namespace Hacked.Core.Models;
 
 public class NavigationMenuItem
 {
-    public string Title { get; set; }
-    public string IconSource { get; set; }
-    public Type TargetType { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string IconSource { get; set; } = string.Empty;
+    public Type TargetType { get; set; } = typeof(object);
 }

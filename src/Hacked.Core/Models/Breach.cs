@@ -10,31 +10,31 @@ public class Breach : BindableBase
     // **** API members ******
 
     [JsonPropertyName("Name")]
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     [JsonPropertyName("Title")]
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
 
     [JsonPropertyName("Domain")]
-    public string Domain { get; set; }
+    public string Domain { get; set; } = string.Empty;
 
     [JsonPropertyName("BreachDate")]
     public DateTime? BreachDate { get; set; }
 
     [JsonPropertyName("AddedDate")]
-    public string AddedDate { get; set; }
+    public string AddedDate { get; set; } = string.Empty;
 
     [JsonPropertyName("ModifiedDate")]
-    public string ModifiedDate { get; set; }
+    public string ModifiedDate { get; set; } = string.Empty;
 
     [JsonPropertyName("PwnCount")]
     public long PwnCount { get; set; }
 
     [JsonPropertyName("Description")]
-    public string Description { get; set; }
+    public string Description { get; set; } = string.Empty;
 
     [JsonPropertyName("DataClasses")]
-    public List<string> DataClasses { get; set; }
+    public List<string> DataClasses { get; set; } = new();
 
     [JsonPropertyName("IsVerified")]
     public bool IsVerified { get; set; }
@@ -52,7 +52,7 @@ public class Breach : BindableBase
     public bool IsSpamList { get; set; }
 
     [JsonPropertyName("LogoPath")]
-    public Uri LogoPath { get; set; }
+    public Uri LogoPath { get; set; } = new("about:blank");
 
     // ***** App specific members *****
 

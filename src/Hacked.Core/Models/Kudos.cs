@@ -4,10 +4,10 @@ namespace Hacked.Core.Models;
 
 public class Kudos : BindableBase
 {
-    private string title;
-    private string storeId;
-    private string imageUrl;
-    private string price;
+    private string title = string.Empty;
+    private string storeId = string.Empty;
+    private string imageUrl = string.Empty;
+    private string price = string.Empty;
     private KudoCategory category;
 
     public string Title
