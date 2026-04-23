@@ -29,6 +29,18 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#EF322F" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#EF322F" BaseSize="128,128" />
+		<MauiImage Include="Resources\Images\*" />
+		<MauiFont Include="Resources\Fonts\*" />
+	</ItemGroup>
+
+	<!-- Raw assets -->
+	<ItemGroup>
+		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
 		<ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
 	</ItemGroup>
@@ -49,33 +61,46 @@
 		<PackageReference Include="WinUIEx" Version="2.9.0" />
 	</ItemGroup>
 
-	<!-- iOS - Global Settings -->
-	<PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
-		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
-		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
-    </PropertyGroup>
+  <!-- **************** Windows **************** -->
 
-	<!-- MacCatalyst - Global Settings -->
-	<PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst'))">
-		<ApplicationTitle>Hacked</ApplicationTitle>
-		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
-		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
-		<RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
-	</PropertyGroup>
+  <!-- Global Settings -->
 
-	<!-- Windows - Global Settings -->
-	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
-		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
-		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
-	</PropertyGroup>
+  <PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
+    <ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
+    <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
+  </PropertyGroup>
 
-	<!-- Android - Global Settings -->
+  <!-- Debug Settings -->
+
+  <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) and '$(Configuration)' == 'Debug'">
+    <WindowsPackageType>None</WindowsPackageType>
+    <GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>
+    <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+  </PropertyGroup>
+
+  <!-- Release Settings -->
+
+  <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) and '$(Configuration)' == 'Release'">
+    <WindowsPackageType>MSIX</WindowsPackageType>
+    <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
+    <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
+    <PackageCertificateThumbprint></PackageCertificateThumbprint>
+  </PropertyGroup>
+
+  <!-- msbuild /restore /t:Publish /p:TargetFramework=net10.0-windows10.0.19041 /p:configuration=release /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=true /p:PackageCertificateThumbprint=$PFX_THUMBPRINT /p:PackageCe
+    rtificatePassword=$PFX_PASSWORD
+    -->
+
+  <!-- **************** Android **************** -->
+
+	<!-- Global Settings -->
+
 	<PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
 		<ApplicationId>com.lancelotsoftware.hacked</ApplicationId>
 		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
 	</PropertyGroup>
 
-	<!-- ******** PUBLISHING Android ******** -->
+  <!-- Release Settings -->
 
 	<!--<PropertyGroup Condition="$(TargetFramework.Contains('-android')) and '$(Configuration)' == 'Release'">
         <AndroidKeyStore>True</AndroidKeyStore>
@@ -86,7 +111,13 @@
     </PropertyGroup>-->
 
 
-	<!-- ******** PUBLISHING iOS ******** -->
+	<!-- **************** iOS **************** -->
+
+  <!-- Global Settings -->
+  <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+    <ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
+    <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
+  </PropertyGroup>
 
 	<!-- Debug - Simulator
   <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
@@ -121,7 +152,21 @@
   </PropertyGroup>-->
 
 
-	<!-- ******** PUBLISHING MacCatalyst ******** -->
+	<!-- **************** MacCatalyst **************** -->
+
+  <!-- Global -->
+  <PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst'))">
+    <ApplicationTitle>Hacked</ApplicationTitle>
+    <ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
+    <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
+    <RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+	<!--<PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst')) and '$(Configuration)' == 'Debug'">
+        <RuntimeIdentifier>maccatalyst-x64</RuntimeIdentifier>
+        <CodesignKey>Apple Development: Lance McCarthy (AJ9XMDH9A2)</CodesignKey>
+        <CodesignProvision>HackedApp_Dev_MacOS_2022.mobileprovision</CodesignProvision>
+    </PropertyGroup>-->
 
 	<!--<PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst')) and '$(Configuration)' == 'Release'">
         <RuntimeIdentifier>maccatalyst-x64</RuntimeIdentifier>
@@ -129,18 +174,8 @@
         <CodesignProvision>HackedApp_MacStore_2022.provisionprofile</CodesignProvision>
     </PropertyGroup>-->
 
-	<!--<PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
-        <RuntimeIdentifier>maccatalyst-x64</RuntimeIdentifier>
-        <CodesignKey>Apple Development: Lance McCarthy (AJ9XMDH9A2)</CodesignKey>
-        <CodesignProvision>HackedApp_Dev_MacOS_2022.mobileprovision</CodesignProvision>
-    </PropertyGroup>-->
 
 
-	<!-- ******** PUBLISHING Windows ******** -->
-
-	<!-- This is just like packaging WinUI projects	
-    msbuild /restore /t:Publish /p:TargetFramework=net6.0-windows10.0.19041 /p:configuration=release /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=true /p:PackageCertificateThumbprint=$PFX_THUMBPRINT /p:PackageCe
-    rtificatePassword=$PFX_PASSWORD
-    -->
+	
 
 </Project>
