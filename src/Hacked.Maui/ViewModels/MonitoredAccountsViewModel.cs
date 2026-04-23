@@ -62,6 +62,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
             pendingAccount.PropertyChanged += PendingAccount_PropertyChanged;
         }
 
+        UpdatePendingAdditionsLastState();
         UpdateIsAddEnabled();
 
         Accounts.CollectionChanged += (s, e) => { HasAccounts = Accounts.Count > 0; };
@@ -189,6 +190,18 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
             Accounts.Add(account);
 
+            await accountsService.SaveAccountsAsync();
+        }
+        catch (PwnedApiException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            if (account == null)
+                return null;
+
+            account.Breaches = new();
+            account.IsUpdating = false;
+            account.LastUpdated = DateTime.Now;
+
+            Accounts.Add(account);
             await accountsService.SaveAccountsAsync();
         }
         catch (Exception ex)
@@ -420,6 +433,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
             }
         }
 
+        UpdatePendingAdditionsLastState();
         UpdateIsAddEnabled();
     }
 
@@ -428,6 +442,14 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         if (e.PropertyName == nameof(PendingAccount.Address))
         {
             UpdateIsAddEnabled();
+        }
+    }
+
+    private void UpdatePendingAdditionsLastState()
+    {
+        for (var i = 0; i < PendingAdditions.Count; i++)
+        {
+            PendingAdditions[i].IsLast = i == PendingAdditions.Count - 1;
         }
     }
 

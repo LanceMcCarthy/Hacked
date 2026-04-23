@@ -7,6 +7,7 @@ public class PendingAccount : BindableBase
     private string address = string.Empty;
     private bool addSuccessful;
     private bool isFocused = true;
+    private bool isLast;
 
     public string Address
     {
@@ -24,5 +25,11 @@ public class PendingAccount : BindableBase
     {
         get => isFocused;
         set => SetProperty(ref isFocused, value);
+    }
+
+    public bool IsLast
+    {
+        get => isLast;
+        set => SetProperty(ref isLast, value);
     }
 }

@@ -301,7 +301,7 @@
                                Padding="10"
                                Margin="10"
                                BorderThickness="2">
-                <Grid RowDefinitions="Auto, Auto, *, Auto, Auto"
+                <Grid RowDefinitions="Auto, *, Auto, Auto"
                       RowSpacing="10"
                       Margin="20">
 
@@ -322,7 +322,9 @@
                         </telerik:RadCollectionView.ItemViewStyle>
                         <telerik:RadCollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:PendingAccount">
-                                <Grid ColumnDefinitions="*, Auto">
+                                <Grid ColumnDefinitions="*, Auto"
+                                      RowDefinitions="Auto, Auto"
+                                      RowSpacing="5">
                                     <telerik:RadEntry Keyboard="Email"
                                                       Placeholder="enter email/username/phone..."
                                                       Text="{Binding Address, Mode=TwoWay}"
@@ -330,10 +332,9 @@
                                                       BackgroundColor="{AppThemeBinding Light={StaticResource WhiteBrush}, Dark={StaticResource BlackBrush}}"
                                                       TextColor="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}"
                                                       PlaceholderColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
-                                                      telerik:EntryExtensions.CompletedCommand="{Binding BindingContext.AddPendingItemCommand, Source={x:Reference ThisPage}}"
                                                       commhelpers:FocusElementHelper.IsFocused="{Binding IsFocused, Mode=TwoWay}"/>
                                     <telerik:RadButton Text="-"
-                                                       Command="{Binding BindingContext.RemovePendingItemCommand, Source={x:Reference ThisPage}}"
+                                                       Clicked="RemovePendingItemButton_OnClicked"
                                                        CommandParameter="{Binding}"
                                                        TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}"
                                                        BorderColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}"
@@ -345,45 +346,46 @@
                                                        Grid.Column="1"
                                                        Padding="5,0,5,0"
                                                        Margin="5,5,0,0"/>
+
+                                    <telerik:RadButton Text="+"
+                                                       Clicked="AddPendingItemButton_OnClicked"
+                                                       IsVisible="{Binding IsLast}"
+                                                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}"
+                                                       BorderColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}"
+                                                       BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray600}}"
+                                                       WidthRequest="25"
+                                                       HeightRequest="25"
+                                                       BorderThickness="1"
+                                                       HorizontalOptions="End"
+                                                       VerticalOptions="Start"
+                                                       Padding="5,0,5,0"
+                                                       Margin="0,5,0,0"
+                                                       Grid.Row="1"
+                                                       Grid.ColumnSpan="2"/>
                                 </Grid>
                             </DataTemplate>
                         </telerik:RadCollectionView.ItemTemplate>
                     </telerik:RadCollectionView>
-
-                    <telerik:RadButton x:Name="AddNewRowButton"
-                                       Text="+"
-                                       Command="{Binding BindingContext.AddPendingItemCommand, Source={x:Reference ThisPage}}"
-                                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}"
-                                       BorderColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}"
-                                       BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray600}}"
-                                       WidthRequest="25"
-                                       HeightRequest="25"
-                                       BorderThickness="1"
-                                       HorizontalOptions="End"
-                                       VerticalOptions="Start"
-                                       Padding="5,0,5,0"
-                                       Margin="0,10,0,10"
-                                       Grid.Row="2"/>
 
                     <telerik:RadButton x:Name="AddAccountButton"
                                        Text="add account(s)"
                                        Command="{Binding AddAccountsCommand}"
                                        IsEnabled="{Binding IsAddEnabled}"
                                        CornerRadius="20"
-                                       Grid.Row="3" />
+                                       Grid.Row="2" />
 
                     <telerik:RadButton x:Name="CancelButton"
                                        Text="cancel"
                                        Command="{Binding CancelAddAccountsCommand}"
                                        CornerRadius="20"
-                                       Grid.Row="4" />
+                                       Grid.Row="3" />
 
                     <telerik:RadBusyIndicator IsVisible="{Binding IsBusy}"
                                               IsBusy="{Binding IsBusy}"
                                               InputTransparent="{Binding IsBusy, Converter={StaticResource InvertBoolConverter}}"
                                               AnimationType="Animation5"
                                               Grid.Row="0"
-                                              Grid.RowSpan="5" />
+                                              Grid.RowSpan="4" />
                 </Grid>
             </telerik:RadBorder>
         </Grid>

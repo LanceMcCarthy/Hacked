@@ -139,4 +139,25 @@ public partial class MonitoredAccountsPage
         if (vm.RemoveAccountCommand is System.Windows.Input.ICommand command && command.CanExecute(account))
             command.Execute(account);
     }
+
+    private void AddPendingItemButton_OnClicked(object? sender, EventArgs e)
+    {
+        if (BindingContext is not MonitoredAccountsViewModel vm)
+            return;
+
+        if (vm.AddPendingItemCommand is System.Windows.Input.ICommand command && command.CanExecute(null))
+            command.Execute(null);
+    }
+
+    private void RemovePendingItemButton_OnClicked(object? sender, EventArgs e)
+    {
+        if (sender is not RadButton { CommandParameter: PendingAccount account })
+            return;
+
+        if (BindingContext is not MonitoredAccountsViewModel vm)
+            return;
+
+        if (vm.RemovePendingItemCommand is System.Windows.Input.ICommand command && command.CanExecute(account))
+            command.Execute(account);
+    }
 }
