@@ -12,15 +12,16 @@ There are **three distinct UI implementations** plus shared library projects und
 |---------|------|--------|
 | `src/Hacked` | UWP (legacy .csproj) | Windows 10/11 (Store) |
 | `src/Hacked.Maui` | .NET MAUI | Android, iOS, macCatalyst, Windows (net10.0) |
-| `src/Uno/Hacked` | Uno Platform | Android, iOS, macCatalyst, Windows, WASM, Desktop (net9.0) |
+| `src/Hacked.Uno/Hacked` | Uno Platform | Android, iOS, macCatalyst, Windows, WASM, Desktop (net9.0) |
 | `src/Hacked.Core` | netstandard2.0 | Shared models & constants |
 | `src/Hacked.Services` | netstandard2.0 | HIBP API service layer |
 | `src/Hacked.BackgroundTasks` | UWP component | Windows background monitoring |
 
 ### Solution files
-- `src/Hacked_Uwp.sln` — UWP app + shared libs
-- `src/Hacked_Maui.sln` — MAUI app + shared libs
-- `src/Uno/Hacked_Uno.sln` — Uno app + tests
+- `src/Hacked.slnx` — umbrella solution for the repo
+- `src/Hacked_Maui.slnx` — MAUI app + shared libs
+- `src/Hacked_Uno.slnx` — Uno app + tests
+- `src/Hacked_Uwp.slnx` — UWP app + shared libs
 
 ## Build Commands
 
@@ -28,16 +29,16 @@ All restores must use the custom NuGet config (requires `TELERIK_NUGET_KEY` env 
 
 ```sh
 # Restore Uno project
-dotnet restore src/Uno/Hacked/Hacked.csproj --configfile src/nuget.config
+dotnet restore src/Hacked.Uno/Hacked/Hacked.csproj --configfile src/nuget.config
 
 # Build shared libs (Core + Services)
 dotnet build src/Hacked.Services/Hacked.Services.csproj -c Debug --no-restore
 
 # Build Uno (net9.0 desktop target — fastest for CI/dev)
-dotnet build src/Uno/Hacked/Hacked.csproj -c Debug -f net9.0
+dotnet build src/Hacked.Uno/Hacked/Hacked.csproj -c Debug -f net9.0
 
 # Build Uno (Windows target)
-dotnet build src/Uno/Hacked/Hacked.csproj -c Debug -f net9.0-windows10.0.19041
+dotnet build src/Hacked.Uno/Hacked/Hacked.csproj -c Debug -f net9.0-windows10.0.19041
 
 # Build MAUI (Windows target)
 dotnet build src/Hacked.Maui/Hacked.Maui.csproj -c Debug -f net10.0-windows10.0.19041.0
@@ -45,20 +46,20 @@ dotnet build src/Hacked.Maui/Hacked.Maui.csproj -c Debug -f net10.0-windows10.0.
 # Build MAUI (Android target)
 dotnet build src/Hacked.Maui/Hacked.Maui.csproj -c Debug -f net10.0-android
 
-# Build UWP (requires msbuild, not dotnet build)
-msbuild src/Hacked_Uwp.sln /t:Restore /p:Configuration=Debug /p:Platform=x64 /p:UapAppxPackageBuildMode=CI /p:AppxBundle=Never /p:AppxPackageSigningEnabled=False
+# Build UWP project directly (legacy)
+dotnet build src/Hacked/Hacked.csproj -c Debug
 ```
 
 ## Running Tests
 
-Tests live in `src/Uno/Hacked.Tests` (NUnit + FluentAssertions, net9.0):
+Tests live in `src/Hacked.Uno/Hacked.Tests` (NUnit + FluentAssertions, net9.0):
 
 ```sh
 # Run all tests
-dotnet test src/Uno/Hacked.Tests/Hacked.Tests.csproj --nologo
+dotnet test src/Hacked.Uno/Hacked.Tests/Hacked.Tests.csproj --nologo
 
 # Run a single test by name filter
-dotnet test src/Uno/Hacked.Tests/Hacked.Tests.csproj --filter "FullyQualifiedName~MyTestName"
+dotnet test src/Hacked.Uno/Hacked.Tests/Hacked.Tests.csproj --filter "FullyQualifiedName~MyTestName"
 ```
 
 ## NuGet Configuration
@@ -84,14 +85,14 @@ The Uno project does NOT use Telerik packages; it can restore without the env va
 - HTTP **429** (rate limit) is handled with `RetryAfter` header back-off; the services retry automatically up to 50 times.
 - The `truncateResponse` query parameter **must be lowercase** (`"true"` / `"false"` strings) — HIBP/Cloudflare does not accept `"True"` (see comment in `BeenPwnedService.cs`).
 
-### Uno Platform App (`src/Uno/Hacked`)
+### Uno Platform App (`src/Hacked.Uno/Hacked`)
 
 Uses **Uno SDK 6.5.31** single-project targeting `net9.0-*` across all platforms.
 
 #### Project Structure
 
 ```
-src/Uno/Hacked/
+src/Hacked.Uno/Hacked/
   Views/           - Shell + 6 pages (MonitoredAccountsPage, AddAccountPage,
                      AccountDetailsPage, BreachDetailsPage, PasswordCheckPage, SettingsPage)
   ViewModels/      - One ViewModel per View (CommunityToolkit.Mvvm ObservableObject)
@@ -150,7 +151,7 @@ Other platforms (`#else`) use logging stubs until native notification support is
 
 - **C# LangVersion 10** is set in `Hacked.Core` and `Hacked.Services` (netstandard2.0). The Uno project uses net9.0 and supports modern C# features.
 - **netstandard2.0 constraints**: `Hacked.Core` and `Hacked.Services` must not use range operators, `File.ReadAllTextAsync`, or `string.Split(char, StringSplitOptions)`.
-- **CPM (Central Package Management)**: All NuGet package versions go in `src/Uno/Directory.Packages.props`. Never add `Version=` to `<PackageReference>` in `.csproj` files under `src/Uno/`.
+- **CPM (Central Package Management)**: All NuGet package versions go in `src/Hacked.Uno/Directory.Packages.props`. Never add `Version=` to `<PackageReference>` in `.csproj` files under `src/Hacked.Uno/`.
 - **`Secrets.cs`** (`Hacked.Core/Common/Secrets.cs`) holds the dev HIBP API key hardcoded. Do not rotate this in code — use environment injection for CI/production.
 - **`HibpConstants.cs`** is the single source of truth for all HIBP API routes and header names.
 - Telerik UI components are used in both the UWP and MAUI apps. UWP uses `Telerik.UI.for.UniversalWindowsPlatform`; MAUI uses `Telerik.UI.for.Maui`. The Uno app does **not** use Telerik.
