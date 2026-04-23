@@ -29,21 +29,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
-		<MauiImage Include="Resources\Images\*" />
-		<MauiImage Update="Resources\Images\dotnet_bot.svg" BaseSize="168,208" />
-		<MauiFont Include="Resources\Fonts\*" />
-		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
 		<ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CommonHelpers.Maui" Version="0.5.2" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.7" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.51" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.5" />
 		<PackageReference Include="CommonHelpers" Version="1.5.1" />

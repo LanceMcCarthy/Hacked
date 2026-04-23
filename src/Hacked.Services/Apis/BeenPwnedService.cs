@@ -21,7 +21,7 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
         PropertyNameCaseInsensitive = true
     };
 
-    public BeenPwnedService(HttpClientHandler? handler = null)
+    public BeenPwnedService(string? apiKey = null, HttpClientHandler? handler = null)
     {
         if (handler == null)
         {
@@ -34,7 +34,7 @@ public class BeenPwnedService : IPwndBreachService, IDisposable
         client = new HttpClient(handler);
         client.BaseAddress = new Uri(HibpConstants.HibpApiBaseAddress);
         client.DefaultRequestHeaders.Add(HibpConstants.HibpUserAgentKey, HibpConstants.HibpUserAgentValue);
-        client.DefaultRequestHeaders.Add(HibpConstants.HibpApiHeaderKey, Secrets.HibpApiKey);
+        client.DefaultRequestHeaders.Add(HibpConstants.HibpApiHeaderKey, apiKey ?? Secrets.HibpApiKey);
     }
 
     /// <summary>

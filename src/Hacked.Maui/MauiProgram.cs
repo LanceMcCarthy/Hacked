@@ -3,7 +3,9 @@ using Hacked.Maui.ViewModels;
 using Hacked.Maui.Views;
 using Hacked.Services.Apis;
 using Hacked.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Maui.LifecycleEvents;
+using System.Reflection;
 using Telerik.Maui.Controls.Compatibility;
 
 #if WINDOWS10_0_17763_0_OR_GREATER
@@ -30,6 +32,17 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
+
+        // Load appsettings from embedded resources
+        var assembly = Assembly.GetExecutingAssembly();
+        using var appSettingsStream = assembly.GetManifestResourceStream("Hacked.Maui.appsettings.json");
+        if (appSettingsStream != null)
+            builder.Configuration.AddJsonStream(appSettingsStream);
+
+        using var devSettingsStream = assembly.GetManifestResourceStream("Hacked.Maui.appsettings.Development.json");
+        if (devSettingsStream != null)
+            builder.Configuration.AddJsonStream(devSettingsStream);
+
         builder
             .UseMauiApp<App>()
             .UseTelerik()
@@ -44,7 +57,12 @@ public static class MauiProgram
             .RegisterLifecycleEvents();
 
 
-        builder.Services.AddSingleton<IPwndBreachService, BeenPwnedService>();
+        builder.Services.AddSingleton<IPwndBreachService>(sp =>
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+            var apiKey = config["HibpApiKey"];
+            return new BeenPwnedService(apiKey);
+        });
         builder.Services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
         builder.Services.AddSingleton<IAccountsService, Hacked.Maui.Services.AccountsService>();
 
