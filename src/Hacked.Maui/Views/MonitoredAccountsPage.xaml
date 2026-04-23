@@ -105,7 +105,7 @@
             <telerik:RadDataGrid.Columns>
                 <telerik:DataGridToggleRowDetailsColumn CellContentStyle="{StaticResource MonitoredAccountsGridToggleStyle}" />
                 <telerik:DataGridTemplateColumn HeaderText="Options"
-                                HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                                HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
                                                 SizeMode="Auto">
                     <telerik:DataGridTemplateColumn.CellContentTemplate>
                         <DataTemplate x:DataType="models:MonitoredAccount">
@@ -114,15 +114,15 @@
                                   Padding="5">
                                 <telerik:RadButton Text="{x:Static res:IconFont.Refresh}"
                                                    Style="{StaticResource FontAwesomeLabelStyle}"
-                                                   Command="{Binding BindingContext.RefreshAccountCommand, Source={x:Reference ThisPage}}"
-                                                   CommandParameter="{Binding}"
+                                                   Clicked="RefreshButton_OnClicked"
+                                                   CommandParameter="{Binding .}"
                                                    HorizontalOptions="Fill"
                                                    Grid.Column="0"
                                                    Padding="0" />
                                 <telerik:RadButton Text="{x:Static res:IconFont.Trash}"
                                                    Style="{StaticResource FontAwesomeLabelStyle}"
-                                                   Command="{Binding BindingContext.RemoveAccountCommand, Source={x:Reference ThisPage}}"
-                                                   CommandParameter="{Binding}"
+                                                   Clicked="RemoveButton_OnClicked"
+                                                   CommandParameter="{Binding .}"
                                                    HorizontalOptions="Fill"
                                                    Grid.Column="1"
                                                    Padding="0" />
@@ -164,10 +164,10 @@
                     </telerik:DataGridTextColumn.AggregateDescriptors>-->
                 </telerik:DataGridTextColumn>
                 <telerik:DataGridDateColumn PropertyName="LastUpdated"
-                                           HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
-                                           CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
-                                           HeaderText="LastUpdated"
-                                           CellContentFormat="{}{0:g}" />
+                                            HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                            CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
+                                            HeaderText="LastUpdated"
+                                            CellContentFormat="{}{0:g}" />
                 <telerik:DataGridBooleanColumn PropertyName="HasNewBreaches"
                                                HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
                                                CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"

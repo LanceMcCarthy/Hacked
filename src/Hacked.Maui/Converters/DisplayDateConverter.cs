@@ -4,7 +4,7 @@ namespace Hacked.Maui.Converters;
 
 internal class DisplayDateConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value;
 
@@ -13,7 +13,7 @@ internal class DisplayDateConverter : IValueConverter
         //return DateTime.TryParse((string) value, out date) ? date.ToString("g") : value;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }

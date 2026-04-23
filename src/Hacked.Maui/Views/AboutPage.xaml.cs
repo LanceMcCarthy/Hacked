@@ -22,9 +22,9 @@ public partial class AboutPage
 
     private void StartAnimations()
     {
-        Gear1.RotateTo(1440, 18000, Easing.CubicInOut);
-        Gear2.RotateTo(-1440, 18000, Easing.CubicInOut);
-        Gear3.RotateTo(1440, 18000, Easing.CubicInOut);
+        _ = Gear1.RotateToAsync(1440, 18000, Easing.CubicInOut);
+        _ = Gear2.RotateToAsync(-1440, 18000, Easing.CubicInOut);
+        _ = Gear3.RotateToAsync(1440, 18000, Easing.CubicInOut);
     }
 
     private async void ContactUsButton_OnClick(object sender, EventArgs e)

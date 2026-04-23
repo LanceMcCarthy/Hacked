@@ -12,14 +12,14 @@
                 Title="Account Details">
 
     <views:PageBase.Resources>
-        <telerik:ListViewLinearLayout x:Key="MobileLayout"
-                                      VerticalItemSpacing="5"
-                                      HorizontalItemSpacing="5" />
+        <telerik:CollectionViewLinearLayout x:Key="MobileLayout"
+                                            VerticalItemSpacing="5"
+                                            HorizontalItemSpacing="5" />
 
-        <telerik:ListViewGridLayout x:Key="DesktopLayout"
-                                    SpanCount="3"
-                                    HorizontalItemSpacing="5"
-                                    VerticalItemSpacing="5" />
+        <telerik:CollectionViewGridLayout x:Key="DesktopLayout"
+                                          SpanCount="3"
+                                          HorizontalItemSpacing="5"
+                                          VerticalItemSpacing="5" />
     </views:PageBase.Resources>
 
     <Grid RowDefinitions="Auto,*">
@@ -54,28 +54,25 @@
             </Grid>
         </Grid>
 
-        <telerik:RadListView x:Name="BreachesListView"
-                             ItemsSource="{Binding SelectedAccount.Breaches}"
-                             IsItemsReorderEnabled="False"
-                             SelectionMode="None"
-                             Margin="10,0,10,0"
-                             Grid.Row="1">
-            <telerik:RadListView.ItemTemplate>
+        <telerik:RadCollectionView x:Name="BreachesListView"
+                                   ItemsSource="{Binding SelectedAccount.Breaches}"
+                                   SelectionMode="None"
+                                   Margin="10,0,10,0"
+                                   Grid.Row="1">
+            <telerik:RadCollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:Breach">
-                    <telerik:ListViewTemplateCell>
-                        <controls:BreachItemView MaximumHeightRequest="500"/>
-                    </telerik:ListViewTemplateCell>
+                    <controls:BreachItemView MaximumHeightRequest="500"/>
                 </DataTemplate>
-            </telerik:RadListView.ItemTemplate>
-            <telerik:RadListView.LayoutDefinition>
-                <OnIdiom x:TypeArguments="telerik:ListViewLayoutBase"
+            </telerik:RadCollectionView.ItemTemplate>
+            <telerik:RadCollectionView.ItemsLayout>
+                <OnIdiom x:TypeArguments="telerik:CollectionViewLayoutBase"
                          Default="{StaticResource MobileLayout}"
                          Phone="{StaticResource MobileLayout}"
                          Desktop="{StaticResource DesktopLayout}"
                          Tablet="{StaticResource DesktopLayout}"
                          TV="{StaticResource DesktopLayout}"/>
-            </telerik:RadListView.LayoutDefinition>
-        </telerik:RadListView>
+            </telerik:RadCollectionView.ItemsLayout>
+        </telerik:RadCollectionView>
 
         <VerticalStackLayout VerticalOptions="{OnIdiom Default=Start, Phone=End, Desktop=Center, Tablet=Center, TV=Start}"
                              Spacing="5"

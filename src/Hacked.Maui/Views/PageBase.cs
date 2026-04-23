@@ -6,21 +6,21 @@ namespace Hacked.Maui.Views;
 
 public class PageBase : ContentPage, IQueryAttributable
 {
-    public MonitoredAccount SelectedAccount { get; private set; }
+    public MonitoredAccount? SelectedAccount { get; private set; }
 
-    public Breach SelectedBreach { get; private set; }
+    public Breach? SelectedBreach { get; private set; }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        if (query.TryGetValue("SelectedAccount", out var account))
+        if (query.TryGetValue("SelectedAccount", out var account) && account is MonitoredAccount monitoredAccount)
         {
-            SelectedAccount = account as MonitoredAccount;
+            SelectedAccount = monitoredAccount;
             OnPropertyChanged(nameof(SelectedAccount));
         }
 
-        if (query.TryGetValue("SelectedBreach", out var breach))
+        if (query.TryGetValue("SelectedBreach", out var breach) && breach is Breach selectedBreach)
         {
-            SelectedBreach = breach as Breach;
+            SelectedBreach = selectedBreach;
             OnPropertyChanged(nameof(SelectedBreach));
         }
     }

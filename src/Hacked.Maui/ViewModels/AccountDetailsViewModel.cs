@@ -14,28 +14,28 @@ public class AccountDetailsViewModel : ViewModelBase
 {
     private readonly IPwndBreachService _apiService;
     private readonly IAccountsService _accountsService;
-    private MonitoredAccount _selectedAccount;
+    private MonitoredAccount? _selectedAccount;
 
     public AccountDetailsViewModel(IPwndBreachService srv, IAccountsService accountsService)
     {
         _apiService = srv;
         _accountsService = accountsService;
 
-        RefreshAccountCommand = new AsyncCommand<MonitoredAccount>(UpdateBreachesForAccountAsync);
-        ClearNewBreachesCommand = new AsyncCommand<MonitoredAccount>(ClearNewBreachesAsync);
+        RefreshAccountCommand = new AsyncCommand<MonitoredAccount?>(UpdateBreachesForAccountAsync);
+        ClearNewBreachesCommand = new AsyncCommand<MonitoredAccount?>(ClearNewBreachesAsync);
     }
 
-    public MonitoredAccount SelectedAccount
+    public MonitoredAccount? SelectedAccount
     {
         get => _selectedAccount;
         set => SetProperty(ref _selectedAccount, value);
     }
 
-    public AsyncCommand<MonitoredAccount> RefreshAccountCommand { get; set; }
+    public AsyncCommand<MonitoredAccount?> RefreshAccountCommand { get; set; }
 
-    public AsyncCommand<MonitoredAccount> ClearNewBreachesCommand { get; set; }
+    public AsyncCommand<MonitoredAccount?> ClearNewBreachesCommand { get; set; }
 
-    public async Task UpdateBreachesForAccountAsync(MonitoredAccount account)
+    public async Task UpdateBreachesForAccountAsync(MonitoredAccount? account)
     {
         if (account == null)
         {
@@ -102,8 +102,11 @@ public class AccountDetailsViewModel : ViewModelBase
         }
     }
 
-    private Task ClearNewBreachesAsync(MonitoredAccount account)
+    private Task ClearNewBreachesAsync(MonitoredAccount? account)
     {
+        if (account == null)
+            return Task.CompletedTask;
+
         WeakReferenceMessenger.Default.Send(new MessagingCenterQuestion
         {
             Title = "Clear New Breaches?",

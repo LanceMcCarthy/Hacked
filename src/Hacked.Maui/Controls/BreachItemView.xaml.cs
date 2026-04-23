@@ -11,35 +11,42 @@ public partial class BreachItemView : ContentView
         BindingContextChanged += BreachItemView_BindingContextChanged;
     }
 
-    private async void BreachItemView_BindingContextChanged(object sender, EventArgs e)
+    private void BreachItemView_BindingContextChanged(object? sender, EventArgs e)
     {
         if (BindingContext is not Breach breach || breach.DataClasses.Count == 0)
             return;
 
-        await Task.Run(() =>
+        if (WrapLayout.Children.Count > 0)
+            WrapLayout.Children.Clear();
+
+        var resources = Application.Current?.Resources;
+        object? borderStyleResource = null;
+        object? labelStyleResource = null;
+        resources?.TryGetValue("DataClassBorderStyle", out borderStyleResource);
+        resources?.TryGetValue("DataClassLabelStyle", out labelStyleResource);
+
+        var borderStyle = borderStyleResource as Style;
+        var labelStyle = labelStyleResource as Style;
+
+        foreach (var dataClass in breach.DataClasses)
         {
-            MainThread.BeginInvokeOnMainThread(() =>
+            var label = new Label
             {
-                if (WrapLayout.Children.Count > 0)
-                    WrapLayout.Children.Clear();
-            });
+                Text = dataClass
+            };
 
-            foreach (var dataClass in breach.DataClasses)
+            if (labelStyle != null)
+                label.Style = labelStyle;
+
+            var border = new RadBorder
             {
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    WrapLayout.Children.Add(new RadBorder
-                    {
-                        Style = (Style)Application.Current?.Resources["DataClassBorderStyle"],
-                        Content = new Label
-                        {
-                            Style = (Style)Application.Current?.Resources["DataClassLabelStyle"],
-                            Text = dataClass
-                        }
-                    });
-                });
+                Content = label
+            };
 
-            }
-        });
+            if (borderStyle != null)
+                border.Style = borderStyle;
+
+            WrapLayout.Children.Add(border);
+        }
     }
 }

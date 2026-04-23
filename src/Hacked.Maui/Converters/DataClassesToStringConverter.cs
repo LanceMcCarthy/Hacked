@@ -4,28 +4,15 @@ namespace Hacked.Maui.Converters;
 
 internal class DataClassesToStringConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value == null)
+        if (value is not string[] classes || classes.Length == 0)
             return "none";
 
-        var classes = (string[]) value;
-
-        if (classes.Length == 0)
-            return "none";
-
-        string classList = "";
-
-        foreach (var item in classes)
-        {
-            var delimiter = string.IsNullOrEmpty(classList) ? "" : ", ";
-            classList = classList + delimiter + item;
-        }
-
-        return classList;
+        return string.Join(", ", classes);
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value;
     }

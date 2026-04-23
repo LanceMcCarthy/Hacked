@@ -9,6 +9,7 @@ public class AboutViewModel : ViewModelBase
     {
         Title = "About";
         OpenWebCommand = new DelegateCommand(async()=> await Launcher.OpenAsync(new Uri("https://www.telerik.com/maui-ui")));
+        AppVersion = AppInfo.Current.VersionString;
     }
 
     public DelegateCommand OpenWebCommand { get; }

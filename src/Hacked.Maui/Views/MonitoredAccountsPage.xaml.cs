@@ -115,4 +115,28 @@ public partial class MonitoredAccountsPage
         if (vm.ClearNewBreachesCommand is System.Windows.Input.ICommand command && command.CanExecute(account))
             command.Execute(account);
     }
+
+    private void RefreshButton_OnClicked(object? sender, EventArgs e)
+    {
+        if (sender is not RadButton { CommandParameter: MonitoredAccount account })
+            return;
+
+        if (BindingContext is not MonitoredAccountsViewModel vm)
+            return;
+
+        if (vm.RefreshAccountCommand is System.Windows.Input.ICommand command && command.CanExecute(account))
+            command.Execute(account);
+    }
+
+    private void RemoveButton_OnClicked(object? sender, EventArgs e)
+    {
+        if (sender is not RadButton { CommandParameter: MonitoredAccount account })
+            return;
+
+        if (BindingContext is not MonitoredAccountsViewModel vm)
+            return;
+
+        if (vm.RemoveAccountCommand is System.Windows.Input.ICommand command && command.CanExecute(account))
+            command.Execute(account);
+    }
 }

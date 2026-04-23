@@ -6,6 +6,8 @@ using Hacked.Core.Common;
 using Hacked.Core.Models;
 using Hacked.Services.Interfaces;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Net;
 using Telerik.Maui.Controls.DataGrid;
@@ -16,9 +18,9 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 {
     private readonly IPwndBreachService apiService;
     private readonly IAccountsService accountsService;
-    private ObservableCollection<CategoricalChartData> accountTotalsChartData;
-    private MonitoredAccount selectedAccount;
-    private Breach selectedBreach;
+    private ObservableCollection<CategoricalChartData> accountTotalsChartData = new();
+    private MonitoredAccount? selectedAccount;
+    private Breach? selectedBreach;
     private bool areAccountsLoaded;
     private bool hasAccounts;
     private int newBreachesTotal;
@@ -30,30 +32,38 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         apiService = srv;
         accountsService = accService;
 
-        RemoveAccountCommand = new AsyncCommand<MonitoredAccount>(RemoveAccountAsync);
+        RemoveAccountCommand = new AsyncCommand<MonitoredAccount?>(RemoveAccountAsync);
         FindAllAccountBreachesCommand = new AsyncCommand(FindAllAccountsBreachesAsync);
         GoToSettingsCommand = new AsyncCommand(GoToSettingsAsync);
-        ViewDetailsCommand = new AsyncCommand<MonitoredAccount>(GoToAccountDetailsAsync);
-        RefreshAccountCommand = new AsyncCommand<MonitoredAccount>((a) => UpdateBreachesForAccountAsync(a, showSuccessMessage:false, saveUpdate:true));
-        CellTapCommand = new AsyncCommand<object>(DataGridCellTappedAsync);
+        ViewDetailsCommand = new AsyncCommand<MonitoredAccount?>(GoToAccountDetailsAsync);
+        RefreshAccountCommand = new AsyncCommand<MonitoredAccount?>(a => UpdateBreachesForAccountAsync(a, showSuccessMessage: false, saveUpdate: true));
+        CellTapCommand = new AsyncCommand<object?>(DataGridCellTappedAsync);
         FindSelectedAccountBreachesCommand = new AsyncCommand(
-            () => UpdateBreachesForAccountAsync(SelectedAccount, showSuccessMessage:true, saveUpdate:true),
+            () => UpdateBreachesForAccountAsync(SelectedAccount, showSuccessMessage: true, saveUpdate: true),
             () => SelectedAccount != null,
             ex =>
             {
                 if (ex.Message.Contains("404") || ex.Message.Contains("net_http_message_not_success_statuscode"))
                 {
-                    SelectedAccount.Breaches = new();
+                    if (SelectedAccount != null)
+                        SelectedAccount.Breaches = new();
                 }
             });
-        ClearNewBreachesCommand = new AsyncCommand<MonitoredAccount>(ClearNewBreachesAsync);
+        ClearNewBreachesCommand = new AsyncCommand<MonitoredAccount?>(ClearNewBreachesAsync);
         AddPendingItemCommand = new Command(InvokeAddPendingItem);
-        RemovePendingItemCommand = new Command<PendingAccount>(InvokeRemovePendingItem);
+        RemovePendingItemCommand = new Command<PendingAccount?>(InvokeRemovePendingItem);
         AddAccountsCommand = new AsyncCommand(InvokeAddAccounts);
         CancelAddAccountsCommand = new Command(InvokeCancelAddAccounts);
         ToggleOverlayCommand = new Command(InvokeToggleOverlay);
 
-        PendingAdditions.CollectionChanged += (s, e) => { IsAddEnabled = PendingAdditions.Count > 0; };
+        PendingAdditions.CollectionChanged += PendingAdditions_CollectionChanged;
+        foreach (var pendingAccount in PendingAdditions)
+        {
+            pendingAccount.PropertyChanged += PendingAccount_PropertyChanged;
+        }
+
+        UpdateIsAddEnabled();
+
         Accounts.CollectionChanged += (s, e) => { HasAccounts = Accounts.Count > 0; };
     }
 
@@ -63,19 +73,19 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
     public ObservableCollection<CategoricalChartData> AccountTotalsChartData
     {
-        get => accountTotalsChartData ??= new();
+        get => accountTotalsChartData;
         set => SetProperty(ref accountTotalsChartData, value);
     }
 
     public ObservableCollection<PendingAccount> PendingAdditions { get; } = [new PendingAccount()];
 
-    public MonitoredAccount SelectedAccount
+    public MonitoredAccount? SelectedAccount
     {
         get => selectedAccount;
         set => SetProperty(ref selectedAccount, value);
     }
 
-    public Breach SelectedBreach
+    public Breach? SelectedBreach
     {
         get => selectedBreach;
         set => SetProperty(ref selectedBreach, value);
@@ -117,19 +127,19 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
     public AsyncCommand FindSelectedAccountBreachesCommand { get; set; }
 
-    public AsyncCommand<MonitoredAccount> RemoveAccountCommand { get; set; }
+    public AsyncCommand<MonitoredAccount?> RemoveAccountCommand { get; set; }
 
     public AsyncCommand FindAllAccountBreachesCommand { get; set; }
 
     public AsyncCommand GoToSettingsCommand { get; set; }
 
-    public AsyncCommand<MonitoredAccount> ViewDetailsCommand { get; set; }
+    public AsyncCommand<MonitoredAccount?> ViewDetailsCommand { get; set; }
 
-    public AsyncCommand<MonitoredAccount> RefreshAccountCommand { get; set; }
+    public AsyncCommand<MonitoredAccount?> RefreshAccountCommand { get; set; }
 
-    public AsyncCommand<object> CellTapCommand { get; set; }
+    public AsyncCommand<object?> CellTapCommand { get; set; }
 
-    public AsyncCommand<MonitoredAccount> ClearNewBreachesCommand { get; set; }
+    public AsyncCommand<MonitoredAccount?> ClearNewBreachesCommand { get; set; }
 
     public Command AddPendingItemCommand { get; set; }
 
@@ -145,13 +155,13 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
     #region Methods
 
-    public async Task<MonitoredAccount> AddAccountAsync(string address)
+    public async Task<MonitoredAccount?> AddAccountAsync(string? address)
     {
-        MonitoredAccount account = null;
+        MonitoredAccount? account = null;
 
         try
         {
-            if (string.IsNullOrEmpty(address))
+            if (string.IsNullOrWhiteSpace(address))
                 return null;
 
             IsBusy = true;
@@ -200,7 +210,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         return account;
     }
 
-    public Task RemoveAccountAsync(MonitoredAccount account)
+    public Task RemoveAccountAsync(MonitoredAccount? account)
     {
         if (account == null)
         {
@@ -281,7 +291,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         }
     }
 
-    public async Task UpdateBreachesForAccountAsync(MonitoredAccount account, bool showSuccessMessage = true, bool saveUpdate = true)
+    public async Task UpdateBreachesForAccountAsync(MonitoredAccount? account, bool showSuccessMessage = true, bool saveUpdate = true)
     {
         if (account == null)
         {
@@ -346,6 +356,8 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         }
         finally
         {
+            account.IsUpdating = false;
+
             UpdateStatistics();
 
             IsBusy = false;
@@ -381,10 +393,47 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         PendingAdditions.Add(new PendingAccount());
     }
 
-    private void InvokeRemovePendingItem(PendingAccount item)
+    private void InvokeRemovePendingItem(PendingAccount? item)
     {
+        if (item == null)
+            return;
+
         item.IsFocused = false;
         PendingAdditions.Remove(item);
+    }
+
+    private void PendingAdditions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems != null)
+        {
+            foreach (PendingAccount item in e.OldItems)
+            {
+                item.PropertyChanged -= PendingAccount_PropertyChanged;
+            }
+        }
+
+        if (e.NewItems != null)
+        {
+            foreach (PendingAccount item in e.NewItems)
+            {
+                item.PropertyChanged += PendingAccount_PropertyChanged;
+            }
+        }
+
+        UpdateIsAddEnabled();
+    }
+
+    private void PendingAccount_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(PendingAccount.Address))
+        {
+            UpdateIsAddEnabled();
+        }
+    }
+
+    private void UpdateIsAddEnabled()
+    {
+        IsAddEnabled = PendingAdditions.Any(a => !string.IsNullOrWhiteSpace(a.Address));
     }
 
     private async Task InvokeAddAccounts()
@@ -393,7 +442,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
         foreach (var addition in PendingAdditions)
         {
-            if (string.IsNullOrEmpty(addition.Address))
+            if (string.IsNullOrWhiteSpace(addition.Address))
             {
                 continue;
 
@@ -409,7 +458,10 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         IsBusyMessage = string.Empty;
         IsBusy = false;
 
-        var failedItems = PendingAdditions.Where(i => i.AddSuccessful == false).Select(i => i.Address).ToList();
+        var failedItems = PendingAdditions
+            .Where(i => i.AddSuccessful == false && !string.IsNullOrWhiteSpace(i.Address))
+            .Select(i => i.Address!)
+            .ToList();
 
         if (failedItems.Count > 0)
         {
@@ -450,12 +502,12 @@ public class MonitoredAccountsViewModel : PageViewModelBase
 
             AreAccountsLoaded = true;
 
-            Debug.WriteLine($"--- {Accounts?.Count} accounts loaded from json file ---");
+            Debug.WriteLine($"--- {Accounts.Count} accounts loaded from json file ---");
 
-            HasAccounts = Accounts?.Count > 0;
+            HasAccounts = Accounts.Count > 0;
 
             if (HasAccounts)
-                SelectedAccount = Accounts?.FirstOrDefault();
+                SelectedAccount = Accounts.FirstOrDefault();
 
             UpdateStatistics();
         }
@@ -476,8 +528,11 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         await Shell.Current.GoToAsync("/Settings");
     }
 
-    private async Task GoToAccountDetailsAsync(MonitoredAccount account)
+    private async Task GoToAccountDetailsAsync(MonitoredAccount? account)
     {
+        if (account == null)
+            return;
+
         SelectedAccount = account;
 
         await Shell.Current.GoToAsync("///MonitoredAccounts/AccountDetails", new Dictionary<string, object>
@@ -486,8 +541,11 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         });
     }
 
-    private Task ClearNewBreachesAsync(MonitoredAccount account)
+    private Task ClearNewBreachesAsync(MonitoredAccount? account)
     {
+        if (account == null)
+            return Task.CompletedTask;
+
         WeakReferenceMessenger.Default.Send(new MessagingCenterQuestion
         {
             Title = "Clear New Breaches?",
@@ -511,7 +569,7 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         return Task.CompletedTask;
     }
 
-    private async Task DataGridCellTappedAsync(object parameter)
+    private async Task DataGridCellTappedAsync(object? parameter)
     {
         if (parameter is DataGridCellInfo { Item: MonitoredAccount account } info)
         {

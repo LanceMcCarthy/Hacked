@@ -5,17 +5,15 @@ namespace Hacked.Maui.Converters;
 
 internal class BreachDetailsConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        var breach = value as Breach;
-
-        if (breach == null)
+        if (value is not Breach breach)
             return "null";
-            
+
         return $"Breached: {breach.BreachDate}, Accounts: {breach.PwnCount}";
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
     }
