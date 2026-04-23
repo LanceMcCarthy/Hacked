@@ -1,7 +1,7 @@
 <Solution>
   <Project Path="Hacked.Core/Hacked.Core.csproj" />
   <Project Path="Hacked.Maui/Hacked.Maui.csproj">
-    <Configuration Solution="Debug|Any CPU" Project="Debug|Any CPU|Deploy" />
+    <Deploy />
   </Project>
   <Project Path="Hacked.Services/Hacked.Services.csproj" />
 </Solution>
