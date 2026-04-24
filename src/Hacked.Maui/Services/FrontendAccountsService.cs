@@ -13,7 +13,7 @@ using System.Net;
 
 namespace Hacked.Maui.Services;
 
-public class AccountsService(IPwndBreachService apiService) : IAccountsService
+public class FrontendAccountsService(IPwndBreachService apiService) : IAccountsService
 {
     private readonly string _accountsFilePath = Path.Join(FileSystem.Current.AppDataDirectory, "AccountsJsonData.json");
     private static readonly string[] HackedExportFileExtension = [".json", ".hked"];

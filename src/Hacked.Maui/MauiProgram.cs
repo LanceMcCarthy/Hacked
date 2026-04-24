@@ -12,17 +12,11 @@ using Telerik.Maui.Controls.Compatibility;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Xaml.Media;
 using WinUIEx;
-
 #elif MACCATALYST
 using AppKit;
 using CoreGraphics;
 using Foundation;
 using UIKit;
-
-#elif IOS
-#elif ANDROID
-#elif TIZEN
-// nothing special here, yet
 #endif
 
 namespace Hacked.Maui;
@@ -32,16 +26,6 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
-
-        // Load appsettings from embedded resources
-        var assembly = Assembly.GetExecutingAssembly();
-        using var appSettingsStream = assembly.GetManifestResourceStream("Hacked.Maui.appsettings.json");
-        if (appSettingsStream != null)
-            builder.Configuration.AddJsonStream(appSettingsStream);
-
-        using var devSettingsStream = assembly.GetManifestResourceStream("Hacked.Maui.appsettings.Development.json");
-        if (devSettingsStream != null)
-            builder.Configuration.AddJsonStream(devSettingsStream);
 
         builder
             .UseMauiApp<App>()
@@ -54,38 +38,77 @@ public static class MauiProgram
                 fonts.AddFont("telerikfontexamples.ttf", "telerikfontexamples");
                 fonts.AddFont("fa-solid-900.ttf", "Font Awesome 6 Free Regular");
             })
+            .LoadConfigurations()
+            .RegisterServices()
+            .RegisterViewModels()
+            .RegisterViews()
             .RegisterLifecycleEvents();
 
-
-        builder.Services.AddSingleton<IPwndBreachService>(sp =>
-        {
-            var config = sp.GetRequiredService<IConfiguration>();
-            var apiKey = config["HibpApiKey"];
-            return new BeenPwnedService(apiKey);
-        });
-        builder.Services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
-        builder.Services.AddSingleton<IAccountsService, Hacked.Maui.Services.AccountsService>();
-
-        builder.Services.AddSingleton<MonitoredAccountsViewModel>();
-        builder.Services.AddTransient<AccountDetailsViewModel>();
-        builder.Services.AddTransient<BreachDetailsViewModel>();
-        builder.Services.AddSingleton<SettingsViewModel>();
-        builder.Services.AddSingleton<AboutViewModel>();
-
-        builder.Services.AddSingleton<AppShell>();
-        builder.Services.AddSingleton<MonitoredAccountsPage>();
-        builder.Services.AddTransient<AccountDetailsPage>();
-        builder.Services.AddTransient<BreachDetailsPage>();
-        builder.Services.AddSingleton<SettingsPage>();
-        builder.Services.AddSingleton<AboutPage>();
 
         return builder.Build();
     }
 
-    public static MauiAppBuilder RegisterLifecycleEvents(this MauiAppBuilder builder)
+    extension(MauiAppBuilder builder)
     {
-        builder.ConfigureLifecycleEvents(events =>
+        public MauiAppBuilder LoadConfigurations()
         {
+            // Load config from embedded resources
+            var assembly = Assembly.GetExecutingAssembly();
+
+            using var appSettingsStream = assembly.GetManifestResourceStream("Hacked.Maui.appsettings.json");
+
+            if (appSettingsStream != null)
+                builder.Configuration.AddJsonStream(appSettingsStream);
+
+            using var devSettingsStream = assembly.GetManifestResourceStream("Hacked.Maui.appsettings.Development.json");
+
+            if (devSettingsStream != null)
+                builder.Configuration.AddJsonStream(devSettingsStream);
+
+            return builder;
+        }
+
+        public MauiAppBuilder RegisterServices()
+        {
+            builder.Services.AddSingleton<IPwndBreachService>(sp =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>();
+                var apiKey = config["HibpApiKey"];
+#pragma warning disable CsWinRT1030
+                return new BeenPwnedService(apiKey);
+#pragma warning restore CsWinRT1030
+            });
+            builder.Services.AddSingleton<IPwndPasswordService, PwnedPasswordService>();
+            builder.Services.AddSingleton<IAccountsService, FrontendAccountsService>();
+
+            return builder;
+        }
+
+        public MauiAppBuilder RegisterViewModels()
+        {
+            builder.Services.AddSingleton<MonitoredAccountsViewModel>();
+            builder.Services.AddTransient<AccountDetailsViewModel>();
+            builder.Services.AddTransient<BreachDetailsViewModel>();
+            builder.Services.AddSingleton<SettingsViewModel>();
+            builder.Services.AddSingleton<AboutViewModel>();
+            return builder;
+        }
+
+        public MauiAppBuilder RegisterViews()
+        {
+            builder.Services.AddSingleton<AppShell>();
+            builder.Services.AddSingleton<MonitoredAccountsPage>();
+            builder.Services.AddTransient<AccountDetailsPage>();
+            builder.Services.AddTransient<BreachDetailsPage>();
+            builder.Services.AddSingleton<SettingsPage>();
+            builder.Services.AddSingleton<AboutPage>();
+            return builder;
+        }
+
+        public MauiAppBuilder RegisterLifecycleEvents()
+        {
+            builder.ConfigureLifecycleEvents(events =>
+            {
 #if WINDOWS10_0_17763_0_OR_GREATER
 
             events.AddWindows(wndLifeCycleBuilder =>
@@ -103,7 +126,7 @@ public static class MauiProgram
                     //manager.MinWidth = 640;
                     //manager.MinHeight = 480;
 
-                    window.CenterOnScreen(1024,768);
+                    window.CenterOnScreen(1200, 900);
 
                     window.SystemBackdrop = new MicaBackdrop { Kind = MicaKind.Base };
 
@@ -152,8 +175,9 @@ public static class MauiProgram
 
                 });
 #endif
-        });
+            });
 
-        return builder;
+            return builder;
+        }
     }
 }
