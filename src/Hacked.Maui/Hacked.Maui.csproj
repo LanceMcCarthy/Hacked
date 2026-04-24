@@ -33,12 +33,9 @@
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#EF322F" BaseSize="128,128" />
 		<MauiImage Include="Resources\Images\*" />
 		<MauiFont Include="Resources\Fonts\*" />
-	</ItemGroup>
-
-	<!-- Raw assets -->
-	<ItemGroup>
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
+
 
 	<ItemGroup>
 		<EmbeddedResource Include="appsettings.json" LogicalName="Hacked.Maui.appsettings.json" />
@@ -86,17 +83,25 @@
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
   </PropertyGroup>
 
-  <!-- Release Settings -->
+  <!-- Release Sideload Settings -->
 
   <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) and '$(Configuration)' == 'Release'">
     <WindowsPackageType>MSIX</WindowsPackageType>
     <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
     <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
-    <PackageCertificateThumbprint></PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>6317f13d6d4324b3f956e732255c521558ecb235</PackageCertificateThumbprint>
+    <UapAppxPackageBuildMode>SideloadOnly</UapAppxPackageBuildMode>
+    <AppxBundle>Always</AppxBundle>
+    <AppxBundlePlatforms>x64|arm64</AppxBundlePlatforms>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
-  <!-- msbuild /restore /t:Publish /p:TargetFramework=net10.0-windows10.0.19041 /p:configuration=release /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=true /p:PackageCertificateThumbprint=$PFX_THUMBPRINT /p:PackageCe
+  <!-- cli
+    msbuild /restore /t:Publish /p:TargetFramework=net10.0-windows10.0.19041 /p:configuration=release /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=true /p:PackageCertificateThumbprint=$PFX_THUMBPRINT /p:PackageCe
     rtificatePassword=$PFX_PASSWORD
+    
+    or with a profile
+    dotnet publish D:\Source\GitHub\Hacked\src\Hacked.Maui\Hacked.Maui.csproj -f net10.0-windows10.0.19041.0 -p:PublishProfile=BetaTesters-Windows-MSIX-Bundle
     -->
 
   <!-- **************** Android **************** -->
