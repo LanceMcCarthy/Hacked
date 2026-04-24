@@ -13,8 +13,7 @@
 
     <views:PageBase.Resources>
         <telerik:CollectionViewLinearLayout x:Key="MobileLayout"
-                                            VerticalItemSpacing="5"
-                                            HorizontalItemSpacing="5" />
+                                            ItemSpacing="5"/>
 
         <telerik:CollectionViewGridLayout x:Key="DesktopLayout"
                                           SpanCount="3"
