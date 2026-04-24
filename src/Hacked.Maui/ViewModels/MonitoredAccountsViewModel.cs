@@ -445,17 +445,17 @@ public class MonitoredAccountsViewModel : PageViewModelBase
         }
     }
 
+    private void UpdateIsAddEnabled()
+    {
+        IsAddEnabled = PendingAdditions.Any(a => !string.IsNullOrWhiteSpace(a.Address));
+    }
+
     private void UpdatePendingAdditionsLastState()
     {
         for (var i = 0; i < PendingAdditions.Count; i++)
         {
             PendingAdditions[i].IsLast = i == PendingAdditions.Count - 1;
         }
-    }
-
-    private void UpdateIsAddEnabled()
-    {
-        IsAddEnabled = PendingAdditions.Any(a => !string.IsNullOrWhiteSpace(a.Address));
     }
 
     private async Task InvokeAddAccounts()

@@ -41,6 +41,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<EmbeddedResource Include="appsettings.json" LogicalName="Hacked.Maui.appsettings.json" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
+		<EmbeddedResource Include="appsettings.Development.json" LogicalName="Hacked.Maui.appsettings.Development.json" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj" />
 		<ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj" />
 	</ItemGroup>
