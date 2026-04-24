@@ -106,6 +106,34 @@ public static class MauiProgram
                     window.CenterOnScreen(1024,768);
 
                     window.SystemBackdrop = new MicaBackdrop { Kind = MicaKind.Base };
+
+                    // Style the caption buttons so they're visible at rest against the Mica backdrop
+                    var titleBar = window.AppWindow.TitleBar;
+                    titleBar.ExtendsContentIntoTitleBar = false;
+
+                    // Foreground: app Primary purple
+                    var fgColor = Windows.UI.Color.FromArgb(0xFF, 0x41, 0x36, 0x54);       // #413654 Primary
+                    // Hover background: Secondary lavender at ~40% opacity
+                    var hoverBg = Windows.UI.Color.FromArgb(0x66, 0xDF, 0xD8, 0xF7);       // #66DFD8F7
+                    // Pressed background: Tertiary purple at ~60% opacity
+                    var pressedBg = Windows.UI.Color.FromArgb(0x99, 0xA6, 0x8C, 0xD4);     // #99A68CD4
+                    // Transparent resting background — lets Mica show through
+                    var transparentBg = Windows.UI.Color.FromArgb(0x00, 0xFF, 0xFF, 0xFF);
+
+                    // Title bar area background (the non-button region)
+                    titleBar.BackgroundColor         = transparentBg;
+                    titleBar.InactiveBackgroundColor = transparentBg;
+
+                    // Caption buttons
+                    titleBar.ButtonForegroundColor         = fgColor;
+                    titleBar.ButtonBackgroundColor         = transparentBg;
+                    titleBar.ButtonHoverForegroundColor    = fgColor;
+                    titleBar.ButtonHoverBackgroundColor    = hoverBg;
+                    titleBar.ButtonPressedForegroundColor  = Windows.UI.Color.FromArgb(0xFF, 0xDF, 0xD8, 0xF7); // Secondary
+                    titleBar.ButtonPressedBackgroundColor  = pressedBg;
+                    titleBar.ButtonInactiveForegroundColor  = Windows.UI.Color.FromArgb(0x66, 0x41, 0x36, 0x54); // Primary @40%
+                    titleBar.ButtonInactiveBackgroundColor = transparentBg;
+
                 });
             });
 
