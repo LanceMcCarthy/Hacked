@@ -170,11 +170,17 @@ jobs:
       - name: Restore NuGet packages
         run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
-      - name: Import Developer ID Certificates
+      - name: Import Developer ID Installer Certificates
         uses: Apple-Actions/import-codesign-certs@v7
         with:
-          p12-file-base64: "${{secrets.APPLE_DEVELOPER_ID_COMBINED_CERT_BASE64}}"
-          p12-password: "${{secrets.APPLE_DEVELOPER_ID_COMBINED_CERT_PASSWORD}}"
+          p12-file-base64: "${{secrets.APPLE_DEVELOPER_ID_INSTALLER_CERT_BASE64}}"
+          p12-password: "${{secrets.APPLE_DEVELOPER_ID_INSTALLER_CERT_PASSWORD}}"
+
+      - name: Import Developer ID Application Certificates
+        uses: Apple-Actions/import-codesign-certs@v7
+        with:
+          p12-file-base64: "${{secrets.APPLE_DEVELOPER_ID_APPLICATION_CERT_BASE64}}"
+          p12-password: "${{secrets.APPLE_DEVELOPER_ID_APPLICATION_CERT_PASSWORD}}"
 
       - name: Verify Developer ID identities are available
         shell: bash
