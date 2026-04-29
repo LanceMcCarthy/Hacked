@@ -96,8 +96,16 @@ jobs:
     - name: Locate msixbundle for signing
       id: locate-msixbundle
       run: |
-        $bundleFiles = Get-ChildItem -Path "${{github.workspace}}\src\Hacked.Maui\AppPackages" -Recurse -File -Filter *.msixbundle | Select-Object -ExpandProperty FullName
-        if (-not $bundleFiles) { throw 'No .msixbundle files found under src\Hacked.Maui\AppPackages.' }
+        $bundleFiles = Get-ChildItem -Path "${{github.workspace}}" -Recurse -File |
+          Where-Object { $_.Name -like '*.msixbundle' } |
+          Select-Object -ExpandProperty FullName -Unique
+        if (-not $bundleFiles) {
+          Write-Host 'No .msixbundle files found. Listing AppPackages contents for diagnostics:'
+          if (Test-Path "${{github.workspace}}\src\Hacked.Maui\AppPackages") {
+            Get-ChildItem -Path "${{github.workspace}}\src\Hacked.Maui\AppPackages" -Recurse | Select-Object FullName
+          }
+          throw 'No .msixbundle files found anywhere under the workspace.'
+        }
         $bundleFiles | ForEach-Object { Write-Host "Found bundle: $_" }
         "files<<EOF" >> $env:GITHUB_OUTPUT
         $bundleFiles >> $env:GITHUB_OUTPUT
@@ -145,143 +153,143 @@ jobs:
   # ***************************************************************************************** #
   #                                  Windows Microsoft Store                                  #
   # ***************************************************************************************** #
-  build-windows:
-    name: Build Windows (Store Upload)
-    runs-on: windows-latest
-    needs: shared-resources
-    if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
-    steps:
-      - uses: actions/checkout@v6
+  # build-windows:
+  #   name: Build Windows (Store Upload)
+  #   runs-on: windows-latest
+  #   needs: shared-resources
+  #   if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
+  #   steps:
+  #     - uses: actions/checkout@v6
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{env.SDK_VERSION}}
+  #     - name: Setup .NET SDK
+  #       uses: actions/setup-dotnet@v5
+  #       with:
+  #         dotnet-version: ${{env.SDK_VERSION}}
 
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v3
+  #     - name: Add msbuild to PATH
+  #       uses: microsoft/setup-msbuild@v3
 
-      - name: Install MAUI Workloads
-        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
+  #     - name: Install MAUI Workloads
+  #       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
-      - name: Add Telerik NuGet Server
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
+  #     - name: Add Telerik NuGet Server
+  #       run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
-      - name: Build Maui WinUI project
-        run: dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:AppxSymbolPackageEnabled=false -p:UapAppxPackageBuildMode=StoreUpload -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU
+  #     - name: Build Maui WinUI project
+  #       run: dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:AppxSymbolPackageEnabled=false -p:UapAppxPackageBuildMode=StoreUpload -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU
 
-      - name: Publish build artifacts
-        uses: actions/upload-artifact@v4
-        with:     
-          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_storeupload"
-          path: "**/*.msixupload"
-          if-no-files-found: error
-          retention-days: 60
+  #     - name: Publish build artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:     
+  #         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_storeupload"
+  #         path: "**/*.msixupload"
+  #         if-no-files-found: error
+  #         retention-days: 60
 
 
   # ***************************************************************************************** #
   #                                      MacCatalyst                                          #
   # ***************************************************************************************** #
-  build-macos:
-    name: Build MacCatalyst (Signed & Notiarized)
-    needs: shared-resources
-    if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
-    runs-on: macos-26
-    env:
-      XCODE_VERSION: '26.3'
-      APPLE_DEV_ID_APP_CERT_NAME: "Developer ID Application: Lancelot Software, LLC (L65255N3F7)"
-      APPLE_DEV_ID_INSTALLER_CERT_NAME: "Developer ID Installer: Lancelot Software, LLC (L65255N3F7)"
-      APPLE_NOTARY_TEAM_ID: "L65255N3F7"
-    steps:
-      - uses: actions/checkout@v6
+  # build-macos:
+  #   name: Build MacCatalyst (Signed & Notiarized)
+  #   needs: shared-resources
+  #   if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
+  #   runs-on: macos-26
+  #   env:
+  #     XCODE_VERSION: '26.3'
+  #     APPLE_DEV_ID_APP_CERT_NAME: "Developer ID Application: Lancelot Software, LLC (L65255N3F7)"
+  #     APPLE_DEV_ID_INSTALLER_CERT_NAME: "Developer ID Installer: Lancelot Software, LLC (L65255N3F7)"
+  #     APPLE_NOTARY_TEAM_ID: "L65255N3F7"
+  #   steps:
+  #     - uses: actions/checkout@v6
 
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: ${{env.XCODE_VERSION}}
+  #     - uses: maxim-lobanov/setup-xcode@v1
+  #       with:
+  #         xcode-version: ${{env.XCODE_VERSION}}
 
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{env.SDK_VERSION}}
+  #     - name: Setup .NET SDK
+  #       uses: actions/setup-dotnet@v5
+  #       with:
+  #         dotnet-version: ${{env.SDK_VERSION}}
 
-      - name: Install MAUI Workloads
-        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
+  #     - name: Install MAUI Workloads
+  #       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
-      - name: Set Telerik NuGet Credentials
-        run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
+  #     - name: Set Telerik NuGet Credentials
+  #       run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
 
-      - name: Restore NuGet packages
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
+  #     - name: Restore NuGet packages
+  #       run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
-      - name: Import Developer ID Installer Certificates
-        uses: Apple-Actions/import-codesign-certs@v7
-        with:
-          p12-file-base64: "${{secrets.APPLE_DEVELOPER_ID_INSTALLER_CERT_BASE64}}"
-          p12-password: "${{secrets.APPLE_DEVELOPER_ID_INSTALLER_CERT_PASSWORD}}"
-          keychain: installer_signing_temp
+  #     - name: Import Developer ID Installer Certificates
+  #       uses: Apple-Actions/import-codesign-certs@v7
+  #       with:
+  #         p12-file-base64: "${{secrets.APPLE_DEVELOPER_ID_INSTALLER_CERT_BASE64}}"
+  #         p12-password: "${{secrets.APPLE_DEVELOPER_ID_INSTALLER_CERT_PASSWORD}}"
+  #         keychain: installer_signing_temp
 
-      - name: Import Developer ID Application Certificates
-        uses: Apple-Actions/import-codesign-certs@v7
-        with:
-          p12-file-base64: "${{secrets.APPLE_DEVELOPER_ID_APPLICATION_CERT_BASE64}}"
-          p12-password: "${{secrets.APPLE_DEVELOPER_ID_APPLICATION_CERT_PASSWORD}}"
-          keychain: application_signing_temp
+  #     - name: Import Developer ID Application Certificates
+  #       uses: Apple-Actions/import-codesign-certs@v7
+  #       with:
+  #         p12-file-base64: "${{secrets.APPLE_DEVELOPER_ID_APPLICATION_CERT_BASE64}}"
+  #         p12-password: "${{secrets.APPLE_DEVELOPER_ID_APPLICATION_CERT_PASSWORD}}"
+  #         keychain: application_signing_temp
 
-      - name: Ensure both signing keychains are in the search list
-        shell: bash
-        run: |
-          # Each import-codesign-certs call rewrites the keychain search list.
-          # The second call (Application cert) drops the first (Installer) keychain,
-          # so productbuild cannot find the "Developer ID Installer" identity.
-          # Re-add both keychains explicitly before any signing occurs.
-          INSTALLER_KC="$HOME/Library/Keychains/installer_signing_temp.keychain-db"
-          APP_KC="$HOME/Library/Keychains/application_signing_temp.keychain-db"
-          security list-keychains -d user -s "$INSTALLER_KC" "$APP_KC" login.keychain
-          echo "Keychain search list:"
-          security list-keychains -d user
+  #     - name: Ensure both signing keychains are in the search list
+  #       shell: bash
+  #       run: |
+  #         # Each import-codesign-certs call rewrites the keychain search list.
+  #         # The second call (Application cert) drops the first (Installer) keychain,
+  #         # so productbuild cannot find the "Developer ID Installer" identity.
+  #         # Re-add both keychains explicitly before any signing occurs.
+  #         INSTALLER_KC="$HOME/Library/Keychains/installer_signing_temp.keychain-db"
+  #         APP_KC="$HOME/Library/Keychains/application_signing_temp.keychain-db"
+  #         security list-keychains -d user -s "$INSTALLER_KC" "$APP_KC" login.keychain
+  #         echo "Keychain search list:"
+  #         security list-keychains -d user
 
-      - name: Verify Developer ID identities are available
-        shell: bash
-        run: |
-          set -euo pipefail
-          security find-identity -v -p codesigning
-          security find-certificate -a -c "${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}" || true
+  #     - name: Verify Developer ID identities are available
+  #       shell: bash
+  #       run: |
+  #         set -euo pipefail
+  #         security find-identity -v -p codesigning
+  #         security find-certificate -a -c "${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}" || true
 
-          if ! security find-identity -v -p codesigning | grep -F "${{env.APPLE_DEV_ID_APP_CERT_NAME}}" >/dev/null; then
-            echo "Missing Developer ID Application identity: ${{env.APPLE_DEV_ID_APP_CERT_NAME}}"
-            exit 1
-          fi
+  #         if ! security find-identity -v -p codesigning | grep -F "${{env.APPLE_DEV_ID_APP_CERT_NAME}}" >/dev/null; then
+  #           echo "Missing Developer ID Application identity: ${{env.APPLE_DEV_ID_APP_CERT_NAME}}"
+  #           exit 1
+  #         fi
 
-          if ! security find-certificate -a -c "${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}" >/dev/null; then
-            echo "Missing Developer ID Installer certificate: ${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}"
-            exit 1
-          fi
+  #         if ! security find-certificate -a -c "${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}" >/dev/null; then
+  #           echo "Missing Developer ID Installer certificate: ${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}"
+  #           exit 1
+  #         fi
 
-      - name: Build, sign, notarize, and staple MacCatalyst artifacts
-        shell: bash
-        env:
-          PROJECT_PATH: ${{env.PROJECT_PATH}}
-          TFM: ${{env.NET_TFM}}-maccatalyst
-          CONFIGURATION: Release
-          APP_VERSION: ${{needs.shared-resources.outputs.app_version}}
-          CODESIGN_KEY: ${{env.APPLE_DEV_ID_APP_CERT_NAME}}
-          INSTALLER_SIGN_ID: ${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}
-          APPLE_NOTARY_APPLE_ID: ${{secrets.APPLE_NOTARY_APPLE_ID}}
-          APPLE_NOTARY_APP_PASSWORD: ${{secrets.APPLE_NOTARY_APP_PASSWORD}}
-          APPLE_NOTARY_TEAM_ID: ${{env.APPLE_NOTARY_TEAM_ID}}
-        run: |
-          ./scripts/maccatalyst/build-sign-notarize.sh
+  #     - name: Build, sign, notarize, and staple MacCatalyst artifacts
+  #       shell: bash
+  #       env:
+  #         PROJECT_PATH: ${{env.PROJECT_PATH}}
+  #         TFM: ${{env.NET_TFM}}-maccatalyst
+  #         CONFIGURATION: Release
+  #         APP_VERSION: ${{needs.shared-resources.outputs.app_version}}
+  #         CODESIGN_KEY: ${{env.APPLE_DEV_ID_APP_CERT_NAME}}
+  #         INSTALLER_SIGN_ID: ${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}
+  #         APPLE_NOTARY_APPLE_ID: ${{secrets.APPLE_NOTARY_APPLE_ID}}
+  #         APPLE_NOTARY_APP_PASSWORD: ${{secrets.APPLE_NOTARY_APP_PASSWORD}}
+  #         APPLE_NOTARY_TEAM_ID: ${{env.APPLE_NOTARY_TEAM_ID}}
+  #       run: |
+  #         ./scripts/maccatalyst/build-sign-notarize.sh
 
-      - name: Publish MacCatalyst build artifacts
-        uses: actions/upload-artifact@v7
-        with:     
-          name: "HackedApp_v${{needs.shared-resources.outputs.app_version}}_maccatalyst_notarized"
-          path: |
-            artifacts/maccatalyst/Hacked-MacCatalyst-Release-signed.pkg
-            artifacts/maccatalyst/Hacked-MacCatalyst-Release-notarized.zip
-            src/Hacked.Maui/bin/Release/net10.0-maccatalyst/Hacked.app
-          if-no-files-found: error
-          retention-days: 30
+  #     - name: Publish MacCatalyst build artifacts
+  #       uses: actions/upload-artifact@v7
+  #       with:     
+  #         name: "HackedApp_v${{needs.shared-resources.outputs.app_version}}_maccatalyst_notarized"
+  #         path: |
+  #           artifacts/maccatalyst/Hacked-MacCatalyst-Release-signed.pkg
+  #           artifacts/maccatalyst/Hacked-MacCatalyst-Release-notarized.zip
+  #           src/Hacked.Maui/bin/Release/net10.0-maccatalyst/Hacked.app
+  #         if-no-files-found: error
+  #         retention-days: 30
 
 
   # ***************************************************************************************** #
