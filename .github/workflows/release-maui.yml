@@ -38,14 +38,14 @@ jobs:
     outputs:
       app_version: ${{steps.version-creator.outputs.app_version}}
     steps:
-    # Generates a version number using year.monthday.run_number.0 (e.g., 2024.824.1.0)
+    # Generates a version number using year.monthday.run_number (e.g., 2024.824.1)
     - name: Generate version number using date and run number
       id: version-creator
       shell: pwsh
       run: |
         $buildDay = Get-Date -Format "yyyy.Mdd"
         $runNumber = "$env:GITHUB_RUN_NUMBER"
-        $ver = $buildDay + "." + $runNumber + ".0"
+        $ver = $buildDay + "." + $runNumber
         echo "app_version=$ver" >> $env:GITHUB_OUTPUT
 
 
@@ -76,7 +76,7 @@ jobs:
       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
     - name: Set Telerik NuGet Credentials
-      run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile 'src/NuGet.Config' --store-password-in-clear-text
+      run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
 
     - name: Restore NuGet packages
       run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
@@ -85,7 +85,7 @@ jobs:
     - name: Update manifest for side load build
       run: |
         [xml]$manifest = get-content 'src\Hacked.Maui\Platforms\Windows\Package.appxmanifest'
-        $manifest.Package.Identity.Version = "${{needs.shared-resources.outputs.app_version}}"
+        $manifest.Package.Identity.Version = "${{needs.shared-resources.outputs.app_version}}.0"
         $manifest.save("src\Hacked.Maui\Platforms\Windows\Package.appxmanifest")
 
     - name: Build WinUI ${{matrix.RID}}
@@ -160,7 +160,7 @@ jobs:
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
       - name: Set Telerik NuGet Credentials
-        run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile 'src/NuGet.Config' --store-password-in-clear-text
+        run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
 
       - name: Restore NuGet packages
         run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
