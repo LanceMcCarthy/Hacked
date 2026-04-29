@@ -95,7 +95,7 @@ jobs:
         $manifest.Save('src\Hacked.Maui\Platforms\Windows\Package.appxmanifest')
 
     - name: Build WinUI ${{matrix.RID}}
-      run: dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:PublishProfile=BetaTesters-Windows-MSIX-Bundle
+      run: dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:PublishProfile=GitHubActions-Windows-MSIX-Bundle
 
     - name: Locate msix
       id: find-msix-file
