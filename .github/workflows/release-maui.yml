@@ -84,9 +84,14 @@ jobs:
     # Update the app manifest
     - name: Update manifest for side load build
       run: |
-        [xml]$manifest = get-content 'src\Hacked.Maui\Platforms\Windows\Package.appxmanifest'
-        $manifest.Package.Identity.Version = "${{needs.shared-resources.outputs.app_version}}.0"
-        $manifest.save("src\Hacked.Maui\Platforms\Windows\Package.appxmanifest")
+        [xml]$manifest = Get-Content 'src\Hacked.Maui\Platforms\Windows\Package.appxmanifest'
+        $ns = $manifest.DocumentElement.NamespaceURI
+        $nsmgr = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
+        $nsmgr.AddNamespace('m', $ns)
+        $identityNode = $manifest.SelectSingleNode('/m:Package/m:Identity', $nsmgr)
+        if ($null -eq $identityNode) { throw 'Identity node not found in Package.appxmanifest' }
+        $identityNode.SetAttribute('Version', "${{needs.shared-resources.outputs.app_version}}.0")
+        $manifest.Save('src\Hacked.Maui\Platforms\Windows\Package.appxmanifest')
 
     - name: Build WinUI ${{matrix.RID}}
       run: dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:PublishProfile=BetaTesters-Windows-MSIX-Bundle
