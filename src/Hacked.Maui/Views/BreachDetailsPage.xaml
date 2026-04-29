@@ -21,35 +21,35 @@
                            BackgroundColor="{AppThemeBinding Light={StaticResource DarkTranslucent}, Dark={StaticResource Gray600}}"
                            Grid.Row="0"
                            Grid.Column="1">
-            <Image Source="{Binding SelectedBreach.LogoPath}" />
+            <Image Source="{Binding SelectedBreach.LogoPath, FallbackValue=''}" />
         </telerik:RadBorder>
 
         <VerticalStackLayout Padding="10"
                              Spacing="5"
                              Grid.Row="0"
                              Grid.Column="1">
-            <Label Text="{Binding SelectedBreach.Domain}" />
-            <Label Text="{Binding SelectedBreach.PwnCount, StringFormat='Accounts Stolen: {0:N0}'}" />
-            <Label Text="{Binding SelectedBreach.BreachDate, StringFormat='Breached: {0:mm dd yy}'}" />
-            <Label Text="{Binding SelectedBreach.AddedDate, StringFormat='Added: {0:mm dd yy}'}" />
-            <Label Text="{Binding SelectedBreach.ModifiedDate, StringFormat='Modified: {0:mm dd yy}'}" />
+            <Label Text="{Binding SelectedBreach.Domain, FallbackValue=''}" />
+            <Label Text="{Binding SelectedBreach.PwnCount, StringFormat='Accounts Stolen: {0:N0}', FallbackValue=''}" />
+            <Label Text="{Binding SelectedBreach.BreachDate, StringFormat='Breached: {0:mm dd yy}', FallbackValue=''}" />
+            <Label Text="{Binding SelectedBreach.AddedDate, StringFormat='Added: {0:mm dd yy}', FallbackValue=''}" />
+            <Label Text="{Binding SelectedBreach.ModifiedDate, StringFormat='Modified: {0:mm dd yy}', FallbackValue=''}" />
 
             <Label Text="New"
-                   IsVisible="{Binding SelectedBreach.IsNew}" />
+                   IsVisible="{Binding SelectedBreach.IsNew, FallbackValue=''}" />
             <Label Text="Fabricated!"
-                   IsVisible="{Binding SelectedBreach.IsFabricated}" />
+                   IsVisible="{Binding SelectedBreach.IsFabricated, FallbackValue=''}" />
             <Label Text="Sensitive!"
                    FontAttributes="Bold"
-                   IsVisible="{Binding SelectedBreach.IsSensitive}" />
+                   IsVisible="{Binding SelectedBreach.IsSensitive, FallbackValue=''}" />
             <Label Text="Verified!"
-                   IsVisible="{Binding SelectedBreach.IsVerified}" />
+                   IsVisible="{Binding SelectedBreach.IsVerified, FallbackValue=''}" />
             <Label Text="Retired!"
-                   IsVisible="{Binding SelectedBreach.IsRetired}" />
+                   IsVisible="{Binding SelectedBreach.IsRetired, FallbackValue=''}" />
             <Label Text="Spam List!"
-                   IsVisible="{Binding SelectedBreach.IsSpamList}" />
+                   IsVisible="{Binding SelectedBreach.IsSpamList, FallbackValue=''}" />
         </VerticalStackLayout>
 
-        <Label Text="{Binding SelectedBreach.Description}"
+        <Label Text="{Binding SelectedBreach.Description, FallbackValue=''}"
                LineBreakMode="WordWrap"
                Grid.Row="1"
                Grid.ColumnSpan="2"
@@ -64,7 +64,7 @@
             <telerik:RadItemsControl.ItemTemplate>
                 <DataTemplate>
                     <telerik:RadBorder Padding="5,2"
-                                                                  BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                                       BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
                         <Label Text="{Binding}" />
                     </telerik:RadBorder>
                 </DataTemplate>
