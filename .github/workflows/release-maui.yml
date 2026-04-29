@@ -74,13 +74,13 @@ jobs:
       uses: microsoft/setup-msbuild@v3
 
     - name: Install MAUI workloads
-      run: dotnet workload install maui-windows --source https://api.nuget.org/v3/index.json
+      run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
     - name: Set Telerik NuGet Credentials
       run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
 
     - name: Restore NuGet packages
-      run: dotnet restore ${{env.PROJECT_PATH}} -p:TargetFramework=${{env.NET_TFM}}-windows10.0.19041.0 --configfile ${{env.NUGET_CONFIG_PATH}}
+      run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
     # Update the app manifest
     - name: Update manifest for side load build
@@ -157,10 +157,10 @@ jobs:
         uses: microsoft/setup-msbuild@v3
 
       - name: Install MAUI Workloads
-        run: dotnet workload install maui-windows --source https://api.nuget.org/v3/index.json
+        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
       - name: Add Telerik NuGet Server
-        run: dotnet restore ${{env.PROJECT_PATH}} -p:TargetFramework=${{env.NET_TFM}}-windows10.0.19041.0 --configfile ${{env.NUGET_CONFIG_PATH}}
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
       - name: Build Maui WinUI project
         run: dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=StoreUpload -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU
@@ -195,13 +195,13 @@ jobs:
   #         dotnet-version: ${{env.SDK_VERSION}}
 
   #     - name: Install MAUI Workloads
-  #       run: dotnet workload install maui-maccatalyst --source https://api.nuget.org/v3/index.json
+  #       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
   #     - name: Set Telerik NuGet Credentials
   #       run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
 
   #     - name: Restore NuGet packages
-  #       run: dotnet restore ${{env.PROJECT_PATH}} -p:TargetFramework=${{env.NET_TFM}}-maccatalyst --configfile ${{env.NUGET_CONFIG_PATH}}
+  #       run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
   #     - name: Import Developer ID Installer Certificates
   #       uses: Apple-Actions/import-codesign-certs@v7
@@ -297,10 +297,10 @@ jobs:
   #         dotnet-version: ${{env.SDK_VERSION}}
 
   #     - name: Install MAUI Workloads
-  #       run: dotnet workload install maui-ios --source https://api.nuget.org/v3/index.json
+  #       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
   #     - name: Add Telerik NuGet Server
-  #       run: dotnet restore ${{env.PROJECT_PATH}} -p:TargetFramework=${{env.NET_TFM}}-ios --configfile ${{env.NUGET_CONFIG_PATH}}
+  #       run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
   #     - name: Build iOS App
   #       run: |
@@ -385,10 +385,10 @@ jobs:
   #         java-version: '11'     
 
   #     - name: Install MAUI Workloads
-  #       run: dotnet workload install maui-android --source https://api.nuget.org/v3/index.json
+  #       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
   #     - name: Add Telerik NuGet Server
-  #       run: dotnet restore ${{env.PROJECT_PATH}} -p:TargetFramework=${{env.NET_TFM}}-android --configfile ${{env.NUGET_CONFIG_PATH}} 
+  #       run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} 
 
   #     - name: Simple build MAUI Android
   #       run: dotnet build ${{env.PROJECT_PATH}} -c Debug -f ${{env.NET_TFM}}-android
