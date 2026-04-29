@@ -17,8 +17,6 @@ permissions:
   id-token: write  # For OIDC auth
 
 env:
-  IOS_ARTIFACTS_PATH: "artifacts_ios"
-  ANDROID_ARTIFACTS_PATH: "artifacts_android"
   PROJECT_PATH: "src/Hacked.Maui/Hacked.Maui.csproj"
   SDK_VERSION: '10.0.x'
   NET_TFM: 'net10.0'
@@ -108,13 +106,14 @@ jobs:
       uses: azure/trusted-signing-action@v1.2.0
       with:
         endpoint: https://eus.codesigning.azure.net/
-        trusted-signing-account-name: PrimaryCodeSign
+        signing-account-name: PrimaryCodeSign
         certificate-profile-name: lancemccarthylivepublic
         timestamp-rfc3161: http://timestamp.acs.microsoft.com
         timestamp-digest: SHA256
         file-digest: SHA256
-        files-folder: ${{github.workspace}}
+        files-folder: ${{github.workspace}}\src\Hacked.Maui\AppPackages
         files-folder-filter: msixbundle
+        files-folder-recurse: true
         exclude-azure-cli-credential: false
         exclude-environment-credential: true
         exclude-workload-identity-credential: true
@@ -130,7 +129,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:     
         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_sideload"
-        path: "**/*.msixbundle"
+        path: "${{github.workspace}}/src/Hacked.Maui/AppPackages/**/*.msixbundle"
         if-no-files-found: error
         retention-days: 30
 
