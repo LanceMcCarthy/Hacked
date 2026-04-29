@@ -23,10 +23,11 @@ env:
   NET_TFM: 'net10.0'
   NUGET_CONFIG_PATH: 'src/nuget.config'
   TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
-  XCODE_VERSION: '26.2'
+  XCODE_VERSION: '26.3'
   APPLE_DEV_ID_APP_CERT_NAME: "Developer ID Application: Lancelot Software, LLC (L65255N3F7)"
   APPLE_DEV_ID_INSTALLER_CERT_NAME: "Developer ID Installer: Lancelot Software, LLC (L65255N3F7)"
   APPLE_NOTARY_TEAM_ID: "L65255N3F7"
+  TELERIK_LICENSE: ${{secrets.TELERIK_LICENSE_KEY_VALUE}}
 
 jobs:
   # ******************************** #
