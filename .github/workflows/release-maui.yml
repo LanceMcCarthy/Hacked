@@ -91,20 +91,22 @@ jobs:
         $manifest.Save('src\Hacked.Maui\Platforms\Windows\Package.appxmanifest')
 
     - name: Build WinUI project and create unsigned msix package
-      run: dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU
+      run: dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:AppxPackageDir="${{github.workspace}}\artifacts\appx\\"
 
     - name: Locate msixbundle for signing
       id: locate-msixbundle
       run: |
-        $bundleFiles = Get-ChildItem -Path "${{github.workspace}}" -Recurse -File |
-          Where-Object { $_.Name -like '*.msixbundle' } |
-          Select-Object -ExpandProperty FullName -Unique
+        $appxRoot = "${{github.workspace}}\artifacts\appx"
+        if (-not (Test-Path $appxRoot)) { throw "Expected package folder was not created: $appxRoot" }
+
+        $bundleFiles = @(Get-ChildItem -Path $appxRoot -Recurse -Force |
+          Where-Object { -not $_.PSIsContainer -and $_.Extension -ieq '.msixbundle' } |
+          Select-Object -ExpandProperty FullName -Unique)
+
         if (-not $bundleFiles) {
-          Write-Host 'No .msixbundle files found. Listing AppPackages contents for diagnostics:'
-          if (Test-Path "${{github.workspace}}\src\Hacked.Maui\AppPackages") {
-            Get-ChildItem -Path "${{github.workspace}}\src\Hacked.Maui\AppPackages" -Recurse | Select-Object FullName
-          }
-          throw 'No .msixbundle files found anywhere under the workspace.'
+          Write-Host "No .msixbundle files found under $appxRoot. Listing package directory contents for diagnostics:"
+          Get-ChildItem -Path $appxRoot -Recurse -Force | Select-Object FullName
+          throw "No .msixbundle files found under $appxRoot."
         }
         $bundleFiles | ForEach-Object { Write-Host "Found bundle: $_" }
         "files<<EOF" >> $env:GITHUB_OUTPUT
