@@ -93,6 +93,16 @@ jobs:
     - name: Build WinUI project and create unsigned msix package
       run: dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU
 
+    - name: Locate msixbundle for signing
+      id: locate-msixbundle
+      run: |
+        $bundleFiles = Get-ChildItem -Path "${{github.workspace}}\src\Hacked.Maui\AppPackages" -Recurse -File -Filter *.msixbundle | Select-Object -ExpandProperty FullName
+        if (-not $bundleFiles) { throw 'No .msixbundle files found under src\Hacked.Maui\AppPackages.' }
+        $bundleFiles | ForEach-Object { Write-Host "Found bundle: $_" }
+        "files<<EOF" >> $env:GITHUB_OUTPUT
+        $bundleFiles >> $env:GITHUB_OUTPUT
+        "EOF" >> $env:GITHUB_OUTPUT
+
     # Entra ID App Registration (Akeyless OIDC Provider) > Certificates and Secrets > Federated Credentials
     - name: Azure login using OIDC via GitHub
       uses: azure/login@v2
@@ -111,9 +121,7 @@ jobs:
         timestamp-rfc3161: http://timestamp.acs.microsoft.com
         timestamp-digest: SHA256
         file-digest: SHA256
-        files-folder: ${{github.workspace}}\src\Hacked.Maui\AppPackages
-        files-folder-filter: msixbundle
-        files-folder-recurse: true
+        files: ${{steps.locate-msixbundle.outputs.files}}
         exclude-azure-cli-credential: false
         exclude-environment-credential: true
         exclude-workload-identity-credential: true
@@ -129,7 +137,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:     
         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_sideload"
-        path: "${{github.workspace}}/src/Hacked.Maui/AppPackages/**/*.msixbundle"
+        path: ${{steps.locate-msixbundle.outputs.files}}
         if-no-files-found: error
         retention-days: 30
 
