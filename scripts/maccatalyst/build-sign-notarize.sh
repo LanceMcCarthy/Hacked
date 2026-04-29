@@ -37,7 +37,7 @@ publish_args=(
   "$PROJECT_PATH"
   -c "$CONFIGURATION"
   -f "$TFM"
-  "-p:CodesignKey=$CODESIGN_KEY"
+  "-p:CodesignKey=\"$CODESIGN_KEY\""
   -p:UseHardenedRuntime=true
 )
 
@@ -45,6 +45,7 @@ if [[ -n "$APP_VERSION" ]]; then
   publish_args+=("-p:ApplicationVersion=$APP_VERSION" "-p:ApplicationDisplayVersion=$APP_VERSION")
 fi
 
+printf 'Running: dotnet publish'; printf ' %q' "${publish_args[@]}"; printf '\n'
 dotnet publish "${publish_args[@]}"
 
 if [[ ! -d "$APP_BUNDLE_PATH" ]]; then
