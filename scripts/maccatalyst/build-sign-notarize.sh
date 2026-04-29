@@ -33,15 +33,19 @@ mkdir -p "$ARTIFACTS_DIR"
 echo "Cleaning and publishing MacCatalyst app..."
 dotnet clean "$PROJECT_PATH" -c "$CONFIGURATION" -f "$TFM"
 
-VERSION_ARGS=""
+publish_args=(
+  "$PROJECT_PATH"
+  -c "$CONFIGURATION"
+  -f "$TFM"
+  "-p:CodesignKey=$CODESIGN_KEY"
+  -p:UseHardenedRuntime=true
+)
+
 if [[ -n "$APP_VERSION" ]]; then
-  VERSION_ARGS="-p:ApplicationVersion=$APP_VERSION -p:ApplicationDisplayVersion=$APP_VERSION"
+  publish_args+=("-p:ApplicationVersion=$APP_VERSION" "-p:ApplicationDisplayVersion=$APP_VERSION")
 fi
 
-dotnet publish "$PROJECT_PATH" -c "$CONFIGURATION" -f "$TFM" \
-  -p:CodesignKey="$CODESIGN_KEY" \
-  -p:UseHardenedRuntime=true \
-  $VERSION_ARGS
+dotnet publish "${publish_args[@]}"
 
 if [[ ! -d "$APP_BUNDLE_PATH" ]]; then
   echo "Expected app bundle not found at $APP_BUNDLE_PATH"
