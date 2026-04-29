@@ -184,6 +184,19 @@ jobs:
           p12-password: "${{secrets.APPLE_DEVELOPER_ID_APPLICATION_CERT_PASSWORD}}"
           keychain: application_signing_temp
 
+      - name: Ensure both signing keychains are in the search list
+        shell: bash
+        run: |
+          # Each import-codesign-certs call rewrites the keychain search list.
+          # The second call (Application cert) drops the first (Installer) keychain,
+          # so productbuild cannot find the "Developer ID Installer" identity.
+          # Re-add both keychains explicitly before any signing occurs.
+          INSTALLER_KC="$HOME/Library/Keychains/installer_signing_temp.keychain-db"
+          APP_KC="$HOME/Library/Keychains/application_signing_temp.keychain-db"
+          security list-keychains -d user -s "$INSTALLER_KC" "$APP_KC" login.keychain
+          echo "Keychain search list:"
+          security list-keychains -d user
+
       - name: Verify Developer ID identities are available
         shell: bash
         run: |
