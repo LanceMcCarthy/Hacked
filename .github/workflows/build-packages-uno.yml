@@ -1,4 +1,4 @@
-name: Build Packages
+name: Build Packages (Uno)
 
 on:
   workflow_dispatch:
