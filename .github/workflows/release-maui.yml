@@ -99,12 +99,30 @@ jobs:
         New-Item -ItemType Directory -Force -Path $appxRoot | Out-Null
         New-Item -ItemType Directory -Force -Path $stagingRoot | Out-Null
 
-        dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:AppxPackageDir="${appxRoot}\"
+        $publishOutput = dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:AppxPackageDir="${appxRoot}\" 2>&1
+        $publishOutput | ForEach-Object { Write-Host $_ }
 
-        $packagePath = Get-ChildItem -Path $appxRoot -Recurse -Force -File |
-          Where-Object { $_.Extension -ieq '.msixbundle' } |
-          Sort-Object LastWriteTime -Descending |
-          Select-Object -ExpandProperty FullName -First 1
+        $packagePath = $null
+        $bundleLine = $publishOutput |
+          Where-Object { $_ -match '\.msixbundle' } |
+          Select-Object -Last 1
+
+        if ($bundleLine -and $bundleLine -match '(?<path>[A-Za-z]:\\[^\r\n]*?\.msixbundle)') {
+          $candidate = $matches['path']
+          if (Test-Path $candidate) {
+            $packagePath = $candidate
+            Write-Host "Using .msixbundle from publish output: $packagePath"
+          } else {
+            Write-Host "Publish log reported a .msixbundle path, but file is not present at copy time: $candidate"
+          }
+        }
+
+        if (-not $packagePath) {
+          $packagePath = Get-ChildItem -Path $appxRoot -Recurse -Force -File |
+            Where-Object { $_.Extension -ieq '.msixbundle' } |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -ExpandProperty FullName -First 1
+        }
 
         if (-not $packagePath) {
           Write-Host "No .msixbundle files remained under $appxRoot after publish; falling back to .msix output."
