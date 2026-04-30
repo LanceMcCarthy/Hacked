@@ -101,22 +101,31 @@ jobs:
 
         dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:AppxPackageDir="${appxRoot}\"
 
-        $bundlePath = Get-ChildItem -Path $appxRoot -Recurse -Force -File |
+        $packagePath = Get-ChildItem -Path $appxRoot -Recurse -Force -File |
           Where-Object { $_.Extension -ieq '.msixbundle' } |
+          Sort-Object LastWriteTime -Descending |
           Select-Object -ExpandProperty FullName -First 1
 
-        if (-not $bundlePath) {
-          Write-Host "No .msixbundle files found under $appxRoot after publish. Listing package directory contents for diagnostics:"
-          Get-ChildItem -Path $appxRoot -Recurse -Force | Format-List -Property FullName, Length, Attributes
-          throw "No .msixbundle files found under $appxRoot after publish."
+        if (-not $packagePath) {
+          Write-Host "No .msixbundle files remained under $appxRoot after publish; falling back to .msix output."
+          $packagePath = Get-ChildItem -Path $appxRoot -Recurse -Force -File |
+            Where-Object { $_.Extension -ieq '.msix' -and $_.Name -notlike '*Microsoft.WindowsAppRuntime*' } |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -ExpandProperty FullName -First 1
         }
 
-        $stagedBundlePath = Join-Path $stagingRoot (Split-Path $bundlePath -Leaf)
-        Copy-Item -Path $bundlePath -Destination $stagedBundlePath -Force
+        if (-not $packagePath) {
+          Write-Host "No .msixbundle or .msix files found under $appxRoot after publish. Listing package directory contents for diagnostics:"
+          Get-ChildItem -Path $appxRoot -Recurse -Force | Format-List -Property FullName, Length, Attributes
+          throw "No .msixbundle or .msix files found under $appxRoot after publish."
+        }
 
-        Write-Host "Found bundle: $bundlePath"
-        Write-Host "Staged bundle: $stagedBundlePath"
-        "bundle_path=$stagedBundlePath" >> $env:GITHUB_OUTPUT
+        $stagedPackagePath = Join-Path $stagingRoot (Split-Path $packagePath -Leaf)
+        Copy-Item -Path $packagePath -Destination $stagedPackagePath -Force
+
+        Write-Host "Selected package for signing: $packagePath"
+        Write-Host "Staged package: $stagedPackagePath"
+        "bundle_path=$stagedPackagePath" >> $env:GITHUB_OUTPUT
 
     # Entra ID App Registration (Akeyless OIDC Provider) > Certificates and Secrets > Federated Credentials
     - name: Azure login using OIDC via GitHub
