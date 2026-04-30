@@ -147,7 +147,7 @@ jobs:
 
     # Entra ID App Registration (Akeyless OIDC Provider) > Certificates and Secrets > Federated Credentials
     - name: Azure login using OIDC via GitHub
-      uses: azure/login@v2
+      uses: azure/login@v3
       id: azlogin
       with:
         client-id: "32daa13b-f4bb-4809-8ef6-58cb39051acd"
