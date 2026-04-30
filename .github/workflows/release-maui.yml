@@ -91,7 +91,7 @@ jobs:
         $manifest.Save('src\Hacked.Maui\Platforms\Windows\Package.appxmanifest')
 
     - name: Build WinUI project and create unsigned msix package
-      run: dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:AppxPackageDir="${{github.workspace}}\artifacts\appx\\"
+      run: dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:AppxPackageDir="${{github.workspace}}\artifacts\appx\"
 
     - name: Locate msixbundle for signing
       id: locate-msixbundle
@@ -99,18 +99,18 @@ jobs:
         $appxRoot = "${{github.workspace}}\artifacts\appx"
         if (-not (Test-Path $appxRoot)) { throw "Expected package folder was not created: $appxRoot" }
 
-        $bundleFiles = @(Get-ChildItem -Path $appxRoot -Recurse -Force |
-          Where-Object { -not $_.PSIsContainer -and $_.Extension -ieq '.msixbundle' } |
-          Select-Object -ExpandProperty FullName -Unique)
+        $version = "${{needs.shared-resources.outputs.app_version}}.0"
+        $bundlePath = Join-Path $appxRoot "Hacked.Maui_${version}_Test\Hacked.Maui_${version}_x64_arm64.msixbundle"
 
-        if (-not $bundleFiles) {
-          Write-Host "No .msixbundle files found under $appxRoot. Listing package directory contents for diagnostics:"
+        if (-not (Test-Path $bundlePath)) {
+          Write-Host "Expected bundle was not found at $bundlePath. Listing package directory contents for diagnostics:"
           Get-ChildItem -Path $appxRoot -Recurse -Force | Select-Object FullName
-          throw "No .msixbundle files found under $appxRoot."
+          throw "Expected bundle was not found at $bundlePath."
         }
-        $bundleFiles | ForEach-Object { Write-Host "Found bundle: $_" }
+
+        Write-Host "Found bundle: $bundlePath"
         "files<<EOF" >> $env:GITHUB_OUTPUT
-        $bundleFiles >> $env:GITHUB_OUTPUT
+        $bundlePath >> $env:GITHUB_OUTPUT
         "EOF" >> $env:GITHUB_OUTPUT
 
     # Entra ID App Registration (Akeyless OIDC Provider) > Certificates and Secrets > Federated Credentials
