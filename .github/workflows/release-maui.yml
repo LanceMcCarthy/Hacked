@@ -90,28 +90,33 @@ jobs:
         $identityNode.SetAttribute('Version', "${{needs.shared-resources.outputs.app_version}}.0")
         $manifest.Save('src\Hacked.Maui\Platforms\Windows\Package.appxmanifest')
 
-    - name: Build WinUI project and create unsigned msix package
-      run: dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:AppxPackageDir="${{github.workspace}}\artifacts\appx\"
-
-    - name: Locate msixbundle for signing
-      id: locate-msixbundle
+    - name: Build WinUI project and stage unsigned msixbundle
+      id: build-sideload-package
       run: |
         $appxRoot = "${{github.workspace}}\artifacts\appx"
-        if (-not (Test-Path $appxRoot)) { throw "Expected package folder was not created: $appxRoot" }
+        $stagingRoot = "${{github.workspace}}\artifacts\signing"
 
-        $version = "${{needs.shared-resources.outputs.app_version}}.0"
-        $bundlePath = Join-Path $appxRoot "Hacked.Maui_${version}_Test\Hacked.Maui_${version}_x64_arm64.msixbundle"
+        New-Item -ItemType Directory -Force -Path $appxRoot | Out-Null
+        New-Item -ItemType Directory -Force -Path $stagingRoot | Out-Null
 
-        if (-not (Test-Path $bundlePath)) {
-          Write-Host "Expected bundle was not found at $bundlePath. Listing package directory contents for diagnostics:"
-          Get-ChildItem -Path $appxRoot -Recurse -Force | Select-Object FullName
-          throw "Expected bundle was not found at $bundlePath."
+        dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:AppxPackageDir="${appxRoot}\"
+
+        $bundlePath = Get-ChildItem -Path $appxRoot -Recurse -Force -File |
+          Where-Object { $_.Extension -ieq '.msixbundle' } |
+          Select-Object -ExpandProperty FullName -First 1
+
+        if (-not $bundlePath) {
+          Write-Host "No .msixbundle files found under $appxRoot after publish. Listing package directory contents for diagnostics:"
+          Get-ChildItem -Path $appxRoot -Recurse -Force | Format-List -Property FullName, Length, Attributes
+          throw "No .msixbundle files found under $appxRoot after publish."
         }
 
+        $stagedBundlePath = Join-Path $stagingRoot (Split-Path $bundlePath -Leaf)
+        Copy-Item -Path $bundlePath -Destination $stagedBundlePath -Force
+
         Write-Host "Found bundle: $bundlePath"
-        "files<<EOF" >> $env:GITHUB_OUTPUT
-        $bundlePath >> $env:GITHUB_OUTPUT
-        "EOF" >> $env:GITHUB_OUTPUT
+        Write-Host "Staged bundle: $stagedBundlePath"
+        "bundle_path=$stagedBundlePath" >> $env:GITHUB_OUTPUT
 
     # Entra ID App Registration (Akeyless OIDC Provider) > Certificates and Secrets > Federated Credentials
     - name: Azure login using OIDC via GitHub
@@ -131,7 +136,7 @@ jobs:
         timestamp-rfc3161: http://timestamp.acs.microsoft.com
         timestamp-digest: SHA256
         file-digest: SHA256
-        files: ${{steps.locate-msixbundle.outputs.files}}
+        files: ${{steps.build-sideload-package.outputs.bundle_path}}
         exclude-azure-cli-credential: false
         exclude-environment-credential: true
         exclude-workload-identity-credential: true
@@ -147,7 +152,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:     
         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_sideload"
-        path: ${{steps.locate-msixbundle.outputs.files}}
+        path: ${{steps.build-sideload-package.outputs.bundle_path}}
         if-no-files-found: error
         retention-days: 30
 
