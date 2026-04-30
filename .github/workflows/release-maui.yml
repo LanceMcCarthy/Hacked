@@ -176,7 +176,7 @@ jobs:
         exclude-interactive-browser-credential: true
 
     - name: Attach artifacts to workflow run
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:     
         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_sideload"
         path: ${{steps.build-sideload-package.outputs.bundle_path}}
@@ -213,7 +213,7 @@ jobs:
         run: dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:AppxSymbolPackageEnabled=false -p:UapAppxPackageBuildMode=StoreUpload -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU
 
       - name: Publish build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:     
           name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_storeupload"
           path: "**/*.msixupload"
@@ -406,7 +406,7 @@ jobs:
   #       run: Get-Childitem -Path ${{github.workspace}} -Include *.app -File -Recurse | Copy-Item -Destination ${{github.workspace}}/${{env.IOS_ARTIFACTS_PATH}}
 
   #     - name: Publish ios build artifacts
-  #       uses: actions/upload-artifact@v4
+  #       uses: actions/upload-artifact@v7
   #       with:     
   #         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_ios" 
   #         path: "${{github.workspace}}/*.app"
@@ -467,7 +467,7 @@ jobs:
   #         Get-Childitem -Path ${{github.workspace}} -Include *Signed.aab -File -Recurse | Copy-Item -Destination ${{env.ANDROID_ARTIFACTS_PATH}}
 
   #     - name: Publish Android build artifacts
-  #       uses: actions/upload-artifact@v3
+  #       uses: actions/upload-artifact@v7
   #       with:     
   #         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_android" 
   #         path: "${{env.ANDROID_ARTIFACTS_PATH}}/*"
