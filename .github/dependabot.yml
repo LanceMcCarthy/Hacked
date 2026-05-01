@@ -1,29 +1,45 @@
 version: 2
-updates:
-- package-ecosystem: nuget
-  directory: "/src/Hacked"
-  schedule:
-    interval: monthly
-    time: "10:00"
-  open-pull-requests-limit: 1
-  labels:
-  - kind/dependency
-  - do-not-merge/work-in-progress
-  groups:
-    nuget-uwp:
-      patterns:
-      - "*"
 
-- package-ecosystem: nuget
-  directory: "/src/Hacked.Maui"
-  schedule:
-    interval: monthly
-    time: "10:00"
-  open-pull-requests-limit: 1
-  labels:
-  - kind/dependency
-  - do-not-merge/work-in-progress
-  groups:
-    nuget-maui:
-      patterns:
-      - "*"
+registries:
+  nuget-org:
+    type: nuget-feed
+    url: https://api.nuget.org/v3/index.json
+  nuget-telerik:
+    type: nuget-feed
+    url: https://nuget.telerik.com/v3/index.json
+    username: api-key
+    password: ${{secrets.TELERIK_API_KEY}}
+
+updates:
+  - package-ecosystem: nuget
+    directory: "/src/Hacked"
+    registries:
+      - github-private-git
+      - azure-devops-git
+    schedule:
+      interval: weekly
+      day: sunday
+      time: "10:00"
+    open-pull-requests-limit: 1
+    labels:
+    - kind/dependency
+    - do-not-merge/work-in-progress
+    groups:
+      nuget-uwp:
+        patterns:
+        - "*"
+
+  - package-ecosystem: nuget
+    directory: "/src/Hacked.Maui"
+    schedule:
+      interval: weekly
+      day: sunday
+      time: "10:00"
+    open-pull-requests-limit: 1
+    labels:
+    - kind/dependency
+    - do-not-merge/work-in-progress
+    groups:
+      nuget-maui:
+        patterns:
+        - "*"
