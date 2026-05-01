@@ -29,14 +29,15 @@
                                FontFamily="Raleway"
                                HorizontalOptions="Start"
                                WidthRequest="160" />
-
             <HorizontalStackLayout Spacing="10">
-                <telerik:RadCheckBox IsChecked="{Binding RefreshDuringImport, Mode=TwoWay}"
+                <telerik:RadCheckBox x:Name="AutomaticRefreshCheckbox" 
+                                     IsChecked="{Binding RefreshDuringImport, Mode=TwoWay}"
                                      CheckedColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray200}}"
                                      CheckedSymbolColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray900}}" />
                 <Label Text="Update breaches after import"
                        VerticalOptions="Center"
-                       FontFamily="Raleway" />
+                       FontFamily="Raleway" 
+                       telerik:RadCheckBox.ToggleOnTap="{x:Reference AutomaticRefreshCheckbox}"/>
             </HorizontalStackLayout>
         </VerticalStackLayout>
 
