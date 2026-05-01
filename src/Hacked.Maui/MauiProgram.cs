@@ -173,6 +173,19 @@ public static class MauiProgram
                         }
                     });
 
+                    // Force Dark UI style via UIKit so title text remains light on the purple title bar when the system switches to Light mode.
+                    wndLifeCycleBuilder.OnActivated(application =>
+                    {
+                        foreach (var scene in application.ConnectedScenes)
+                        {
+                            if (scene is not UIWindowScene windowScene)
+                                continue;
+
+                            foreach (var window in windowScene.Windows)
+                                window.OverrideUserInterfaceStyle = UIUserInterfaceStyle.Dark;
+                        }
+                    });
+
                 });
 #endif
             });
