@@ -36,7 +36,6 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
-
 	<ItemGroup>
 		<EmbeddedResource Include="appsettings.json" LogicalName="Hacked.Maui.appsettings.json" />
 	</ItemGroup>
