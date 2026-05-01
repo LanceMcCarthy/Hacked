@@ -58,7 +58,7 @@ jobs:
       uses: actions/checkout@v6
       with:
         fetch-depth: 0
-    
+
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v5
       with:
@@ -77,8 +77,7 @@ jobs:
     - name: Restore NuGet packages
       run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
-    # Update the app manifest
-    # We add an extra .0 to the end to satisfy the 4-segment version requirement (e.g., 2024.824.1.0)
+    # Update the app manifest with version number, even if Version attribute is missing.
     - name: Update manifest for side load build
       run: |
         [xml]$manifest = Get-Content 'src\Hacked.Maui\Platforms\Windows\Package.appxmanifest'
@@ -90,6 +89,15 @@ jobs:
         $identityNode.SetAttribute('Version', "${{needs.shared-resources.outputs.app_version}}.0")
         $manifest.Save('src\Hacked.Maui\Platforms\Windows\Package.appxmanifest')
 
+    - name: Set API Key
+      run: |
+        $file = 'src/Hacked.Maui/appsettings.json'
+        $config = Get-Content $file -Raw | ConvertFrom-Json
+        $config.HibpApiKey = $env:HIBP_API_KEY
+        $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
+      env:
+        HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
+          
     - name: Build WinUI project and stage unsigned msixbundle
       id: build-sideload-package
       run: |
@@ -209,6 +217,27 @@ jobs:
       - name: Add Telerik NuGet Server
         run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
+      # Update the app manifest with version number, even if Version attribute is missing.
+      - name: Update manifest for side load build
+        run: |
+          [xml]$manifest = Get-Content 'src\Hacked.Maui\Platforms\Windows\Package.appxmanifest'
+          $ns = $manifest.DocumentElement.NamespaceURI
+          $nsmgr = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
+          $nsmgr.AddNamespace('m', $ns)
+          $identityNode = $manifest.SelectSingleNode('/m:Package/m:Identity', $nsmgr)
+          if ($null -eq $identityNode) { throw 'Identity node not found in Package.appxmanifest' }
+          $identityNode.SetAttribute('Version', "${{needs.shared-resources.outputs.app_version}}.0")
+          $manifest.Save('src\Hacked.Maui\Platforms\Windows\Package.appxmanifest')
+
+      - name: Set API Key
+        run: |
+          $file = 'src/Hacked.Maui/appsettings.json'
+          $config = Get-Content $file -Raw | ConvertFrom-Json
+          $config.HibpApiKey = $env:HIBP_API_KEY
+          $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
+        env:
+          HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
+
       - name: Build Maui WinUI project
         run: dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:AppxSymbolPackageEnabled=false -p:UapAppxPackageBuildMode=StoreUpload -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU
 
@@ -299,6 +328,15 @@ jobs:
             exit 1
           fi
 
+      - name: Set API Key
+        run: |
+          $file = 'src/Hacked.Maui/appsettings.json'
+          $config = Get-Content $file -Raw | ConvertFrom-Json
+          $config.HibpApiKey = $env:HIBP_API_KEY
+          $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
+        env:
+          HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
+            
       - name: Build, sign, notarize, and staple MacCatalyst artifacts
         shell: bash
         env:
@@ -383,6 +421,15 @@ jobs:
   #         APPLE_PROV_PROFILE: "Hacked_AppStore_Distribution"
   #         APPLE_PROV_PROFILE_TYPE: "IOS_APP_STORE"
 
+  #     - name: Set API Key
+  #       run: |
+  #         $file = 'src/Hacked.Maui/appsettings.json'
+  #         $config = Get-Content $file -Raw | ConvertFrom-Json
+  #         $config.HibpApiKey = $env:HIBP_API_KEY
+  #         $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
+  #       env:
+  #         HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
+          
   #     # Docs https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/publish-cli?view=net-maui-9.0
   #     - name: Build MAUI iOS project
   #       run: |
@@ -452,6 +499,15 @@ jobs:
   #     - name: Simple build MAUI Android
   #       run: dotnet build ${{env.PROJECT_PATH}} -c Debug -f ${{env.NET_TFM}}-android
 
+  #     - name: Set API Key
+  #       run: |
+  #         $file = 'src/Hacked.Maui/appsettings.json'
+  #         $config = Get-Content $file -Raw | ConvertFrom-Json
+  #         $config.HibpApiKey = $env:HIBP_API_KEY
+  #         $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
+  #       env:
+  #         HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
+          
   #     - name: Publish MAUI Android
   #       run: |
   #         dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_SIGNING_KEYSTORE_FILENAME}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_STORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
