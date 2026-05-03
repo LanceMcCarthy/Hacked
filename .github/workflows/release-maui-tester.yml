@@ -73,8 +73,7 @@ jobs:
 
         # Publish x64
         Write-Host "Publishing x64..."
-        Remove-Item -Path "src/Hacked.Maui/bin" -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item -Path "src/Hacked.Maui/obj" -Recurse -Force -ErrorAction SilentlyContinue
+        dotnet clean ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0
         $publishArgsX64 = @(
           'publish'
           '${{env.PROJECT_PATH}}'
@@ -84,6 +83,7 @@ jobs:
           '-p:UapAppxPackageBuildMode=SideloadOnly'
           '-p:AppxBundle=Never'
           '-p:PlatformTarget=x64'
+          '-p:RuntimeIdentifier=win-x64'
           "-p:PackageCertificateThumbprint=$thumbprint"
           "-p:AppxPackageCertificateSubjectName=$subjectNameForMsBuild"
           "-p:AppxPackageVersion=$appVersion"
@@ -98,8 +98,7 @@ jobs:
 
         # Publish arm64
         Write-Host "Publishing arm64..."
-        Remove-Item -Path "src/Hacked.Maui/bin" -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item -Path "src/Hacked.Maui/obj" -Recurse -Force -ErrorAction SilentlyContinue
+        dotnet clean ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0
         $publishArgsArm64 = @(
           'publish'
           '${{env.PROJECT_PATH}}'
@@ -109,6 +108,7 @@ jobs:
           '-p:UapAppxPackageBuildMode=SideloadOnly'
           '-p:AppxBundle=Never'
           '-p:PlatformTarget=arm64'
+          '-p:RuntimeIdentifier=win-arm64'
           "-p:PackageCertificateThumbprint=$thumbprint"
           "-p:AppxPackageCertificateSubjectName=$subjectNameForMsBuild"
           "-p:AppxPackageVersion=$appVersion"
