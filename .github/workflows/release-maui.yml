@@ -104,16 +104,53 @@ jobs:
         $appxRoot = "${{github.workspace}}\artifacts\appx"
         $stagingRoot = "${{github.workspace}}\artifacts\signing"
 
-        New-Item -ItemType Directory -Force -Path $appxRoot, $stagingRoot | Out-Null
+        New-Item -ItemType Directory -Force -Path $appxRoot | Out-Null
+        New-Item -ItemType Directory -Force -Path $stagingRoot | Out-Null
 
-        dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:AppxPackageDir="${appxRoot}\"
+        $publishOutput = dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:AppxPackageDir="${appxRoot}\" 2>&1
+        $publishOutput | ForEach-Object { Write-Host $_ }
 
-        $packagePath = Get-ChildItem -Path $appxRoot -Recurse -File -Filter "*.msixbundle" | Select-Object -ExpandProperty FullName -First 1
-        if (-not $packagePath) { throw "No .msixbundle found in $appxRoot" }
+        $packagePath = $null
+        $bundleLine = $publishOutput |
+          Where-Object { $_ -match '\.msixbundle' } |
+          Select-Object -Last 1
+
+        if ($bundleLine -and $bundleLine -match '(?<path>[A-Za-z]:\\[^\r\n]*?\.msixbundle)') {
+          $candidate = $matches['path']
+          if (Test-Path $candidate) {
+            $packagePath = $candidate
+            Write-Host "Using .msixbundle from publish output: $packagePath"
+          } else {
+            Write-Host "Publish log reported a .msixbundle path, but file is not present at copy time: $candidate"
+          }
+        }
+
+        if (-not $packagePath) {
+          $packagePath = Get-ChildItem -Path $appxRoot -Recurse -Force -File |
+            Where-Object { $_.Extension -ieq '.msixbundle' } |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -ExpandProperty FullName -First 1
+        }
+
+        if (-not $packagePath) {
+          Write-Host "No .msixbundle files remained under $appxRoot after publish; falling back to .msix output."
+          $packagePath = Get-ChildItem -Path $appxRoot -Recurse -Force -File |
+            Where-Object { $_.Extension -ieq '.msix' -and $_.Name -notlike '*Microsoft.WindowsAppRuntime*' } |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -ExpandProperty FullName -First 1
+        }
+
+        if (-not $packagePath) {
+          Write-Host "No .msixbundle or .msix files found under $appxRoot after publish. Listing package directory contents for diagnostics:"
+          Get-ChildItem -Path $appxRoot -Recurse -Force | Format-List -Property FullName, Length, Attributes
+          throw "No .msixbundle or .msix files found under $appxRoot after publish."
+        }
 
         $stagedPackagePath = Join-Path $stagingRoot (Split-Path $packagePath -Leaf)
         Copy-Item -Path $packagePath -Destination $stagedPackagePath -Force
 
+        Write-Host "Selected package for signing: $packagePath"
+        Write-Host "Staged package: $stagedPackagePath"
         "bundle_path=$stagedPackagePath" >> $env:GITHUB_OUTPUT
 
     # Entra ID App Registration (Akeyless OIDC Provider) > Certificates and Secrets > Federated Credentials
