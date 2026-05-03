@@ -73,6 +73,8 @@ jobs:
 
         # Publish x64
         Write-Host "Publishing x64..."
+        Remove-Item -Path "src/Hacked.Maui/bin" -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "src/Hacked.Maui/obj" -Recurse -Force -ErrorAction SilentlyContinue
         $publishArgsX64 = @(
           'publish'
           '${{env.PROJECT_PATH}}'
@@ -96,6 +98,8 @@ jobs:
 
         # Publish arm64
         Write-Host "Publishing arm64..."
+        Remove-Item -Path "src/Hacked.Maui/bin" -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "src/Hacked.Maui/obj" -Recurse -Force -ErrorAction SilentlyContinue
         $publishArgsArm64 = @(
           'publish'
           '${{env.PROJECT_PATH}}'
