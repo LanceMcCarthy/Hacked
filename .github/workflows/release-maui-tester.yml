@@ -63,9 +63,10 @@ jobs:
         & $sacTools /Token /LogOn /Password "${{secrets.DIGICERT_HARDWARE_TOKEN_PASSWORD}}"
 
         $thumbprint = "8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97"
-        $cn="CN='Lancelot Software, LLC', OU=IoT, O='Lancelot Software, LLC', L=NORTH BILLERICA, S=Massachusetts, C=US"
+        $cert = Get-Item "Cert:\CurrentUser\My\$thumbprint"
+        $subjectName = $cert.Subject
 
-        dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=true -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:PackageCertificateThumbprint=$thumbprint -p:AppxPackageCertificateSubjectName=$cn -p:AppxPackageVersion="${{steps.version-creator.outputs.app_version}}.0" -p:AppxPublisherDisplayName="Lancelot Software"
+        dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=true -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:PackageCertificateThumbprint=$thumbprint "-p:AppxPackageCertificateSubjectName=$subjectName" -p:AppxPackageVersion="${{steps.version-creator.outputs.app_version}}.0" -p:AppxPublisherDisplayName="Lancelot Software"
 
     - name: Locate msixbundle
       id: find-msix-file
@@ -92,7 +93,7 @@ jobs:
     - name: Attach artifacts to workflow run
       uses: actions/upload-artifact@v7
       with:     
-        name: "Hacked_v${{steps.version-creator.outputs.app_version}}_sideload"
+        name: "Hacked_v${{steps.version-creator.outputs.app_version}}.x64_arm64"
         path: ${{steps.find-msix-file.outputs.PACKAGE_PATH}}
         if-no-files-found: error
         retention-days: 30
