@@ -23,16 +23,15 @@ env:
   TELERIK_LICENSE: ${{secrets.TELERIK_LICENSE_KEY_VALUE}}
 
 jobs:
-  # *********************************************************************************** #
-  #                                   Shared Resources                                  #
-  # *********************************************************************************** #
-  shared-resources:
-    name: Create Shared Resources
-    runs-on: windows-latest
-    outputs:
-      app_version: ${{steps.version-creator.outputs.app_version}}
+  maui-windows-sideload:
+    name: Build Windows (Sideload)
+    runs-on: [self-hosted, x64, digicert-enabled]
     steps:
-    # Generates a version number using year.monthday.run_number (e.g., 2024.824.1)
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
     - name: Generate version number using date and run number
       id: version-creator
       shell: pwsh
@@ -41,17 +40,6 @@ jobs:
         $runNumber = "$env:GITHUB_RUN_NUMBER"
         $ver = $buildDay + "." + $runNumber
         echo "app_version=$ver" >> $env:GITHUB_OUTPUT
-
-  maui-windows-sideload:
-    name: Build Windows (Sideload)
-    needs: shared-resources
-    runs-on: [self-hosted, x64, digicert-enabled]
-    if: ${{ needs.shared-resources.outputs.app_version != ''}}
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
 
     - name: Set Telerik NuGet Credentials
       run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
@@ -78,12 +66,13 @@ jobs:
         $thumbprint = "8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97"
         $cn="CN='Lancelot Software, LLC', OU=IoT, O='Lancelot Software, LLC', L=NORTH BILLERICA, S=Massachusetts, C=US"
 
-        dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=true  -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always -p:AppxBundlePlatforms=x64|arm64 -p:PlatformTarget=AnyCPU -thumbprint $thumbprint -p:AppxPackageCertificateSubjectName="$cn" -p:AppxPackageVersion="${{needs.shared-resources.outputs.app_version}}.0" -p:AppxPublisherDisplayName="Lancelot Software"
+        dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=true -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:PackageCertificateThumbprint=$thumbprint -p:AppxPackageCertificateSubjectName=$cn -p:AppxPackageVersion="${{steps.version-creator.outputs.app_version}}.0" -p:AppxPublisherDisplayName="Lancelot Software"
 
-    - name: Locate msix
+    - name: Locate msixbundle
       id: find-msix-file
       run: |
-        $msixPath = Get-ChildItem -Filter Hacked*.msix -Recurse | %{$_.FullName}
+        $msixPath = Get-ChildItem -Filter Hacked*.msixbundle -Recurse | Select-Object -ExpandProperty FullName -First 1
+        if (-not $msixPath) { throw "No .msixbundle found after publish" }
         echo "PACKAGE_PATH=$msixPath" >> $env:GITHUB_OUTPUT
 
     # - name: Use hardware token and sign with digicert certificate
@@ -104,7 +93,7 @@ jobs:
     - name: Attach artifacts to workflow run
       uses: actions/upload-artifact@v7
       with:     
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_sideload"
+        name: "Hacked_v${{steps.version-creator.outputs.app_version}}_sideload"
         path: ${{steps.find-msix-file.outputs.PACKAGE_PATH}}
         if-no-files-found: error
         retention-days: 30
