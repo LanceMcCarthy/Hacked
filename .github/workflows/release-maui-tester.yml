@@ -45,7 +45,7 @@ jobs:
   maui-windows-sideload:
     name: Build Windows (Sideload)
     needs: shared-resources
-    runs-on: OMEN-30L
+    runs-on: [self-hosted, x64, digicert-enabled]
     if: ${{ needs.shared-resources.outputs.app_version != ''}}
     steps:
     - name: Checkout
