@@ -75,8 +75,10 @@ jobs:
       run: |
         $file = 'src/Hacked.Maui/appsettings.json'
         $config = Get-Content $file -Raw | ConvertFrom-Json
-        $config.HibpApiKey = ${{secrets.HIBP_API_KEY}}
+        $config.HibpApiKey = $env:HIBP_API_KEY
         $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
+      env:
+        HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
           
     - name: Build WinUI project and stage unsigned msixbundle
       id: build-sideload-package
@@ -101,7 +103,7 @@ jobs:
         # Launch SafeNet authentication client (USB hardware token must be plugged in)
         # Unlock token via SafeNet's PKCS#11 interface; this will prompt for PIN entry if token is locked
         $sacTools = "C:\Program Files\SafeNet\Authentication\SAC\x64\SACTools.exe"
-        & $sacTools /Token /LogOn /Password ${{secrets.DIGICERT_HARDWARE_TOKEN_PASSWORD}}
+        & $sacTools /Token /LogOn /Password "${{secrets.DIGICERT_HARDWARE_TOKEN_PASSWORD}}"
 
         # Now the cert is ready to be used for signing. Sign the package with a timestamp.
         $signtool = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"
