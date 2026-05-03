@@ -65,30 +65,75 @@ jobs:
         $thumbprint = "8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97"
         $subjectName = (Get-Item "Cert:\CurrentUser\My\$thumbprint").Subject
         $subjectNameForMsBuild = $subjectName.Replace(',', '%2c').Replace(';', '%3b')
-        $publishArgs = @(
+        $appVersion = "${{steps.version-creator.outputs.app_version}}.0"
+        $artifactDir = "${{github.workspace}}\artifacts"
+        $bundleDir = "$artifactDir\bundle"
+        
+        New-Item -ItemType Directory -Force -Path $bundleDir | Out-Null
+
+        # Publish x64
+        Write-Host "Publishing x64..."
+        $publishArgsX64 = @(
           'publish'
           '${{env.PROJECT_PATH}}'
           '-c', 'Release'
           '-f', '${{env.NET_TFM}}-windows10.0.19041.0'
+          '-p:RuntimeIdentifier=win10-x64'
           '-p:AppxPackageSigningEnabled=true'
           '-p:UapAppxPackageBuildMode=SideloadOnly'
-          '-p:AppxBundle=Always'
-          '-p:AppxBundlePlatforms=x64|arm64'
-          '-p:PlatformTarget=AnyCPU'
+          '-p:AppxBundle=Never'
           "-p:PackageCertificateThumbprint=$thumbprint"
           "-p:AppxPackageCertificateSubjectName=$subjectNameForMsBuild"
-          '-p:AppxPackageVersion=${{steps.version-creator.outputs.app_version}}.0'
+          "-p:AppxPackageVersion=$appVersion"
           '-p:AppxPublisherDisplayName=Lancelot Software'
         )
+        & dotnet @publishArgsX64
+        
+        $msixX64 = Get-ChildItem -Filter Hacked*.msix -Recurse | Where-Object { $_.FullName -notlike '*arm64*' } | Select-Object -ExpandProperty FullName -First 1
+        if (-not $msixX64) { throw "No x64 .msix found after publish" }
+        Write-Host "Found x64 package: $msixX64"
+        Copy-Item -Path $msixX64 -Destination "$bundleDir\Hacked.x64.msix" -Force
 
-        & dotnet @publishArgs
+        # Publish arm64
+        Write-Host "Publishing arm64..."
+        $publishArgsArm64 = @(
+          'publish'
+          '${{env.PROJECT_PATH}}'
+          '-c', 'Release'
+          '-f', '${{env.NET_TFM}}-windows10.0.19041.0'
+          '-p:RuntimeIdentifier=win10-arm64'
+          '-p:AppxPackageSigningEnabled=true'
+          '-p:UapAppxPackageBuildMode=SideloadOnly'
+          '-p:AppxBundle=Never'
+          "-p:PackageCertificateThumbprint=$thumbprint"
+          "-p:AppxPackageCertificateSubjectName=$subjectNameForMsBuild"
+          "-p:AppxPackageVersion=$appVersion"
+          '-p:AppxPublisherDisplayName=Lancelot Software'
+        )
+        & dotnet @publishArgsArm64
+        
+        $msixArm64 = Get-ChildItem -Filter Hacked*.msix -Recurse | Where-Object { $_.FullName -like '*arm64*' } | Select-Object -ExpandProperty FullName -First 1
+        if (-not $msixArm64) { throw "No arm64 .msix found after publish" }
+        Write-Host "Found arm64 package: $msixArm64"
+        Copy-Item -Path $msixArm64 -Destination "$bundleDir\Hacked.arm64.msix" -Force
+
+        # Create bundle using MakeAppx
+        Write-Host "Creating msixbundle from x64 and arm64 packages..."
+        $bundlePath = "$bundleDir\Hacked.$appVersion.msixbundle"
+        $makeappx = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\MakeAppx.exe"
+        & $makeappx bundle /d "$bundleDir" /p $bundlePath
+        
+        if (-not (Test-Path $bundlePath)) { throw "Failed to create msixbundle at $bundlePath" }
+        Write-Host "Created bundle: $bundlePath"
+        
+        echo "PACKAGE_PATH=$bundlePath" >> $env:GITHUB_OUTPUT
 
     - name: Locate msixbundle
       id: find-msix-file
       run: |
-        $msixPath = Get-ChildItem -Filter Hacked*.msixbundle -Recurse | Select-Object -ExpandProperty FullName -First 1
-        if (-not $msixPath) { throw "No .msixbundle found after publish" }
-        echo "PACKAGE_PATH=$msixPath" >> $env:GITHUB_OUTPUT
+        $bundlePath = "${{steps.build-sideload-package.outputs.PACKAGE_PATH}}"
+        if (-not (Test-Path $bundlePath)) { throw "msixbundle not found at $bundlePath" }
+        echo "PACKAGE_PATH=$bundlePath" >> $env:GITHUB_OUTPUT
 
     # - name: Use hardware token and sign with digicert certificate
     #   run: |
@@ -108,7 +153,7 @@ jobs:
     - name: Attach artifacts to workflow run
       uses: actions/upload-artifact@v7
       with:     
-        name: "Hacked_v${{steps.version-creator.outputs.app_version}}.x64_arm64"
+        name: "Hacked_v${{steps.version-creator.outputs.app_version}}_x64_arm64"
         path: ${{steps.find-msix-file.outputs.PACKAGE_PATH}}
         if-no-files-found: error
         retention-days: 30
