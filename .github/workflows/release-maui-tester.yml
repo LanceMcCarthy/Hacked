@@ -59,18 +59,6 @@ jobs:
     - name: Restore NuGet packages
       run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
-    # Update the app manifest with version number, even if Version attribute is missing.
-    - name: Update manifest for side load build
-      run: |
-        [xml]$manifest = Get-Content 'src\Hacked.Maui\Platforms\Windows\Package.appxmanifest'
-        $ns = $manifest.DocumentElement.NamespaceURI
-        $nsmgr = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
-        $nsmgr.AddNamespace('m', $ns)
-        $identityNode = $manifest.SelectSingleNode('/m:Package/m:Identity', $nsmgr)
-        if ($null -eq $identityNode) { throw 'Identity node not found in Package.appxmanifest' }
-        $identityNode.SetAttribute('Version', "${{needs.shared-resources.outputs.app_version}}.0")
-        $manifest.Save('src\Hacked.Maui\Platforms\Windows\Package.appxmanifest')
-
     - name: Set API Key
       run: |
         $file = 'src/Hacked.Maui/appsettings.json'
@@ -83,40 +71,40 @@ jobs:
     - name: Build WinUI project and stage unsigned msixbundle
       id: build-sideload-package
       run: |
-        $appxRoot = "${{github.workspace}}\artifacts\appx"
-        $stagingRoot = "${{github.workspace}}\artifacts\signing"
-
-        New-Item -ItemType Directory -Force -Path $appxRoot, $stagingRoot | Out-Null
-
-        dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:AppxPackageDir="${appxRoot}\"
-
-        $packagePath = Get-ChildItem -Path $appxRoot -Recurse -File -Filter "*.msixbundle" | Select-Object -ExpandProperty FullName -First 1
-        if (-not $packagePath) { throw "No .msixbundle found in $appxRoot" }
-
-        $stagedPackagePath = Join-Path $stagingRoot (Split-Path $packagePath -Leaf)
-        Copy-Item -Path $packagePath -Destination $stagedPackagePath -Force
-
-        "bundle_path=$stagedPackagePath" >> $env:GITHUB_OUTPUT
-
-    - name: Use hardware token and sign with digicert certificate
-      run: |
-        # Launch SafeNet authentication client (USB hardware token must be plugged in)
-        # Unlock token via SafeNet's PKCS#11 interface; this will prompt for PIN entry if token is locked
+        # Unlock certificate using  SafeNet authentication client (USB hardware token must be plugged in)
         $sacTools = "C:\Program Files\SafeNet\Authentication\SAC\x64\SACTools.exe"
         & $sacTools /Token /LogOn /Password "${{secrets.DIGICERT_HARDWARE_TOKEN_PASSWORD}}"
 
-        # Now the cert is ready to be used for signing. Sign the package with a timestamp.
-        $signtool = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"
-        & $signtool sign /sha1 8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97 `
-          /fd sha256 `
-          /tr http://timestamp.digicert.com `
-          /td sha256 `
-          "${{steps.build-sideload-package.outputs.bundle_path}}"
+        $thumbprint = "8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97"
+        $cn="CN='Lancelot Software, LLC', OU=IoT, O='Lancelot Software, LLC', L=NORTH BILLERICA, S=Massachusetts, C=US"
+
+        dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=true  -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always -p:AppxBundlePlatforms=x64|arm64 -p:PlatformTarget=AnyCPU -thumbprint $thumbprint -p:AppxPackageCertificateSubjectName="$cn" -p:AppxPackageVersion="${{needs.shared-resources.outputs.app_version}}.0" -p:AppxPublisherDisplayName="Lancelot Software"
+
+    - name: Locate msix
+      id: find-msix-file
+      run: |
+        $msixPath = Get-ChildItem -Filter Hacked*.msix -Recurse | %{$_.FullName}
+        echo "PACKAGE_PATH=$msixPath" >> $env:GITHUB_OUTPUT
+
+    # - name: Use hardware token and sign with digicert certificate
+    #   run: |
+    #     # Launch SafeNet authentication client (USB hardware token must be plugged in)
+    #     # Unlock token via SafeNet's PKCS#11 interface; this will prompt for PIN entry if token is locked
+    #     $sacTools = "C:\Program Files\SafeNet\Authentication\SAC\x64\SACTools.exe"
+    #     & $sacTools /Token /LogOn /Password "${{secrets.DIGICERT_HARDWARE_TOKEN_PASSWORD}}"
+
+    #     # Now the cert is ready to be used for signing. Sign the package with a timestamp.
+    #     $signtool = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"
+    #     & $signtool sign /sha1 8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97 `
+    #       /fd sha256 `
+    #       /tr http://timestamp.digicert.com `
+    #       /td sha256 `
+    #       "${{steps.build-sideload-package.outputs.bundle_path}}"
 
     - name: Attach artifacts to workflow run
       uses: actions/upload-artifact@v7
       with:     
         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_sideload"
-        path: ${{steps.build-sideload-package.outputs.bundle_path}}
+        path: ${{steps.find-msix-file.outputs.PACKAGE_PATH}}
         if-no-files-found: error
         retention-days: 30
