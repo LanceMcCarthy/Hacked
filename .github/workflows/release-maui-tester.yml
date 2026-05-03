@@ -53,18 +53,6 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: ${{env.SDK_VERSION}}
-
-    # Needed only for WinUI builds
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v3
-
-    - name: Install MAUI workloads
-      run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
-
     - name: Set Telerik NuGet Credentials
       run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
 
@@ -87,10 +75,8 @@ jobs:
       run: |
         $file = 'src/Hacked.Maui/appsettings.json'
         $config = Get-Content $file -Raw | ConvertFrom-Json
-        $config.HibpApiKey = $env:HIBP_API_KEY
+        $config.HibpApiKey = ${{secrets.HIBP_API_KEY}}
         $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
-      env:
-        HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
           
     - name: Build WinUI project and stage unsigned msixbundle
       id: build-sideload-package
@@ -115,18 +101,15 @@ jobs:
         # Launch SafeNet authentication client (USB hardware token must be plugged in)
         # Unlock token via SafeNet's PKCS#11 interface; this will prompt for PIN entry if token is locked
         $sacTools = "C:\Program Files\SafeNet\Authentication\SAC\x64\SACTools.exe"
-        & $sacTools /Token /LogOn /Password $env:TOKEN_PIN
+        & $sacTools /Token /LogOn /Password ${{secrets.DIGICERT_HARDWARE_TOKEN_PASSWORD}}
 
         # Now the cert is ready to be used for signing. Sign the package with a timestamp.
         $signtool = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"
-        $fileToSign = "${{steps.build-sideload-package.outputs.bundle_path}}"
         & $signtool sign /sha1 8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97 `
           /fd sha256 `
           /tr http://timestamp.digicert.com `
           /td sha256 `
           "${{steps.build-sideload-package.outputs.bundle_path}}"
-      env:
-        TOKEN_PIN: ${{secrets.DIGICERT_HARDWARE_TOKEN_PASSWORD}}
 
     - name: Attach artifacts to workflow run
       uses: actions/upload-artifact@v7
