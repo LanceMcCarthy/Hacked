@@ -2,11 +2,10 @@ name: Release .NET MAUI (tester)
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches: [main]
-  #   paths:
-  #     - 'src/Hacked.Maui/**/*'
-  #     - '.github/workflows/release-maui.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/release-maui-tester.yml'
   # pull_request:
   #   types: []  # Explicitly disabled - external PRs cannot trigger this workflow
 
