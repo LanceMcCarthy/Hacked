@@ -1,0 +1,137 @@
+name: Release .NET MAUI (tester)
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'src/Hacked.Maui/**/*'
+  #     - '.github/workflows/release-maui.yml'
+  # pull_request:
+  #   types: []  # Explicitly disabled - external PRs cannot trigger this workflow
+
+defaults:
+  run:
+    shell: pwsh
+
+env:
+  PROJECT_PATH: "src/Hacked.Maui/Hacked.Maui.csproj"
+  SDK_VERSION: '10.0.x'
+  NET_TFM: 'net10.0'
+  NUGET_CONFIG_PATH: 'src/nuget.config'
+  TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
+  TELERIK_LICENSE: ${{secrets.TELERIK_LICENSE_KEY_VALUE}}
+
+jobs:
+  # *********************************************************************************** #
+  #                                   Shared Resources                                  #
+  # *********************************************************************************** #
+  shared-resources:
+    name: Create Shared Resources
+    runs-on: windows-latest
+    outputs:
+      app_version: ${{steps.version-creator.outputs.app_version}}
+    steps:
+    # Generates a version number using year.monthday.run_number (e.g., 2024.824.1)
+    - name: Generate version number using date and run number
+      id: version-creator
+      shell: pwsh
+      run: |
+        $buildDay = Get-Date -Format "yyyy.Mdd"
+        $runNumber = "$env:GITHUB_RUN_NUMBER"
+        $ver = $buildDay + "." + $runNumber
+        echo "app_version=$ver" >> $env:GITHUB_OUTPUT
+
+  maui-windows-sideload:
+    name: Build Windows (Sideload)
+    needs: shared-resources
+    runs-on: OMEN-30L
+    if: ${{ needs.shared-resources.outputs.app_version != ''}}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: ${{env.SDK_VERSION}}
+
+    # Needed only for WinUI builds
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v3
+
+    - name: Install MAUI workloads
+      run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
+
+    - name: Set Telerik NuGet Credentials
+      run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
+
+    - name: Restore NuGet packages
+      run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
+
+    # Update the app manifest with version number, even if Version attribute is missing.
+    - name: Update manifest for side load build
+      run: |
+        [xml]$manifest = Get-Content 'src\Hacked.Maui\Platforms\Windows\Package.appxmanifest'
+        $ns = $manifest.DocumentElement.NamespaceURI
+        $nsmgr = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
+        $nsmgr.AddNamespace('m', $ns)
+        $identityNode = $manifest.SelectSingleNode('/m:Package/m:Identity', $nsmgr)
+        if ($null -eq $identityNode) { throw 'Identity node not found in Package.appxmanifest' }
+        $identityNode.SetAttribute('Version', "${{needs.shared-resources.outputs.app_version}}.0")
+        $manifest.Save('src\Hacked.Maui\Platforms\Windows\Package.appxmanifest')
+
+    - name: Set API Key
+      run: |
+        $file = 'src/Hacked.Maui/appsettings.json'
+        $config = Get-Content $file -Raw | ConvertFrom-Json
+        $config.HibpApiKey = $env:HIBP_API_KEY
+        $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
+      env:
+        HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
+          
+    - name: Build WinUI project and stage unsigned msixbundle
+      id: build-sideload-package
+      run: |
+        $appxRoot = "${{github.workspace}}\artifacts\appx"
+        $stagingRoot = "${{github.workspace}}\artifacts\signing"
+
+        New-Item -ItemType Directory -Force -Path $appxRoot, $stagingRoot | Out-Null
+
+        dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:AppxPackageDir="${appxRoot}\"
+
+        $packagePath = Get-ChildItem -Path $appxRoot -Recurse -File -Filter "*.msixbundle" | Select-Object -ExpandProperty FullName -First 1
+        if (-not $packagePath) { throw "No .msixbundle found in $appxRoot" }
+
+        $stagedPackagePath = Join-Path $stagingRoot (Split-Path $packagePath -Leaf)
+        Copy-Item -Path $packagePath -Destination $stagedPackagePath -Force
+
+        "bundle_path=$stagedPackagePath" >> $env:GITHUB_OUTPUT
+
+    - name: Use hardware token and sign with digicert certificate
+      run: |
+        # Launch SafeNet authentication client (USB hardware token must be plugged in)
+        # Unlock token via SafeNet's PKCS#11 interface; this will prompt for PIN entry if token is locked
+        $sacTools = "C:\Program Files\SafeNet\Authentication\SAC\x64\SACTools.exe"
+        & $sacTools /Token /LogOn /Password $env:TOKEN_PIN
+
+        # Now the cert is ready to be used for signing. Sign the package with a timestamp.
+        $signtool = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"
+        $fileToSign = "${{steps.build-sideload-package.outputs.bundle_path}}"
+        & $signtool sign /sha1 8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97 `
+          /fd sha256 `
+          /tr http://timestamp.digicert.com `
+          /td sha256 `
+          "${{steps.build-sideload-package.outputs.bundle_path}}"
+      env:
+        TOKEN_PIN: ${{secrets.DIGICERT_HARDWARE_TOKEN_PASSWORD}}
+
+    - name: Attach artifacts to workflow run
+      uses: actions/upload-artifact@v7
+      with:     
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_sideload"
+        path: ${{steps.build-sideload-package.outputs.bundle_path}}
+        if-no-files-found: error
+        retention-days: 30
