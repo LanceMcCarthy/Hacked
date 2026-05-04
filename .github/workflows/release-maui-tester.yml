@@ -64,7 +64,7 @@ jobs:
       run: dotnet workload restore --project ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} --skip-manifest-update
 
     - name: Restore Windows RID runtime packs for x64
-      run: dotnet restore ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -r win-x64 --configfile ${{env.NUGET_CONFIG_PATH}}
+      run: dotnet restore ${{env.PROJECT_PATH}} --framework ${{env.NET_TFM}}-windows10.0.19041.0 --runtime win-x64 --configfile ${{env.NUGET_CONFIG_PATH}} -p:Configuration=Release
 
     - name: Set API Key
       run: |
