@@ -45,18 +45,9 @@ jobs:
   #                                  Windows Sideload                                  #
   # ********************************************************************************** #
   maui-windows-sideload:
-    name: Build Windows (${{ matrix.arch }})
+    name: Build Windows (x64)
     needs: shared-resources
     runs-on: [self-hosted, x64, digicert-enabled]
-    strategy:
-      matrix:
-        include:
-          - arch: x64
-            platform_target: x64
-            runtime_id: win-x64
-          - arch: arm64
-            platform_target: arm64
-            runtime_id: win-arm64
     steps:
     - name: Checkout
       uses: actions/checkout@v6
@@ -69,11 +60,11 @@ jobs:
     - name: Restore NuGet packages
       run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
-    - name: Restore MAUI workloads (including arm64 runtime)
+    - name: Restore MAUI workloads
       run: dotnet workload restore --project ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} --skip-manifest-update
 
-    - name: Restore Windows RID runtime packs for ${{ matrix.arch }}
-      run: dotnet restore ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -r ${{matrix.runtime_id}} --configfile ${{env.NUGET_CONFIG_PATH}}
+    - name: Restore Windows RID runtime packs for x64
+      run: dotnet restore ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -r win-x64 --configfile ${{env.NUGET_CONFIG_PATH}}
 
     - name: Set API Key
       run: |
@@ -84,7 +75,7 @@ jobs:
       env:
         HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
           
-    - name: Publish ${{ matrix.arch }} package
+    - name: Publish x64 package
       id: publish-package
       run: |
         # Unlock certificate using SafeNet authentication client (USB hardware token must be plugged in)
@@ -95,11 +86,11 @@ jobs:
         $subjectName = (Get-Item "Cert:\CurrentUser\My\$thumbprint").Subject
         $subjectNameForMsBuild = $subjectName.Replace(',', '%2c').Replace(';', '%3b')
         $appVersion = "${{needs.shared-resources.outputs.app_version}}.0"
-        $artifactDir = "${{github.workspace}}\artifacts\${{matrix.arch}}"
+        $artifactDir = "${{github.workspace}}\artifacts\x64"
         
         New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
 
-        Write-Host "Publishing ${{matrix.arch}}..."
+        Write-Host "Publishing x64..."
         dotnet clean ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0
         
         $publishArgs = @(
@@ -111,8 +102,8 @@ jobs:
           '-p:AppxPackageSigningEnabled=true'
           '-p:UapAppxPackageBuildMode=SideloadOnly'
           '-p:AppxBundle=Never'
-          '-p:PlatformTarget=${{matrix.platform_target}}'
-          '-p:RuntimeIdentifier=${{matrix.runtime_id}}'
+          '-p:PlatformTarget=x64'
+          '-p:RuntimeIdentifier=win-x64'
           "-p:PackageCertificateThumbprint=$thumbprint"
           "-p:AppxPackageCertificateSubjectName=$subjectNameForMsBuild"
           "-p:AppxPackageVersion=$appVersion"
@@ -121,60 +112,16 @@ jobs:
         & dotnet @publishArgs
         
         $msix = Get-ChildItem -Filter Hacked*.msix -Recurse | Select-Object -ExpandProperty FullName -First 1
-        if (-not $msix) { throw "No .msix found after publish for ${{matrix.arch}}" }
-        Write-Host "Found ${{matrix.arch}} package: $msix"
-        Copy-Item -Path $msix -Destination "$artifactDir\Hacked.${{matrix.arch}}.msix" -Force
+        if (-not $msix) { throw "No .msix found after publish for x64" }
+        Write-Host "Found x64 package: $msix"
+        Copy-Item -Path $msix -Destination "$artifactDir\Hacked.x64.msix" -Force
         
-        echo "PACKAGE_PATH=$artifactDir\Hacked.${{matrix.arch}}.msix" >> $env:GITHUB_OUTPUT
+        echo "PACKAGE_PATH=$artifactDir\Hacked.x64.msix" >> $env:GITHUB_OUTPUT
 
-    - name: Upload ${{ matrix.arch }} artifact
+    - name: Upload x64 artifact
       uses: actions/upload-artifact@v7
       with:     
-        name: "msix-${{matrix.arch}}"
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_x64"
         path: ${{steps.publish-package.outputs.PACKAGE_PATH}}
-        if-no-files-found: error
-        retention-days: 30
-
-  # ********************************************************************************** #
-  #                                Bundle msixbundle                                   #
-  # ********************************************************************************** #
-  bundle-packages:
-    name: Bundle MSIX Packages
-    needs: [shared-resources, maui-windows-sideload]
-    runs-on: [self-hosted, x64]
-    steps:
-    - name: Download x64 artifact
-      uses: actions/download-artifact@v7
-      with:
-        name: msix-x64
-        path: ${{ github.workspace }}/packages
-
-    - name: Download arm64 artifact
-      uses: actions/download-artifact@v7
-      with:
-        name: msix-arm64
-        path: ${{ github.workspace }}/packages
-
-    - name: Create msixbundle
-      id: create-bundle
-      run: |
-        $appVersion = "${{needs.shared-resources.outputs.app_version}}.0"
-        $bundleDir = "${{github.workspace}}\packages"
-        $bundlePath = "$bundleDir\Hacked.$appVersion.msixbundle"
-        
-        Write-Host "Creating msixbundle from packages in $bundleDir..."
-        $makeappx = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\MakeAppx.exe"
-        & $makeappx bundle /d "$bundleDir" /p $bundlePath
-        
-        if (-not (Test-Path $bundlePath)) { throw "Failed to create msixbundle at $bundlePath" }
-        Write-Host "Created bundle: $bundlePath"
-        
-        echo "BUNDLE_PATH=$bundlePath" >> $env:GITHUB_OUTPUT
-
-    - name: Attach bundle artifact to workflow run
-      uses: actions/upload-artifact@v7
-      with:     
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_msixbundle"
-        path: ${{ steps.create-bundle.outputs.BUNDLE_PATH }}
         if-no-files-found: error
         retention-days: 30
