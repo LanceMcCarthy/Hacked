@@ -69,6 +69,9 @@ jobs:
     - name: Restore NuGet packages
       run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
+    - name: Restore MAUI workloads (including arm64 runtime)
+      run: dotnet workload restore --project ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
+
     - name: Set API Key
       run: |
         $file = 'src/Hacked.Maui/appsettings.json'
