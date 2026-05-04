@@ -70,7 +70,10 @@ jobs:
       run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
     - name: Restore MAUI workloads (including arm64 runtime)
-      run: dotnet workload restore --project ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
+      run: dotnet workload restore --project ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} --skip-manifest-update
+
+    - name: Restore Windows RID runtime packs for ${{ matrix.arch }}
+      run: dotnet restore ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -r ${{matrix.runtime_id}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
     - name: Set API Key
       run: |
@@ -102,6 +105,7 @@ jobs:
         $publishArgs = @(
           'publish'
           '${{env.PROJECT_PATH}}'
+          '--no-restore'
           '-c', 'Release'
           '-f', '${{env.NET_TFM}}-windows10.0.19041.0'
           '-p:AppxPackageSigningEnabled=true'
