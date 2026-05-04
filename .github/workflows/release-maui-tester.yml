@@ -67,6 +67,38 @@ jobs:
     - name: Set Telerik NuGet Credentials
       run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
 
+    # Update the app manifest before publish. Identity/@Publisher MUST match the
+    # DigiCert signing cert's Subject exactly, or signing the final .msixbundle
+    # will fail. We look up the cert on the runner and write its subject in.
+    - name: Update manifest for side load build
+      run: |
+        $manifestPath = 'src\Hacked.Maui\Platforms\Windows\Package.appxmanifest'
+        $thumbprint = '8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97'
+        $cert = Get-Item "Cert:\CurrentUser\My\$thumbprint" -ErrorAction SilentlyContinue
+        if (-not $cert) { $cert = Get-Item "Cert:\LocalMachine\My\$thumbprint" -ErrorAction SilentlyContinue }
+        if (-not $cert) { throw "Signing certificate $thumbprint not found in CurrentUser\My or LocalMachine\My" }
+        $publisherSubject = $cert.Subject
+        Write-Host "Setting Identity/@Publisher to: $publisherSubject"
+
+        [xml]$manifest = Get-Content $manifestPath
+        $ns = $manifest.DocumentElement.NamespaceURI
+        $nsmgr = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
+        $nsmgr.AddNamespace('m', $ns)
+
+        $identityNode = $manifest.SelectSingleNode('/m:Package/m:Identity', $nsmgr)
+        if ($null -eq $identityNode) { throw 'Identity node not found in Package.appxmanifest' }
+        $identityNode.SetAttribute('Version', "${{needs.shared-resources.outputs.app_version}}.0")
+        $identityNode.SetAttribute('Publisher', $publisherSubject)
+        $identityNode.SetAttribute('ProcessorArchitecture', '${{matrix.arch}}')
+
+        $publisherDisplayNode = $manifest.SelectSingleNode('/m:Package/m:Properties/m:PublisherDisplayName', $nsmgr)
+        if ($null -ne $publisherDisplayNode) { $publisherDisplayNode.InnerText = 'Lancelot Software' }
+
+        $displayNameNode = $manifest.SelectSingleNode('/m:Package/m:Properties/m:DisplayName', $nsmgr)
+        if ($null -ne $displayNameNode) { $displayNameNode.InnerText = 'Hacked?' }
+
+        $manifest.Save($manifestPath)
+
     - name: Set API Key
       run: |
         $file = 'src/Hacked.Maui/appsettings.json'
@@ -75,6 +107,13 @@ jobs:
         $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
       env:
         HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
+
+    # Self-hosted runner persists workspace; remove stale outputs so the
+    # MSIX we discover is guaranteed to be from THIS run.
+    - name: Clean prior publish outputs
+      run: |
+        Remove-Item -Recurse -Force "src\Hacked.Maui\AppPackages" -ErrorAction SilentlyContinue
+        Remove-Item -Recurse -Force "src\Hacked.Maui\bin\${{matrix.platform}}" -ErrorAction SilentlyContinue
           
     # Standard MAUI Windows MSIX publish. dotnet publish does its own restore.
     # Self-hosted runner already has MAUI workloads installed; do NOT call
@@ -104,17 +143,15 @@ jobs:
           '-p:UapAppxPackageBuildMode=SideloadOnly'
           '-p:AppxBundle=Never'
           '-p:WindowsPackageType=MSIX'
-          "-p:AppxPackageVersion=$appVersion"
-          '-p:AppxPublisherDisplayName=Lancelot Software'
         )
         & dotnet @publishArgs
         if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for ${{matrix.arch}} with exit code $LASTEXITCODE" }
 
-        # Search only the project's bin folder to avoid picking up stale/other MSIX.
-        $searchRoot = "src\Hacked.Maui\bin"
-        $candidates = Get-ChildItem -Path $searchRoot -Filter *.msix -Recurse -ErrorAction SilentlyContinue |
-          Where-Object { $_.FullName -notmatch '\\AppPackages\\.*\\Dependencies\\' }
-        Write-Host "Found $($candidates.Count) candidate MSIX file(s):"
+        # MAUI writes MSIX to src\Hacked.Maui\AppPackages\<name>_<ver>_<arch>_Test\*.msix
+        $appPackagesRoot = "src\Hacked.Maui\AppPackages"
+        $candidates = Get-ChildItem -Path $appPackagesRoot -Filter *.msix -Recurse -ErrorAction SilentlyContinue |
+          Where-Object { $_.FullName -notmatch '\\Dependencies\\' -and $_.Name -match "_${{matrix.arch}}\.msix$" }
+        Write-Host "Found $($candidates.Count) candidate MSIX file(s) for ${{matrix.arch}}:"
         $candidates | ForEach-Object { Write-Host "  $($_.FullName)" }
         $msix = $candidates | Sort-Object LastWriteTime -Descending | Select-Object -ExpandProperty FullName -First 1
         if (-not $msix) { throw "No .msix found after publish for ${{matrix.arch}}" }
