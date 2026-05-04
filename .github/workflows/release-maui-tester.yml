@@ -22,22 +22,31 @@ env:
   TELERIK_LICENSE: ${{secrets.TELERIK_LICENSE_KEY_VALUE}}
 
 jobs:
-  generate-version:
-    name: Generate Version
-    runs-on: ubuntu-latest
+  # *********************************************************************************** #
+  #                                   Shared Resources                                  #
+  # *********************************************************************************** #
+  shared-resources:
+    name: Create Shared Resources
+    runs-on: windows-latest
     outputs:
-      app_version: ${{ steps.version-creator.outputs.app_version }}
+      app_version: ${{steps.version-creator.outputs.app_version}}
     steps:
+    # Generates a version number using year.monthday.run_number (e.g., 2024.824.1)
     - name: Generate version number using date and run number
       id: version-creator
+      shell: pwsh
       run: |
-        buildDay=$(date +"%Y.%m%d")
-        ver="${buildDay}.${{ github.run_number }}"
-        echo "app_version=$ver" >> $GITHUB_OUTPUT
+        $buildDay = Get-Date -Format "yyyy.Mdd"
+        $runNumber = "$env:GITHUB_RUN_NUMBER"
+        $ver = $buildDay + "." + $runNumber
+        echo "app_version=$ver" >> $env:GITHUB_OUTPUT
 
+  # ********************************************************************************** #
+  #                                  Windows Sideload                                  #
+  # ********************************************************************************** #
   maui-windows-sideload:
     name: Build Windows (${{ matrix.arch }})
-    needs: generate-version
+    needs: shared-resources
     runs-on: [self-hosted, x64, digicert-enabled]
     strategy:
       matrix:
@@ -79,7 +88,7 @@ jobs:
         $thumbprint = "8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97"
         $subjectName = (Get-Item "Cert:\CurrentUser\My\$thumbprint").Subject
         $subjectNameForMsBuild = $subjectName.Replace(',', '%2c').Replace(';', '%3b')
-        $appVersion = "${{needs.generate-version.outputs.app_version}}.0"
+        $appVersion = "${{needs.shared-resources.outputs.app_version}}.0"
         $artifactDir = "${{github.workspace}}\artifacts\${{matrix.arch}}"
         
         New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
@@ -119,9 +128,12 @@ jobs:
         if-no-files-found: error
         retention-days: 30
 
+  # ********************************************************************************** #
+  #                                Bundle msixbundle                                   #
+  # ********************************************************************************** #
   bundle-packages:
     name: Bundle MSIX Packages
-    needs: [generate-version, maui-windows-sideload]
+    needs: [shared-resources, maui-windows-sideload]
     runs-on: [self-hosted, x64]
     steps:
     - name: Download x64 artifact
@@ -139,7 +151,7 @@ jobs:
     - name: Create msixbundle
       id: create-bundle
       run: |
-        $appVersion = "${{needs.generate-version.outputs.app_version}}.0"
+        $appVersion = "${{needs.shared-resources.outputs.app_version}}.0"
         $bundleDir = "${{github.workspace}}\packages"
         $bundlePath = "$bundleDir\Hacked.$appVersion.msixbundle"
         
@@ -155,7 +167,7 @@ jobs:
     - name: Attach bundle artifact to workflow run
       uses: actions/upload-artifact@v7
       with:     
-        name: "Hacked_v${{needs.generate-version.outputs.app_version}}_msixbundle"
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_msixbundle"
         path: ${{ steps.create-bundle.outputs.BUNDLE_PATH }}
         if-no-files-found: error
         retention-days: 30
