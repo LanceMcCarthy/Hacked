@@ -65,11 +65,12 @@ jobs:
     - name: Set Telerik NuGet Credentials
       run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
 
-    # Restore with --framework filter so only the Windows TFM is restored at the top level.
-    # This avoids fetching Mono runtime packs for android/ios/maccatalyst TFMs while
-    # letting project references (Hacked.Core, Hacked.Services) restore as netstandard2.0.
+    # Restore with TargetFramework (singular) MSBuild property so only the Windows TFM
+    # is restored at the top level. This avoids fetching Mono runtime packs for the
+    # android/ios/maccatalyst TFMs. TargetFramework (singular) is the MSBuild inner-build
+    # property and does NOT propagate to project references (which keep their own TFM).
     - name: Restore (Windows TFM, ${{ matrix.arch }})
-      run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} --framework ${{env.NET_TFM}}-windows10.0.19041.0 --runtime ${{matrix.runtime_id}}
+      run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} --runtime ${{matrix.runtime_id}} -p:TargetFramework=${{env.NET_TFM}}-windows10.0.19041.0
 
     - name: Set API Key
       run: |
