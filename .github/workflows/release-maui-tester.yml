@@ -77,23 +77,18 @@ jobs:
     # Standard MAUI Windows MSIX publish. dotnet publish does its own restore.
     # Self-hosted runner already has MAUI workloads installed; do NOT call
     # `dotnet workload restore` (it updates manifests and breaks the build).
+    # Per-arch MSIX packages are NOT signed here; the final .msixbundle is
+    # signed once in the bundle-msix job.
     - name: Publish ${{ matrix.arch }} package
       id: publish-package
       run: |
-        # Unlock certificate using SafeNet authentication client (USB hardware token must be plugged in)
-        $sacTools = "C:\Program Files\SafeNet\Authentication\SAC\x64\SACTools.exe"
-        & $sacTools /Token /LogOn /Password "${{secrets.DIGICERT_HARDWARE_TOKEN_PASSWORD}}"
-
-        $thumbprint = "8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97"
-        $subjectName = (Get-Item "Cert:\CurrentUser\My\$thumbprint").Subject
-        $subjectNameForMsBuild = $subjectName.Replace(',', '%2c').Replace(';', '%3b')
         $appVersion = "${{needs.shared-resources.outputs.app_version}}.0"
         $artifactDir = "${{github.workspace}}\artifacts\${{matrix.arch}}"
-        
+
         New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
 
         Write-Host "Publishing ${{matrix.arch}}..."
-        
+
         $publishArgs = @(
           'publish'
           '${{env.PROJECT_PATH}}'
@@ -101,12 +96,10 @@ jobs:
           '-f', '${{env.NET_TFM}}-windows10.0.19041.0'
           '-p:RuntimeIdentifierOverride=${{matrix.runtime_id}}'
           '-p:GenerateAppxPackageOnBuild=true'
-          '-p:AppxPackageSigningEnabled=true'
+          '-p:AppxPackageSigningEnabled=false'
           '-p:UapAppxPackageBuildMode=SideloadOnly'
           '-p:AppxBundle=Never'
           '-p:WindowsPackageType=MSIX'
-          "-p:PackageCertificateThumbprint=$thumbprint"
-          "-p:AppxPackageCertificateSubjectName=$subjectNameForMsBuild"
           "-p:AppxPackageVersion=$appVersion"
           '-p:AppxPublisherDisplayName=Lancelot Software'
         )
@@ -125,5 +118,73 @@ jobs:
       with:     
         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_${{matrix.arch}}"
         path: ${{steps.publish-package.outputs.PACKAGE_PATH}}
+        if-no-files-found: error
+        retention-days: 30
+
+  # ********************************************************************************** #
+  #                              Bundle MSIX -> MSIXBUNDLE                             #
+  # ********************************************************************************** #
+  bundle-msix:
+    name: Bundle MSIX packages
+    needs: [shared-resources, maui-windows-sideload]
+    runs-on: [self-hosted, x64, digicert-enabled]
+    steps:
+    - name: Download x64 artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_x64"
+        path: ${{github.workspace}}\bundle-input
+
+    - name: Download arm64 artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_arm64"
+        path: ${{github.workspace}}\bundle-input
+
+    - name: Create MSIX bundle
+      id: bundle
+      run: |
+        $appVersion = "${{needs.shared-resources.outputs.app_version}}.0"
+        $inputDir = "${{github.workspace}}\bundle-input"
+        $outputDir = "${{github.workspace}}\bundle-output"
+        New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
+
+        # Locate makeappx.exe from the latest installed Windows 10 SDK
+        $sdkRoot = "C:\Program Files (x86)\Windows Kits\10\bin"
+        $makeAppx = Get-ChildItem -Path $sdkRoot -Recurse -Filter makeappx.exe -ErrorAction SilentlyContinue |
+          Where-Object { $_.FullName -match '\\x64\\makeappx\.exe$' } |
+          Sort-Object FullName -Descending | Select-Object -First 1
+        if (-not $makeAppx) { throw "makeappx.exe not found under $sdkRoot" }
+        Write-Host "Using makeappx: $($makeAppx.FullName)"
+
+        Get-ChildItem $inputDir -Filter *.msix | ForEach-Object { Write-Host "Input: $($_.FullName)" }
+
+        $bundlePath = "$outputDir\Hacked_v${{needs.shared-resources.outputs.app_version}}.msixbundle"
+        & $makeAppx.FullName bundle /d $inputDir /p $bundlePath /bv $appVersion /o
+        if ($LASTEXITCODE -ne 0) { throw "makeappx bundle failed with exit code $LASTEXITCODE" }
+
+        echo "BUNDLE_PATH=$bundlePath" >> $env:GITHUB_OUTPUT
+
+    - name: Sign MSIX bundle
+      run: |
+        $sacTools = "C:\Program Files\SafeNet\Authentication\SAC\x64\SACTools.exe"
+        & $sacTools /Token /LogOn /Password "${{secrets.DIGICERT_HARDWARE_TOKEN_PASSWORD}}"
+
+        $thumbprint = "8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97"
+        $sdkRoot = "C:\Program Files (x86)\Windows Kits\10\bin"
+        $signTool = Get-ChildItem -Path $sdkRoot -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
+          Where-Object { $_.FullName -match '\\x64\\signtool\.exe$' } |
+          Sort-Object FullName -Descending | Select-Object -First 1
+        if (-not $signTool) { throw "signtool.exe not found under $sdkRoot" }
+        Write-Host "Using signtool: $($signTool.FullName)"
+
+        & $signTool.FullName sign /fd SHA256 /sha1 $thumbprint /tr http://timestamp.digicert.com /td SHA256 "${{steps.bundle.outputs.BUNDLE_PATH}}"
+        if ($LASTEXITCODE -ne 0) { throw "signtool sign failed with exit code $LASTEXITCODE" }
+
+    - name: Upload MSIX bundle artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_msixbundle"
+        path: ${{steps.bundle.outputs.BUNDLE_PATH}}
         if-no-files-found: error
         retention-days: 30
