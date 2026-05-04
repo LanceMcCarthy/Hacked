@@ -45,9 +45,17 @@ jobs:
   #                                  Windows Sideload                                  #
   # ********************************************************************************** #
   maui-windows-sideload:
-    name: Build Windows (x64)
+    name: Build Windows (${{ matrix.arch }})
     needs: shared-resources
     runs-on: [self-hosted, x64, digicert-enabled]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runtime_id: win-x64
+          - arch: arm64
+            runtime_id: win-arm64
     steps:
     - name: Checkout
       uses: actions/checkout@v6
@@ -57,14 +65,11 @@ jobs:
     - name: Set Telerik NuGet Credentials
       run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
 
-    - name: Restore NuGet packages
-      run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
-
-    - name: Restore MAUI workloads
-      run: dotnet workload restore --project ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} --skip-manifest-update
-
-    - name: Restore Windows RID runtime packs for x64
-      run: dotnet restore ${{env.PROJECT_PATH}} --framework ${{env.NET_TFM}}-windows10.0.19041.0 --runtime win-x64 --configfile ${{env.NUGET_CONFIG_PATH}} -p:Configuration=Release
+    # Override TargetFrameworks to Windows-only so restore does not try to fetch
+    # Mono runtime packs for the android/ios/maccatalyst TFMs (which require
+    # Microsoft.NETCore.App.Runtime.Mono.* packages that may not be on nuget.org).
+    - name: Restore (Windows-only TFM, ${{ matrix.arch }})
+      run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} --runtime ${{matrix.runtime_id}} -p:TargetFrameworks=${{env.NET_TFM}}-windows10.0.19041.0 -p:Configuration=Release
 
     - name: Set API Key
       run: |
@@ -75,7 +80,7 @@ jobs:
       env:
         HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
           
-    - name: Publish x64 package
+    - name: Publish ${{ matrix.arch }} package
       id: publish-package
       run: |
         # Unlock certificate using SafeNet authentication client (USB hardware token must be plugged in)
@@ -86,12 +91,12 @@ jobs:
         $subjectName = (Get-Item "Cert:\CurrentUser\My\$thumbprint").Subject
         $subjectNameForMsBuild = $subjectName.Replace(',', '%2c').Replace(';', '%3b')
         $appVersion = "${{needs.shared-resources.outputs.app_version}}.0"
-        $artifactDir = "${{github.workspace}}\artifacts\x64"
+        $artifactDir = "${{github.workspace}}\artifacts\${{matrix.arch}}"
         
         New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
 
-        Write-Host "Publishing x64..."
-        dotnet clean ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0
+        Write-Host "Publishing ${{matrix.arch}}..."
+        dotnet clean ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:TargetFrameworks=${{env.NET_TFM}}-windows10.0.19041.0
         
         $publishArgs = @(
           'publish'
@@ -99,29 +104,31 @@ jobs:
           '--no-restore'
           '-c', 'Release'
           '-f', '${{env.NET_TFM}}-windows10.0.19041.0'
+          '-r', '${{matrix.runtime_id}}'
+          '-p:TargetFrameworks=${{env.NET_TFM}}-windows10.0.19041.0'
           '-p:AppxPackageSigningEnabled=true'
           '-p:UapAppxPackageBuildMode=SideloadOnly'
           '-p:AppxBundle=Never'
-          '-p:PlatformTarget=x64'
-          '-p:RuntimeIdentifier=win-x64'
+          '-p:PlatformTarget=${{matrix.arch}}'
           "-p:PackageCertificateThumbprint=$thumbprint"
           "-p:AppxPackageCertificateSubjectName=$subjectNameForMsBuild"
           "-p:AppxPackageVersion=$appVersion"
           '-p:AppxPublisherDisplayName=Lancelot Software'
         )
         & dotnet @publishArgs
+        if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for ${{matrix.arch}} with exit code $LASTEXITCODE" }
         
         $msix = Get-ChildItem -Filter Hacked*.msix -Recurse | Select-Object -ExpandProperty FullName -First 1
-        if (-not $msix) { throw "No .msix found after publish for x64" }
-        Write-Host "Found x64 package: $msix"
-        Copy-Item -Path $msix -Destination "$artifactDir\Hacked.x64.msix" -Force
+        if (-not $msix) { throw "No .msix found after publish for ${{matrix.arch}}" }
+        Write-Host "Found ${{matrix.arch}} package: $msix"
+        Copy-Item -Path $msix -Destination "$artifactDir\Hacked.${{matrix.arch}}.msix" -Force
         
-        echo "PACKAGE_PATH=$artifactDir\Hacked.x64.msix" >> $env:GITHUB_OUTPUT
+        echo "PACKAGE_PATH=$artifactDir\Hacked.${{matrix.arch}}.msix" >> $env:GITHUB_OUTPUT
 
-    - name: Upload x64 artifact
+    - name: Upload ${{ matrix.arch }} artifact
       uses: actions/upload-artifact@v7
       with:     
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_x64"
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_${{matrix.arch}}"
         path: ${{steps.publish-package.outputs.PACKAGE_PATH}}
         if-no-files-found: error
         retention-days: 30
