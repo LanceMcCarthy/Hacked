@@ -54,8 +54,10 @@ jobs:
         include:
           - arch: x64
             runtime_id: win-x64
+            platform: x64
           - arch: arm64
             runtime_id: win-arm64
+            platform: ARM64
     steps:
     - name: Checkout
       uses: actions/checkout@v6
@@ -94,6 +96,8 @@ jobs:
           '${{env.PROJECT_PATH}}'
           '-c', 'Release'
           '-f', '${{env.NET_TFM}}-windows10.0.19041.0'
+          '-p:Platform=${{matrix.platform}}'
+          '-p:AppxPackageBuildPlatform=${{matrix.platform}}'
           '-p:RuntimeIdentifierOverride=${{matrix.runtime_id}}'
           '-p:GenerateAppxPackageOnBuild=true'
           '-p:AppxPackageSigningEnabled=false'
@@ -105,8 +109,14 @@ jobs:
         )
         & dotnet @publishArgs
         if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for ${{matrix.arch}} with exit code $LASTEXITCODE" }
-        
-        $msix = Get-ChildItem -Filter Hacked*.msix -Recurse | Select-Object -ExpandProperty FullName -First 1
+
+        # Search only the project's bin folder to avoid picking up stale/other MSIX.
+        $searchRoot = "src\Hacked.Maui\bin"
+        $candidates = Get-ChildItem -Path $searchRoot -Filter *.msix -Recurse -ErrorAction SilentlyContinue |
+          Where-Object { $_.FullName -notmatch '\\AppPackages\\.*\\Dependencies\\' }
+        Write-Host "Found $($candidates.Count) candidate MSIX file(s):"
+        $candidates | ForEach-Object { Write-Host "  $($_.FullName)" }
+        $msix = $candidates | Sort-Object LastWriteTime -Descending | Select-Object -ExpandProperty FullName -First 1
         if (-not $msix) { throw "No .msix found after publish for ${{matrix.arch}}" }
         Write-Host "Found ${{matrix.arch}} package: $msix"
         Copy-Item -Path $msix -Destination "$artifactDir\Hacked.${{matrix.arch}}.msix" -Force
@@ -129,6 +139,11 @@ jobs:
     needs: [shared-resources, maui-windows-sideload]
     runs-on: [self-hosted, x64, digicert-enabled]
     steps:
+    - name: Clean bundle workspace
+      run: |
+        Remove-Item -Recurse -Force "${{github.workspace}}\bundle-input" -ErrorAction SilentlyContinue
+        Remove-Item -Recurse -Force "${{github.workspace}}\bundle-output" -ErrorAction SilentlyContinue
+
     - name: Download x64 artifact
       uses: actions/download-artifact@v6
       with:
