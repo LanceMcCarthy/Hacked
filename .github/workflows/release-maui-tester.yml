@@ -22,23 +22,37 @@ env:
   TELERIK_LICENSE: ${{secrets.TELERIK_LICENSE_KEY_VALUE}}
 
 jobs:
+  generate-version:
+    name: Generate Version
+    runs-on: ubuntu-latest
+    outputs:
+      app_version: ${{ steps.version-creator.outputs.app_version }}
+    steps:
+    - name: Generate version number using date and run number
+      id: version-creator
+      run: |
+        buildDay=$(date +"%Y.%m%d")
+        ver="${buildDay}.${{ github.run_number }}"
+        echo "app_version=$ver" >> $GITHUB_OUTPUT
+
   maui-windows-sideload:
-    name: Build Windows (Sideload)
+    name: Build Windows (${{ matrix.arch }})
+    needs: generate-version
     runs-on: [self-hosted, x64, digicert-enabled]
+    strategy:
+      matrix:
+        include:
+          - arch: x64
+            platform_target: x64
+            runtime_id: win-x64
+          - arch: arm64
+            platform_target: arm64
+            runtime_id: win-arm64
     steps:
     - name: Checkout
       uses: actions/checkout@v6
       with:
         fetch-depth: 0
-
-    - name: Generate version number using date and run number
-      id: version-creator
-      shell: pwsh
-      run: |
-        $buildDay = Get-Date -Format "yyyy.Mdd"
-        $runNumber = "$env:GITHUB_RUN_NUMBER"
-        $ver = $buildDay + "." + $runNumber
-        echo "app_version=$ver" >> $env:GITHUB_OUTPUT
 
     - name: Set Telerik NuGet Credentials
       run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
@@ -55,26 +69,25 @@ jobs:
       env:
         HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
           
-    - name: Build WinUI project and stage unsigned msixbundle
-      id: build-sideload-package
+    - name: Publish ${{ matrix.arch }} package
+      id: publish-package
       run: |
-        # Unlock certificate using  SafeNet authentication client (USB hardware token must be plugged in)
+        # Unlock certificate using SafeNet authentication client (USB hardware token must be plugged in)
         $sacTools = "C:\Program Files\SafeNet\Authentication\SAC\x64\SACTools.exe"
         & $sacTools /Token /LogOn /Password "${{secrets.DIGICERT_HARDWARE_TOKEN_PASSWORD}}"
 
         $thumbprint = "8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97"
         $subjectName = (Get-Item "Cert:\CurrentUser\My\$thumbprint").Subject
         $subjectNameForMsBuild = $subjectName.Replace(',', '%2c').Replace(';', '%3b')
-        $appVersion = "${{steps.version-creator.outputs.app_version}}.0"
-        $artifactDir = "${{github.workspace}}\artifacts"
-        $bundleDir = "$artifactDir\bundle"
+        $appVersion = "${{needs.generate-version.outputs.app_version}}.0"
+        $artifactDir = "${{github.workspace}}\artifacts\${{matrix.arch}}"
         
-        New-Item -ItemType Directory -Force -Path $bundleDir | Out-Null
+        New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
 
-        # Publish x64
-        Write-Host "Publishing x64..."
+        Write-Host "Publishing ${{matrix.arch}}..."
         dotnet clean ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0
-        $publishArgsX64 = @(
+        
+        $publishArgs = @(
           'publish'
           '${{env.PROJECT_PATH}}'
           '-c', 'Release'
@@ -82,82 +95,67 @@ jobs:
           '-p:AppxPackageSigningEnabled=true'
           '-p:UapAppxPackageBuildMode=SideloadOnly'
           '-p:AppxBundle=Never'
-          '-p:PlatformTarget=x64'
-          '-p:RuntimeIdentifier=win-x64'
+          '-p:PlatformTarget=${{matrix.platform_target}}'
+          '-p:RuntimeIdentifier=${{matrix.runtime_id}}'
           "-p:PackageCertificateThumbprint=$thumbprint"
           "-p:AppxPackageCertificateSubjectName=$subjectNameForMsBuild"
           "-p:AppxPackageVersion=$appVersion"
           '-p:AppxPublisherDisplayName=Lancelot Software'
         )
-        & dotnet @publishArgsX64
+        & dotnet @publishArgs
         
-        $msixX64 = Get-ChildItem -Filter Hacked*.msix -Recurse | Where-Object { $_.FullName -notlike '*arm64*' } | Select-Object -ExpandProperty FullName -First 1
-        if (-not $msixX64) { throw "No x64 .msix found after publish" }
-        Write-Host "Found x64 package: $msixX64"
-        Copy-Item -Path $msixX64 -Destination "$bundleDir\Hacked.x64.msix" -Force
-
-        # Publish arm64
-        Write-Host "Publishing arm64..."
-        dotnet clean ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0
-        $publishArgsArm64 = @(
-          'publish'
-          '${{env.PROJECT_PATH}}'
-          '-c', 'Release'
-          '-f', '${{env.NET_TFM}}-windows10.0.19041.0'
-          '-p:AppxPackageSigningEnabled=true'
-          '-p:UapAppxPackageBuildMode=SideloadOnly'
-          '-p:AppxBundle=Never'
-          '-p:PlatformTarget=arm64'
-          '-p:RuntimeIdentifier=win-arm64'
-          "-p:PackageCertificateThumbprint=$thumbprint"
-          "-p:AppxPackageCertificateSubjectName=$subjectNameForMsBuild"
-          "-p:AppxPackageVersion=$appVersion"
-          '-p:AppxPublisherDisplayName=Lancelot Software'
-        )
-        & dotnet @publishArgsArm64
+        $msix = Get-ChildItem -Filter Hacked*.msix -Recurse | Select-Object -ExpandProperty FullName -First 1
+        if (-not $msix) { throw "No .msix found after publish for ${{matrix.arch}}" }
+        Write-Host "Found ${{matrix.arch}} package: $msix"
+        Copy-Item -Path $msix -Destination "$artifactDir\Hacked.${{matrix.arch}}.msix" -Force
         
-        $msixArm64 = Get-ChildItem -Filter Hacked*.msix -Recurse | Where-Object { $_.FullName -like '*arm64*' } | Select-Object -ExpandProperty FullName -First 1
-        if (-not $msixArm64) { throw "No arm64 .msix found after publish" }
-        Write-Host "Found arm64 package: $msixArm64"
-        Copy-Item -Path $msixArm64 -Destination "$bundleDir\Hacked.arm64.msix" -Force
+        echo "PACKAGE_PATH=$artifactDir\Hacked.${{matrix.arch}}.msix" >> $env:GITHUB_OUTPUT
 
-        # Create bundle using MakeAppx
-        Write-Host "Creating msixbundle from x64 and arm64 packages..."
+    - name: Upload ${{ matrix.arch }} artifact
+      uses: actions/upload-artifact@v7
+      with:     
+        name: "msix-${{matrix.arch}}"
+        path: ${{steps.publish-package.outputs.PACKAGE_PATH}}
+        if-no-files-found: error
+        retention-days: 30
+
+  bundle-packages:
+    name: Bundle MSIX Packages
+    needs: [generate-version, maui-windows-sideload]
+    runs-on: [self-hosted, x64]
+    steps:
+    - name: Download x64 artifact
+      uses: actions/download-artifact@v7
+      with:
+        name: msix-x64
+        path: ${{ github.workspace }}/packages
+
+    - name: Download arm64 artifact
+      uses: actions/download-artifact@v7
+      with:
+        name: msix-arm64
+        path: ${{ github.workspace }}/packages
+
+    - name: Create msixbundle
+      id: create-bundle
+      run: |
+        $appVersion = "${{needs.generate-version.outputs.app_version}}.0"
+        $bundleDir = "${{github.workspace}}\packages"
         $bundlePath = "$bundleDir\Hacked.$appVersion.msixbundle"
+        
+        Write-Host "Creating msixbundle from packages in $bundleDir..."
         $makeappx = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\MakeAppx.exe"
         & $makeappx bundle /d "$bundleDir" /p $bundlePath
         
         if (-not (Test-Path $bundlePath)) { throw "Failed to create msixbundle at $bundlePath" }
         Write-Host "Created bundle: $bundlePath"
         
-        echo "PACKAGE_PATH=$bundlePath" >> $env:GITHUB_OUTPUT
+        echo "BUNDLE_PATH=$bundlePath" >> $env:GITHUB_OUTPUT
 
-    - name: Locate msixbundle
-      id: find-msix-file
-      run: |
-        $bundlePath = "${{steps.build-sideload-package.outputs.PACKAGE_PATH}}"
-        if (-not (Test-Path $bundlePath)) { throw "msixbundle not found at $bundlePath" }
-        echo "PACKAGE_PATH=$bundlePath" >> $env:GITHUB_OUTPUT
-
-    # - name: Use hardware token and sign with digicert certificate
-    #   run: |
-    #     # Launch SafeNet authentication client (USB hardware token must be plugged in)
-    #     # Unlock token via SafeNet's PKCS#11 interface; this will prompt for PIN entry if token is locked
-    #     $sacTools = "C:\Program Files\SafeNet\Authentication\SAC\x64\SACTools.exe"
-    #     & $sacTools /Token /LogOn /Password "${{secrets.DIGICERT_HARDWARE_TOKEN_PASSWORD}}"
-
-    #     # Now the cert is ready to be used for signing. Sign the package with a timestamp.
-    #     $signtool = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"
-    #     & $signtool sign /sha1 8BC202959D2DCE3EEB3A489D8348B5C9B6B64A97 `
-    #       /fd sha256 `
-    #       /tr http://timestamp.digicert.com `
-    #       /td sha256 `
-    #       "${{steps.build-sideload-package.outputs.bundle_path}}"
-
-    - name: Attach artifacts to workflow run
+    - name: Attach bundle artifact to workflow run
       uses: actions/upload-artifact@v7
       with:     
-        name: "Hacked_v${{steps.version-creator.outputs.app_version}}_x64_arm64"
-        path: ${{steps.find-msix-file.outputs.PACKAGE_PATH}}
+        name: "Hacked_v${{needs.generate-version.outputs.app_version}}_msixbundle"
+        path: ${{ steps.create-bundle.outputs.BUNDLE_PATH }}
         if-no-files-found: error
         retention-days: 30
