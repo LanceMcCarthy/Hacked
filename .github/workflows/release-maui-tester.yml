@@ -65,19 +65,6 @@ jobs:
     - name: Set Telerik NuGet Credentials
       run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
 
-    # Restore project references first (netstandard2.0) so their assets files are correct.
-    # The -p:TargetFramework filter on the main project restore would otherwise propagate
-    # to these references and cause NETSDK1005 errors during publish.
-    - name: Restore project references (netstandard2.0)
-      run: |
-        dotnet restore src/Hacked.Core/Hacked.Core.csproj --configfile ${{env.NUGET_CONFIG_PATH}}
-        dotnet restore src/Hacked.Services/Hacked.Services.csproj --configfile ${{env.NUGET_CONFIG_PATH}}
-
-    # Restore the MAUI project for the Windows TFM only, with the matrix RID, to avoid
-    # fetching Mono runtime packs for android/ios/maccatalyst TFMs.
-    - name: Restore Hacked.Maui (Windows TFM, ${{ matrix.arch }})
-      run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} --runtime ${{matrix.runtime_id}} -p:TargetFramework=${{env.NET_TFM}}-windows10.0.19041.0
-
     - name: Set API Key
       run: |
         $file = 'src/Hacked.Maui/appsettings.json'
@@ -87,6 +74,9 @@ jobs:
       env:
         HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
           
+    # Standard MAUI Windows MSIX publish. dotnet publish does its own restore.
+    # Self-hosted runner already has MAUI workloads installed; do NOT call
+    # `dotnet workload restore` (it updates manifests and breaks the build).
     - name: Publish ${{ matrix.arch }} package
       id: publish-package
       run: |
@@ -103,19 +93,18 @@ jobs:
         New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
 
         Write-Host "Publishing ${{matrix.arch}}..."
-        dotnet clean ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0
         
         $publishArgs = @(
           'publish'
           '${{env.PROJECT_PATH}}'
-          '--no-restore'
           '-c', 'Release'
           '-f', '${{env.NET_TFM}}-windows10.0.19041.0'
-          '-r', '${{matrix.runtime_id}}'
+          '-p:RuntimeIdentifierOverride=${{matrix.runtime_id}}'
+          '-p:GenerateAppxPackageOnBuild=true'
           '-p:AppxPackageSigningEnabled=true'
           '-p:UapAppxPackageBuildMode=SideloadOnly'
           '-p:AppxBundle=Never'
-          '-p:PlatformTarget=${{matrix.arch}}'
+          '-p:WindowsPackageType=MSIX'
           "-p:PackageCertificateThumbprint=$thumbprint"
           "-p:AppxPackageCertificateSubjectName=$subjectNameForMsBuild"
           "-p:AppxPackageVersion=$appVersion"
