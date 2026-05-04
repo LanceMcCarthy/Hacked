@@ -65,11 +65,11 @@ jobs:
     - name: Set Telerik NuGet Credentials
       run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
 
-    # Override TargetFrameworks to Windows-only so restore does not try to fetch
-    # Mono runtime packs for the android/ios/maccatalyst TFMs (which require
-    # Microsoft.NETCore.App.Runtime.Mono.* packages that may not be on nuget.org).
-    - name: Restore (Windows-only TFM, ${{ matrix.arch }})
-      run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} --runtime ${{matrix.runtime_id}} -p:TargetFrameworks=${{env.NET_TFM}}-windows10.0.19041.0 -p:Configuration=Release
+    # Restore with --framework filter so only the Windows TFM is restored at the top level.
+    # This avoids fetching Mono runtime packs for android/ios/maccatalyst TFMs while
+    # letting project references (Hacked.Core, Hacked.Services) restore as netstandard2.0.
+    - name: Restore (Windows TFM, ${{ matrix.arch }})
+      run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}} --framework ${{env.NET_TFM}}-windows10.0.19041.0 --runtime ${{matrix.runtime_id}}
 
     - name: Set API Key
       run: |
@@ -96,7 +96,7 @@ jobs:
         New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
 
         Write-Host "Publishing ${{matrix.arch}}..."
-        dotnet clean ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:TargetFrameworks=${{env.NET_TFM}}-windows10.0.19041.0
+        dotnet clean ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0
         
         $publishArgs = @(
           'publish'
@@ -105,7 +105,6 @@ jobs:
           '-c', 'Release'
           '-f', '${{env.NET_TFM}}-windows10.0.19041.0'
           '-r', '${{matrix.runtime_id}}'
-          '-p:TargetFrameworks=${{env.NET_TFM}}-windows10.0.19041.0'
           '-p:AppxPackageSigningEnabled=true'
           '-p:UapAppxPackageBuildMode=SideloadOnly'
           '-p:AppxBundle=Never'
