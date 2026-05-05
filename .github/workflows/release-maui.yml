@@ -156,6 +156,7 @@ jobs:
         if-no-files-found: error
         retention-days: 30
 
+
   # ********************************************************************************** #
   #                              Bundle MSIX -> MSIXBUNDLE                             #
   # ********************************************************************************** #
@@ -311,7 +312,7 @@ jobs:
     if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
     runs-on: macos-26
     env:
-      XCODE_VERSION: '26.3'
+      XCODE_VERSION: '26.4'
       APPLE_DEV_ID_APP_CERT_NAME: "Developer ID Application: Lancelot Software, LLC (L65255N3F7)"
       APPLE_DEV_ID_INSTALLER_CERT_NAME: "Developer ID Installer: Lancelot Software, LLC (L65255N3F7)"
       APPLE_NOTARY_TEAM_ID: "L65255N3F7"
