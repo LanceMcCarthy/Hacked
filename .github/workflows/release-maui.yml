@@ -51,8 +51,18 @@ jobs:
   maui-windows-sideload:
     name: Build Windows (Sideload)
     needs: shared-resources
-    runs-on: windows-2022
+    runs-on: windows-latest
     if: ${{ needs.shared-resources.outputs.app_version != ''}}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runtime_id: win-x64
+            platform: x64
+          - arch: arm64
+            runtime_id: win-arm64
+            platform: ARM64
     steps:
     - name: Checkout
       uses: actions/checkout@v6
@@ -97,61 +107,103 @@ jobs:
         $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
       env:
         HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
-          
-    - name: Build WinUI project and stage unsigned msixbundle
-      id: build-sideload-package
+
+    - name: Publish ${{matrix.arch}} Windows package
+      id: publish-package
       run: |
-        $appxRoot = "${{github.workspace}}\artifacts\appx"
-        $stagingRoot = "${{github.workspace}}\artifacts\signing"
+        $appVersion = "${{needs.shared-resources.outputs.app_version}}.0"
+        $artifactDir = "${{github.workspace}}\artifacts\${{matrix.arch}}"
 
-        New-Item -ItemType Directory -Force -Path $appxRoot | Out-Null
-        New-Item -ItemType Directory -Force -Path $stagingRoot | Out-Null
+        New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
 
-        $publishOutput = dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-windows10.0.19041.0 -p:AppxPackageSigningEnabled=false -p:UapAppxPackageBuildMode=SideloadOnly -p:AppxBundle=Always "-p:AppxBundlePlatforms=x64|arm64" -p:PlatformTarget=AnyCPU -p:AppxPackageDir="${appxRoot}\" 2>&1
-        $publishOutput | ForEach-Object { Write-Host $_ }
+        Write-Host "Publishing Windows ${{matrix.arch}}..."
 
-        $packagePath = $null
-        $bundleLine = $publishOutput |
-          Where-Object { $_ -match '\.msixbundle' } |
-          Select-Object -Last 1
+        $publishArgs = @(
+          'publish'
+          '${{env.PROJECT_PATH}}'
+          '-c', 'Release'
+          '-f', '${{env.NET_TFM}}-windows10.0.19041.0'
+          '-p:Platform=${{matrix.platform}}'
+          '-p:AppxPackageBuildPlatform=${{matrix.platform}}'
+          '-p:RuntimeIdentifierOverride=${{matrix.runtime_id}}'
+          '-p:GenerateAppxPackageOnBuild=true'
+          '-p:AppxPackageSigningEnabled=false'
+          '-p:UapAppxPackageBuildMode=SideloadOnly'
+          '-p:AppxBundle=Never'
+          '-p:WindowsPackageType=MSIX'
+        )
+        & dotnet @publishArgs
+        if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for ${{matrix.arch}} with exit code $LASTEXITCODE" }
 
-        if ($bundleLine -and $bundleLine -match '(?<path>[A-Za-z]:\\[^\r\n]*?\.msixbundle)') {
-          $candidate = $matches['path']
-          if (Test-Path $candidate) {
-            $packagePath = $candidate
-            Write-Host "Using .msixbundle from publish output: $packagePath"
-          } else {
-            Write-Host "Publish log reported a .msixbundle path, but file is not present at copy time: $candidate"
-          }
-        }
+        # MAUI writes MSIX to src\Hacked.Maui\AppPackages\<name>_<ver>_<arch>_Test\*.msix
+        $appPackagesRoot = "src\Hacked.Maui\AppPackages"
+        $candidates = Get-ChildItem -Path $appPackagesRoot -Filter *.msix -Recurse -ErrorAction SilentlyContinue |
+          Where-Object { $_.FullName -notmatch '\\Dependencies\\' -and $_.Name -match "_${{matrix.arch}}\.msix$" }
+        Write-Host "Found $($candidates.Count) candidate MSIX file(s) for ${{matrix.arch}}:"
+        $candidates | ForEach-Object { Write-Host "  $($_.FullName)" }
+        $msix = $candidates | Sort-Object LastWriteTime -Descending | Select-Object -ExpandProperty FullName -First 1
+        if (-not $msix) { throw "No .msix found after publish for ${{matrix.arch}}" }
+        Write-Host "Found ${{matrix.arch}} package: $msix"
+        Copy-Item -Path $msix -Destination "$artifactDir\Hacked.${{matrix.arch}}.msix" -Force
+        
+        echo "PACKAGE_PATH=$artifactDir\Hacked.${{matrix.arch}}.msix" >> $env:GITHUB_OUTPUT
 
-        if (-not $packagePath) {
-          $packagePath = Get-ChildItem -Path $appxRoot -Recurse -Force -File |
-            Where-Object { $_.Extension -ieq '.msixbundle' } |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -ExpandProperty FullName -First 1
-        }
+    - name: Upload ${{matrix.arch}} artifact
+      uses: actions/upload-artifact@v7
+      with:     
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_${{matrix.arch}}"
+        path: ${{steps.publish-package.outputs.PACKAGE_PATH}}
+        if-no-files-found: error
+        retention-days: 30
 
-        if (-not $packagePath) {
-          Write-Host "No .msixbundle files remained under $appxRoot after publish; falling back to .msix output."
-          $packagePath = Get-ChildItem -Path $appxRoot -Recurse -Force -File |
-            Where-Object { $_.Extension -ieq '.msix' -and $_.Name -notlike '*Microsoft.WindowsAppRuntime*' } |
-            Sort-Object LastWriteTime -Descending |
-            Select-Object -ExpandProperty FullName -First 1
-        }
+  # ********************************************************************************** #
+  #                              Bundle MSIX -> MSIXBUNDLE                             #
+  # ********************************************************************************** #
+  bundle-msix:
+    name: Bundle MSIX packages
+    needs: [shared-resources, maui-windows-sideload]
+    runs-on: windows-latest
+    steps:
+    - name: Clean bundle workspace
+      run: |
+        Remove-Item -Recurse -Force "${{github.workspace}}\bundle-input" -ErrorAction SilentlyContinue
+        Remove-Item -Recurse -Force "${{github.workspace}}\bundle-output" -ErrorAction SilentlyContinue
 
-        if (-not $packagePath) {
-          Write-Host "No .msixbundle or .msix files found under $appxRoot after publish. Listing package directory contents for diagnostics:"
-          Get-ChildItem -Path $appxRoot -Recurse -Force | Format-List -Property FullName, Length, Attributes
-          throw "No .msixbundle or .msix files found under $appxRoot after publish."
-        }
+    - name: Download x64 artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_x64"
+        path: ${{github.workspace}}\bundle-input
 
-        $stagedPackagePath = Join-Path $stagingRoot (Split-Path $packagePath -Leaf)
-        Copy-Item -Path $packagePath -Destination $stagedPackagePath -Force
+    - name: Download arm64 artifact
+      uses: actions/download-artifact@v6
+      with:
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_arm64"
+        path: ${{github.workspace}}\bundle-input
 
-        Write-Host "Selected package for signing: $packagePath"
-        Write-Host "Staged package: $stagedPackagePath"
-        "bundle_path=$stagedPackagePath" >> $env:GITHUB_OUTPUT
+    - name: Create MSIX bundle
+      id: bundle
+      run: |
+        $appVersion = "${{needs.shared-resources.outputs.app_version}}.0"
+        $inputDir = "${{github.workspace}}\bundle-input"
+        $outputDir = "${{github.workspace}}\bundle-output"
+        New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
+
+        # Locate makeappx.exe from the latest installed Windows 10 SDK
+        $sdkRoot = "C:\Program Files (x86)\Windows Kits\10\bin"
+        $makeAppx = Get-ChildItem -Path $sdkRoot -Recurse -Filter makeappx.exe -ErrorAction SilentlyContinue |
+          Where-Object { $_.FullName -match '\\x64\\makeappx\.exe$' } |
+          Sort-Object FullName -Descending | Select-Object -First 1
+        if (-not $makeAppx) { throw "makeappx.exe not found under $sdkRoot" }
+        Write-Host "Using makeappx: $($makeAppx.FullName)"
+
+        Get-ChildItem $inputDir -Filter *.msix | ForEach-Object { Write-Host "Input: $($_.FullName)" }
+
+        $bundlePath = "$outputDir\Hacked_v${{needs.shared-resources.outputs.app_version}}.msixbundle"
+        & $makeAppx.FullName bundle /d $inputDir /p $bundlePath /bv $appVersion /o
+        if ($LASTEXITCODE -ne 0) { throw "makeappx bundle failed with exit code $LASTEXITCODE" }
+
+        echo "BUNDLE_PATH=$bundlePath" >> $env:GITHUB_OUTPUT
 
     # Entra ID App Registration (Akeyless OIDC Provider) > Certificates and Secrets > Federated Credentials
     - name: Azure login using OIDC via GitHub
@@ -162,7 +214,7 @@ jobs:
         tenant-id: "bd47e796-3473-4b8a-9101-1f4c0c7af31a"
         subscription-id: "48ab4839-62af-4ab3-afe6-043ea4d7c137"
 
-    - name: Sign files with Trusted Signing
+    - name: Sign MSIX bundle
       uses: azure/trusted-signing-action@v1.2.0
       with:
         endpoint: https://eus.codesigning.azure.net/
@@ -171,7 +223,7 @@ jobs:
         timestamp-rfc3161: http://timestamp.acs.microsoft.com
         timestamp-digest: SHA256
         file-digest: SHA256
-        files: ${{steps.build-sideload-package.outputs.bundle_path}}
+        files: ${{steps.bundle.outputs.BUNDLE_PATH}}
         exclude-azure-cli-credential: false
         exclude-environment-credential: true
         exclude-workload-identity-credential: true
@@ -183,11 +235,11 @@ jobs:
         exclude-azure-developer-cli-credential: true
         exclude-interactive-browser-credential: true
 
-    - name: Attach artifacts to workflow run
+    - name: Upload MSIX bundle artifact
       uses: actions/upload-artifact@v7
-      with:     
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_sideload"
-        path: ${{steps.build-sideload-package.outputs.bundle_path}}
+      with:
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_msixbundle"
+        path: ${{steps.bundle.outputs.BUNDLE_PATH}}
         if-no-files-found: error
         retention-days: 30
 
