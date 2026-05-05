@@ -30,7 +30,7 @@ jobs:
   # *********************************************************************************** #
   shared-resources:
     name: Create Shared Resources
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     outputs:
       app_version: ${{steps.version-creator.outputs.app_version}}
     steps:
@@ -51,7 +51,7 @@ jobs:
   maui-windows-sideload:
     name: Build Windows (Sideload)
     needs: shared-resources
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     if: ${{ needs.shared-resources.outputs.app_version != ''}}
     strategy:
       fail-fast: false
@@ -163,7 +163,7 @@ jobs:
   bundle-msix:
     name: Bundle MSIX packages
     needs: [shared-resources, maui-windows-sideload]
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     steps:
     - name: Clean bundle workspace
       run: |
@@ -250,7 +250,7 @@ jobs:
   # ***************************************************************************************** #
   build-windows:
     name: Build Windows (Store Upload)
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     needs: shared-resources
     if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
     steps:
@@ -519,7 +519,7 @@ jobs:
   # ***************************************************************************************** #
   # build-android:
   #   name: Build Android (Store Upload)
-  #   runs-on: windows-latest
+  #   runs-on: windows-2025-vs2026
   #   needs: shared-resources
   #   if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
   #   env:
