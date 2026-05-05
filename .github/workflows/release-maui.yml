@@ -171,13 +171,13 @@ jobs:
         Remove-Item -Recurse -Force "${{github.workspace}}\bundle-output" -ErrorAction SilentlyContinue
 
     - name: Download x64 artifact
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v8
       with:
         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_x64"
         path: ${{github.workspace}}\bundle-input
 
     - name: Download arm64 artifact
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v8
       with:
         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_arm64"
         path: ${{github.workspace}}\bundle-input
