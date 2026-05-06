@@ -14,6 +14,8 @@ defaults:
     shell: pwsh
 
 permissions:
+  actions: write   # Needed to delete artifacts after bundle upload
+  contents: read
   id-token: write  # For OIDC auth
 
 env:
@@ -243,6 +245,39 @@ jobs:
         path: ${{steps.bundle.outputs.BUNDLE_PATH}}
         if-no-files-found: error
         retention-days: 30
+
+    - name: Delete source x64/arm64 MSIX artifacts
+      uses: actions/github-script@v8
+      with:
+        script: |
+          const version = '${{ needs.shared-resources.outputs.app_version }}';
+          const targetNames = new Set([
+            `Hacked_v${version}_x64`,
+            `Hacked_v${version}_arm64`
+          ]);
+
+          const { owner, repo } = context.repo;
+          const run_id = context.runId;
+
+          const artifacts = await github.paginate(
+            github.rest.actions.listWorkflowRunArtifacts,
+            { owner, repo, run_id, per_page: 100 }
+          );
+
+          const toDelete = artifacts.filter((artifact) => targetNames.has(artifact.name));
+          if (toDelete.length === 0) {
+            core.info('No source artifacts found to delete.');
+            return;
+          }
+
+          for (const artifact of toDelete) {
+            await github.rest.actions.deleteArtifact({
+              owner,
+              repo,
+              artifact_id: artifact.id,
+            });
+            core.info(`Deleted artifact: ${artifact.name} (id ${artifact.id})`);
+          }
 
 
   # ***************************************************************************************** #
