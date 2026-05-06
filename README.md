@@ -16,19 +16,18 @@ An application so you can be notified of any data breaches that included your pe
   * macOS   - coming soon
   * Android - coming soon
   * iOS     - coming soon
-  * Windows (UWP), Xbox, Hololens => [Microsoft Store](https://www.microsoft.com/store/productId/9NBLGGH6850J)
+  * (UWP) Windows 10+, Xbox, Hololens, Windows 10 Mobile [Microsoft Store](https://www.microsoft.com/store/productId/9NBLGGH6850J)
   
 ## Builds
 
-### GitHub Actions (replacing AzDO)
+### GitHub Actions
 
-| Project | Main | Prerelease | Release |
-|---------|------|------------|---------|
-| Common | [![Build Common](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-common.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-common.yml) |  |  |
-| UWP | [![UWP](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-uwp.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-uwp.yml) |  |  |
-| Maui | [![MAUI](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml) |  | [![MAUI](https://github.com/LanceMcCarthy/Hacked/actions/workflows/release-maui.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/release-maui.yml) |
+| Project | Main | Release |
+|---------|------|---------|
+| UWP | [![UWP](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-uwp.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-uwp.yml) | |
+| Maui | [![MAUI](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml) | [![MAUI](https://github.com/LanceMcCarthy/Hacked/actions/workflows/release-maui.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/release-maui.yml) |
 
-### Azure DevOps
+### Azure DevOps (legacy)
 
 #### Build Pipelines
 
