@@ -536,7 +536,6 @@ jobs:
     env:
       RID: ios-arm64
       XCODE_VERSION: '26.4'
-      APPLE_DISTRIBUTION_CERT_NAME: "Apple Distribution: Lancelot Software, LLC (L65255N3F7)"
       APPLE_APP_ID: "com.lancelotsoftware.HackedApp"
       APPLE_PROV_PROFILE: ${{matrix.provisioning_profile}}
       APPLE_PROV_PROFILE_TYPE: ${{matrix.provisioning_profile_type}}
@@ -593,8 +592,8 @@ jobs:
         run: |
           set -euo pipefail
           security find-identity -v -p codesigning
-          if ! security find-identity -v -p codesigning | grep -F "${APPLE_DISTRIBUTION_CERT_NAME}" >/dev/null; then
-            echo "Missing Apple Distribution identity: ${APPLE_DISTRIBUTION_CERT_NAME}"
+          if ! security find-identity -v -p codesigning | grep -F "Apple Distribution" >/dev/null; then
+            echo "Missing Apple Distribution identity"
             exit 1
           fi
 
@@ -610,6 +609,12 @@ jobs:
       # Docs https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/publish-cli?view=net-maui-9.0
       - name: Publish MAUI iOS IPA
         run: |
+          # Query the actual signing identity to avoid comma parsing issues
+          $identityOutput = security find-identity -v -p codesigning | Select-String "Apple Distribution"
+          if (-not $identityOutput) { throw "No Apple Distribution identity found in keychain" }
+          $codesignKey = $identityOutput.Line.Trim() -replace '^\s*\d+\)\s+', ''
+          Write-Host "Using codesign key: $codesignKey"
+          
           $publishArgs = @(
             'publish'
             '${{env.PROJECT_PATH}}'
@@ -622,7 +627,7 @@ jobs:
             '-p:ApplicationId=${{env.APPLE_APP_ID}}'
             '-p:ApplicationVersion=${{needs.shared-resources.outputs.app_version}}'
             '-p:CodesignProvision=${{env.APPLE_PROV_PROFILE}}'
-            '-p:CodesignKey=${{env.APPLE_DISTRIBUTION_CERT_NAME}}'
+            "-p:CodesignKey=$codesignKey"
           )
           & dotnet @publishArgs
           if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed with exit code $LASTEXITCODE" }
