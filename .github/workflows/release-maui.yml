@@ -233,7 +233,7 @@ jobs:
     - name: Upload MSIX bundle artifact
       uses: actions/upload-artifact@v7
       with:
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_signed-sideload"
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_signed-windows"
         path: ${{steps.bundle.outputs.BUNDLE_PATH}}
         if-no-files-found: error
         retention-days: 30
@@ -320,7 +320,7 @@ jobs:
       - name: Publish build artifacts
         uses: actions/upload-artifact@v7
         with:     
-          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}-storeupload"
+          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_storeupload-windows"
           path: "**/*.msixupload"
           if-no-files-found: error
           retention-days: 60
