@@ -516,19 +516,30 @@ jobs:
   # ********************************************************************************** #
   #                                        iOS                                         #
   # ********************************************************************************** #
-  ios-store:
-    name: Build iOS (Store Upload IPA)
+  ios:
+    name: Build iOS (${{matrix.distribution_name}})
     runs-on: macos-26
     needs: shared-resources
     if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - distribution_name: Store Upload IPA
+            artifact_suffix: storeupload-ios
+            provisioning_profile: Hacked_AppStore_Distribution
+            provisioning_profile_type: IOS_APP_STORE
+          - distribution_name: Ad Hoc Sideload IPA
+            artifact_suffix: sideload-ios
+            provisioning_profile: Hacked_AdHoc_Distribution
+            provisioning_profile_type: IOS_APP_ADHOC
     env:
-      IOS_ARTIFACTS_PATH: "artifacts_ios"
       RID: ios-arm64
       XCODE_VERSION: '26.4'
       APPLE_DISTRIBUTION_CERT_NAME: "Apple Distribution: Lancelot Software, LLC (L65255N3F7)"
       APPLE_APP_ID: "com.lancelotsoftware.HackedApp"
-      APPLE_PROV_PROFILE: "Hacked_AppStore_Distribution"
-      APPLE_PROV_PROFILE_TYPE: "IOS_APP_STORE"
+      APPLE_PROV_PROFILE: ${{matrix.provisioning_profile}}
+      APPLE_PROV_PROFILE_TYPE: ${{matrix.provisioning_profile_type}}
     steps:
       - uses: actions/checkout@v6
 
@@ -567,7 +578,7 @@ jobs:
           api-key-id: "${{secrets.APPSTORE_API_KEY_ID}}"
           api-private-key: "${{secrets.APPSTORE_API_PRIVATE_KEY}}"
 
-      - name: Verify App Store provisioning profile
+      - name: Verify provisioning profile
         run: |
           $profiles = '${{steps.provisioning-profiles.outputs.profiles}}' | ConvertFrom-Json
           $profile = $profiles | Where-Object { $_.name -eq $env:APPLE_PROV_PROFILE -and $_.type -eq $env:APPLE_PROV_PROFILE_TYPE } | Select-Object -First 1
@@ -595,7 +606,7 @@ jobs:
           $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
         env:
           HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
-          
+
       # Docs https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/publish-cli?view=net-maui-9.0
       - name: Publish MAUI iOS IPA
         run: |
@@ -616,26 +627,10 @@ jobs:
           & dotnet @publishArgs
           if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed with exit code $LASTEXITCODE" }
 
-      - name: Create artifacts folder
-        run: |
-          New-Item -ItemType Directory -Force -Path ${{env.IOS_ARTIFACTS_PATH}} | Out-Null
-
-      - name: Copy iOS packages
-        run: |
-          $publishRoot = "src/Hacked.Maui/bin/Release/${{env.NET_TFM}}-ios/${{env.RID}}/publish"
-          $ipaFiles = Get-ChildItem -Path $publishRoot -Filter *.ipa -File -Recurse -ErrorAction SilentlyContinue
-
-          if ($ipaFiles.Count -eq 0) {
-            throw "No iOS IPA files found under $publishRoot"
-          }
-
-          $ipaFiles | ForEach-Object { Copy-Item -Path $_.FullName -Destination ${{env.IOS_ARTIFACTS_PATH}} -Force }
-
       - name: Publish iOS build artifacts
         uses: actions/upload-artifact@v7
         with:     
-          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_storeupload-ios"
-          path: "${{env.IOS_ARTIFACTS_PATH}}/*.ipa"
+          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_${{matrix.artifact_suffix}}"
+          path: "src/Hacked.Maui/bin/Release/${{env.NET_TFM}}-ios/${{env.RID}}/publish/*.ipa"
           if-no-files-found: error
           retention-days: 60
-
