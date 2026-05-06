@@ -517,16 +517,15 @@ jobs:
   #                                        iOS                                         #
   # ********************************************************************************** #
   ios-store:
-    name: Build iOS (iOS TestFlight Upload)
-    runs-on: macos-latest
+    name: Build iOS (Store Upload IPA)
+    runs-on: macos-26
     needs: shared-resources
     if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
     env:
       IOS_ARTIFACTS_PATH: "artifacts_ios"
-      RID: iossimulator-x64
+      RID: ios-arm64
       XCODE_VERSION: '26.4'
-      APPLE_DEV_ID_APP_CERT_NAME: "Apple Distribution: Lancelot Software, LLC (L65255N3F7)"
-      APPLE_NOTARY_TEAM_ID: "L65255N3F7"
+      APPLE_DISTRIBUTION_CERT_NAME: "Apple Distribution: Lancelot Software, LLC (L65255N3F7)"
       APPLE_APP_ID: "com.lancelotsoftware.HackedApp"
       APPLE_PROV_PROFILE: "Hacked_AppStore_Distribution"
       APPLE_PROV_PROFILE_TYPE: "IOS_APP_STORE"
@@ -545,11 +544,11 @@ jobs:
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
-      - name: Add Telerik NuGet Server
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
+      - name: Set Telerik NuGet Credentials
+        run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
 
-      - name: Build iOS App
-        run: dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Release -p:BuildIpa=True -p:RuntimeIdentifier=${{env.RID}}
+      - name: Restore NuGet packages
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
       # Docs https://github.com/Apple-Actions/import-codesign-certs
       - name: Import Code-Signing Certificates
@@ -559,14 +558,34 @@ jobs:
           p12-password: "${{secrets.APPLE_DISTRIBUTION_CERT_PASSWORD}}"
 
       # Docs https://github.com/Apple-Actions/download-provisioning-profiles
-      - uses: Apple-Actions/download-provisioning-profiles@v6
+      - id: provisioning-profiles
+        uses: Apple-Actions/download-provisioning-profiles@v6
         with:
           profile-type: "${{env.APPLE_PROV_PROFILE_TYPE}}"
           bundle-id: "${{env.APPLE_APP_ID}}"
           issuer-id: "${{secrets.APPSTORE_API_ISSUER_ID}}"
           api-key-id: "${{secrets.APPSTORE_API_KEY_ID}}"
           api-private-key: "${{secrets.APPSTORE_API_PRIVATE_KEY}}"
-        env:
+
+      - name: Verify App Store provisioning profile
+        run: |
+          $profiles = '${{steps.provisioning-profiles.outputs.profiles}}' | ConvertFrom-Json
+          $profile = $profiles | Where-Object { $_.name -eq $env:APPLE_PROV_PROFILE -and $_.type -eq $env:APPLE_PROV_PROFILE_TYPE } | Select-Object -First 1
+
+          if ($null -eq $profile) {
+            $profiles | Format-Table -AutoSize | Out-String | Write-Host
+            throw "Provisioning profile '$env:APPLE_PROV_PROFILE' with type '$env:APPLE_PROV_PROFILE_TYPE' was not downloaded."
+          }
+
+      - name: Verify iOS signing identity is available
+        shell: bash
+        run: |
+          set -euo pipefail
+          security find-identity -v -p codesigning
+          if ! security find-identity -v -p codesigning | grep -F "${APPLE_DISTRIBUTION_CERT_NAME}" >/dev/null; then
+            echo "Missing Apple Distribution identity: ${APPLE_DISTRIBUTION_CERT_NAME}"
+            exit 1
+          fi
 
       - name: Set API Key
         run: |
@@ -578,32 +597,45 @@ jobs:
           HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
           
       # Docs https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/publish-cli?view=net-maui-9.0
-      - name: Build MAUI iOS project
+      - name: Publish MAUI iOS IPA
         run: |
-          dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -p:RuntimeIdentifier=${{env.RID}} -p:PublishTrimmed=true -p:MtouchLink=SdkOnly -p:ApplicationId=${{env.APPLE_APP_ID}} -p:CodesignProvision=${{env.APPLE_PROV_PROFILE}} -p:CodesignKey=${{env.CODESIGN_KEY}}
-
-      # Docs https://github.com/Apple-Actions/upload-testflight-build
-      - name: 'Upload app to TestFlight'
-        uses: apple-actions/upload-testflight-build@v1
-        with: 
-          app-path: "${{github.workspace}}/**/*.ipa" 
-          issuer-id: ${{secrets.APPSTORE_API_ISSUER_ID}}
-          api-key-id: "${{secrets.APPSTORE_API_KEY_ID}}"
-          api-private-key: "${{secrets.APPSTORE_API_PRIVATE_KEY}}"
+          $publishArgs = @(
+            'publish'
+            '${{env.PROJECT_PATH}}'
+            '-f', '${{env.NET_TFM}}-ios'
+            '-c', 'Release'
+            '-p:ArchiveOnBuild=true'
+            '-p:RuntimeIdentifier=${{env.RID}}'
+            '-p:PublishTrimmed=true'
+            '-p:MtouchLink=SdkOnly'
+            '-p:ApplicationId=${{env.APPLE_APP_ID}}'
+            '-p:ApplicationVersion=${{needs.shared-resources.outputs.app_version}}'
+            '-p:CodesignProvision=${{env.APPLE_PROV_PROFILE}}'
+            '-p:CodesignKey=${{env.APPLE_DISTRIBUTION_CERT_NAME}}'
+          )
+          & dotnet @publishArgs
+          if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed with exit code $LASTEXITCODE" }
 
       - name: Create artifacts folder
         run: |
-          cd ${{github.workspace}}
-          mkdir -p ${{github.workspace}}/${{env.IOS_ARTIFACTS_PATH}}
+          New-Item -ItemType Directory -Force -Path ${{env.IOS_ARTIFACTS_PATH}} | Out-Null
 
       - name: Copy iOS packages
-        run: Get-Childitem -Path ${{github.workspace}} -Include *.app -File -Recurse | Copy-Item -Destination ${{github.workspace}}/${{env.IOS_ARTIFACTS_PATH}}
+        run: |
+          $publishRoot = "src/Hacked.Maui/bin/Release/${{env.NET_TFM}}-ios/${{env.RID}}/publish"
+          $ipaFiles = Get-ChildItem -Path $publishRoot -Filter *.ipa -File -Recurse -ErrorAction SilentlyContinue
 
-      - name: Publish ios build artifacts
+          if ($ipaFiles.Count -eq 0) {
+            throw "No iOS IPA files found under $publishRoot"
+          }
+
+          $ipaFiles | ForEach-Object { Copy-Item -Path $_.FullName -Destination ${{env.IOS_ARTIFACTS_PATH}} -Force }
+
+      - name: Publish iOS build artifacts
         uses: actions/upload-artifact@v7
         with:     
-          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_ios" 
-          path: "${{github.workspace}}/*.app"
+          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_storeupload-ios"
+          path: "${{env.IOS_ARTIFACTS_PATH}}/*.ipa"
           if-no-files-found: error
           retention-days: 60
 
