@@ -27,9 +27,9 @@ env:
   TELERIK_LICENSE: ${{secrets.TELERIK_LICENSE_KEY_VALUE}}
 
 jobs:
-  # *********************************************************************************** #
-  #                                   Shared Resources                                  #
-  # *********************************************************************************** #
+  # ********************************************************************************** #
+  #                                  Shared Resources                                  #
+  # ********************************************************************************** #
   shared-resources:
     name: Create Shared Resources
     runs-on: windows-2025-vs2026
@@ -48,7 +48,7 @@ jobs:
 
 
   # ********************************************************************************** #
-  #                                  Windows Sideload                                  #
+  #                        Windows (Sideload - Platform MSIX)                          #
   # ********************************************************************************** #
   maui-windows-sideload:
     name: Build Windows (Sideload)
@@ -155,7 +155,7 @@ jobs:
 
 
   # ********************************************************************************** #
-  #                              Bundle MSIX -> MSIXBUNDLE                             #
+  #                       Windows (Sideload - Create msixbundle)                       #
   # ********************************************************************************** #
   bundle-msix:
     name: Bundle MSIX packages
@@ -268,9 +268,9 @@ jobs:
           }
 
 
-  # ***************************************************************************************** #
-  #                                  Windows Microsoft Store                                  #
-  # ***************************************************************************************** #
+  # ********************************************************************************** #
+  #                           Windows (Store - msixupload)                             #
+  # ********************************************************************************** #
   build-windows:
     name: Build Windows (Store Upload)
     runs-on: windows-2025-vs2026
@@ -326,9 +326,9 @@ jobs:
           retention-days: 60
 
 
-  # ***************************************************************************************** #
-  #                                      MacCatalyst                                          #
-  # ***************************************************************************************** #
+  # ********************************************************************************** #
+  #                                   MacCatalyst                                      #
+  # ********************************************************************************** #
   build-macos:
     name: Build MacCatalyst (Signed & Notiarized)
     needs: shared-resources
@@ -435,9 +435,9 @@ jobs:
           retention-days: 30
 
 
-  # ***************************************************************************************** #
-  #                                          Android                                          #
-  # ***************************************************************************************** #
+  # ********************************************************************************** #
+  #                                     Android                                        #
+  # ********************************************************************************** #
   build-android:
     name: Build Android (Store Upload)
     runs-on: windows-2025-vs2026
@@ -512,99 +512,100 @@ jobs:
           if-no-files-found: error
           retention-days: 60
 
-  # ***************************************************************************************** #
-  #                                            iOS                                            #
-  # ***************************************************************************************** #
-  # build-ios:
-  #   name: Build iOS (iOS TestFlight Upload)
-  #   runs-on: macos-latest
-  #   needs: shared-resources
-  #   if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
-  #   env:
-  #     IOS_ARTIFACTS_PATH: "artifacts_ios"
-  #     RID: iossimulator-x64
-  #     XCODE_VERSION: '26.3'
-  #     APPLE_DEV_ID_APP_CERT_NAME: "Developer ID Application: Lancelot Software, LLC (L65255N3F7)"
-  #     APPLE_DEV_ID_INSTALLER_CERT_NAME: "Developer ID Installer: Lancelot Software, LLC (L65255N3F7)"
-  #     APPLE_NOTARY_TEAM_ID: "L65255N3F7"
-  #   steps:
-  #     - uses: actions/checkout@v6
 
-  #     - uses: maxim-lobanov/setup-xcode@v1
-  #       with:
-  #         xcode-version: ${{env.XCODE_VERSION}}
+  # ********************************************************************************** #
+  #                                        iOS                                         #
+  # ********************************************************************************** #
+  build-ios:
+    name: Build iOS (iOS TestFlight Upload)
+    runs-on: macos-latest
+    needs: shared-resources
+    if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
+    env:
+      IOS_ARTIFACTS_PATH: "artifacts_ios"
+      RID: iossimulator-x64
+      XCODE_VERSION: '26.3'
+      APPLE_DEV_ID_APP_CERT_NAME: "Developer ID Application: Lancelot Software, LLC (L65255N3F7)"
+      APPLE_DEV_ID_INSTALLER_CERT_NAME: "Developer ID Installer: Lancelot Software, LLC (L65255N3F7)"
+      APPLE_NOTARY_TEAM_ID: "L65255N3F7"
+    steps:
+      - uses: actions/checkout@v6
 
-  #     - name: Setup .NET SDK
-  #       uses: actions/setup-dotnet@v5
-  #       with:
-  #         dotnet-version: ${{env.SDK_VERSION}}
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: ${{env.XCODE_VERSION}}
 
-  #     - name: Install MAUI Workloads
-  #       run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{env.SDK_VERSION}}
 
-  #     - name: Add Telerik NuGet Server
-  #       run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
+      - name: Install MAUI Workloads
+        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
-  #     - name: Build iOS App
-  #       run: |
-  #         dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Debug -p:MtouchLink=SdkOnly -p:RuntimeIdentifier=${{env.RID}}
-  #         # dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Release -p:BuildIpa=True
+      - name: Add Telerik NuGet Server
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
-  #     # Docs https://github.com/Apple-Actions/import-codesign-certs
-  #     - name: Import Code-Signing Certificates
-  #       uses: Apple-Actions/import-codesign-certs@v2
-  #       with:
-  #         p12-file-base64: "${{secrets.APPLE_DISTRIBUTION_CERT_BASE64}}"
-  #         p12-password: "${{secrets.APPLE_DISTRIBUTION_CERT_PASSWORD}}"
+      - name: Build iOS App
+        run: |
+          dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Debug -p:MtouchLink=SdkOnly -p:RuntimeIdentifier=${{env.RID}}
+          # dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Release -p:BuildIpa=True
 
-  #     # Docs https://github.com/Apple-Actions/download-provisioning-profiles
-  #     - uses: Apple-Actions/download-provisioning-profiles@v2
-  #       with:
-  #         profile-type: "${{env.APPLE_PROV_PROFILE_TYPE}}"
-  #         bundle-id: "${{env.APPLE_APP_ID}}"
-  #         issuer-id: "${{secrets.APPSTORE_API_ISSUER_ID}}"
-  #         api-key-id: "${{secrets.APPSTORE_API_KEY_ID}}"
-  #         api-private-key: "${{secrets.APPSTORE_API_PRIVATE_KEY}}"
-  #       env:
-  #         APPLE_PROV_PROFILE: "Hacked_AppStore_Distribution"
-  #         APPLE_PROV_PROFILE_TYPE: "IOS_APP_STORE"
+      # Docs https://github.com/Apple-Actions/import-codesign-certs
+      - name: Import Code-Signing Certificates
+        uses: Apple-Actions/import-codesign-certs@v7
+        with:
+          p12-file-base64: "${{secrets.APPLE_DISTRIBUTION_CERT_BASE64}}"
+          p12-password: "${{secrets.APPLE_DISTRIBUTION_CERT_PASSWORD}}"
 
-  #     - name: Set API Key
-  #       run: |
-  #         $file = 'src/Hacked.Maui/appsettings.json'
-  #         $config = Get-Content $file -Raw | ConvertFrom-Json
-  #         $config.HibpApiKey = $env:HIBP_API_KEY
-  #         $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
-  #       env:
-  #         HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
+      # Docs https://github.com/Apple-Actions/download-provisioning-profiles
+      - uses: Apple-Actions/download-provisioning-profiles@v6
+        with:
+          profile-type: "${{env.APPLE_PROV_PROFILE_TYPE}}"
+          bundle-id: "${{env.APPLE_APP_ID}}"
+          issuer-id: "${{secrets.APPSTORE_API_ISSUER_ID}}"
+          api-key-id: "${{secrets.APPSTORE_API_KEY_ID}}"
+          api-private-key: "${{secrets.APPSTORE_API_PRIVATE_KEY}}"
+        env:
+          APPLE_PROV_PROFILE: "Hacked_AppStore_Distribution"
+          APPLE_PROV_PROFILE_TYPE: "IOS_APP_STORE"
+
+      - name: Set API Key
+        run: |
+          $file = 'src/Hacked.Maui/appsettings.json'
+          $config = Get-Content $file -Raw | ConvertFrom-Json
+          $config.HibpApiKey = $env:HIBP_API_KEY
+          $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
+        env:
+          HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
           
-  #     # Docs https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/publish-cli?view=net-maui-9.0
-  #     - name: Build MAUI iOS project
-  #       run: |
-  #         dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -p:RuntimeIdentifier=${{env.RID}} -p:PublishTrimmed=true -p:MtouchLink=SdkOnly -p:ApplicationId=${{env.APP_ID}} -p:CodesignProvision=${{env.CODESIGN_PROV_PROFILE}} -p:CodesignKey=${{env.CODESIGN_KEY}}
+      # Docs https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/publish-cli?view=net-maui-9.0
+      - name: Build MAUI iOS project
+        run: |
+          dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -p:RuntimeIdentifier=${{env.RID}} -p:PublishTrimmed=true -p:MtouchLink=SdkOnly -p:ApplicationId=${{env.APP_ID}} -p:CodesignProvision=${{env.CODESIGN_PROV_PROFILE}} -p:CodesignKey=${{env.CODESIGN_KEY}}
 
-  #     # Docs https://github.com/Apple-Actions/upload-testflight-build
-  #     - name: 'Upload app to TestFlight'
-  #       uses: apple-actions/upload-testflight-build@v1
-  #       with: 
-  #         app-path: "${{github.workspace}}/**/*.ipa" 
-  #         issuer-id: ${{secrets.APPSTORE_API_ISSUER_ID}}
-  #         api-key-id: "${{secrets.APPSTORE_API_KEY_ID}}"
-  #         api-private-key: "${{secrets.APPSTORE_API_PRIVATE_KEY}}"
+      # Docs https://github.com/Apple-Actions/upload-testflight-build
+      - name: 'Upload app to TestFlight'
+        uses: apple-actions/upload-testflight-build@v1
+        with: 
+          app-path: "${{github.workspace}}/**/*.ipa" 
+          issuer-id: ${{secrets.APPSTORE_API_ISSUER_ID}}
+          api-key-id: "${{secrets.APPSTORE_API_KEY_ID}}"
+          api-private-key: "${{secrets.APPSTORE_API_PRIVATE_KEY}}"
 
-  #     - name: Create artifacts folder
-  #       run: |
-  #         cd ${{github.workspace}}
-  #         mkdir -p ${{github.workspace}}/${{env.IOS_ARTIFACTS_PATH}}
+      - name: Create artifacts folder
+        run: |
+          cd ${{github.workspace}}
+          mkdir -p ${{github.workspace}}/${{env.IOS_ARTIFACTS_PATH}}
 
-  #     - name: Copy iOS packages
-  #       run: Get-Childitem -Path ${{github.workspace}} -Include *.app -File -Recurse | Copy-Item -Destination ${{github.workspace}}/${{env.IOS_ARTIFACTS_PATH}}
+      - name: Copy iOS packages
+        run: Get-Childitem -Path ${{github.workspace}} -Include *.app -File -Recurse | Copy-Item -Destination ${{github.workspace}}/${{env.IOS_ARTIFACTS_PATH}}
 
-  #     - name: Publish ios build artifacts
-  #       uses: actions/upload-artifact@v7
-  #       with:     
-  #         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_ios" 
-  #         path: "${{github.workspace}}/*.app"
-  #         if-no-files-found: error
-  #         retention-days: 60
+      - name: Publish ios build artifacts
+        uses: actions/upload-artifact@v7
+        with:     
+          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_ios" 
+          path: "${{github.workspace}}/*.app"
+          if-no-files-found: error
+          retention-days: 60
 
