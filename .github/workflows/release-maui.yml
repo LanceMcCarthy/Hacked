@@ -48,9 +48,87 @@ jobs:
 
 
   # ********************************************************************************** #
+  #                                     Android                                        #
+  # ********************************************************************************** #
+  android:
+    name: Build Android (Store Upload)
+    runs-on: windows-2025-vs2026
+    needs: shared-resources
+    if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
+    env:
+      ANDROID_ARTIFACTS_PATH: "artifacts_android"
+      ANDROID_KEYSTORE_PATH: "${{github.workspace}}/android-upload.keystore"
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Decode the Keystore
+        shell: pwsh
+        run: |
+          $file_bytes = [System.Convert]::FromBase64String("${{secrets.ANDROID_SIGNING_KEYSTORE_BASE64}}")
+          [IO.File]::WriteAllBytes("${{env.ANDROID_KEYSTORE_PATH}}", $file_bytes)
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{env.SDK_VERSION}}
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: 'microsoft'
+          java-version: '17'
+
+      - name: Install MAUI Workloads
+        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
+
+      - name: Set Telerik NuGet Credentials
+        run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
+
+      - name: Restore NuGet packages
+        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
+
+      - name: Set API Key
+        run: |
+          $file = 'src/Hacked.Maui/appsettings.json'
+          $config = Get-Content $file -Raw | ConvertFrom-Json
+          $config.HibpApiKey = $env:HIBP_API_KEY
+          $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
+        env:
+          HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
+          
+      - name: Publish MAUI Android
+        run: |
+          dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_KEYSTORE_PATH}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_STORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
+
+      - name: Create artifacts folder
+        run: |
+          New-Item -ItemType Directory -Force -Path ${{env.ANDROID_ARTIFACTS_PATH}} | Out-Null
+
+      - name: Copy signed APKs & AABs
+        run: |
+          $publishRoot = "src/Hacked.Maui/bin/Release/${{env.NET_TFM}}-android"
+          $apkFiles = Get-ChildItem -Path $publishRoot -Filter *-Signed.apk -File -Recurse -ErrorAction SilentlyContinue
+          $aabFiles = Get-ChildItem -Path $publishRoot -Filter *-Signed.aab -File -Recurse -ErrorAction SilentlyContinue
+
+          if ($apkFiles.Count -eq 0 -and $aabFiles.Count -eq 0) {
+            throw "No signed Android APK/AAB files found under $publishRoot"
+          }
+
+          $apkFiles | ForEach-Object { Copy-Item -Path $_.FullName -Destination ${{env.ANDROID_ARTIFACTS_PATH}} -Force }
+          $aabFiles | ForEach-Object { Copy-Item -Path $_.FullName -Destination ${{env.ANDROID_ARTIFACTS_PATH}} -Force }
+
+      - name: Publish Android build artifacts
+        uses: actions/upload-artifact@v7
+        with:     
+          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_signed-android" 
+          path: "${{env.ANDROID_ARTIFACTS_PATH}}/*"
+          if-no-files-found: error
+          retention-days: 60
+
+
+  # ********************************************************************************** #
   #                        Windows (Sideload - Platform MSIX)                          #
   # ********************************************************************************** #
-  maui-windows-sideload:
+  windows-sideload-packages:
     name: Build Windows (Sideload)
     needs: shared-resources
     runs-on: windows-2025-vs2026
@@ -159,7 +237,7 @@ jobs:
   # ********************************************************************************** #
   bundle-msix:
     name: Bundle MSIX packages
-    needs: [shared-resources, maui-windows-sideload]
+    needs: [shared-resources, windows-sideload-packages]
     runs-on: windows-2025-vs2026
     steps:
     - name: Clean bundle workspace
@@ -436,87 +514,9 @@ jobs:
 
 
   # ********************************************************************************** #
-  #                                     Android                                        #
-  # ********************************************************************************** #
-  build-android:
-    name: Build Android (Store Upload)
-    runs-on: windows-2025-vs2026
-    needs: shared-resources
-    if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
-    env:
-      ANDROID_ARTIFACTS_PATH: "artifacts_android"
-      ANDROID_KEYSTORE_PATH: "${{github.workspace}}/android-upload.keystore"
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Decode the Keystore
-        shell: pwsh
-        run: |
-          $file_bytes = [System.Convert]::FromBase64String("${{secrets.ANDROID_SIGNING_KEYSTORE_BASE64}}")
-          [IO.File]::WriteAllBytes("${{env.ANDROID_KEYSTORE_PATH}}", $file_bytes)
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{env.SDK_VERSION}}
-
-      - uses: actions/setup-java@v5
-        with:
-          distribution: 'microsoft'
-          java-version: '17'
-
-      - name: Install MAUI Workloads
-        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
-
-      - name: Set Telerik NuGet Credentials
-        run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
-
-      - name: Restore NuGet packages
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
-
-      - name: Set API Key
-        run: |
-          $file = 'src/Hacked.Maui/appsettings.json'
-          $config = Get-Content $file -Raw | ConvertFrom-Json
-          $config.HibpApiKey = $env:HIBP_API_KEY
-          $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
-        env:
-          HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
-          
-      - name: Publish MAUI Android
-        run: |
-          dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_KEYSTORE_PATH}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_STORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
-
-      - name: Create artifacts folder
-        run: |
-          New-Item -ItemType Directory -Force -Path ${{env.ANDROID_ARTIFACTS_PATH}} | Out-Null
-
-      - name: Copy signed APKs & AABs
-        run: |
-          $publishRoot = "src/Hacked.Maui/bin/Release/${{env.NET_TFM}}-android"
-          $apkFiles = Get-ChildItem -Path $publishRoot -Filter *-Signed.apk -File -Recurse -ErrorAction SilentlyContinue
-          $aabFiles = Get-ChildItem -Path $publishRoot -Filter *-Signed.aab -File -Recurse -ErrorAction SilentlyContinue
-
-          if ($apkFiles.Count -eq 0 -and $aabFiles.Count -eq 0) {
-            throw "No signed Android APK/AAB files found under $publishRoot"
-          }
-
-          $apkFiles | ForEach-Object { Copy-Item -Path $_.FullName -Destination ${{env.ANDROID_ARTIFACTS_PATH}} -Force }
-          $aabFiles | ForEach-Object { Copy-Item -Path $_.FullName -Destination ${{env.ANDROID_ARTIFACTS_PATH}} -Force }
-
-      - name: Publish Android build artifacts
-        uses: actions/upload-artifact@v7
-        with:     
-          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_signed-android" 
-          path: "${{env.ANDROID_ARTIFACTS_PATH}}/*"
-          if-no-files-found: error
-          retention-days: 60
-
-
-  # ********************************************************************************** #
   #                                        iOS                                         #
   # ********************************************************************************** #
-  build-ios:
+  ios-store:
     name: Build iOS (iOS TestFlight Upload)
     runs-on: macos-latest
     needs: shared-resources
@@ -524,10 +524,12 @@ jobs:
     env:
       IOS_ARTIFACTS_PATH: "artifacts_ios"
       RID: iossimulator-x64
-      XCODE_VERSION: '26.3'
-      APPLE_DEV_ID_APP_CERT_NAME: "Developer ID Application: Lancelot Software, LLC (L65255N3F7)"
-      APPLE_DEV_ID_INSTALLER_CERT_NAME: "Developer ID Installer: Lancelot Software, LLC (L65255N3F7)"
+      XCODE_VERSION: '26.4'
+      APPLE_DEV_ID_APP_CERT_NAME: "Apple Distribution: Lancelot Software, LLC (L65255N3F7)"
       APPLE_NOTARY_TEAM_ID: "L65255N3F7"
+      APPLE_APP_ID: "com.lancelotsoftware.HackedApp"
+      APPLE_PROV_PROFILE: "Hacked_AppStore_Distribution"
+      APPLE_PROV_PROFILE_TYPE: "IOS_APP_STORE"
     steps:
       - uses: actions/checkout@v6
 
@@ -547,9 +549,7 @@ jobs:
         run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
       - name: Build iOS App
-        run: |
-          dotnet build ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Debug -p:MtouchLink=SdkOnly -p:RuntimeIdentifier=${{env.RID}}
-          # dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Release -p:BuildIpa=True
+        run: dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -c Release -p:BuildIpa=True -p:RuntimeIdentifier=${{env.RID}}
 
       # Docs https://github.com/Apple-Actions/import-codesign-certs
       - name: Import Code-Signing Certificates
@@ -567,8 +567,6 @@ jobs:
           api-key-id: "${{secrets.APPSTORE_API_KEY_ID}}"
           api-private-key: "${{secrets.APPSTORE_API_PRIVATE_KEY}}"
         env:
-          APPLE_PROV_PROFILE: "Hacked_AppStore_Distribution"
-          APPLE_PROV_PROFILE_TYPE: "IOS_APP_STORE"
 
       - name: Set API Key
         run: |
@@ -582,7 +580,7 @@ jobs:
       # Docs https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/publish-cli?view=net-maui-9.0
       - name: Build MAUI iOS project
         run: |
-          dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -p:RuntimeIdentifier=${{env.RID}} -p:PublishTrimmed=true -p:MtouchLink=SdkOnly -p:ApplicationId=${{env.APP_ID}} -p:CodesignProvision=${{env.CODESIGN_PROV_PROFILE}} -p:CodesignKey=${{env.CODESIGN_KEY}}
+          dotnet publish ${{env.PROJECT_PATH}} -f ${{env.NET_TFM}}-ios -p:RuntimeIdentifier=${{env.RID}} -p:PublishTrimmed=true -p:MtouchLink=SdkOnly -p:ApplicationId=${{env.APPLE_APP_ID}} -p:CodesignProvision=${{env.APPLE_PROV_PROFILE}} -p:CodesignKey=${{env.CODESIGN_KEY}}
 
       # Docs https://github.com/Apple-Actions/upload-testflight-build
       - name: 'Upload app to TestFlight'
