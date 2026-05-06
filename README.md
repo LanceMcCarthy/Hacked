@@ -34,7 +34,7 @@ An application so you can be notified of any data breaches that included your pe
 |---------|------|------------|---------|
 | Common | [![Build Common](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-common.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-common.yml) |  |  |
 | UWP | [![UWP](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-uwp.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-uwp.yml) |  |  |
-| Maui | [![MAUI](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml) |  |  |
+| Maui | [![MAUI](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/build-maui.yml) |  | [![MAUI](https://github.com/LanceMcCarthy/Hacked/actions/workflows/release-maui.yml/badge.svg)](https://github.com/LanceMcCarthy/Hacked/actions/workflows/release-maui.yml) |
 
 ## AppInstaller
 
