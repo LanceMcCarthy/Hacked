@@ -115,11 +115,8 @@ jobs:
       run: |
         $appVersion = "${{needs.shared-resources.outputs.app_version}}.0"
         $artifactDir = "${{github.workspace}}\artifacts\${{matrix.arch}}"
-
         New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
-
         Write-Host "Publishing Windows ${{matrix.arch}}..."
-
         $publishArgs = @(
           'publish'
           '${{env.PROJECT_PATH}}'
@@ -136,7 +133,6 @@ jobs:
         )
         & dotnet @publishArgs
         if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for ${{matrix.arch}} with exit code $LASTEXITCODE" }
-
         # MAUI writes MSIX to src\Hacked.Maui\AppPackages\<name>_<ver>_<arch>_Test\*.msix
         $appPackagesRoot = "src\Hacked.Maui\AppPackages"
         $candidates = Get-ChildItem -Path $appPackagesRoot -Filter *.msix -Recurse -ErrorAction SilentlyContinue |
@@ -147,7 +143,6 @@ jobs:
         if (-not $msix) { throw "No .msix found after publish for ${{matrix.arch}}" }
         Write-Host "Found ${{matrix.arch}} package: $msix"
         Copy-Item -Path $msix -Destination "$artifactDir\Hacked.${{matrix.arch}}.msix" -Force
-        
         echo "PACKAGE_PATH=$artifactDir\Hacked.${{matrix.arch}}.msix" >> $env:GITHUB_OUTPUT
 
     - name: Upload ${{matrix.arch}} artifact
@@ -191,7 +186,6 @@ jobs:
         $inputDir = "${{github.workspace}}\bundle-input"
         $outputDir = "${{github.workspace}}\bundle-output"
         New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
-
         # Locate makeappx.exe from the latest installed Windows 10 SDK
         $sdkRoot = "C:\Program Files (x86)\Windows Kits\10\bin"
         $makeAppx = Get-ChildItem -Path $sdkRoot -Recurse -Filter makeappx.exe -ErrorAction SilentlyContinue |
@@ -199,9 +193,7 @@ jobs:
           Sort-Object FullName -Descending | Select-Object -First 1
         if (-not $makeAppx) { throw "makeappx.exe not found under $sdkRoot" }
         Write-Host "Using makeappx: $($makeAppx.FullName)"
-
         Get-ChildItem $inputDir -Filter *.msix | ForEach-Object { Write-Host "Input: $($_.FullName)" }
-
         $bundlePath = "$outputDir\Hacked_v${{needs.shared-resources.outputs.app_version}}.msixbundle"
         & $makeAppx.FullName bundle /d $inputDir /p $bundlePath /bv $appVersion /o
         if ($LASTEXITCODE -ne 0) { throw "makeappx bundle failed with exit code $LASTEXITCODE" }
@@ -241,7 +233,7 @@ jobs:
     - name: Upload MSIX bundle artifact
       uses: actions/upload-artifact@v7
       with:
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_msixbundle"
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_signed-sideload"
         path: ${{steps.bundle.outputs.BUNDLE_PATH}}
         if-no-files-found: error
         retention-days: 30
@@ -255,21 +247,17 @@ jobs:
             `Hacked_v${version}_x64`,
             `Hacked_v${version}_arm64`
           ]);
-
           const { owner, repo } = context.repo;
           const run_id = context.runId;
-
           const artifacts = await github.paginate(
             github.rest.actions.listWorkflowRunArtifacts,
             { owner, repo, run_id, per_page: 100 }
           );
-
           const toDelete = artifacts.filter((artifact) => targetNames.has(artifact.name));
           if (toDelete.length === 0) {
             core.info('No source artifacts found to delete.');
             return;
           }
-
           for (const artifact of toDelete) {
             await github.rest.actions.deleteArtifact({
               owner,
@@ -332,7 +320,7 @@ jobs:
       - name: Publish build artifacts
         uses: actions/upload-artifact@v7
         with:     
-          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_storeupload"
+          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}-storeupload"
           path: "**/*.msixupload"
           if-no-files-found: error
           retention-days: 60
@@ -405,12 +393,10 @@ jobs:
           set -euo pipefail
           security find-identity -v -p codesigning
           security find-certificate -a -c "${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}" || true
-
           if ! security find-identity -v -p codesigning | grep -F "${{env.APPLE_DEV_ID_APP_CERT_NAME}}" >/dev/null; then
             echo "Missing Developer ID Application identity: ${{env.APPLE_DEV_ID_APP_CERT_NAME}}"
             exit 1
           fi
-
           if ! security find-certificate -a -c "${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}" >/dev/null; then
             echo "Missing Developer ID Installer certificate: ${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}"
             exit 1
@@ -443,11 +429,8 @@ jobs:
       - name: Publish MacCatalyst build artifacts
         uses: actions/upload-artifact@v7
         with:     
-          name: "HackedApp_v${{needs.shared-resources.outputs.app_version}}_maccatalyst_notarized"
-          path: |
-            artifacts/maccatalyst/Hacked-MacCatalyst-Release-signed.pkg
-            artifacts/maccatalyst/Hacked-MacCatalyst-Release-notarized.zip
-            src/Hacked.Maui/bin/Release/net10.0-maccatalyst/Hacked.app
+          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_signed-maccatalyst"
+          path: artifacts/maccatalyst/Hacked-MacCatalyst-Release-signed.pkg
           if-no-files-found: error
           retention-days: 30
 
