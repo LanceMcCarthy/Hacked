@@ -1,11 +1,11 @@
-name: Release .NET MAUI (tester)
+name: Release MAUI (Windows Digicert)
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/release-maui-tester.yml'
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - '.github/workflows/release-maui-tester.yml'
   # pull_request:
   #   types: []  # Explicitly disabled - external PRs cannot trigger this workflow
 
@@ -27,7 +27,7 @@ jobs:
   # *********************************************************************************** #
   shared-resources:
     name: Create Shared Resources
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     outputs:
       app_version: ${{steps.version-creator.outputs.app_version}}
     steps:
@@ -182,13 +182,13 @@ jobs:
         Remove-Item -Recurse -Force "${{github.workspace}}\bundle-output" -ErrorAction SilentlyContinue
 
     - name: Download x64 artifact
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v8
       with:
         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_x64"
         path: ${{github.workspace}}\bundle-input
 
     - name: Download arm64 artifact
-      uses: actions/download-artifact@v6
+      uses: actions/download-artifact@v8
       with:
         name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_arm64"
         path: ${{github.workspace}}\bundle-input
