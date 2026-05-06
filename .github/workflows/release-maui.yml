@@ -220,7 +220,7 @@ jobs:
     - name: Upload ${{matrix.arch}} artifact
       uses: actions/upload-artifact@v7
       with:     
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_${{matrix.arch}}"
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_${{matrix.runtime_id}}"
         path: ${{steps.publish-package.outputs.PACKAGE_PATH}}
         if-no-files-found: error
         retention-days: 30
@@ -242,13 +242,13 @@ jobs:
     - name: Download x64 artifact
       uses: actions/download-artifact@v8
       with:
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_x64"
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_win-x64"
         path: ${{github.workspace}}\bundle-input
 
     - name: Download arm64 artifact
       uses: actions/download-artifact@v8
       with:
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_arm64"
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_win-arm64"
         path: ${{github.workspace}}\bundle-input
 
     - name: Create MSIX bundle
@@ -305,39 +305,10 @@ jobs:
     - name: Upload MSIX bundle artifact
       uses: actions/upload-artifact@v7
       with:
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_signed-windows"
+        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_signed-windows.msixbundle"
         path: ${{steps.bundle.outputs.BUNDLE_PATH}}
         if-no-files-found: error
         retention-days: 30
-
-    - name: Delete source x64/arm64 MSIX artifacts
-      uses: actions/github-script@v8
-      with:
-        script: |
-          const version = '${{ needs.shared-resources.outputs.app_version }}';
-          const targetNames = new Set([
-            `Hacked_v${version}_x64`,
-            `Hacked_v${version}_arm64`
-          ]);
-          const { owner, repo } = context.repo;
-          const run_id = context.runId;
-          const artifacts = await github.paginate(
-            github.rest.actions.listWorkflowRunArtifacts,
-            { owner, repo, run_id, per_page: 100 }
-          );
-          const toDelete = artifacts.filter((artifact) => targetNames.has(artifact.name));
-          if (toDelete.length === 0) {
-            core.info('No source artifacts found to delete.');
-            return;
-          }
-          for (const artifact of toDelete) {
-            await github.rest.actions.deleteArtifact({
-              owner,
-              repo,
-              artifact_id: artifact.id,
-            });
-            core.info(`Deleted artifact: ${artifact.name} (id ${artifact.id})`);
-          }
 
 
   # ********************************************************************************** #
@@ -642,7 +613,7 @@ jobs:
   create-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
-    needs: [shared-resources, android, windows-generate-msixbundle, windows-store, maccatalyst, ios]
+    needs: [shared-resources, android, windows-sideload-packages, windows-generate-msixbundle, windows-store, maccatalyst, ios]
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v8
@@ -653,6 +624,43 @@ jobs:
         shell: bash
         run: find release-artifacts -type f | sort
 
+      - name: Prepare release files
+        shell: bash
+        run: |
+          VER="${{needs.shared-resources.outputs.app_version}}"
+          mkdir -p release-upload
+
+          # Android
+          find "release-artifacts/Hacked_v${VER}_signed-android" -name "*-Signed.apk" -exec cp {} "release-upload/Hacked_v${VER}.apk" \;
+          find "release-artifacts/Hacked_v${VER}_signed-android" -name "*-Signed.aab" -exec cp {} "release-upload/Hacked_v${VER}.aab" \;
+
+          # Windows sideload (individual per-arch MSIX)
+          cp "release-artifacts/Hacked_v${VER}_win-x64/Hacked.x64.msix"     "release-upload/Hacked_v${VER}_x64.msix"
+          cp "release-artifacts/Hacked_v${VER}_win-arm64/Hacked.arm64.msix" "release-upload/Hacked_v${VER}_arm64.msix"
+
+          # Windows msixbundle (signed)
+          cp "release-artifacts/Hacked_v${VER}_signed-windows.msixbundle/Hacked_v${VER}.msixbundle" \
+             "release-upload/Hacked_v${VER}.msixbundle"
+
+          # Windows Store upload
+          find "release-artifacts/Hacked_v${VER}_storeupload-windows" -name "*.msixupload" \
+               -exec cp {} "release-upload/Hacked_v${VER}_msstore.msixupload" \;
+
+          # MacCatalyst pkg
+          cp "release-artifacts/Hacked_v${VER}_signed-maccatalyst/Hacked-MacCatalyst-Release-signed.pkg" \
+             "release-upload/Hacked_v${VER}.pkg"
+
+          # iOS Store IPA
+          find "release-artifacts/Hacked_v${VER}_storeupload-ios" -name "*.ipa" \
+               -exec cp {} "release-upload/Hacked_v${VER}_store.ipa" \;
+
+          # iOS Ad Hoc sideload IPA
+          find "release-artifacts/Hacked_v${VER}_sideload-ios" -name "*.ipa" \
+               -exec cp {} "release-upload/Hacked_v${VER}_sideload.ipa" \;
+
+          echo "Files prepared for release:"
+          ls -lh release-upload/
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -661,4 +669,13 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
-          files: release-artifacts/**/*
+          files: |
+            release-upload/Hacked_v${{needs.shared-resources.outputs.app_version}}.apk
+            release-upload/Hacked_v${{needs.shared-resources.outputs.app_version}}.aab
+            release-upload/Hacked_v${{needs.shared-resources.outputs.app_version}}_x64.msix
+            release-upload/Hacked_v${{needs.shared-resources.outputs.app_version}}_arm64.msix
+            release-upload/Hacked_v${{needs.shared-resources.outputs.app_version}}.msixbundle
+            release-upload/Hacked_v${{needs.shared-resources.outputs.app_version}}_msstore.msixupload
+            release-upload/Hacked_v${{needs.shared-resources.outputs.app_version}}.pkg
+            release-upload/Hacked_v${{needs.shared-resources.outputs.app_version}}_store.ipa
+            release-upload/Hacked_v${{needs.shared-resources.outputs.app_version}}_sideload.ipa
