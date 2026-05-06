@@ -612,7 +612,8 @@ jobs:
           # Query the actual signing identity to avoid comma parsing issues
           $identityOutput = security find-identity -v -p codesigning | Select-String "Apple Distribution"
           if (-not $identityOutput) { throw "No Apple Distribution identity found in keychain" }
-          $codesignKey = $identityOutput.Line.Trim() -replace '^\s*\d+\)\s+', ''
+          $codesignKey = [regex]::Match($identityOutput.Line, '"(?<name>Apple Distribution:[^"]+)"').Groups['name'].Value
+          if (-not $codesignKey) { throw "Could not parse Apple Distribution identity from keychain output" }
           Write-Host "Using codesign key: $codesignKey"
           
           $publishArgs = @(
