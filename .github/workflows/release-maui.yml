@@ -13,12 +13,57 @@ permissions:
   id-token: write  # Needed for Azure auth (OIDC)
 
 env:
+  # ____Global____________________________________________
   PROJECT_PATH: "src/Hacked.Maui/Hacked.Maui.csproj"
   SDK_VERSION: '10.0.x'
   NET_TFM: 'net10.0'
+  XCODE_VERSION: '26.4'
   NUGET_CONFIG_PATH: 'src/nuget.config'
   TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
   TELERIK_LICENSE: ${{secrets.TELERIK_LICENSE_KEY_VALUE}}
+  # ____Android___________________________________________
+  ANDROID_ARTIFACTS_PATH: "artifacts_android"
+  ANDROID_KEYSTORE_PATH: "${{github.workspace}}/android-upload.keystore"
+  JAVA_VERSION: '17'
+  JAVA_DISTRIBUTION: 'microsoft'
+  # ____MacCatalyst_______________________________________
+  APPLE_DEV_ID_APP_CERT_NAME: "Developer ID Application: Lancelot Software, LLC (L65255N3F7)"
+  APPLE_DEV_ID_INSTALLER_CERT_NAME: "Developer ID Installer: Lancelot Software, LLC (L65255N3F7)"
+  APPLE_NOTARY_TEAM_ID: "L65255N3F7"
+  # ____iOS______________________________________________ (also check matrix vars)
+  APPLE_APP_ID: "com.lancelotsoftware.HackedApp"
+  # ____Windows__________________________________________ (also check matrix vars)
+  WINDOWS_PACKAGE_NAME: "Hacked"
+  SERVICE_PRINCIPAL_CLIENT_ID: "32daa13b-f4bb-4809-8ef6-58cb39051acd"
+  SERVICE_PRINCIPAL_TENANT_ID: "bd47e796-3473-4b8a-9101-1f4c0c7af31a"
+  SERVICE_PRINCIPAL_SUBSCRIPTION_ID: "48ab4839-62af-4ab3-afe6-043ea4d7c137"
+  SIGNING_ACCT_NAME: "PrimaryCodeSign"
+  SIGNING_ACCT_CERT_PROFILE: "lancemccarthylivepublic"
+  SIGNING_ACCT_ENDPOINT_URL: "https://eus.codesigning.azure.net/"
+
+  # ------------------ REQUIRED SECRETS ---------------- #
+  # ____Global____________________________________________
+  # TELERIK_NUGET_KEY
+  # HIBP_API_KEY
+  # ____Android___________________________________________
+  # ANDROID_SIGNING_KEYSTORE_BASE64
+  # ANDROID_SIGNING_KEYSTORE_PASS
+  # ANDROID_SIGNING_KEY_ALIAS
+  # ANDROID_SIGNING_KEY_PASS
+  # ____MacCatalyst_______________________________________
+  # APPLE_DEVELOPER_ID_INSTALLER_CERT_BASE64
+  # APPLE_DEVELOPER_ID_INSTALLER_CERT_PASSWORD
+  # APPLE_DEVELOPER_ID_APPLICATION_CERT_BASE64
+  # APPLE_NOTARY_APPLE_ID
+  # APPLE_NOTARY_APP_PASSWORD
+  # ____iOS______________________________________________
+  # APPLE_DISTRIBUTION_CERT_BASE64
+  # APPLE_DISTRIBUTION_CERT_PASSWORD
+  # APPSTORE_API_ISSUER_ID
+  # APPSTORE_API_KEY_ID
+  # APPSTORE_API_PRIVATE_KEY
+  # ____Windows__________________________________________
+  # No additional secrets needed, uses Azure Trusted Signing.
 
 jobs:
   # ********************************************************************************** #
@@ -49,9 +94,6 @@ jobs:
     runs-on: windows-2025-vs2026
     needs: shared-resources
     if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
-    env:
-      ANDROID_ARTIFACTS_PATH: "artifacts_android"
-      ANDROID_KEYSTORE_PATH: "${{github.workspace}}/android-upload.keystore"
     steps:
       - uses: actions/checkout@v6
 
@@ -68,8 +110,8 @@ jobs:
 
       - uses: actions/setup-java@v5
         with:
-          distribution: 'microsoft'
-          java-version: '17'
+          distribution: ${{env.JAVA_DISTRIBUTION}}
+          java-version: ${{env.JAVA_VERSION}}
 
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
@@ -91,7 +133,7 @@ jobs:
           
       - name: Publish MAUI Android
         run: |
-          dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_KEYSTORE_PATH}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_STORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
+          dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_KEYSTORE_PATH}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_KEYSTORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
 
       - name: Create artifacts folder
         run: |
@@ -120,7 +162,7 @@ jobs:
 
 
   # ********************************************************************************** #
-  #                        Windows (Sideload - Platform MSIX)                          #
+  #                          Windows (Sideload - msixbundle)                           #
   # ********************************************************************************** #
   windows-sideload-packages:
     name: Build Windows (Sideload)
@@ -225,10 +267,6 @@ jobs:
         if-no-files-found: error
         retention-days: 30
 
-
-  # ********************************************************************************** #
-  #                       Windows (Sideload - Create msixbundle)                       #
-  # ********************************************************************************** #
   windows-generate-msixbundle:
     name: Bundle MSIX packages
     needs: [shared-resources, windows-sideload-packages]
@@ -277,16 +315,16 @@ jobs:
       uses: azure/login@v3
       id: azlogin
       with:
-        client-id: "32daa13b-f4bb-4809-8ef6-58cb39051acd"
-        tenant-id: "bd47e796-3473-4b8a-9101-1f4c0c7af31a"
-        subscription-id: "48ab4839-62af-4ab3-afe6-043ea4d7c137"
+        client-id: ${{env.SERVICE_PRINCIPAL_CLIENT_ID}}
+        tenant-id: ${{env.SERVICE_PRINCIPAL_TENANT_ID}}
+        subscription-id: ${{env.SERVICE_PRINCIPAL_SUBSCRIPTION_ID}}
 
     - name: Sign MSIX bundle
       uses: azure/trusted-signing-action@v1.2.0
       with:
-        endpoint: https://eus.codesigning.azure.net/
-        signing-account-name: PrimaryCodeSign
-        certificate-profile-name: lancemccarthylivepublic
+        endpoint: ${{env.SIGNING_ACCT_ENDPOINT_URL}}
+        signing-account-name: ${{env.SIGNING_ACCT_NAME}}
+        certificate-profile-name: ${{env.SIGNING_ACCT_CERT_PROFILE}}
         timestamp-rfc3161: http://timestamp.acs.microsoft.com
         timestamp-digest: SHA256
         file-digest: SHA256
@@ -333,7 +371,10 @@ jobs:
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
 
-      - name: Add Telerik NuGet Server
+      - name: Set Telerik NuGet Credentials
+        run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
+
+      - name: Restore NuGet packages
         run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
       # Update the app manifest with version number, even if Version attribute is missing.
@@ -377,11 +418,6 @@ jobs:
     needs: shared-resources
     if: ${{ success() && needs.shared-resources.outputs.app_version != '' }}
     runs-on: macos-26
-    env:
-      XCODE_VERSION: '26.4'
-      APPLE_DEV_ID_APP_CERT_NAME: "Developer ID Application: Lancelot Software, LLC (L65255N3F7)"
-      APPLE_DEV_ID_INSTALLER_CERT_NAME: "Developer ID Installer: Lancelot Software, LLC (L65255N3F7)"
-      APPLE_NOTARY_TEAM_ID: "L65255N3F7"
     steps:
       - uses: actions/checkout@v6
 
@@ -417,33 +453,18 @@ jobs:
           p12-password: "${{secrets.APPLE_DEVELOPER_ID_APPLICATION_CERT_PASSWORD}}"
           keychain: application_signing_temp
 
+      # Each import-codesign-certs call rewrites the keychain search list. The second import step (Application cert) drops the first (Installer) keychain, so product build cannot find the "Developer ID Installer" identity. This step re-adds both keychains explicitly before any signing occurs.
       - name: Ensure both signing keychains are in the search list
         shell: bash
-        run: |
-          # Each import-codesign-certs call rewrites the keychain search list.
-          # The second call (Application cert) drops the first (Installer) keychain,
-          # so productbuild cannot find the "Developer ID Installer" identity.
-          # Re-add both keychains explicitly before any signing occurs.
-          INSTALLER_KC="$HOME/Library/Keychains/installer_signing_temp.keychain-db"
-          APP_KC="$HOME/Library/Keychains/application_signing_temp.keychain-db"
-          security list-keychains -d user -s "$INSTALLER_KC" "$APP_KC" login.keychain
-          echo "Keychain search list:"
-          security list-keychains -d user
-
+        run: bash ./scripts/maccatalyst/ensure-signing-keychains.sh
+      
+      # Finally make sure both certs are available before we build
       - name: Verify Developer ID identities are available
         shell: bash
-        run: |
-          set -euo pipefail
-          security find-identity -v -p codesigning
-          security find-certificate -a -c "${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}" || true
-          if ! security find-identity -v -p codesigning | grep -F "${{env.APPLE_DEV_ID_APP_CERT_NAME}}" >/dev/null; then
-            echo "Missing Developer ID Application identity: ${{env.APPLE_DEV_ID_APP_CERT_NAME}}"
-            exit 1
-          fi
-          if ! security find-certificate -a -c "${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}" >/dev/null; then
-            echo "Missing Developer ID Installer certificate: ${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}"
-            exit 1
-          fi
+        run: bash ./scripts/maccatalyst/verify-developer-id-identities.sh
+        env:
+          APPLE_DEV_ID_APP_CERT_NAME: ${{env.APPLE_DEV_ID_APP_CERT_NAME}}
+          APPLE_DEV_ID_INSTALLER_CERT_NAME: ${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}
 
       - name: Set API Key
         run: |
@@ -456,6 +477,7 @@ jobs:
             
       - name: Build, sign, notarize, and staple MacCatalyst artifacts
         shell: bash
+        run: ./scripts/maccatalyst/build-sign-notarize.sh
         env:
           PROJECT_PATH: ${{env.PROJECT_PATH}}
           TFM: ${{env.NET_TFM}}-maccatalyst
@@ -466,8 +488,6 @@ jobs:
           APPLE_NOTARY_APPLE_ID: ${{secrets.APPLE_NOTARY_APPLE_ID}}
           APPLE_NOTARY_APP_PASSWORD: ${{secrets.APPLE_NOTARY_APP_PASSWORD}}
           APPLE_NOTARY_TEAM_ID: ${{env.APPLE_NOTARY_TEAM_ID}}
-        run: |
-          ./scripts/maccatalyst/build-sign-notarize.sh
 
       - name: Publish MacCatalyst build artifacts
         uses: actions/upload-artifact@v7
@@ -494,14 +514,13 @@ jobs:
             artifact_suffix: storeupload-ios
             provisioning_profile: Hacked_AppStore_Distribution
             provisioning_profile_type: IOS_APP_STORE
+            rid: ios-arm64
           - distribution_name: Ad Hoc Sideload IPA
             artifact_suffix: sideload-ios
             provisioning_profile: Hacked_AdHoc_Distribution
             provisioning_profile_type: IOS_APP_ADHOC
+            rid: ios-arm64
     env:
-      RID: ios-arm64
-      XCODE_VERSION: '26.4'
-      APPLE_APP_ID: "com.lancelotsoftware.HackedApp"
       APPLE_PROV_PROFILE: ${{matrix.provisioning_profile}}
       APPLE_PROV_PROFILE_TYPE: ${{matrix.provisioning_profile_type}}
     steps:
@@ -588,7 +607,7 @@ jobs:
             '-f', '${{env.NET_TFM}}-ios'
             '-c', 'Release'
             '-p:ArchiveOnBuild=true'
-            '-p:RuntimeIdentifier=${{env.RID}}'
+            '-p:RuntimeIdentifier=${{matrix.rid}}'
             '-p:MtouchLink=SdkOnly'
             '-p:ApplicationId=${{env.APPLE_APP_ID}}'
             '-p:ApplicationVersion=${{needs.shared-resources.outputs.app_version}}'
@@ -602,7 +621,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:     
           name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_${{matrix.artifact_suffix}}"
-          path: "src/Hacked.Maui/bin/Release/${{env.NET_TFM}}-ios/${{env.RID}}/publish/*.ipa"
+          path: "src/Hacked.Maui/bin/Release/${{env.NET_TFM}}-ios/${{matrix.rid}}/publish/*.ipa"
           if-no-files-found: error
           retention-days: 60
 
