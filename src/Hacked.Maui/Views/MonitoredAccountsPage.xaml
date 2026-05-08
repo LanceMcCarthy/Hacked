@@ -35,6 +35,16 @@
                     Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Yellow100Accent}}" />
         </Style>
 
+        <Style x:Key="MonitoredAccountsGridFooterStyle"
+               TargetType="telerik:DataGridColumnFooterAppearance">
+            <Setter Property="BackgroundColor"
+                    Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}" />
+            <Setter Property="TextColor"
+                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
+            <Setter Property="BorderColor"
+                    Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}" />
+        </Style>
+
         <Style x:Key="MonitoredAccountsGroupHeaderStyle"
                TargetType="telerik:DataGridGroupHeaderAppearance">
             <Setter Property="BackgroundColor"
@@ -104,9 +114,11 @@
             </telerik:RadDataGrid.Commands>
             <telerik:RadDataGrid.Columns>
                 <telerik:DataGridToggleRowDetailsColumn CellContentStyle="{StaticResource MonitoredAccountsGridToggleStyle}"
-                                                        HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}" />
+                                                        HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                                        FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}" />
                 <telerik:DataGridTemplateColumn HeaderText="Options"
                                                 HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                                FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}"
                                                 SizeMode="Auto">
                     <telerik:DataGridTemplateColumn.CellContentTemplate>
                         <DataTemplate x:DataType="models:MonitoredAccount">
@@ -144,6 +156,7 @@
                 <telerik:DataGridTextColumn x:Name="AddressColumn"
                                             PropertyName="Address"
                                             HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                            FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}"
                                             CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                             HeaderText="Account">
                     <telerik:DataGridTextColumn.AggregateDescriptors>
@@ -155,6 +168,7 @@
                 <telerik:DataGridTextColumn x:Name="BreachCountColumn"
                                             PropertyName="Breaches.Count"
                                             HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                            FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}"
                                             CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                             HeaderText="Breaches">
                     <!-- Workaround in DataGrid.Loaded event
@@ -166,15 +180,18 @@
                 </telerik:DataGridTextColumn>
                 <telerik:DataGridDateColumn PropertyName="LastUpdated"
                                             HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                            FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}"
                                             CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                             HeaderText="LastUpdated"
                                             CellContentFormat="{}{0:g}" />
                 <telerik:DataGridBooleanColumn PropertyName="HasNewBreaches"
                                                HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                               FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}"
                                                CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                                HeaderText="New Breaches?" />
                 <telerik:DataGridNumericalColumn PropertyName="NewBreachCount"
                                                  HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
+                                                 FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}"
                                                  CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                                  HeaderText="New Breach Count">
                     <telerik:DataGridNumericalColumn.AggregateDescriptors>
