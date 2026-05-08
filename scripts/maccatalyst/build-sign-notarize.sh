@@ -62,11 +62,7 @@ ditto -c -k --sequesterRsrc --keepParent "$APP_BUNDLE_PATH" "$SIGNED_ZIP_PATH"
 productbuild --component "$APP_BUNDLE_PATH" /Applications --sign "$INSTALLER_SIGN_ID" "$SIGNED_PKG_PATH"
 
 echo "Submitting pkg for notarization..."
-pkg_submit_json="$(xcrun notarytool submit "$SIGNED_PKG_PATH" \
-  --apple-id "$APPLE_NOTARY_APPLE_ID" \
-  --team-id "$APPLE_NOTARY_TEAM_ID" \
-  --password "$APPLE_NOTARY_APP_PASSWORD" \
-  --wait --output-format json)"
+pkg_submit_json="$(xcrun notarytool submit "$SIGNED_PKG_PATH" --apple-id "$APPLE_NOTARY_APPLE_ID" --team-id "$APPLE_NOTARY_TEAM_ID" --password "$APPLE_NOTARY_APP_PASSWORD" --wait --output-format json)"
 echo "$pkg_submit_json"
 if ! grep -q '"status":"Accepted"' <<< "$pkg_submit_json"; then
   echo "Notarization failed for pkg."
@@ -78,11 +74,7 @@ xcrun stapler staple "$SIGNED_PKG_PATH"
 xcrun stapler validate "$SIGNED_PKG_PATH"
 
 echo "Submitting signed app zip for notarization..."
-zip_submit_json="$(xcrun notarytool submit "$SIGNED_ZIP_PATH" \
-  --apple-id "$APPLE_NOTARY_APPLE_ID" \
-  --team-id "$APPLE_NOTARY_TEAM_ID" \
-  --password "$APPLE_NOTARY_APP_PASSWORD" \
-  --wait --output-format json)"
+zip_submit_json="$(xcrun notarytool submit "$SIGNED_ZIP_PATH" --apple-id "$APPLE_NOTARY_APPLE_ID" --team-id "$APPLE_NOTARY_TEAM_ID" --password "$APPLE_NOTARY_APP_PASSWORD" --wait --output-format json)"
 echo "$zip_submit_json"
 if ! grep -q '"status":"Accepted"' <<< "$zip_submit_json"; then
   echo "Notarization failed for app zip."
