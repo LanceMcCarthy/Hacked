@@ -60,7 +60,7 @@
                                    Grid.Row="1">
             <telerik:RadCollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:Breach">
-                    <controls:BreachItemView MaximumHeightRequest="500"/>
+                    <controls:BreachItemView MaximumHeightRequest="500" Margin="0,5"/>
                 </DataTemplate>
             </telerik:RadCollectionView.ItemTemplate>
             <telerik:RadCollectionView.ItemsLayout>
