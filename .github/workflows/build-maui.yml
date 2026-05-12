@@ -32,7 +32,7 @@ env:
   ANDROID_ARTIFACTS_PATH: "artifacts_android"
   WINDOWS_ARTIFACTS_PATH: "artifacts_windows"
   PROJECT_PATH: "src/Hacked.Maui/Hacked.maui.csproj"
-  SDK_VERSION: '10.0.x'
+  SDK_VERSION: '10.0.203'
   NET_TFM: 'net10.0'
   NUGET_CONFIG_PATH: 'src/nuget.config'
   TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
