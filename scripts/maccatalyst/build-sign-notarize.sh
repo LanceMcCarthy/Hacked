@@ -33,12 +33,15 @@ mkdir -p "$ARTIFACTS_DIR"
 echo "Cleaning and publishing MacCatalyst app..."
 dotnet clean "$PROJECT_PATH" -c "$CONFIGURATION" -f "$TFM"
 
+BINLOG_PATH="$ARTIFACTS_DIR/build.binlog"
+
 publish_args=(
   "$PROJECT_PATH"
   -c "$CONFIGURATION"
   -f "$TFM"
   "-p:CodesignKey=\"$CODESIGN_KEY\""
   -p:UseHardenedRuntime=true
+  "-bl:$BINLOG_PATH"
 )
 
 if [[ -n "$APP_VERSION" ]]; then
