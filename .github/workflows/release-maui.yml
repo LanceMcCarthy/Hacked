@@ -471,7 +471,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          security list-keychains -d user -s "$HOME/Library/Keychains/installer_signing_temp.keychain-db" "$HOME/Library/Keychains/application_signing_temp.keychain-db" login.keychain
+          security list-keychains -d user -s "$HOME/Library/Keychains/installer_signing_temp.keychain-db" "$HOME/Library/Keychains/application_signing_temp.keychain-db" "$HOME/Library/Keychains/login.keychain-db"
           echo "Keychain search list:"
           security list-keychains -d user
       
@@ -500,8 +500,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-          cd "$ROOT_DIR"
+          cd "$GITHUB_WORKSPACE"
+
+          if [[ ! -f "$PROJECT_PATH" ]]; then
+            echo "Project file not found: $PROJECT_PATH"
+            echo "Current directory: $(pwd)"
+            exit 1
+          fi
+
           mkdir -p "$ARTIFACTS_DIR"
 
           echo "Cleaning project..."
@@ -511,7 +517,7 @@ jobs:
             "$PROJECT_PATH"
             -c "$CONFIGURATION"
             -f "$TFM"
-            "-p:CodesignKey=\"$CODESIGN_KEY\""
+            "-p:CodesignKey=$CODESIGN_KEY"
             "-p:ApplicationVersion=$APP_VERSION"
             "-p:ApplicationDisplayVersion=$APP_VERSION"
             -p:UseHardenedRuntime=true
@@ -544,7 +550,7 @@ jobs:
           ARTIFACTS_DIR: "${{env.MAC_ARTIFACTS_PATH}}"
           APP_BUNDLE_PATH: "${{env.MAC_APP_BUNDLE_PATH}}"
           CODESIGN_KEY: "${{env.APPLE_DEV_ID_APP_CERT_NAME}}"
-          INSTALLER_SIGN_ID: "${{ env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}"
+          INSTALLER_SIGN_ID: "${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}"
           SIGNED_ZIP_PATH: "${{env.MAC_ARTIFACTS_PATH}}/${{env.APP_NAME}}-MacCatalyst-Release-signed.zip"
           SIGNED_PKG_PATH: "${{env.MAC_ARTIFACTS_PATH}}/${{env.APP_NAME}}-MacCatalyst-Release-signed.pkg"
 
@@ -552,8 +558,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-          cd "$ROOT_DIR"
+          cd "$GITHUB_WORKSPACE"
 
           if [[ -z "$APPLE_NOTARY_APPLE_ID" || -z "$APPLE_NOTARY_APP_PASSWORD" || -z "$APPLE_NOTARY_TEAM_ID" ]]; then
             echo "Missing notarization credentials."
@@ -574,7 +579,7 @@ jobs:
           echo "Submitting pkg for notarization..."
           pkg_submit_json="$(xcrun notarytool submit "$SIGNED_PKG_PATH" --apple-id "$APPLE_NOTARY_APPLE_ID" --team-id "$APPLE_NOTARY_TEAM_ID" --password "$APPLE_NOTARY_APP_PASSWORD" --wait --output-format json)"
           echo "$pkg_submit_json"
-          if ! grep -q '"status":"Accepted"' <<< "$pkg_submit_json"; then
+          if ! grep -Eq '"status"[[:space:]]*:[[:space:]]*"Accepted"' <<< "$pkg_submit_json"; then
             echo "Notarization failed for pkg."
             exit 1
           fi
@@ -586,7 +591,7 @@ jobs:
           echo "Submitting signed app zip for notarization..."
           zip_submit_json="$(xcrun notarytool submit "$SIGNED_ZIP_PATH" --apple-id "$APPLE_NOTARY_APPLE_ID" --team-id "$APPLE_NOTARY_TEAM_ID" --password "$APPLE_NOTARY_APP_PASSWORD" --wait --output-format json)"
           echo "$zip_submit_json"
-          if ! grep -q '"status":"Accepted"' <<< "$zip_submit_json"; then
+          if ! grep -Eq '"status"[[:space:]]*:[[:space:]]*"Accepted"' <<< "$zip_submit_json"; then
             echo "Notarization failed for app zip."
             exit 1
           fi
