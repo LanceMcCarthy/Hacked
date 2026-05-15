@@ -21,8 +21,8 @@ env:
   NET_TFM: 'net10.0'
   XCODE_VERSION: '26.4'
   NUGET_CONFIG_PATH: 'src/nuget.config'
-  TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
   TELERIK_LICENSE: ${{secrets.TELERIK_LICENSE_KEY_VALUE}}
+  APPLE_NOTARY_TEAM_ID: "L65255N3F7"
   # ____Android___________________________________________
   ANDROID_ARTIFACTS_PATH: "artifacts_android"
   ANDROID_KEYSTORE_PATH: "${{github.workspace}}/android-upload.keystore"
@@ -31,10 +31,12 @@ env:
   # ____MacCatalyst_______________________________________
   APPLE_DEV_ID_APP_CERT_NAME: "Developer ID Application: Lancelot Software, LLC (L65255N3F7)"
   APPLE_DEV_ID_INSTALLER_CERT_NAME: "Developer ID Installer: Lancelot Software, LLC (L65255N3F7)"
-  APPLE_NOTARY_TEAM_ID: "L65255N3F7"
+  MAC_APP_BUNDLE_PATH: "src/Hacked.Maui/bin/Release/net10.0-maccatalyst/Hacked.app"
+  MAC_ARTIFACTS_PATH: "artifacts/maccatalyst"
   # ____iOS______________________________________________ (also check matrix vars)
   APPLE_APP_ID: "com.lancelotsoftware.HackedApp"
   # ____Windows__________________________________________ (also check matrix vars)
+  WINDOWS_ARTIFACTS_PATH: "artifacts/windows"
   SERVICE_PRINCIPAL_CLIENT_ID: "32daa13b-f4bb-4809-8ef6-58cb39051acd"
   SERVICE_PRINCIPAL_TENANT_ID: "bd47e796-3473-4b8a-9101-1f4c0c7af31a"
   SERVICE_PRINCIPAL_SUBSCRIPTION_ID: "48ab4839-62af-4ab3-afe6-043ea4d7c137"
@@ -45,6 +47,7 @@ env:
   # ------------------ REQUIRED SECRETS ---------------- #
   # ____Global____________________________________________
   # TELERIK_NUGET_KEY
+  # TELERIK_LICENSE_KEY_VALUE
   # HIBP_API_KEY
   # ____Android___________________________________________
   # ANDROID_SIGNING_KEYSTORE_BASE64
@@ -229,7 +232,7 @@ jobs:
       id: publish-package
       run: |
         $appVersion = "${{needs.shared-resources.outputs.app_version}}.0"
-        $artifactDir = "${{github.workspace}}\artifacts\${{matrix.arch}}"
+        $artifactDir = "${{github.workspace}}\${{env.WINDOWS_ARTIFACTS_PATH}}\${{matrix.arch}}"
         New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
         Write-Host "Publishing Windows ${{matrix.arch}}..."
         $publishArgs = @(
@@ -257,8 +260,8 @@ jobs:
         $msix = $candidates | Sort-Object LastWriteTime -Descending | Select-Object -ExpandProperty FullName -First 1
         if (-not $msix) { throw "No .msix found after publish for ${{matrix.arch}}" }
         Write-Host "Found ${{matrix.arch}} package: $msix"
-        Copy-Item -Path $msix -Destination "$artifactDir\Hacked.${{matrix.arch}}.msix" -Force
-        echo "PACKAGE_PATH=$artifactDir\Hacked.${{matrix.arch}}.msix" >> $env:GITHUB_OUTPUT
+        Copy-Item -Path $msix -Destination "$artifactDir\$${{env.APP_NAME}}.${{matrix.arch}}.msix" -Force
+        echo "PACKAGE_PATH=$artifactDir\${{env.APP_NAME}}.${{matrix.arch}}.msix" >> $env:GITHUB_OUTPUT
 
     - name: Upload ${{matrix.arch}} artifact
       uses: actions/upload-artifact@v7
@@ -457,15 +460,32 @@ jobs:
       # Each import-codesign-certs call rewrites the keychain search list. The second import step (Application cert) drops the first (Installer) keychain, so product build cannot find the "Developer ID Installer" identity. This step re-adds both keychains explicitly before any signing occurs.
       - name: Ensure both signing keychains are in the search list
         shell: bash
-        run: bash ./scripts/maccatalyst/ensure-signing-keychains.sh
+        run: |
+          set -euo pipefail
+          security list-keychains -d user -s "$HOME/Library/Keychains/installer_signing_temp.keychain-db" "$HOME/Library/Keychains/application_signing_temp.keychain-db" login.keychain
+          echo "Keychain search list:"
+          security list-keychains -d user
       
       # Finally make sure both certs are available before we build
       - name: Verify Developer ID identities are available
         shell: bash
-        run: bash ./scripts/maccatalyst/verify-developer-id-identities.sh
-        env:
-          APPLE_DEV_ID_APP_CERT_NAME: ${{env.APPLE_DEV_ID_APP_CERT_NAME}}
-          APPLE_DEV_ID_INSTALLER_CERT_NAME: ${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}
+        run: |
+          set -euo pipefail
+          APPLE_DEV_ID_APP_CERT_NAME="${{env.APPLE_DEV_ID_APP_CERT_NAME}}"
+          APPLE_DEV_ID_INSTALLER_CERT_NAME="${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}"
+
+          security find-identity -v -p codesigning
+          security find-certificate -a -c "$APPLE_DEV_ID_INSTALLER_CERT_NAME" || true
+
+          if ! security find-identity -v -p codesigning | grep -F "$APPLE_DEV_ID_APP_CERT_NAME" >/dev/null; then
+            echo "Missing Developer ID Application identity: $APPLE_DEV_ID_APP_CERT_NAME"
+            exit 1
+          fi
+
+          if ! security find-certificate -a -c "$APPLE_DEV_ID_INSTALLER_CERT_NAME" >/dev/null; then
+            echo "Missing Developer ID Installer certificate: $APPLE_DEV_ID_INSTALLER_CERT_NAME"
+            exit 1
+          fi
 
       - name: Set API Key
         run: |
@@ -476,25 +496,133 @@ jobs:
         env:
           HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
             
-      - name: Build, sign, notarize, and staple MacCatalyst artifacts
+ 
+      - name: Build and sign MacCatalyst artifacts
         shell: bash
-        run: ./scripts/maccatalyst/build-sign-notarize.sh
+        run: |
+          set -euo pipefail
+          ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+          cd "$ROOT_DIR"
+          mkdir -p "$ARTIFACTS_DIR"
+
+          echo "Cleaning and publishing MacCatalyst app..."
+          dotnet clean "$PROJECT_PATH" -c "$CONFIGURATION" -f "$TFM"
+
+          publish_args=(
+            "$PROJECT_PATH"
+            -c "$CONFIGURATION"
+            -f "$TFM"
+            "-p:CodesignKey=\"$CODESIGN_KEY\""
+            -p:UseHardenedRuntime=true
+          )
+
+          if [[ -n "$APP_VERSION" ]]; then
+            publish_args+=("-p:ApplicationVersion=$APP_VERSION" "-p:ApplicationDisplayVersion=$APP_VERSION")
+          fi
+
+          printf 'Running: dotnet publish'; printf ' %q' "${publish_args[@]}"; printf '\n'
+          dotnet publish "${publish_args[@]}"
+
+          if [[ ! -d "$APP_BUNDLE_PATH" ]]; then
+            echo "Expected app bundle not found at $APP_BUNDLE_PATH"
+            exit 1
+          fi
+
+          echo "Verifying app signature..."
+          codesign -dv --verbose=2 "$APP_BUNDLE_PATH" >/dev/null 2>&1
+
+          echo "Creating signed app zip and installer pkg..."
+          rm -f "$SIGNED_ZIP_PATH" "$SIGNED_PKG_PATH"
+          ditto -c -k --sequesterRsrc --keepParent "$APP_BUNDLE_PATH" "$SIGNED_ZIP_PATH"
+          productbuild --component "$APP_BUNDLE_PATH" /Applications --sign "$INSTALLER_SIGN_ID" "$SIGNED_PKG_PATH"
+
+          echo "Done. Signed artifacts:"
+          echo "- $SIGNED_PKG_PATH"
+          echo "- $SIGNED_ZIP_PATH"
         env:
-          PROJECT_PATH: ${{env.PROJECT_PATH}}
-          TFM: ${{env.NET_TFM}}-maccatalyst
-          CONFIGURATION: Release
-          APP_VERSION: ${{needs.shared-resources.outputs.app_version}}
-          CODESIGN_KEY: ${{env.APPLE_DEV_ID_APP_CERT_NAME}}
-          INSTALLER_SIGN_ID: ${{env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}
-          APPLE_NOTARY_APPLE_ID: ${{secrets.APPLE_NOTARY_APPLE_ID}}
-          APPLE_NOTARY_APP_PASSWORD: ${{secrets.APPLE_NOTARY_APP_PASSWORD}}
-          APPLE_NOTARY_TEAM_ID: ${{env.APPLE_NOTARY_TEAM_ID}}
+          PROJECT_PATH: "${{env.PROJECT_PATH}}"
+          TFM: "${{env.NET_TFM}}-maccatalyst"
+          CONFIGURATION: "Release"
+          APP_VERSION: "${{needs.shared-resources.outputs.app_version}}"
+          ARTIFACTS_DIR: "${{env.MAC_ARTIFACTS_PATH}}"
+          APP_BUNDLE_PATH: "${{env.MAC_APP_BUNDLE_PATH}}"
+          CODESIGN_KEY: "${{env.APPLE_DEV_ID_APP_CERT_NAME}}"
+          INSTALLER_SIGN_ID: "${{ env.APPLE_DEV_ID_INSTALLER_CERT_NAME}}"
+          SIGNED_ZIP_PATH: "${{env.MAC_ARTIFACTS_PATH}}/${{env.APP_NAME}}-MacCatalyst-Release-signed.zip"
+          SIGNED_PKG_PATH: "${{env.MAC_ARTIFACTS_PATH}}/${{env.APP_NAME}}-MacCatalyst-Release-signed.pkg"
+
+      - name: Notarize and staple MacCatalyst artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+          cd "$ROOT_DIR"
+
+          if [[ -z "$APPLE_NOTARY_APPLE_ID" || -z "$APPLE_NOTARY_APP_PASSWORD" || -z "$APPLE_NOTARY_TEAM_ID" ]]; then
+            echo "Missing notarization credentials."
+            echo "Set APPLE_NOTARY_APPLE_ID, APPLE_NOTARY_APP_PASSWORD, and APPLE_NOTARY_TEAM_ID."
+            exit 1
+          fi
+
+          if [[ ! -d "$APP_BUNDLE_PATH" ]]; then
+            echo "Expected app bundle not found at $APP_BUNDLE_PATH"
+            exit 1
+          fi
+
+          if [[ ! -f "$SIGNED_PKG_PATH" || ! -f "$SIGNED_ZIP_PATH" ]]; then
+            echo "Expected signed artifacts not found in $ARTIFACTS_DIR"
+            exit 1
+          fi
+
+          echo "Submitting pkg for notarization..."
+          pkg_submit_json="$(xcrun notarytool submit "$SIGNED_PKG_PATH" --apple-id "$APPLE_NOTARY_APPLE_ID" --team-id "$APPLE_NOTARY_TEAM_ID" --password "$APPLE_NOTARY_APP_PASSWORD" --wait --output-format json)"
+          echo "$pkg_submit_json"
+          if ! grep -q '"status":"Accepted"' <<< "$pkg_submit_json"; then
+            echo "Notarization failed for pkg."
+            exit 1
+          fi
+
+          echo "Stapling and validating pkg..."
+          xcrun stapler staple "$SIGNED_PKG_PATH"
+          xcrun stapler validate "$SIGNED_PKG_PATH"
+
+          echo "Submitting signed app zip for notarization..."
+          zip_submit_json="$(xcrun notarytool submit "$SIGNED_ZIP_PATH" --apple-id "$APPLE_NOTARY_APPLE_ID" --team-id "$APPLE_NOTARY_TEAM_ID" --password "$APPLE_NOTARY_APP_PASSWORD" --wait --output-format json)"
+          echo "$zip_submit_json"
+          if ! grep -q '"status":"Accepted"' <<< "$zip_submit_json"; then
+            echo "Notarization failed for app zip."
+            exit 1
+          fi
+
+          echo "Stapling and validating app..."
+          xcrun stapler staple "$APP_BUNDLE_PATH"
+          xcrun stapler validate "$APP_BUNDLE_PATH"
+
+          # Recreate the final distributable zip from the stapled app.
+          ditto -c -k --sequesterRsrc --keepParent "$APP_BUNDLE_PATH" "$NOTARIZED_ZIP_PATH"
+
+          echo "Gatekeeper checks..."
+          spctl -a -t exec -vv "$APP_BUNDLE_PATH"
+          spctl -a -t install -vv "$SIGNED_PKG_PATH"
+
+          echo "Done. Artifacts:"
+          echo "- $SIGNED_PKG_PATH"
+          echo "- $NOTARIZED_ZIP_PATH"
+        env:
+          ARTIFACTS_DIR: "${{env.MAC_ARTIFACTS_PATH}}"
+          APP_BUNDLE_PATH: "${{env.MAC_APP_BUNDLE_PATH}}"
+          APPLE_NOTARY_APPLE_ID: "${{secrets.APPLE_NOTARY_APPLE_ID}}"
+          APPLE_NOTARY_APP_PASSWORD: "${{secrets.APPLE_NOTARY_APP_PASSWORD}}"
+          APPLE_NOTARY_TEAM_ID: "${{env.APPLE_NOTARY_TEAM_ID}}"
+          SIGNED_ZIP_PATH: "${{env.MAC_ARTIFACTS_PATH}}/${{env.APP_NAME}}-MacCatalyst-Release-signed.zip"
+          NOTARIZED_ZIP_PATH: "${{env.MAC_ARTIFACTS_PATH}}/${{env.APP_NAME}}-MacCatalyst-Release-notarized.zip"
+          SIGNED_PKG_PATH: "${{env.MAC_ARTIFACTS_PATH}}/${{env.APP_NAME}}-MacCatalyst-Release-signed.pkg"
 
       - name: Publish MacCatalyst build artifacts
         uses: actions/upload-artifact@v7
         with:     
           name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_signed-maccatalyst"
-          path: artifacts/maccatalyst/${{env.APP_NAME}}-MacCatalyst-Release-signed.pkg
+          path: "${{env.MAC_ARTIFACTS_PATH}}/${{env.APP_NAME}}-MacCatalyst-Release-signed.pkg"
           if-no-files-found: error
           retention-days: 30
 
