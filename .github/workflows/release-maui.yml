@@ -14,7 +14,9 @@ permissions:
 
 env:
   # ____Global____________________________________________
+  APP_NAME: "Hacked"
   PROJECT_PATH: "src/Hacked.Maui/Hacked.Maui.csproj"
+  PROJECT_DIRECTORY: "Hacked.Maui"
   SDK_VERSION: '10.0.*'
   NET_TFM: 'net10.0'
   XCODE_VERSION: '26.4'
@@ -33,7 +35,6 @@ env:
   # ____iOS______________________________________________ (also check matrix vars)
   APPLE_APP_ID: "com.lancelotsoftware.HackedApp"
   # ____Windows__________________________________________ (also check matrix vars)
-  WINDOWS_PACKAGE_NAME: "Hacked"
   SERVICE_PRINCIPAL_CLIENT_ID: "32daa13b-f4bb-4809-8ef6-58cb39051acd"
   SERVICE_PRINCIPAL_TENANT_ID: "bd47e796-3473-4b8a-9101-1f4c0c7af31a"
   SERVICE_PRINCIPAL_SUBSCRIPTION_ID: "48ab4839-62af-4ab3-afe6-043ea4d7c137"
@@ -124,7 +125,7 @@ jobs:
 
       - name: Set API Key
         run: |
-          $file = 'src/Hacked.Maui/appsettings.json'
+          $file = "src/${{env.PROJECT_DIRECTORY}}/appsettings.json"
           $config = Get-Content $file -Raw | ConvertFrom-Json
           $config.HibpApiKey = $env:HIBP_API_KEY
           $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
@@ -141,7 +142,7 @@ jobs:
 
       - name: Copy signed APKs & AABs
         run: |
-          $publishRoot = "src/Hacked.Maui/bin/Release/${{env.NET_TFM}}-android"
+          $publishRoot = "src/${{env.PROJECT_DIRECTORY}}/bin/Release/${{env.NET_TFM}}-android"
           $apkFiles = Get-ChildItem -Path $publishRoot -Filter *-Signed.apk -File -Recurse -ErrorAction SilentlyContinue
           $aabFiles = Get-ChildItem -Path $publishRoot -Filter *-Signed.aab -File -Recurse -ErrorAction SilentlyContinue
 
@@ -155,7 +156,7 @@ jobs:
       - name: Publish Android build artifacts
         uses: actions/upload-artifact@v7
         with:     
-          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_signed-android" 
+          name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_signed-android" 
           path: "${{env.ANDROID_ARTIFACTS_PATH}}/*"
           if-no-files-found: error
           retention-days: 60
@@ -206,18 +207,18 @@ jobs:
     # Update the app manifest with version number, even if Version attribute is missing.
     - name: Update manifest for side load build
       run: |
-        [xml]$manifest = Get-Content 'src\Hacked.Maui\Platforms\Windows\Package.appxmanifest'
+        [xml]$manifest = Get-Content 'src\${{env.PROJECT_DIRECTORY}}\Platforms\Windows\Package.appxmanifest'
         $ns = $manifest.DocumentElement.NamespaceURI
         $nsmgr = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
         $nsmgr.AddNamespace('m', $ns)
         $identityNode = $manifest.SelectSingleNode('/m:Package/m:Identity', $nsmgr)
         if ($null -eq $identityNode) { throw 'Identity node not found in Package.appxmanifest' }
         $identityNode.SetAttribute('Version', "${{needs.shared-resources.outputs.app_version}}.0")
-        $manifest.Save('src\Hacked.Maui\Platforms\Windows\Package.appxmanifest')
+        $manifest.Save('src\${{env.PROJECT_DIRECTORY}}\Platforms\Windows\Package.appxmanifest')
 
     - name: Set API Key
       run: |
-        $file = 'src/Hacked.Maui/appsettings.json'
+        $file = "src/${{env.PROJECT_DIRECTORY}}/appsettings.json"
         $config = Get-Content $file -Raw | ConvertFrom-Json
         $config.HibpApiKey = $env:HIBP_API_KEY
         $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
@@ -247,8 +248,8 @@ jobs:
         )
         & dotnet @publishArgs
         if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for ${{matrix.arch}} with exit code $LASTEXITCODE" }
-        # MAUI writes MSIX to src\Hacked.Maui\AppPackages\<name>_<ver>_<arch>_Test\*.msix
-        $appPackagesRoot = "src\Hacked.Maui\AppPackages"
+        # MAUI writes MSIX to src\${{env.PROJECT_DIRECTORY}}\AppPackages\<name>_<ver>_<arch>_Test\*.msix
+        $appPackagesRoot = "src\${{env.PROJECT_DIRECTORY}}\AppPackages"
         $candidates = Get-ChildItem -Path $appPackagesRoot -Filter *.msix -Recurse -ErrorAction SilentlyContinue |
           Where-Object { $_.FullName -notmatch '\\Dependencies\\' -and $_.Name -match "_${{matrix.arch}}\.msix$" }
         Write-Host "Found $($candidates.Count) candidate MSIX file(s) for ${{matrix.arch}}:"
@@ -262,7 +263,7 @@ jobs:
     - name: Upload ${{matrix.arch}} artifact
       uses: actions/upload-artifact@v7
       with:     
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_${{matrix.runtime_id}}"
+        name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_${{matrix.runtime_id}}"
         path: ${{steps.publish-package.outputs.PACKAGE_PATH}}
         if-no-files-found: error
         retention-days: 30
@@ -280,13 +281,13 @@ jobs:
     - name: Download x64 artifact
       uses: actions/download-artifact@v8
       with:
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_win-x64"
+        name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_win-x64"
         path: ${{github.workspace}}\bundle-input
 
     - name: Download arm64 artifact
       uses: actions/download-artifact@v8
       with:
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_win-arm64"
+        name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_win-arm64"
         path: ${{github.workspace}}\bundle-input
 
     - name: Create MSIX bundle
@@ -304,7 +305,7 @@ jobs:
         if (-not $makeAppx) { throw "makeappx.exe not found under $sdkRoot" }
         Write-Host "Using makeappx: $($makeAppx.FullName)"
         Get-ChildItem $inputDir -Filter *.msix | ForEach-Object { Write-Host "Input: $($_.FullName)" }
-        $bundlePath = "$outputDir\Hacked_v${{needs.shared-resources.outputs.app_version}}.msixbundle"
+        $bundlePath = "$outputDir\${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}.msixbundle"
         & $makeAppx.FullName bundle /d $inputDir /p $bundlePath /bv $appVersion /o
         if ($LASTEXITCODE -ne 0) { throw "makeappx bundle failed with exit code $LASTEXITCODE" }
 
@@ -343,7 +344,7 @@ jobs:
     - name: Upload MSIX bundle artifact
       uses: actions/upload-artifact@v7
       with:
-        name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_signed-windows.msixbundle"
+        name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_signed-windows.msixbundle"
         path: ${{steps.bundle.outputs.BUNDLE_PATH}}
         if-no-files-found: error
         retention-days: 30
@@ -380,18 +381,18 @@ jobs:
       # Update the app manifest with version number, even if Version attribute is missing.
       - name: Update manifest for side load build
         run: |
-          [xml]$manifest = Get-Content 'src\Hacked.Maui\Platforms\Windows\Package.appxmanifest'
+          [xml]$manifest = Get-Content 'src\${{env.PROJECT_DIRECTORY}}\Platforms\Windows\Package.appxmanifest'
           $ns = $manifest.DocumentElement.NamespaceURI
           $nsmgr = New-Object System.Xml.XmlNamespaceManager($manifest.NameTable)
           $nsmgr.AddNamespace('m', $ns)
           $identityNode = $manifest.SelectSingleNode('/m:Package/m:Identity', $nsmgr)
           if ($null -eq $identityNode) { throw 'Identity node not found in Package.appxmanifest' }
           $identityNode.SetAttribute('Version', "${{needs.shared-resources.outputs.app_version}}.0")
-          $manifest.Save('src\Hacked.Maui\Platforms\Windows\Package.appxmanifest')
+          $manifest.Save('src\${{env.PROJECT_DIRECTORY}}\Platforms\Windows\Package.appxmanifest')
 
       - name: Set API Key
         run: |
-          $file = 'src/Hacked.Maui/appsettings.json'
+          $file = 'src/${{env.PROJECT_DIRECTORY}}/appsettings.json'
           $config = Get-Content $file -Raw | ConvertFrom-Json
           $config.HibpApiKey = $env:HIBP_API_KEY
           $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
@@ -404,7 +405,7 @@ jobs:
       - name: Publish build artifacts
         uses: actions/upload-artifact@v7
         with:     
-          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_storeupload-windows"
+          name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_storeupload-windows"
           path: "**/*.msixupload"
           if-no-files-found: error
           retention-days: 60
@@ -468,7 +469,7 @@ jobs:
 
       - name: Set API Key
         run: |
-          $file = 'src/Hacked.Maui/appsettings.json'
+          $file = 'src/${{env.PROJECT_DIRECTORY}}/appsettings.json'
           $config = Get-Content $file -Raw | ConvertFrom-Json
           $config.HibpApiKey = $env:HIBP_API_KEY
           $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
@@ -492,8 +493,8 @@ jobs:
       - name: Publish MacCatalyst build artifacts
         uses: actions/upload-artifact@v7
         with:     
-          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_signed-maccatalyst"
-          path: artifacts/maccatalyst/Hacked-MacCatalyst-Release-signed.pkg
+          name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_signed-maccatalyst"
+          path: artifacts/maccatalyst/${{env.APP_NAME}}-MacCatalyst-Release-signed.pkg
           if-no-files-found: error
           retention-days: 30
 
@@ -583,7 +584,7 @@ jobs:
 
       - name: Set API Key
         run: |
-          $file = 'src/Hacked.Maui/appsettings.json'
+          $file = 'src/${{env.PROJECT_DIRECTORY}}/appsettings.json'
           $config = Get-Content $file -Raw | ConvertFrom-Json
           $config.HibpApiKey = $env:HIBP_API_KEY
           $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
@@ -620,8 +621,8 @@ jobs:
       - name: Publish iOS build artifacts
         uses: actions/upload-artifact@v7
         with:     
-          name: "Hacked_v${{needs.shared-resources.outputs.app_version}}_${{matrix.artifact_suffix}}"
-          path: "src/Hacked.Maui/bin/Release/${{env.NET_TFM}}-ios/${{matrix.rid}}/publish/*.ipa"
+          name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_${{matrix.artifact_suffix}}"
+          path: "src/${{env.PROJECT_DIRECTORY}}/bin/Release/${{env.NET_TFM}}-ios/${{matrix.rid}}/publish/*.ipa"
           if-no-files-found: error
           retention-days: 60
 
@@ -647,31 +648,31 @@ jobs:
         shell: bash
         run: |
           VER="${{needs.shared-resources.outputs.app_version}}"
+          PREFIX="${{env.APP_NAME}}_v${VER}"
           mkdir -p release-upload
-          NAME_PREFIX="release-upload/Hacked_v${VER}"
 
           # Android
-          find "release-artifacts/Hacked_v${VER}_signed-android" -name "*-Signed.apk" -exec cp {} "${NAME_PREFIX}_android-signed.apk" \;
-          find "release-artifacts/Hacked_v${VER}_signed-android" -name "*-Signed.aab" -exec cp {} "${NAME_PREFIX}_android-signed.aab" \;
+          find "release-artifacts/${PREFIX}_signed-android" -name "*-Signed.apk" -exec cp {} "release-upload/${PREFIX}_android-signed.apk" \;
+          find "release-artifacts/${PREFIX}_signed-android" -name "*-Signed.aab" -exec cp {} "release-upload/${PREFIX}_android-signed.aab" \;
 
           # Windows sideload (individual per-arch MSIX)
-          cp "release-artifacts/Hacked_v${VER}_win-x64/Hacked.x64.msix"     "${NAME_PREFIX}_win-x64.msix";
-          cp "release-artifacts/Hacked_v${VER}_win-arm64/Hacked.arm64.msix" "${NAME_PREFIX}_win-arm64.msix";
+          cp "release-artifacts/${PREFIX}_win-x64/${{env.APP_NAME}}.x64.msix"     "release-upload/${PREFIX}_win-x64.msix";
+          cp "release-artifacts/${PREFIX}_win-arm64/${{env.APP_NAME}}.arm64.msix" "release-upload/${PREFIX}_win-arm64.msix";
 
           # Windows msixbundle (signed)
-          cp "release-artifacts/Hacked_v${VER}_signed-windows.msixbundle/Hacked_v${VER}.msixbundle" "${NAME_PREFIX}_windows.msixbundle";
+          cp "release-artifacts/${PREFIX}_signed-windows.msixbundle/${PREFIX}.msixbundle" "release-upload/${PREFIX}_windows.msixbundle";
 
           # Windows Store upload
-          find "release-artifacts/Hacked_v${VER}_storeupload-windows" -name "*.msixupload" -exec cp {} "${NAME_PREFIX}_msstore.msixupload" \;
+          find "release-artifacts/${PREFIX}_storeupload-windows" -name "*.msixupload" -exec cp {} "release-upload/${PREFIX}_msstore.msixupload" \;
 
           # MacCatalyst pkg
-          cp "release-artifacts/Hacked_v${VER}_signed-maccatalyst/Hacked-MacCatalyst-Release-signed.pkg" "${NAME_PREFIX}_mac.pkg";
+          cp "release-artifacts/${PREFIX}_signed-maccatalyst/${PREFIX}-MacCatalyst-Release-signed.pkg" "release-upload/${PREFIX}_mac.pkg";
 
           # iOS Store IPA
-          find "release-artifacts/Hacked_v${VER}_storeupload-ios" -name "*.ipa" -exec cp {} "${NAME_PREFIX}_ios-store.ipa" \;
+          find "release-artifacts/${PREFIX}_storeupload-ios" -name "*.ipa" -exec cp {} "release-upload/${PREFIX}_ios-store.ipa" \;
 
           # iOS Ad Hoc sideload IPA
-          find "release-artifacts/Hacked_v${VER}_sideload-ios" -name "*.ipa" -exec cp {} "${NAME_PREFIX}_ios-sideload.ipa" \;
+          find "release-artifacts/${PREFIX}_sideload-ios" -name "*.ipa" -exec cp {} "release-upload/${PREFIX}_ios-sideload.ipa" \;
 
           echo "Files prepared for release:"
           ls -lh release-upload/
@@ -680,7 +681,7 @@ jobs:
         uses: softprops/action-gh-release@v3.0.0
         with:
           tag_name: "v${{needs.shared-resources.outputs.app_version}}"
-          name: "Hacked v${{needs.shared-resources.outputs.app_version}}"
+          name: "${{env.APP_NAME}} v${{needs.shared-resources.outputs.app_version}}"
           draft: false
           prerelease: false
           generate_release_notes: true
