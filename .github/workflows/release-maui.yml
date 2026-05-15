@@ -15,7 +15,7 @@ permissions:
 env:
   # ____Global____________________________________________
   PROJECT_PATH: "src/Hacked.Maui/Hacked.Maui.csproj"
-  SDK_VERSION: '10.0.203'
+  SDK_VERSION: '10.0.*'
   NET_TFM: 'net10.0'
   XCODE_VERSION: '26.4'
   NUGET_CONFIG_PATH: 'src/nuget.config'
