@@ -443,6 +443,15 @@ jobs:
       - name: Restore NuGet packages
         run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
+      - name: Set API Key
+        run: |
+          $file = 'src/${{env.PROJECT_DIRECTORY}}/appsettings.json'
+          $config = Get-Content $file -Raw | ConvertFrom-Json
+          $config.HibpApiKey = $env:HIBP_API_KEY
+          $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
+        env:
+          HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
+
       - name: Import Developer ID Installer Certificates
         uses: Apple-Actions/import-codesign-certs@v7
         with:
@@ -487,16 +496,6 @@ jobs:
             exit 1
           fi
 
-      - name: Set API Key
-        run: |
-          $file = 'src/${{env.PROJECT_DIRECTORY}}/appsettings.json'
-          $config = Get-Content $file -Raw | ConvertFrom-Json
-          $config.HibpApiKey = $env:HIBP_API_KEY
-          $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
-        env:
-          HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
-            
- 
       - name: Build and sign MacCatalyst artifacts
         shell: bash
         run: |
@@ -505,7 +504,7 @@ jobs:
           cd "$ROOT_DIR"
           mkdir -p "$ARTIFACTS_DIR"
 
-          echo "Cleaning and publishing MacCatalyst app..."
+          echo "Cleaning project..."
           dotnet clean "$PROJECT_PATH" -c "$CONFIGURATION" -f "$TFM"
 
           publish_args=(
@@ -513,14 +512,12 @@ jobs:
             -c "$CONFIGURATION"
             -f "$TFM"
             "-p:CodesignKey=\"$CODESIGN_KEY\""
+            "-p:ApplicationVersion=$APP_VERSION"
+            "-p:ApplicationDisplayVersion=$APP_VERSION"
             -p:UseHardenedRuntime=true
           )
 
-          if [[ -n "$APP_VERSION" ]]; then
-            publish_args+=("-p:ApplicationVersion=$APP_VERSION" "-p:ApplicationDisplayVersion=$APP_VERSION")
-          fi
-
-          printf 'Running: dotnet publish'; printf ' %q' "${publish_args[@]}"; printf '\n'
+          echo "Publishing project..."
           dotnet publish "${publish_args[@]}"
 
           if [[ ! -d "$APP_BUNDLE_PATH" ]]; then
@@ -673,6 +670,15 @@ jobs:
       - name: Restore NuGet packages
         run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
 
+      - name: Set API Key
+        run: |
+          $file = 'src/${{env.PROJECT_DIRECTORY}}/appsettings.json'
+          $config = Get-Content $file -Raw | ConvertFrom-Json
+          $config.HibpApiKey = $env:HIBP_API_KEY
+          $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
+        env:
+          HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
+
       # Docs https://github.com/Apple-Actions/import-codesign-certs
       - name: Import Code-Signing Certificates
         uses: Apple-Actions/import-codesign-certs@v7
@@ -709,15 +715,6 @@ jobs:
             echo "Missing Apple Distribution identity"
             exit 1
           fi
-
-      - name: Set API Key
-        run: |
-          $file = 'src/${{env.PROJECT_DIRECTORY}}/appsettings.json'
-          $config = Get-Content $file -Raw | ConvertFrom-Json
-          $config.HibpApiKey = $env:HIBP_API_KEY
-          $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
-        env:
-          HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
 
       # Docs https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/publish-cli?view=net-maui-9.0
       - name: Publish MAUI iOS IPA
