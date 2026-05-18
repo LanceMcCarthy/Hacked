@@ -260,8 +260,9 @@ jobs:
         $msix = $candidates | Sort-Object LastWriteTime -Descending | Select-Object -ExpandProperty FullName -First 1
         if (-not $msix) { throw "No .msix found after publish for ${{matrix.arch}}" }
         Write-Host "Found ${{matrix.arch}} package: $msix"
-        Copy-Item -Path $msix -Destination "$artifactDir\$${{env.APP_NAME}}.${{matrix.arch}}.msix" -Force
-        echo "PACKAGE_PATH=$artifactDir\${{env.APP_NAME}}.${{matrix.arch}}.msix" >> $env:GITHUB_OUTPUT
+        $outputMsixPath = "$artifactDir\${{env.APP_NAME}}.${{matrix.arch}}.msix"
+        Copy-Item -Path $msix -Destination $outputMsixPath -Force
+        echo "PACKAGE_PATH=$outputMsixPath" >> $env:GITHUB_OUTPUT
 
     - name: Upload ${{matrix.arch}} artifact
       uses: actions/upload-artifact@v7
