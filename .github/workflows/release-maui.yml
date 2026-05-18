@@ -20,6 +20,7 @@ env:
   SDK_VERSION: '10.0.x'
   NET_TFM: 'net10.0'
   XCODE_VERSION: '26.4'
+  MAC_DOTNET_VERSION: '10.0.203'
   NUGET_CONFIG_PATH: 'src/nuget.config'
   TELERIK_LICENSE: ${{secrets.TELERIK_LICENSE_KEY_VALUE}}
   APPLE_NOTARY_TEAM_ID: "L65255N3F7"
@@ -35,6 +36,7 @@ env:
   MAC_ARTIFACTS_PATH: "artifacts/maccatalyst"
   # ____iOS______________________________________________ (also check matrix vars)
   APPLE_APP_ID: "com.lancelotsoftware.HackedApp"
+  IOS_RID: ios-arm64
   # ____Windows__________________________________________ (also check matrix vars)
   WINDOWS_ARTIFACTS_PATH: "artifacts/windows"
   SERVICE_PRINCIPAL_CLIENT_ID: "32daa13b-f4bb-4809-8ef6-58cb39051acd"
@@ -433,7 +435,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: ${{env.SDK_VERSION}}
+          dotnet-version: ${{env.MAC_DOTNET_VERSION}}
 
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
@@ -643,18 +645,13 @@ jobs:
       matrix:
         include:
           - distribution_name: Store Upload IPA
-            artifact_suffix: storeupload-ios
+            artifact_suffix: ios-store
             provisioning_profile: Hacked_AppStore_Distribution
             provisioning_profile_type: IOS_APP_STORE
-            rid: ios-arm64
           - distribution_name: Ad Hoc Sideload IPA
-            artifact_suffix: sideload-ios
+            artifact_suffix: ios-adhoc
             provisioning_profile: Hacked_AdHoc_Distribution
             provisioning_profile_type: IOS_APP_ADHOC
-            rid: ios-arm64
-    env:
-      APPLE_PROV_PROFILE: ${{matrix.provisioning_profile}}
-      APPLE_PROV_PROFILE_TYPE: ${{matrix.provisioning_profile_type}}
     steps:
       - uses: actions/checkout@v6
 
@@ -662,10 +659,47 @@ jobs:
         with:
           xcode-version: ${{env.XCODE_VERSION}}
 
+      - name: Import Code-Signing Certificates
+        uses: Apple-Actions/import-codesign-certs@v7
+        with:
+          p12-file-base64: "${{secrets.APPLE_DISTRIBUTION_CERT_BASE64}}"
+          p12-password: "${{secrets.APPLE_DISTRIBUTION_CERT_PASSWORD}}"
+
+      - id: provisioning-profiles
+        uses: Apple-Actions/download-provisioning-profiles@v6
+        with:
+          profile-type: "${{matrix.provisioning_profile_type}}"
+          bundle-id: "${{env.APPLE_APP_ID}}"
+          issuer-id: "${{secrets.APPSTORE_API_ISSUER_ID}}"
+          api-key-id: "${{secrets.APPSTORE_API_KEY_ID}}"
+          api-private-key: "${{secrets.APPSTORE_API_PRIVATE_KEY}}"
+
+      - name: Verify provisioning profile
+        run: |
+          $profiles = '${{steps.provisioning-profiles.outputs.profiles}}' | ConvertFrom-Json
+          $expectedName = '${{matrix.provisioning_profile}}'
+          $expectedType = '${{matrix.provisioning_profile_type}}'
+          $profile = $profiles | Where-Object { $_.name -eq $expectedName -and $_.type -eq $expectedType } | Select-Object -First 1
+
+          if ($null -eq $profile) {
+            $profiles | Format-Table -AutoSize | Out-String | Write-Host
+            throw "Provisioning profile '$expectedName' with type '$expectedType' was not downloaded."
+          }
+
+      - name: Verify iOS signing identity is available
+        shell: bash
+        run: |
+          set -euo pipefail
+          security find-identity -v -p codesigning
+          if ! security find-identity -v -p codesigning | grep -F "Apple Distribution" >/dev/null; then
+            echo "Missing Apple Distribution identity"
+            exit 1
+          fi
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: ${{env.SDK_VERSION}}
+          dotnet-version: ${{env.MAC_DOTNET_VERSION}}
 
       - name: Install MAUI Workloads
         run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
@@ -685,44 +719,6 @@ jobs:
         env:
           HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
 
-      # Docs https://github.com/Apple-Actions/import-codesign-certs
-      - name: Import Code-Signing Certificates
-        uses: Apple-Actions/import-codesign-certs@v7
-        with:
-          p12-file-base64: "${{secrets.APPLE_DISTRIBUTION_CERT_BASE64}}"
-          p12-password: "${{secrets.APPLE_DISTRIBUTION_CERT_PASSWORD}}"
-
-      # Docs https://github.com/Apple-Actions/download-provisioning-profiles
-      - id: provisioning-profiles
-        uses: Apple-Actions/download-provisioning-profiles@v6
-        with:
-          profile-type: "${{env.APPLE_PROV_PROFILE_TYPE}}"
-          bundle-id: "${{env.APPLE_APP_ID}}"
-          issuer-id: "${{secrets.APPSTORE_API_ISSUER_ID}}"
-          api-key-id: "${{secrets.APPSTORE_API_KEY_ID}}"
-          api-private-key: "${{secrets.APPSTORE_API_PRIVATE_KEY}}"
-
-      - name: Verify provisioning profile
-        run: |
-          $profiles = '${{steps.provisioning-profiles.outputs.profiles}}' | ConvertFrom-Json
-          $profile = $profiles | Where-Object { $_.name -eq $env:APPLE_PROV_PROFILE -and $_.type -eq $env:APPLE_PROV_PROFILE_TYPE } | Select-Object -First 1
-
-          if ($null -eq $profile) {
-            $profiles | Format-Table -AutoSize | Out-String | Write-Host
-            throw "Provisioning profile '$env:APPLE_PROV_PROFILE' with type '$env:APPLE_PROV_PROFILE_TYPE' was not downloaded."
-          }
-
-      - name: Verify iOS signing identity is available
-        shell: bash
-        run: |
-          set -euo pipefail
-          security find-identity -v -p codesigning
-          if ! security find-identity -v -p codesigning | grep -F "Apple Distribution" >/dev/null; then
-            echo "Missing Apple Distribution identity"
-            exit 1
-          fi
-
-      # Docs https://learn.microsoft.com/en-us/dotnet/maui/ios/deployment/publish-cli?view=net-maui-9.0
       - name: Publish MAUI iOS IPA
         run: |
           # Query the actual signing identity to avoid comma parsing issues
@@ -739,11 +735,11 @@ jobs:
             '-f', '${{env.NET_TFM}}-ios'
             '-c', 'Release'
             '-p:ArchiveOnBuild=true'
-            '-p:RuntimeIdentifier=${{matrix.rid}}'
+            '-p:RuntimeIdentifier=${{env.IOS_RID}}'
             '-p:MtouchLink=SdkOnly'
             '-p:ApplicationId=${{env.APPLE_APP_ID}}'
             '-p:ApplicationVersion=${{needs.shared-resources.outputs.app_version}}'
-            '-p:CodesignProvision=${{env.APPLE_PROV_PROFILE}}'
+            '-p:CodesignProvision=${{matrix.provisioning_profile}}'
             "-p:CodesignKey=$quotedCodesignKey"
           )
           & dotnet @publishArgs
@@ -753,7 +749,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:     
           name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_${{matrix.artifact_suffix}}"
-          path: "src/${{env.PROJECT_DIRECTORY}}/bin/Release/${{env.NET_TFM}}-ios/${{matrix.rid}}/publish/*.ipa"
+          path: "src/${{env.PROJECT_DIRECTORY}}/bin/Release/${{env.NET_TFM}}-ios/${{env.IOS_RID}}/publish/*.ipa"
           if-no-files-found: error
           retention-days: 60
 
@@ -778,32 +774,50 @@ jobs:
       - name: Prepare release files
         shell: bash
         run: |
+          set -euo pipefail
+
           VER="${{needs.shared-resources.outputs.app_version}}"
           PREFIX="${{env.APP_NAME}}_v${VER}"
           mkdir -p release-upload
 
-          # Android
-          find "release-artifacts/${PREFIX}_signed-android" -name "*-Signed.apk" -exec cp {} "release-upload/${PREFIX}_android-signed.apk" \;
-          find "release-artifacts/${PREFIX}_signed-android" -name "*-Signed.aab" -exec cp {} "release-upload/${PREFIX}_android-signed.aab" \;
+          copy_one() {
+            local artifact_dir="$1"
+            local pattern="$2"
+            local destination="$3"
+            local -a matches=()
 
-          # Windows sideload (individual per-arch MSIX)
-          cp "release-artifacts/${PREFIX}_win-x64/${{env.APP_NAME}}.x64.msix"     "release-upload/${PREFIX}_win-x64.msix";
-          cp "release-artifacts/${PREFIX}_win-arm64/${{env.APP_NAME}}.arm64.msix" "release-upload/${PREFIX}_win-arm64.msix";
+            if [[ ! -d "$artifact_dir" ]]; then
+              echo "Expected artifact directory not found: $artifact_dir" >&2
+              exit 1
+            fi
+
+            mapfile -d '' matches < <(find "$artifact_dir" -type f -name "$pattern" -print0 | sort -z)
+
+            if [[ ${#matches[@]} -ne 1 ]]; then
+              echo "Expected exactly one match for '$pattern' under '$artifact_dir', found ${#matches[@]}." >&2
+              find "$artifact_dir" -type f | sort >&2
+              exit 1
+            fi
+
+            cp -- "${matches[0]}" "$destination"
+          }
+
+          # Android
+          copy_one "release-artifacts/${PREFIX}_signed-android" "*-Signed.apk" "release-upload/${PREFIX}_android-signed.apk"
+          copy_one "release-artifacts/${PREFIX}_signed-android" "*-Signed.aab" "release-upload/${PREFIX}_android-signed.aab"
 
           # Windows msixbundle (signed)
-          cp "release-artifacts/${PREFIX}_signed-windows.msixbundle/${PREFIX}.msixbundle" "release-upload/${PREFIX}_windows.msixbundle";
+          copy_one "release-artifacts/${PREFIX}_signed-windows.msixbundle" "*.msixbundle" "release-upload/${PREFIX}_windows.msixbundle"
 
-          # Windows Store upload
-          find "release-artifacts/${PREFIX}_storeupload-windows" -name "*.msixupload" -exec cp {} "release-upload/${PREFIX}_msstore.msixupload" \;
+          # Windows Store
+          copy_one "release-artifacts/${PREFIX}_storeupload-windows" "*.msixupload" "release-upload/${PREFIX}_msstore.msixupload"
 
-          # MacCatalyst pkg
-          cp "release-artifacts/${PREFIX}_signed-maccatalyst/${{env.APP_NAME}}-MacCatalyst-Release-signed.pkg" "release-upload/${PREFIX}_mac.pkg";
+          # MacCatalyst
+          copy_one "release-artifacts/${PREFIX}_signed-maccatalyst" "*.pkg" "release-upload/${PREFIX}_mac.pkg"
 
-          # iOS Store IPA
-          find "release-artifacts/${PREFIX}_storeupload-ios" -name "*.ipa" -exec cp {} "release-upload/${PREFIX}_ios-store.ipa" \;
-
-          # iOS Ad Hoc sideload IPA
-          find "release-artifacts/${PREFIX}_sideload-ios" -name "*.ipa" -exec cp {} "release-upload/${PREFIX}_ios-sideload.ipa" \;
+          # iOS
+          copy_one "release-artifacts/${PREFIX}_ios-adhoc" "*.ipa" "release-upload/${PREFIX}_ios-adhoc.ipa"
+          copy_one "release-artifacts/${PREFIX}_ios-store" "*.ipa" "release-upload/${PREFIX}_ios-store.ipa"
 
           echo "Files prepared for release:"
           ls -lh release-upload/
