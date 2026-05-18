@@ -797,7 +797,7 @@ jobs:
           find "release-artifacts/${PREFIX}_storeupload-windows" -name "*.msixupload" -exec cp {} "release-upload/${PREFIX}_msstore.msixupload" \;
 
           # MacCatalyst pkg
-          cp "release-artifacts/${PREFIX}_signed-maccatalyst/${PREFIX}-MacCatalyst-Release-signed.pkg" "release-upload/${PREFIX}_mac.pkg";
+          cp "release-artifacts/${PREFIX}_signed-maccatalyst/${{env.APP_NAME}}-MacCatalyst-Release-signed.pkg" "release-upload/${PREFIX}_mac.pkg";
 
           # iOS Store IPA
           find "release-artifacts/${PREFIX}_storeupload-ios" -name "*.ipa" -exec cp {} "release-upload/${PREFIX}_ios-store.ipa" \;
