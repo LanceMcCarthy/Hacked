@@ -18,8 +18,6 @@ env:
   AppxBundle: Never
   AppxPackageSigningEnabled: False
   DOTNET_SDK_VERSION: '10.0.x'
-  NUGET_CONFIG_PATH: 'src/nuget.config'
-  TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
 
 jobs:
   smoke-test-uwp:

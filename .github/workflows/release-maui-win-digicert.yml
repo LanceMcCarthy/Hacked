@@ -2,12 +2,6 @@ name: Release MAUI (Windows Digicert)
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches: [main]
-  #   paths:
-  #     - '.github/workflows/release-maui-tester.yml'
-  # pull_request:
-  #   types: []  # Explicitly disabled - external PRs cannot trigger this workflow
 
 defaults:
   run:
@@ -15,10 +9,8 @@ defaults:
 
 env:
   PROJECT_PATH: "src/Hacked.Maui/Hacked.Maui.csproj"
-  SDK_VERSION: '10.0.203'
+  SDK_VERSION: '10.0.x'
   NET_TFM: 'net10.0'
-  NUGET_CONFIG_PATH: 'src/nuget.config'
-  TELERIK_NUGET_KEY: ${{secrets.TELERIK_NUGET_KEY}}
   TELERIK_LICENSE: ${{secrets.TELERIK_LICENSE_KEY_VALUE}}
 
 jobs:
@@ -61,15 +53,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
 
-    - name: Set Telerik NuGet Credentials
-      run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
-
-    # Update the app manifest before publish. Identity/@Publisher MUST match the
-    # DigiCert signing cert's Subject exactly, or signing the final .msixbundle
-    # will fail. We look up the cert on the runner and write its subject in.
+    # Update the app manifest before publish. 
+    # Identity/@Publisher MUST match the DigiCert signing cert's Subject exactly, or signing the final .msixbundle will fail.
     - name: Update manifest for side load build
       run: |
         $manifestPath = 'src\Hacked.Maui\Platforms\Windows\Package.appxmanifest'

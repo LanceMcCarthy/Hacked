@@ -2,6 +2,47 @@ name: Release .NET MAUI
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - release-maui*
+    paths:
+      - 'src/Hacked.Maui/**/*'
+      - '.github/workflows/release-maui.yml'
+  # required secrets
+  workflow_call:
+    secrets:
+      TELERIK_LICENSE_KEY_VALUE:
+        required: true
+      HIBP_API_KEY:
+        required: true
+      ANDROID_SIGNING_KEYSTORE_BASE64:
+        required: true
+      ANDROID_SIGNING_KEYSTORE_PASS:
+        required: true
+      ANDROID_SIGNING_KEY_ALIAS:
+        required: true
+      ANDROID_SIGNING_KEY_PASS:
+        required: true
+      APPLE_DEVELOPER_ID_INSTALLER_CERT_BASE64:
+        required: true
+      APPLE_DEVELOPER_ID_INSTALLER_CERT_PASSWORD:
+        required: true
+      APPLE_DEVELOPER_ID_APPLICATION_CERT_BASE64:
+        required: true
+      APPLE_NOTARY_APPLE_ID:
+        required: true
+      APPLE_NOTARY_APP_PASSWORD:
+        required: true
+      APPLE_DISTRIBUTION_CERT_BASE64:
+        required: true
+      APPLE_DISTRIBUTION_CERT_PASSWORD:
+        required: true
+      APPSTORE_API_ISSUER_ID:
+        required: true
+      APPSTORE_API_KEY_ID:
+        required: true
+      APPSTORE_API_PRIVATE_KEY:
+        required: true
 
 defaults:
   run:
@@ -19,9 +60,8 @@ env:
   PROJECT_DIRECTORY: "Hacked.Maui"
   SDK_VERSION: '10.0.x'
   NET_TFM: 'net10.0'
-  XCODE_VERSION: '26.4'
-  MAC_DOTNET_VERSION: '10.0.203'
-  NUGET_CONFIG_PATH: 'src/nuget.config'
+  XCODE_VERSION: '26.5'
+  MAC_DOTNET_VERSION: '10.0.x'
   TELERIK_LICENSE: ${{secrets.TELERIK_LICENSE_KEY_VALUE}}
   APPLE_NOTARY_TEAM_ID: "L65255N3F7"
   # ____Android___________________________________________
@@ -46,30 +86,6 @@ env:
   SIGNING_ACCT_CERT_PROFILE: "lancemccarthylivepublic"
   SIGNING_ACCT_ENDPOINT_URL: "https://eus.codesigning.azure.net/"
 
-  # ------------------ REQUIRED SECRETS ---------------- #
-  # ____Global____________________________________________
-  # TELERIK_NUGET_KEY
-  # TELERIK_LICENSE_KEY_VALUE
-  # HIBP_API_KEY
-  # ____Android___________________________________________
-  # ANDROID_SIGNING_KEYSTORE_BASE64
-  # ANDROID_SIGNING_KEYSTORE_PASS
-  # ANDROID_SIGNING_KEY_ALIAS
-  # ANDROID_SIGNING_KEY_PASS
-  # ____MacCatalyst_______________________________________
-  # APPLE_DEVELOPER_ID_INSTALLER_CERT_BASE64
-  # APPLE_DEVELOPER_ID_INSTALLER_CERT_PASSWORD
-  # APPLE_DEVELOPER_ID_APPLICATION_CERT_BASE64
-  # APPLE_NOTARY_APPLE_ID
-  # APPLE_NOTARY_APP_PASSWORD
-  # ____iOS______________________________________________
-  # APPLE_DISTRIBUTION_CERT_BASE64
-  # APPLE_DISTRIBUTION_CERT_PASSWORD
-  # APPSTORE_API_ISSUER_ID
-  # APPSTORE_API_KEY_ID
-  # APPSTORE_API_PRIVATE_KEY
-  # ____Windows__________________________________________
-  # No additional secrets needed, uses Azure Trusted Signing.
 
 jobs:
   # ********************************************************************************** #
@@ -120,13 +136,7 @@ jobs:
           java-version: ${{env.JAVA_VERSION}}
 
       - name: Install MAUI Workloads
-        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
-
-      - name: Set Telerik NuGet Credentials
-        run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
-
-      - name: Restore NuGet packages
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
+        run: dotnet workload install maui
 
       - name: Set API Key
         run: |
@@ -138,12 +148,10 @@ jobs:
           HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
           
       - name: Publish MAUI Android
-        run: |
-          dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_KEYSTORE_PATH}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_KEYSTORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
+        run: dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_KEYSTORE_PATH}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_KEYSTORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
 
       - name: Create artifacts folder
-        run: |
-          New-Item -ItemType Directory -Force -Path ${{env.ANDROID_ARTIFACTS_PATH}} | Out-Null
+        run: New-Item -ItemType Directory -Force -Path ${{env.ANDROID_ARTIFACTS_PATH}} | Out-Null
 
       - name: Copy signed APKs & AABs
         run: |
@@ -201,13 +209,7 @@ jobs:
       uses: microsoft/setup-msbuild@v3
 
     - name: Install MAUI workloads
-      run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
-
-    - name: Set Telerik NuGet Credentials
-      run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
-
-    - name: Restore NuGet packages
-      run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
+      run: dotnet workload install maui
 
     # Update the app manifest with version number, even if Version attribute is missing.
     - name: Update manifest for side load build
@@ -376,13 +378,7 @@ jobs:
         uses: microsoft/setup-msbuild@v3
 
       - name: Install MAUI Workloads
-        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
-
-      - name: Set Telerik NuGet Credentials
-        run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
-
-      - name: Restore NuGet packages
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
+        run: dotnet workload install maui
 
       # Update the app manifest with version number, even if Version attribute is missing.
       - name: Update manifest for side load build
@@ -438,13 +434,7 @@ jobs:
           dotnet-version: ${{env.MAC_DOTNET_VERSION}}
 
       - name: Install MAUI Workloads
-        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
-
-      - name: Set Telerik NuGet Credentials
-        run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
-
-      - name: Restore NuGet packages
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
+        run: dotnet workload install maui
 
       - name: Set API Key
         run: |
@@ -708,13 +698,7 @@ jobs:
           dotnet-version: ${{env.MAC_DOTNET_VERSION}}
 
       - name: Install MAUI Workloads
-        run: dotnet workload install maui --source https://api.nuget.org/v3/index.json
-
-      - name: Set Telerik NuGet Credentials
-        run: dotnet nuget update source 'Telerik_v3_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p "${{secrets.TELERIK_NUGET_KEY}}" --configfile '${{env.NUGET_CONFIG_PATH}}' --store-password-in-clear-text
-
-      - name: Restore NuGet packages
-        run: dotnet restore ${{env.PROJECT_PATH}} --configfile ${{env.NUGET_CONFIG_PATH}}
+        run: dotnet workload install maui
 
       - name: Set API Key
         run: |
