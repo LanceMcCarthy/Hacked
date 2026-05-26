@@ -54,7 +54,7 @@
     </Project>
   </Folder>
   <Folder Name="/UWP/">
-    <Project Path="Hacked.BackgroundTasks/Hacked.BackgroundTasks.csproj">
+    <Project Path="Hacked.BackgroundTasks/Hacked.BackgroundTasks.csproj" Id="da28b98c-48c5-4673-8395-a07712332c53">
       <BuildType Solution="Ad-Hoc|*" Project="Debug" />
       <BuildType Solution="AppStore|*" Project="Debug" />
       <Platform Solution="*|ARM" Project="ARM" />
@@ -62,7 +62,7 @@
       <Platform Solution="*|x64" Project="x64" />
       <Platform Solution="*|x86" Project="x86" />
     </Project>
-    <Project Path="Hacked/Hacked.csproj">
+    <Project Path="Hacked/Hacked.csproj" Id="8c081783-895a-4f1e-9cef-ddd5c15d96ea">
       <BuildType Solution="Ad-Hoc|Any CPU" Project="Release" />
       <BuildType Solution="Ad-Hoc|ARM" Project="Release" />
       <BuildType Solution="Ad-Hoc|ARM64" Project="Debug" />
