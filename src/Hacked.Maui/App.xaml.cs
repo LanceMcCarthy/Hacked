@@ -1,4 +1,6 @@
-﻿namespace Hacked.Maui;
+﻿using Hacked.Maui.Helpers;
+
+namespace Hacked.Maui;
 
 public partial class App : Application
 {
@@ -8,7 +10,7 @@ public partial class App : Application
 
         UserAppTheme = AppTheme.Unspecified;
         RequestedThemeChanged += OnRequestedThemeChanged;
-        ApplyTelerikTheme(RequestedTheme);
+        ThemeHelper.ApplySavedTheme(GetEffectiveAppTheme(RequestedTheme));
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
@@ -16,7 +18,7 @@ public partial class App : Application
         var win = new Window();
         win.Page ??= activationState?.Context.Services.GetRequiredService<AppShell>();
 
-        win.Created += (_, _) => ApplyTelerikTheme(RequestedTheme);
+        win.Created += (_, _) => ThemeHelper.ApplySavedTheme(GetEffectiveAppTheme(RequestedTheme));
 
         return win;
 
@@ -26,13 +28,11 @@ public partial class App : Application
 
     private void OnRequestedThemeChanged(object? sender, AppThemeChangedEventArgs e)
     {
-        ApplyTelerikTheme(e.RequestedTheme);
+        ThemeHelper.ApplySavedTheme(GetEffectiveAppTheme(e.RequestedTheme));
     }
 
-    private static void ApplyTelerikTheme(AppTheme requestedTheme)
+    private static AppTheme GetEffectiveAppTheme(AppTheme requestedTheme)
     {
-        TelerikThemeResources.AppTheme = requestedTheme == AppTheme.Dark 
-            ? TelerikTheme.TelerikTurquoiseDark 
-            : TelerikTheme.TelerikTurquoise;
+        return requestedTheme == AppTheme.Unspecified ? AppTheme.Light : requestedTheme;
     }
 }

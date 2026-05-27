@@ -4,6 +4,8 @@ namespace Hacked.Maui.Common;
 
 public static class Settings
 {
+    public const string DefaultTheme = "Turquoise";
+
     public static bool IsFirstLaunch
     {
         get => Preferences.Get(Constants.IsFirstLaunchKey, true);
@@ -12,7 +14,7 @@ public static class Settings
 
     public static string SelectedTheme
     {
-        get => Preferences.Get(Constants.SelectedThemeKey, "Blue");
+        get => Preferences.Get(Constants.SelectedThemeKey, DefaultTheme);
         set => Preferences.Set(Constants.SelectedThemeKey, value);
     }
 
