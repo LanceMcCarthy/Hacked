@@ -146,7 +146,7 @@ jobs:
           $config | ConvertTo-Json -Depth 10 | Set-Content -Path $file -Encoding utf8NoBOM
         env:
           HIBP_API_KEY: ${{secrets.HIBP_API_KEY}}
-          
+
       - name: Publish MAUI Android
         run: dotnet publish ${{env.PROJECT_PATH}} -c Release -f ${{env.NET_TFM}}-android /p:AndroidKeyStore=true /p:AndroidSigningKeyStore=${{env.ANDROID_KEYSTORE_PATH}} /p:AndroidSigningStorePass=${{secrets.ANDROID_SIGNING_KEYSTORE_PASS}} /p:AndroidSigningKeyAlias=${{secrets.ANDROID_SIGNING_KEY_ALIAS}} /p:AndroidSigningKeyPass=${{secrets.ANDROID_SIGNING_KEY_PASS}}
 
@@ -168,8 +168,8 @@ jobs:
 
       - name: Publish Android build artifacts
         uses: actions/upload-artifact@v7
-        with:     
-          name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_signed-android" 
+        with:
+          name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_signed-android"
           path: "${{env.ANDROID_ARTIFACTS_PATH}}/*"
           if-no-files-found: error
           retention-days: 60
@@ -270,7 +270,7 @@ jobs:
 
     - name: Upload ${{matrix.arch}} artifact
       uses: actions/upload-artifact@v7
-      with:     
+      with:
         name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_${{matrix.runtime_id}}"
         path: ${{steps.publish-package.outputs.PACKAGE_PATH}}
         if-no-files-found: error
@@ -406,7 +406,7 @@ jobs:
 
       - name: Publish build artifacts
         uses: actions/upload-artifact@v7
-        with:     
+        with:
           name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_storeupload-windows"
           path: "**/*.msixupload"
           if-no-files-found: error
@@ -467,7 +467,7 @@ jobs:
           security list-keychains -d user -s "$HOME/Library/Keychains/installer_signing_temp.keychain-db" "$HOME/Library/Keychains/application_signing_temp.keychain-db" "$HOME/Library/Keychains/login.keychain-db"
           echo "Keychain search list:"
           security list-keychains -d user
-      
+
       # Finally make sure both certs are available before we build
       - name: Verify Developer ID identities are available
         shell: bash
@@ -621,7 +621,7 @@ jobs:
 
       - name: Publish MacCatalyst build artifacts
         uses: actions/upload-artifact@v7
-        with:     
+        with:
           name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_signed-maccatalyst"
           path: "${{env.MAC_ARTIFACTS_PATH}}/${{env.APP_NAME}}-MacCatalyst-Release-signed.pkg"
           if-no-files-found: error
@@ -718,7 +718,7 @@ jobs:
           if (-not $codesignKey) { throw "Could not parse Apple Distribution identity from keychain output" }
           Write-Host "Using codesign key: $codesignKey"
           $quotedCodesignKey = '"' + $codesignKey + '"'
-          
+
           $publishArgs = @(
             'publish'
             '${{env.PROJECT_PATH}}'
@@ -737,7 +737,7 @@ jobs:
 
       - name: Publish iOS build artifacts
         uses: actions/upload-artifact@v7
-        with:     
+        with:
           name: "${{env.APP_NAME}}_v${{needs.shared-resources.outputs.app_version}}_${{matrix.artifact_suffix}}"
           path: "src/${{env.PROJECT_DIRECTORY}}/bin/Release/${{env.NET_TFM}}-ios/${{env.IOS_RID}}/publish/*.ipa"
           if-no-files-found: error
@@ -752,6 +752,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [shared-resources, android, windows-sideload-packages, windows-generate-msixbundle, windows-store, maccatalyst, ios]
     steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Download all artifacts
         uses: actions/download-artifact@v8
         with:
@@ -812,6 +816,91 @@ jobs:
           echo "Files prepared for release:"
           ls -lh release-upload/
 
+      - name: Generate release summary
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="${{needs.shared-resources.outputs.app_version}}"
+          CURRENT_TAG="v${VERSION}"
+          PREVIOUS_TAG="$(git for-each-ref --sort=-creatordate --format='%(refname:short)' refs/tags/v* | awk -v current="$CURRENT_TAG" '$0 != current { print; exit }')"
+
+          if [[ -n "$PREVIOUS_TAG" ]]; then
+            RANGE="$PREVIOUS_TAG..HEAD"
+            COMPARE_URL="https://github.com/${GITHUB_REPOSITORY}/compare/${PREVIOUS_TAG}...${CURRENT_TAG}"
+          else
+            RANGE="HEAD"
+            COMPARE_URL="https://github.com/${GITHUB_REPOSITORY}/commits/${CURRENT_TAG}"
+          fi
+
+          mkdir -p release-notes
+          features="release-notes/features.md"
+          fixes="release-notes/fixes.md"
+          build="release-notes/build.md"
+          other="release-notes/other.md"
+          : > "$features"
+          : > "$fixes"
+          : > "$build"
+          : > "$other"
+
+          while IFS=$'\t' read -r hash subject; do
+            [[ -z "$hash" || -z "$subject" ]] && continue
+
+            short_hash="${hash:0:7}"
+            lower_subject="$(printf '%s' "$subject" | tr '[:upper:]' '[:lower:]')"
+            item="- ${subject} ([${short_hash}](https://github.com/${GITHUB_REPOSITORY}/commit/${hash}))"
+
+            case "$lower_subject" in
+              feat:*|feature:*|add\ *|added\ *) echo "$item" >> "$features" ;;
+              fix:*|bugfix:*|hotfix:*|*fix*|*crash*|*error*) echo "$item" >> "$fixes" ;;
+              build:*|ci:*|chore:*|release:*|*workflow*|*pipeline*) echo "$item" >> "$build" ;;
+              *) echo "$item" >> "$other" ;;
+            esac
+          done < <(git log "$RANGE" --no-merges --pretty=format:$'%H\t%s')
+
+          append_section() {
+            local title="$1"
+            local file="$2"
+
+            if [[ -s "$file" ]]; then
+              {
+                echo
+                echo "## ${title}"
+                cat "$file"
+              } >> release-notes.md
+            fi
+          }
+
+          {
+            echo "## What's changed"
+            if [[ -n "$PREVIOUS_TAG" ]]; then
+              echo "This release includes signed packages for Android, Windows, macOS, and iOS. Changes since ${PREVIOUS_TAG}: [full comparison](${COMPARE_URL})."
+            else
+              echo "This release includes signed packages for Android, Windows, macOS, and iOS. Changes included in this release: [commit history](${COMPARE_URL})."
+            fi
+          } > release-notes.md
+
+          append_section "Features and improvements" "$features"
+          append_section "Fixes" "$fixes"
+          append_section "Build and release updates" "$build"
+          append_section "Other changes" "$other"
+
+          {
+            echo
+            echo "## Downloads"
+            echo "| Platform | File |"
+            echo "|----------|---------|"
+            echo "| Android (sideload) | `.apk` |"
+            echo "| Android (store upload) | `.aab` |"
+            echo "| Windows (installer) | `.msixbundle` |"
+            echo "| Windows (store upload) | `.msixupload` |"
+            echo "| macOS (installer) | `.pkg` |"
+            echo "| iOS (sideload) | `-adhoc.ipa` |"
+            echo "| iOS (store upload) | `-store.ipa` |"
+          } >> release-notes.md
+
+          cat release-notes.md
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3.0.0
         with:
@@ -819,5 +908,5 @@ jobs:
           name: "${{env.APP_NAME}} v${{needs.shared-resources.outputs.app_version}}"
           draft: false
           prerelease: false
-          generate_release_notes: true
+          body_path: release-notes.md
           files: release-upload/*
