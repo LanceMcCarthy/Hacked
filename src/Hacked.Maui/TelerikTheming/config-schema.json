@@ -1,0 +1,169 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "http://telerik.com/ui/maui/theme-config",
+    "title": "Telerik UI for MAUI theme config",
+    "description": "Version 10.0.0",
+    "type": "object",
+    "allOf": [
+        {
+            "properties": {
+                "version": {
+                    "type": "string",
+                    "enum": [ "10.0.0" ],
+                    "default": "10.0.0"
+                }
+            }
+        },
+        {
+            "properties": {
+                "useStaticResources": {
+                    "description": "Specify whether to use static resources for the themes instead of dynamic resources.",
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+        {
+            "properties": {
+                "themes": {
+                    "description": "Specify multiple themes that will be bundled with your app and will allow you to switch them at runtime.",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "Platform Light",
+                            "Platform Dark",
+                            "Telerik Main",
+                            "Telerik Main Dark",
+                            "Telerik Ocean Blue",
+                            "Telerik Ocean Blue Dark",
+                            "Telerik Purple",
+                            "Telerik Purple Dark",
+                            "Telerik Turquoise",
+                            "Telerik Turquoise Dark"
+                        ],
+                        "uniqueItems": true
+                    },
+                    "default": [
+                        "Platform Light",
+                        "Platform Dark",
+                        "Telerik Main",
+                        "Telerik Main Dark",
+                        "Telerik Ocean Blue",
+                        "Telerik Ocean Blue Dark",
+                        "Telerik Purple",
+                        "Telerik Purple Dark",
+                        "Telerik Turquoise",
+                        "Telerik Turquoise Dark"
+                    ]
+                }
+            },
+            "required": [
+                "themes"
+            ],
+            "uniqueItems": true
+        },
+        {
+            "properties": {
+                "controls": {
+                    "description": "Specify which controls will be used in the application. Ignoring the styling for some of the Telerik controls will reduce app size.",
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "AIPrompt",
+                            "Accordion",
+                            "AutoComplete",
+                            "BadgeView",
+                            "BottomSheet",
+                            "BusyIndicator",
+                            "Buttons",
+                            "Core",
+                            "Calendar",
+                            "Chat",
+                            "Chart",
+                            "CheckBox",
+                            "CollectionView",
+                            "ComboBox",
+                            "DataGrid",
+                            "DataForm",
+                            "DataPager",
+                            "Editor",
+                            "Entry",
+                            "Expander",
+                            "GridSplitter",
+                            "ImageEditor",
+                            "InputView",
+                            "LinearProgressBar",
+                            "MaskedEntry",
+                            "NavigationView",
+                            "NumericInput",
+                            "PdfViewer",
+                            "Pickers",
+                            "PromptInput",
+                            "Rating",
+                            "RichTextEditor",
+                            "Scheduler",
+                            "SegmentedControl",
+                            "SignaturePad",
+                            "Skeleton",
+                            "Sliders",
+                            "SlideView",
+                            "SpeechToTextButton",
+                            "TabView",
+                            "Toolbar",
+                            "TreeDataGrid",
+                            "TreeView"
+                        ]
+                    },
+                    "default": [
+                        "AIPrompt",
+                        "Accordion",
+                        "AutoComplete",
+                        "BadgeView",
+                        "BottomSheet",
+                        "BusyIndicator",
+                        "Buttons",
+                        "Core",
+                        "Calendar",
+                        "Chat",
+                        "Chart",
+                        "CheckBox",
+                        "CollectionView",
+                        "ComboBox",
+                        "DataGrid",
+                        "DataForm",
+                        "DataPager",
+                        "Editor",
+                        "Entry",
+                        "Expander",
+                        "GridSplitter",
+                        "ImageEditor",
+                        "InputView",
+                        "LinearProgressBar",
+                        "MaskedEntry",
+                        "NavigationView",
+                        "NumericInput",
+                        "PdfViewer",
+                        "Pickers",
+                        "PromptInput",
+                        "Rating",
+                        "RichTextEditor",
+                        "Scheduler",
+                        "SegmentedControl",
+                        "SignaturePad",
+                        "Skeleton",
+                        "Sliders",
+                        "SlideView",
+                        "SpeechToTextButton",
+                        "TabView",
+                        "Toolbar",
+                        "TreeDataGrid",
+                        "TreeView"
+                    ]
+                }
+            }
+        }
+    ]
+}

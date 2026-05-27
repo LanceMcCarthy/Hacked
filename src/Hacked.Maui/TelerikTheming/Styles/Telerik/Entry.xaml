@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                    xmlns:telerikMaui="clr-namespace:Telerik.Maui;assembly=Telerik.Maui.Core"
+                    xmlns:telerikMauiControls="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
+                    x:Class="Telerik.Theming.Telerik.Styles.Entry">
+
+    <Style x:Key="RadEntryStyle" TargetType="telerikMauiControls:RadEntry" BasedOn="{StaticResource RadInputViewStyle}">
+        <Setter Property="Padding" Value="{OnPlatform Android='9, 11, 9, 10', iOS='9, 10, 9, 9', MacCatalyst='9, 5', WinUI='9, 4'}" />
+    </Style>
+    <Style TargetType="telerikMauiControls:RadEntry" BasedOn="{StaticResource RadEntryStyle}" />
+
+    <VisualStateGroupList x:Key="RadOutlineEntryVisualStates_Desktop">
+        <VisualStateGroup Name="CommonStates">
+            <VisualState Name="Normal">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="MouseOver">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadOnAppSurfaceColorAlpha80}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="Focused">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="Invalid">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadErrorColor}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="InvalidMouseOver">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadErrorColor}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="InvalidFocused">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadErrorColor}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="ReadOnly">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="ReadOnlyMouseOver">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadOnAppSurfaceColorAlpha80}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="ReadOnlyFocused">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="ReadOnlyInvalid">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadErrorColor}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="ReadOnlyInvalidMouseOver">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadErrorColor}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="ReadOnlyInvalidFocused">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadErrorColor}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="Disabled">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+                    <Setter Property="telerikMauiControls:RadEntry.Opacity" Value="0.6" />
+                </VisualState.Setters>
+            </VisualState>
+        </VisualStateGroup>
+    </VisualStateGroupList>
+
+    <VisualStateGroupList x:Key="RadOutlineEntryVisualStates_Mobile">
+        <VisualStateGroup Name="CommonStates">
+            <VisualState Name="Normal">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="Focused">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="Invalid">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadErrorColor}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="InvalidFocused">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadErrorColor}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="ReadOnly">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="ReadOnlyFocused">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="ReadOnlyInvalid">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadErrorColor}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="ReadOnlyInvalidFocused">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadErrorColor}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="Disabled">
+                <VisualState.Setters>
+                    <Setter Property="telerikMauiControls:RadEntry.BorderBrush" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+                    <Setter Property="telerikMauiControls:RadEntry.Opacity" Value="0.6" />
+                </VisualState.Setters>
+            </VisualState>
+        </VisualStateGroup>
+    </VisualStateGroupList>
+
+    <Style x:Key="RadOutlineEntryStyle" TargetType="telerikMauiControls:RadEntry" BasedOn="{StaticResource RadEntryStyle}">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+        <Setter Property="VisualStateManager.VisualStateGroups"
+                Value="{OnPlatform Android={StaticResource RadOutlineEntryVisualStates_Mobile},
+                                   iOS={StaticResource RadOutlineEntryVisualStates_Mobile},
+                                   MacCatalyst={StaticResource RadOutlineEntryVisualStates_Desktop},
+                                   WinUI={StaticResource RadOutlineEntryVisualStates_Desktop}}" />
+    </Style>
+
+    <Style x:Key="RadFlatEntryStyle" TargetType="telerikMauiControls:RadEntry" BasedOn="{StaticResource RadEntryStyle}">
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0, 0, 0, 1" />
+        <Setter Property="CornerRadius" Value="4, 4, 0, 0" />
+    </Style>
+
+    <Style x:Key="RadMaskedEntryBaseStyle" TargetType="telerikMauiControls:RadMaskedEntryBase">
+        <Setter Property="TextColor" Value="{DynamicResource RadOnAppSurfaceColor}" />
+        <Setter Property="EntryBackgroundColor" Value="{DynamicResource RadAppSurfaceColor}" />
+        <Setter Property="EntryCornerRadius" Value="4" />
+        <Setter Property="ClearButtonStyle" Value="{StaticResource InputViewClearButtonStyle}" />
+        <Setter Property="ControlTemplate">
+            <ControlTemplate>
+                <telerikMauiControls:RadEntry AutomationId="MaskedEntryView"
+                                              IsValueValid="{Binding IsValueValid, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              ValidationErrorMessage="{Binding ActualValidationErrorMessage, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              IsReadOnly="{Binding IsReadOnly, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              IsEnabled="{Binding IsEnabled, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              Placeholder="{Binding Placeholder, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              FontFamily="{Binding FontFamily, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              FontSize="{Binding FontSize, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              ClearButtonVisibility="{Binding ClearButtonVisibility, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              BackgroundColor="{Binding EntryBackgroundColor, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              CornerRadius="{Binding EntryCornerRadius, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              TextColor="{Binding TextColor, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              Keyboard="{Binding Keyboard, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}" />
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style x:Key="RadOutlineMaskedEntryBaseStyle" TargetType="telerikMauiControls:RadMaskedEntryBase" BasedOn="{StaticResource RadMaskedEntryBaseStyle}">
+        <Setter Property="EntryBackgroundColor" Value="Transparent" />
+        <Setter Property="ControlTemplate">
+            <ControlTemplate>
+                <telerikMauiControls:RadEntry Style="{StaticResource RadOutlineEntryStyle}"
+                                              AutomationId="MaskedEntryView"
+                                              IsValueValid="{Binding IsValueValid, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              ValidationErrorMessage="{Binding ActualValidationErrorMessage, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              IsReadOnly="{Binding IsReadOnly, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              IsEnabled="{Binding IsEnabled, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              Placeholder="{Binding Placeholder, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              FontFamily="{Binding FontFamily, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              FontSize="{Binding FontSize, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              ClearButtonVisibility="{Binding ClearButtonVisibility, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              BackgroundColor="{Binding EntryBackgroundColor, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              CornerRadius="{Binding EntryCornerRadius, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              TextColor="{Binding TextColor, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              Keyboard="{Binding Keyboard, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}" />
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style x:Key="RadFlatMaskedEntryBaseStyle" TargetType="telerikMauiControls:RadMaskedEntryBase" BasedOn="{StaticResource RadMaskedEntryBaseStyle}">
+        <Setter Property="EntryBackgroundColor" Value="Transparent" />
+        <Setter Property="EntryCornerRadius" Value="4, 4, 0, 0" />
+        <Setter Property="ControlTemplate">
+            <ControlTemplate>
+                <telerikMauiControls:RadEntry Style="{StaticResource RadFlatEntryStyle}"
+                                              AutomationId="MaskedEntryView"
+                                              IsValueValid="{Binding IsValueValid, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              ValidationErrorMessage="{Binding ActualValidationErrorMessage, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              IsReadOnly="{Binding IsReadOnly, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              IsEnabled="{Binding IsEnabled, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              Placeholder="{Binding Placeholder, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              FontFamily="{Binding FontFamily, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              FontSize="{Binding FontSize, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              ClearButtonVisibility="{Binding ClearButtonVisibility, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              BackgroundColor="{Binding EntryBackgroundColor, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              CornerRadius="{Binding EntryCornerRadius, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              TextColor="{Binding TextColor, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}"
+                                              Keyboard="{Binding Keyboard, Source={x:RelativeSource AncestorType={Type telerikMauiControls:RadMaskedEntryBase}}}" />
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style TargetType="telerikMauiControls:RadEmailMaskedEntry" BasedOn="{StaticResource RadMaskedEntryBaseStyle}" />
+    <Style TargetType="telerikMauiControls:RadIPMaskedEntry" BasedOn="{StaticResource RadMaskedEntryBaseStyle}" />
+    <Style TargetType="telerikMauiControls:RadNumericMaskedEntry" BasedOn="{StaticResource RadMaskedEntryBaseStyle}" />
+    <Style TargetType="telerikMauiControls:RadRegexMaskedEntry" BasedOn="{StaticResource RadMaskedEntryBaseStyle}" />
+    <Style TargetType="telerikMauiControls:RadTextMaskedEntry" BasedOn="{StaticResource RadMaskedEntryBaseStyle}" />
+
+</ResourceDictionary>

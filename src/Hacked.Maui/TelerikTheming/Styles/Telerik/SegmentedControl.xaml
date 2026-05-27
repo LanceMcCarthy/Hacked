@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                    xmlns:telerikMauiControls="clr-namespace:Telerik.Maui.Controls;assembly=Telerik.Maui.Controls"
+                    xmlns:telerikSegmentedControl="clr-namespace:Telerik.Maui.Controls.SegmentedControl;assembly=Telerik.Maui.Controls"
+                    xmlns:telerikTheming="clr-namespace:Telerik.Maui.Controls.Theming;assembly=Telerik.Maui.Controls"
+                    x:Class="Telerik.Theming.Telerik.Styles.SegmentedControl">
+
+    <Style x:Key="RadSegmentedControlSelectionIndicatorStyle" TargetType="telerikMauiControls:RadBorder">
+        <Setter Property="BackgroundColor" Value="{DynamicResource RadPrimaryColor}" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style x:Key="RadSegmentedControlSeparatorStyle" TargetType="telerikMauiControls:RadBorder">
+        <Setter Property="WidthRequest" Value="0" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource RadBorderColor}" />
+        <Setter Property="Margin" Value="0" />
+    </Style>
+
+    <Style x:Key="RadSegmentedControlStyle" TargetType="telerikMauiControls:RadSegmentedControl">
+        <Setter Property="BorderColor" Value="Transparent" />
+        <Setter Property="BackgroundColor" Value="{DynamicResource RadBaseColor}" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="SeparatorStyle" Value="{DynamicResource RadSegmentedControlSeparatorStyle}" />
+        <Setter Property="SelectionIndicatorStyle" Value="{DynamicResource RadSegmentedControlSelectionIndicatorStyle}" />
+    </Style>
+    <Style TargetType="telerikMauiControls:RadSegmentedControl" BasedOn="{StaticResource RadSegmentedControlStyle}" />
+
+    <VisualStateGroupList x:Key="SegmentedControlItemViewVisualStates">
+        <VisualStateGroup Name="CommonStates">
+            <VisualState Name="Normal" />
+            <VisualState Name="Pressed">
+                <VisualState.Setters>
+                    <Setter Property="telerikSegmentedControl:RadSegmentedControlItemView.TextColor" Value="{DynamicResource RadOnBaseColor}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="SelectedPressed" />
+            <VisualState Name="MouseOver">
+                <VisualState.Setters>
+                    <Setter Property="telerikSegmentedControl:RadSegmentedControlItemView.TextColor" Value="{DynamicResource RadOnBaseColor}" />
+                    <Setter Property="telerikSegmentedControl:RadSegmentedControlItemView.BackgroundColor" Value="{DynamicResource RadBaseHoverColor}"/>
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="SelectedMouseOver" />
+            <VisualState Name="FocusedMouseOver">
+                <VisualState.Setters>
+                    <Setter Property="telerikSegmentedControl:RadSegmentedControlItemView.BackgroundColor" Value="{DynamicResource RadBaseHoverColor}" />
+                    <Setter Property="telerikSegmentedControl:RadSegmentedControlItemView.BorderColor" Value="{DynamicResource RadOnAppSurfaceColorAlpha30}" />
+                    <Setter Property="telerikSegmentedControl:RadSegmentedControlItemView.BorderThickness" Value="2" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="Selected" />
+            <VisualState Name="FocusedSelected">
+                <VisualState.Setters>
+                    <Setter Property="telerikSegmentedControl:RadSegmentedControlItemView.BorderColor" Value="{DynamicResource RadOnAppSurfaceColorAlpha30}" />
+                    <Setter Property="telerikSegmentedControl:RadSegmentedControlItemView.BorderThickness" Value="2" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="Focused">
+                <VisualState.Setters>
+                    <Setter Property="telerikSegmentedControl:RadSegmentedControlItemView.BorderColor" Value="{DynamicResource RadOnAppSurfaceColorAlpha30}" />
+                    <Setter Property="telerikSegmentedControl:RadSegmentedControlItemView.BorderThickness" Value="2" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="Disabled">
+                <VisualState.Setters>
+                    <Setter Property="telerikSegmentedControl:RadSegmentedControlItemView.TextColor" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+                </VisualState.Setters>
+            </VisualState>
+            <VisualState Name="DisabledSelected">
+                <VisualState.Setters>
+                    <Setter Property="telerikSegmentedControl:RadSegmentedControlItemView.TextColor" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+                    <Setter Property="telerikSegmentedControl:RadSegmentedControlItemView.SelectedTextColor" Value="{DynamicResource RadOnAppSurfaceColorAlpha50}" />
+                </VisualState.Setters>
+            </VisualState>
+        </VisualStateGroup>
+    </VisualStateGroupList>
+
+    <Style x:Key="RadSegmentedControlItemViewStyle" TargetType="telerikSegmentedControl:RadSegmentedControlItemView">
+        <Setter Property="telerikTheming:RadEffects.RippleMode" Value="Pulse" />
+        <Setter Property="telerikTheming:RadEffects.RippleColor" Value="{DynamicResource RadOnAppSurfaceColorAlpha12}" />
+        <Setter Property="TextColor" Value="{DynamicResource RadOnBaseColor}" />
+        <Setter Property="SelectedTextColor" Value="{DynamicResource RadOnPrimaryColor}" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="VisualStateManager.VisualStateGroups" Value="{StaticResource SegmentedControlItemViewVisualStates}" />
+    </Style>
+    <Style TargetType="telerikSegmentedControl:RadSegmentedControlItemView" BasedOn="{StaticResource RadSegmentedControlItemViewStyle}" />
+</ResourceDictionary>
