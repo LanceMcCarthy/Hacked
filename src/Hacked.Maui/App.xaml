@@ -59,7 +59,7 @@
                 <Setter Property="Margin"
                         Value="0,0,5,5" />
                 <Setter Property="BackgroundColor"
-                        Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray600}}" />
+                        Value="{DynamicResource RadAppSurfaceColor}" />
             </Style>
 
             <Style x:Key="DataClassLabelStyle"
@@ -69,7 +69,7 @@
                 <Setter Property="Margin"
                         Value="2" />
                 <Setter Property="TextColor"
-                        Value="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray100}}" />
+                        Value="{DynamicResource RadOnAppSurfaceColor}" />
             </Style>
 
             <Style x:Key="LargeIconRadButtonStyle"
@@ -97,28 +97,6 @@
                         </OnPlatform>
                     </Setter.Value>
                 </Setter>
-                <Setter Property="VisualStateManager.VisualStateGroups">
-                    <VisualStateGroupList>
-                        <VisualStateGroup x:Name="CommonStates">
-                            <VisualState x:Name="Normal">
-                                <VisualState.Setters>
-                                    <Setter Property="TextColor"
-                                            Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Primary}}" />
-                                    <Setter Property="BackgroundColor"
-                                            Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
-                                </VisualState.Setters>
-                            </VisualState>
-                            <VisualState x:Name="Disabled">
-                                <VisualState.Setters>
-                                    <Setter Property="TextColor"
-                                            Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray100}}" />
-                                    <Setter Property="BackgroundColor"
-                                            Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray600}}" />
-                                </VisualState.Setters>
-                            </VisualState>
-                        </VisualStateGroup>
-                    </VisualStateGroupList>
-                </Setter>
             </Style>
 
             <Style x:Key="MediumIconRadButtonStyle"
@@ -142,7 +120,7 @@
                 <Setter Property="CornerRadius"
                         Value="90" />
                 <Setter Property="BorderColor"
-                        Value="{DynamicResource Blue100Accent}" />
+                        Value="{DynamicResource RadPrimaryColor}" />
             </Style>
 
             <Style x:Key="FontAwesomeLabelStyle"

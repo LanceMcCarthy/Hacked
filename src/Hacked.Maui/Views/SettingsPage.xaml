@@ -15,44 +15,67 @@
         </Grid.RowDefinitions>
 
         <VerticalStackLayout Padding="10" Spacing="10">
-            <Label Text="Theme"
-                   FontSize="18"
-                   FontFamily="Raleway" />
-            <Picker Title="Select a theme"
-                    ItemsSource="{Binding ThemeOptions}"
-                    SelectedItem="{Binding SelectedTheme, Mode=TwoWay}" />
-
-            <Label Text="Monitored Account Backup"
-                   FontSize="18"
-                   FontFamily="Raleway" />
-            <telerik:RadButton Text="Create Backup"
-                               Command="{Binding ExportCommand}"
-                               FontFamily="Raleway"
-                               HorizontalOptions="Start"
-                               WidthRequest="160" />
-
-            <telerik:RadButton Text="Import Backup"
-                               Command="{Binding ImportCommand}"
-                               FontFamily="Raleway"
-                               HorizontalOptions="Start"
-                               WidthRequest="160" />
-            <HorizontalStackLayout Spacing="10">
-                <telerik:RadCheckBox x:Name="AutomaticRefreshCheckbox" 
-                                     IsChecked="{Binding RefreshDuringImport, Mode=TwoWay}"
-                                     CheckedColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray200}}"
-                                     CheckedSymbolColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray900}}" />
-                <Label Text="Update breaches after import"
-                       VerticalOptions="Center"
+            <VerticalStackLayout Spacing="10" 
+                                 Padding="20"
+                                 BackgroundColor="{DynamicResource RadOnAppSurfaceColorAlpha8}">
+                <Label Text="Theme Options" 
+                       FontSize="20"
                        FontFamily="Raleway" 
-                       telerik:RadCheckBox.ToggleOnTap="{x:Reference AutomaticRefreshCheckbox}"/>
-            </HorizontalStackLayout>
+                       TextColor="{DynamicResource RadOnAppSurfaceColor}" />
+                <BoxView Color="{DynamicResource RadPrimaryColor}"
+                         HeightRequest="2" />
+                <Picker Title="Select Theme"
+                        FontFamily="Raleway" 
+                        ItemsSource="{Binding ThemeOptions}"
+                        SelectedItem="{Binding SelectedTheme, Mode=TwoWay}" 
+                        BackgroundColor="{DynamicResource RadPrimaryColor}"
+                        Margin="0,5,0,0"
+                        HorizontalOptions="Start"/>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="10" 
+                                 Padding="20"
+                                 BackgroundColor="{DynamicResource RadOnAppSurfaceColorAlpha8}">
+                <Label Text="Backup Options"
+                       FontSize="20"
+                       FontFamily="Raleway" 
+                       HorizontalOptions="Start"/>
+                <BoxView Color="{DynamicResource RadPrimaryColor}"
+                         HeightRequest="2" />
+
+                <telerik:RadButton Text="Create Backup"
+                                   Command="{Binding ExportCommand}"
+                                   FontFamily="Raleway"
+                                   HorizontalOptions="Start"
+                                   WidthRequest="160" 
+                                   Margin="0,10,0,0"/>
+
+
+                <HorizontalStackLayout Spacing="10"
+                                       HorizontalOptions="Start"
+                                       Margin="0,10,0,0">
+                <telerik:RadButton Text="Import Backup"
+                                   Command="{Binding ImportCommand}"
+                                   FontFamily="Raleway"
+                                   HorizontalOptions="Center"
+                                   WidthRequest="160" />
+                    <telerik:RadCheckBox x:Name="AutomaticRefreshCheckbox" 
+                                         IsChecked="{Binding RefreshDuringImport, Mode=TwoWay}"
+                                         CheckedColor="{DynamicResource RadPrimaryColor}"/>
+                    <Label Text="Update breaches after import"
+                           VerticalOptions="Center"
+                           FontFamily="Raleway" 
+                           telerik:RadCheckBox.ToggleOnTap="{x:Reference AutomaticRefreshCheckbox}"/>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+
+            
         </VerticalStackLayout>
 
         <telerik:RadBusyIndicator IsVisible="{Binding IsBusy}"
                                   IsBusy="{Binding IsBusy}"
                                   AnimationType="Animation3"
-                                  BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
-                                  AnimationContentColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}"
+                                  BackgroundColor="{DynamicResource RadOnAppSurfaceColorAlpha30}"
                                   Grid.RowSpan="2"
                                   Grid.Row="0" />
     </Grid>

@@ -12,12 +12,10 @@
 		<NoWarn>NU1608;XC0022;CS8602</NoWarn>
     <MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
 		
-		<!-- Local macOS dev often has newer Xcode than the currently pinned .NET mobile SDK. -->
+		<!-- In case macOS dev often has newer Xcode than the current dotnet SDK expects -->
 		<ValidateXcodeVersion>false</ValidateXcodeVersion>
 
-		<!-- Display name -->
 		<ApplicationTitle>Hacked?</ApplicationTitle>
-		<!-- Version -->
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
@@ -71,127 +69,34 @@
 
   <!-- **************** Windows **************** -->
 
-  <!-- Global Settings -->
-
-  <PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
+  <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) and '$(Configuration)' == 'Debug'">
     <ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
     <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
-  </PropertyGroup>
-
-  <!-- Debug Settings -->
-
-  <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) and '$(Configuration)' == 'Debug'">
     <WindowsPackageType>None</WindowsPackageType>
     <GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
   </PropertyGroup>
 
-  <!-- Release Sideload Settings -->
-
-  <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) and '$(Configuration)' == 'Release'">
-    <WindowsPackageType>MSIX</WindowsPackageType>
-    <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
-    <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
-    <PackageCertificateThumbprint>6317f13d6d4324b3f956e732255c521558ecb235</PackageCertificateThumbprint>
-    <UapAppxPackageBuildMode>SideloadOnly</UapAppxPackageBuildMode>
-    <AppxBundle>Always</AppxBundle>
-    <AppxBundlePlatforms>x64|arm64</AppxBundlePlatforms>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-
-  <!-- cli
-    msbuild /restore /t:Publish /p:TargetFramework=net10.0-windows10.0.19041 /p:configuration=release /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=true /p:PackageCertificateThumbprint=$PFX_THUMBPRINT /p:PackageCe
-    rtificatePassword=$PFX_PASSWORD
-    
-    or with a profile
-    dotnet publish D:\Source\GitHub\Hacked\src\Hacked.Maui\Hacked.Maui.csproj -f net10.0-windows10.0.19041.0 -p:PublishProfile=BetaTesters-Windows-MSIX-Bundle
-    -->
-
   <!-- **************** Android **************** -->
-
-	<!-- Global Settings -->
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
 		<ApplicationId>com.lancelotsoftware.hacked</ApplicationId>
 		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
 	</PropertyGroup>
 
-  <!-- Release Settings -->
-
-	<!--<PropertyGroup Condition="$(TargetFramework.Contains('-android')) and '$(Configuration)' == 'Release'">
-        <AndroidKeyStore>True</AndroidKeyStore>
-        <AndroidSigningKeyStore>dvlup.keystore</AndroidSigningKeyStore>
-        <AndroidSigningStorePass>$(android_keystore_password)</AndroidSigningStorePass>
-        <AndroidSigningKeyAlias>dvlup.alias</AndroidSigningKeyAlias>
-        <AndroidSigningKeyPass>$(android_keystore_alias_password)</AndroidSigningKeyPass>
-    </PropertyGroup>-->
-
-
 	<!-- **************** iOS **************** -->
 
-  <!-- Global Settings -->
   <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
     <ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
     <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
   </PropertyGroup>
 
-	<!-- Debug - Simulator
-  <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
-    <ProvisioningType>manual</ProvisioningType>
-    <RuntimeIdentifier>iossimulator-x64</RuntimeIdentifier>
-	<CodesignKey>Apple Development: Created via API (F85G643H5K)</CodesignKey>
-	<CodesignProvision>VS: com.lancelotsoftware.HackedApp Development</CodesignProvision>
-  </PropertyGroup>-->
-
-	<!-- Debug - Local iPhone 
-  <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Debug'">
-    <ProvisioningType>manual</ProvisioningType>
-    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-    <CodesignKey>Apple Development: Lance McCarthy (AJ9XMDH9A2)</CodesignKey>
-    <CodesignProvision>Hacked_iOS_Development_2023.mobileprovision</CodesignProvision>
-  </PropertyGroup>-->
-
-	<!-- Release - AdHoc
-  <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
-    <ProvisioningType>manual</ProvisioningType>
-    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-    <CodesignKey>Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
-    <CodesignProvision>Hacked_AdHoc_Distribution_2023.mobileprovision</CodesignProvision>
-  </PropertyGroup>-->
-
-	<!-- Release - App Store
-  <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
-    <ProvisioningType>manual</ProvisioningType>
-    <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
-    <CodesignKey>Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
-    <CodesignProvision>Hacked_AppStore_Distribution_2023.mobileprovision</CodesignProvision>
-  </PropertyGroup>-->
-
-
 	<!-- **************** MacCatalyst **************** -->
 
-  <!-- Global -->
-  <PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst'))">
+  <PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst')) and '$(Configuration)' == 'Debug'">
     <ApplicationTitle>Hacked</ApplicationTitle>
     <ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
     <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
     <RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
   </PropertyGroup>
-
-	<!--<PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst')) and '$(Configuration)' == 'Debug'">
-        <RuntimeIdentifier>maccatalyst-x64</RuntimeIdentifier>
-        <CodesignKey>Apple Development: Lance McCarthy (AJ9XMDH9A2)</CodesignKey>
-        <CodesignProvision>HackedApp_Dev_MacOS_2022.mobileprovision</CodesignProvision>
-    </PropertyGroup>-->
-
-	<!--<PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst')) and '$(Configuration)' == 'Release'">
-        <RuntimeIdentifier>maccatalyst-x64</RuntimeIdentifier>
-        <CodesignKey>Apple Distribution: Lancelot Software, LLC (L65255N3F7)</CodesignKey>
-        <CodesignProvision>HackedApp_MacStore_2022.provisionprofile</CodesignProvision>
-    </PropertyGroup>-->
-
-
-
-	
-
 </Project>

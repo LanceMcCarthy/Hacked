@@ -28,65 +28,65 @@ public partial class MonitoredAccountsPage
             });
         }
 
-        ApplyGroupingPanelTheme();
+        //ApplyGroupingPanelTheme();
 
-        if (Application.Current != null)
-            Application.Current.RequestedThemeChanged += OnThemeChanged;
+        //if (Application.Current != null)
+        //    Application.Current.RequestedThemeChanged += OnThemeChanged;
 
-        MonitoredAccountDataGrid.Unloaded += (_, _) =>
-        {
-            if (Application.Current != null)
-                Application.Current.RequestedThemeChanged -= OnThemeChanged;
-        };
+        //MonitoredAccountDataGrid.Unloaded += (_, _) =>
+        //{
+        //    if (Application.Current != null)
+        //        Application.Current.RequestedThemeChanged -= OnThemeChanged;
+        //};
     }
 
-    private void OnThemeChanged(object? sender, AppThemeChangedEventArgs e) =>
-        ApplyGroupingPanelTheme();
+    //private void OnThemeChanged(object? sender, AppThemeChangedEventArgs e) =>
+    //    ApplyGroupingPanelTheme();
 
-    private void ApplyGroupingPanelTheme()
-    {
-        var resources = Application.Current?.Resources;
-        if (resources == null) return;
+    //private void ApplyGroupingPanelTheme()
+    //{
+    //    var resources = Application.Current?.Resources;
+    //    if (resources == null) return;
 
-        bool isLight = Application.Current?.RequestedTheme != AppTheme.Dark;
+    //    bool isLight = Application.Current?.RequestedTheme != AppTheme.Dark;
 
-        var servicePanel = FindVisualDescendant<DataGridServicePanel>(MonitoredAccountDataGrid);
-        if (servicePanel != null)
-        {
-            servicePanel.BackgroundColor = isLight
-                ? (Color)resources["Gray100"]
-                : (Color)resources["Gray900"];
-            servicePanel.BorderColor = isLight
-                ? (Color)resources["Gray300"]
-                : (Color)resources["Gray600"];
-        }
+    //    var servicePanel = FindVisualDescendant<DataGridServicePanel>(MonitoredAccountDataGrid);
+    //    if (servicePanel != null)
+    //    {
+    //        servicePanel.BackgroundColor = isLight
+    //            ? (Color)resources["Gray100"]
+    //            : (Color)resources["Gray900"];
+    //        servicePanel.BorderColor = isLight
+    //            ? (Color)resources["Gray300"]
+    //            : (Color)resources["Gray600"];
+    //    }
 
-        var groupingPanel = FindVisualDescendant<DataGridGroupingPanel>(MonitoredAccountDataGrid);
-        if (groupingPanel != null)
-        {
-            var label = FindVisualDescendant<Label>(groupingPanel);
-            if (label != null)
-            {
-                label.TextColor = isLight
-                    ? (Color)resources["PrimaryHighContrast"]
-                    : (Color)resources["Gray100"];
-            }
-        }
-    }
+    //    var groupingPanel = FindVisualDescendant<DataGridGroupingPanel>(MonitoredAccountDataGrid);
+    //    if (groupingPanel != null)
+    //    {
+    //        var label = FindVisualDescendant<Label>(groupingPanel);
+    //        if (label != null)
+    //        {
+    //            label.TextColor = isLight
+    //                ? (Color)resources["PrimaryHighContrast"]
+    //                : (Color)resources["Gray100"];
+    //        }
+    //    }
+    //}
 
-    private static T? FindVisualDescendant<T>(IVisualTreeElement element) where T : class
-    {
-        foreach (var child in element.GetVisualChildren())
-        {
-            if (child is T result) return result;
-            if (child is IVisualTreeElement ve)
-            {
-                var found = FindVisualDescendant<T>(ve);
-                if (found != null) return found;
-            }
-        }
-        return null;
-    }
+    //private static T? FindVisualDescendant<T>(IVisualTreeElement element) where T : class
+    //{
+    //    foreach (var child in element.GetVisualChildren())
+    //    {
+    //        if (child is T result) return result;
+    //        if (child is IVisualTreeElement ve)
+    //        {
+    //            var found = FindVisualDescendant<T>(ve);
+    //            if (found != null) return found;
+    //        }
+    //    }
+    //    return null;
+    //}
 
     private async void MoreDetailsButton_OnClicked(object? sender, EventArgs e)
     {

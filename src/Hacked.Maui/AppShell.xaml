@@ -16,7 +16,7 @@
             <FontImageSource FontAutoScalingEnabled="True"
                              FontFamily="Font Awesome 6 Free Regular"
                              Glyph="{x:Static res:IconFont.Users}"
-                             Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}"/>
+                             Color="{DynamicResource RadOnAppSurfaceColor}"/>
         </FlyoutItem.Icon>
         <ShellContent Title="Accounts"
                       ContentTemplate="{DataTemplate views:MonitoredAccountsPage}"
@@ -31,7 +31,7 @@
             <FontImageSource FontAutoScalingEnabled="True"
                              FontFamily="Font Awesome 6 Free Regular"
                              Glyph="{x:Static res:IconFont.ScrewdriverWrench}"
-                             Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}"/>
+                             Color="{DynamicResource RadOnAppSurfaceColor}"/>
         </FlyoutItem.Icon>
         <ShellContent Title="Settings"
                       ContentTemplate="{DataTemplate views:SettingsPage}"
@@ -45,7 +45,7 @@
             <FontImageSource FontAutoScalingEnabled="True"
                              FontFamily="Font Awesome 6 Free Regular"
                              Glyph="{x:Static res:IconFont.InfoCircle}"
-                             Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}"/>
+                             Color="{DynamicResource RadOnAppSurfaceColor}"/>
         </FlyoutItem.Icon>
         <ShellContent Title="About"
                       ContentTemplate="{DataTemplate views:AboutPage}"

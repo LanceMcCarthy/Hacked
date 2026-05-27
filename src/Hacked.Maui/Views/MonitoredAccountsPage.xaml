@@ -15,86 +15,6 @@
                 android:Application.WindowSoftInputModeAdjust="Resize"
                 x:Name="ThisPage">
     <views:PageBase.Resources>
-        <Style x:Key="MonitoredAccountsGridHeaderStyle"
-               TargetType="telerik:DataGridColumnHeaderAppearance">
-            <Setter Property="BackgroundColor"
-                    Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}" />
-            <Setter Property="HoverBackgroundColor"
-                    Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
-            <Setter Property="TextColor"
-                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
-            <Setter Property="BorderColor"
-                    Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}" />
-            <Setter Property="SortIndicatorColor"
-                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray200}}" />
-            <Setter Property="IndicatorColor"
-                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray200}}" />
-            <Setter Property="FilterIndicatorTextColor"
-                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray200}}" />
-            <Setter Property="FilterIndicatorActiveTextColor"
-                    Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Yellow100Accent}}" />
-        </Style>
-
-        <Style x:Key="MonitoredAccountsGridFooterStyle"
-               TargetType="telerik:DataGridColumnFooterAppearance">
-            <Setter Property="BackgroundColor"
-                    Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}" />
-            <Setter Property="TextColor"
-                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
-            <Setter Property="BorderColor"
-                    Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}" />
-        </Style>
-
-        <Style x:Key="MonitoredAccountsGroupHeaderStyle"
-               TargetType="telerik:DataGridGroupHeaderAppearance">
-            <Setter Property="BackgroundColor"
-                    Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}" />
-            <Setter Property="BorderColor"
-                    Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}" />
-            <Setter Property="TextColor"
-                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
-            <Setter Property="AggregatesTextColor"
-                    Value="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}" />
-            <Setter Property="ButtonTextColor"
-                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray200}}" />
-        </Style>
-
-        <Style x:Key="MonitoredAccountsGridTextCellStyle"
-               TargetType="telerik:DataGridTextCellAppearance">
-            <Setter Property="TextColor"
-                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
-            <Setter Property="SelectedTextColor"
-                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
-            <Setter Property="HoverTextColor"
-                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource PrimaryHighContrast}}" />
-        </Style>
-
-        <Style x:Key="MonitoredAccountsGridToggleStyle"
-               TargetType="telerik:DataGridToggleRowDetailsCellAppearance">
-            <Setter Property="ButtonTextColor"
-                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
-            <Setter Property="SelectedButtonTextColor"
-                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
-            <Setter Property="HoverButtonTextColor"
-                    Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource PrimaryHighContrast}}" />
-        </Style>
-
-        <Style x:Key="MonitoredAccountsGridRowStyle"
-               TargetType="telerik:DataGridRowBackgroundAppearance">
-            <Setter Property="BackgroundColor"
-                    Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}" />
-            <Setter Property="BorderColor"
-                    Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
-        </Style>
-
-        <Style x:Key="MonitoredAccountsGridAlternateRowStyle"
-               TargetType="telerik:DataGridRowBackgroundAppearance">
-            <Setter Property="BackgroundColor"
-                    Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}" />
-            <Setter Property="BorderColor"
-                    Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
-        </Style>
-
         <Style x:Key="AddOverlayIconButtonStyle"
                TargetType="telerik:RadButton">
             <Setter Property="BorderThickness"
@@ -102,40 +22,6 @@
             <Setter Property="Padding"
                 Value="5" />
             <Setter Property="VisualStateManager.VisualStateGroups">
-            <VisualStateGroupList>
-                <VisualStateGroup x:Name="CommonStates">
-                <VisualState x:Name="Normal">
-                    <VisualState.Setters>
-                    <Setter Property="TextColor"
-                        Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Yellow100Accent}}" />
-                    <Setter Property="BorderColor"
-                        Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}" />
-                    <Setter Property="BackgroundColor"
-                        Value="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray900}}" />
-                    </VisualState.Setters>
-                </VisualState>
-                <VisualState x:Name="PointerOver">
-                    <VisualState.Setters>
-                    <Setter Property="TextColor"
-                        Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource White}}" />
-                    <Setter Property="BorderColor"
-                        Value="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource White}}" />
-                    <Setter Property="BackgroundColor"
-                        Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
-                    </VisualState.Setters>
-                </VisualState>
-                <VisualState x:Name="Pressed">
-                    <VisualState.Setters>
-                    <Setter Property="TextColor"
-                        Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource White}}" />
-                    <Setter Property="BorderColor"
-                        Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}" />
-                    <Setter Property="BackgroundColor"
-                        Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray600}}" />
-                    </VisualState.Setters>
-                </VisualState>
-                </VisualStateGroup>
-            </VisualStateGroupList>
             </Setter>
         </Style>
     </views:PageBase.Resources>
@@ -149,7 +35,7 @@
             <ToolbarItem.IconImageSource>
                 <FontImageSource FontFamily="Font Awesome 6 Free Regular"
                                  Glyph="{x:Static res:IconFont.Plus}"
-                                 Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}" />
+                                 Color="{DynamicResource RadOnAppSurfaceColor}" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
     </views:PageBase.ToolbarItems>
@@ -161,22 +47,14 @@
                              SelectedItem="{Binding SelectedAccount}"
                              AutoGenerateColumns="False"
                              ShowColumnFooters="True"
-                             RowBackgroundStyle="{StaticResource MonitoredAccountsGridRowStyle}"
-                             AlternateRowBackgroundStyle="{StaticResource MonitoredAccountsGridAlternateRowStyle}"
-                             GridLinesColor="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
-                             BorderBrush="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}"
                              Loaded="MonitoredAccountDataGrid_OnLoaded">
             <telerik:RadDataGrid.Commands>
                 <commands:CustomDataGridCommand Id="CellTap"
                                                 Command="{Binding CellTapCommand}" />
             </telerik:RadDataGrid.Commands>
             <telerik:RadDataGrid.Columns>
-                <telerik:DataGridToggleRowDetailsColumn CellContentStyle="{StaticResource MonitoredAccountsGridToggleStyle}"
-                                                        HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
-                                                        FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}" />
+                <telerik:DataGridToggleRowDetailsColumn />
                 <telerik:DataGridTemplateColumn HeaderText="Options"
-                                                HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
-                                                FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}"
                                                 SizeMode="Auto">
                     <telerik:DataGridTemplateColumn.CellContentTemplate>
                         <DataTemplate x:DataType="models:MonitoredAccount">
@@ -200,8 +78,8 @@
 
                                 <telerik:RadBusyIndicator IsBusy="{Binding IsUpdating}"
                                                           IsVisible="{Binding IsUpdating}"
-                                                          BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
-                                                          AnimationContentColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}"
+                                                          BackgroundColor="{DynamicResource RadOnAppSurfaceColorAlpha30}"
+                                                          AnimationContentColor="{DynamicResource RadPrimaryColor}"
                                                           InputTransparent="{Binding IsUpdating, Converter={StaticResource InvertBoolConverter}}"
                                                           HorizontalOptions="Fill"
                                                           VerticalOptions="Fill"
@@ -211,11 +89,9 @@
                         </DataTemplate>
                     </telerik:DataGridTemplateColumn.CellContentTemplate>
                 </telerik:DataGridTemplateColumn>
+
                 <telerik:DataGridTextColumn x:Name="AddressColumn"
                                             PropertyName="Address"
-                                            HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
-                                            FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}"
-                                            CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                             HeaderText="Account">
                     <telerik:DataGridTextColumn.AggregateDescriptors>
                         <telerik:PropertyAggregateDescriptor PropertyName="Address"
@@ -225,9 +101,6 @@
                 </telerik:DataGridTextColumn>
                 <telerik:DataGridTextColumn x:Name="BreachCountColumn"
                                             PropertyName="Breaches.Count"
-                                            HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
-                                            FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}"
-                                            CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                             HeaderText="Breaches">
                     <!-- Workaround in DataGrid.Loaded event
                     <telerik:DataGridTextColumn.AggregateDescriptors>
@@ -236,21 +109,13 @@
                                                              Caption="Average per account: " />
                     </telerik:DataGridTextColumn.AggregateDescriptors>-->
                 </telerik:DataGridTextColumn>
+
                 <telerik:DataGridDateColumn PropertyName="LastUpdated"
-                                            HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
-                                            FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}"
-                                            CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                             HeaderText="LastUpdated"
                                             CellContentFormat="{}{0:g}" />
                 <telerik:DataGridBooleanColumn PropertyName="HasNewBreaches"
-                                               HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
-                                               FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}"
-                                               CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                                HeaderText="New Breaches?" />
                 <telerik:DataGridNumericalColumn PropertyName="NewBreachCount"
-                                                 HeaderStyle="{StaticResource MonitoredAccountsGridHeaderStyle}"
-                                                 FooterStyle="{StaticResource MonitoredAccountsGridFooterStyle}"
-                                                 CellContentStyle="{StaticResource MonitoredAccountsGridTextCellStyle}"
                                                  HeaderText="New Breach Count">
                     <telerik:DataGridNumericalColumn.AggregateDescriptors>
                         <telerik:PropertyAggregateDescriptor PropertyName="NewBreachCount"
@@ -261,19 +126,19 @@
             </telerik:RadDataGrid.Columns>
             <telerik:RadDataGrid.RowDetailsTemplate>
                 <DataTemplate x:DataType="models:MonitoredAccount">
-                    <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray900}}"
+                    <Grid BackgroundColor="{DynamicResource RadSurfaceAltColor}"
                           ColumnDefinitions="Auto,*">
                         <VerticalStackLayout Spacing="5"
                                              Padding="10"
                                              HorizontalOptions="Start">
                             <Label Text="{Binding LastUpdated, StringFormat='Last Update: {0:g}'}"
-                                   TextColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
+                                   TextColor="{DynamicResource RadOnAppSurfaceColor}" />
 
                             <HorizontalStackLayout Spacing="5">
                                 <Label Text="{Binding Breaches.Count, StringFormat='Breaches: {0}'}"
-                                       TextColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}" />
+                                       TextColor="{DynamicResource RadOnAppSurfaceColor}" />
                                 <Label Text="{Binding NewBreachCount, StringFormat='({0} new)'}"
-                                       TextColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}"
+                                       TextColor="{DynamicResource RadOnAppSurfaceColor}"
                                        IsVisible="{Binding HasNewBreaches}" />
                             </HorizontalStackLayout>
 
@@ -281,15 +146,12 @@
                                                    HorizontalOptions="Start"
                                                    VerticalOptions="End"
                                                    Margin="0,10,0,0">
-                                <telerik:RadButton BackgroundColor="{StaticResource Tertiary}"
-                                                   TextColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray100}}"
+                                <telerik:RadButton BackgroundColor="{DynamicResource RadPrimaryColor}"
                                                    Text="more details..."
                                                    Clicked="MoreDetailsButton_OnClicked"
                                                    CommandParameter="{Binding .}"
                                                    CornerRadius="5" />
-                                <telerik:RadButton BackgroundColor="{StaticResource Complimentary1}"
-                                                   TextColor="{AppThemeBinding Light={StaticResource PrimaryHighContrast}, Dark={StaticResource Gray900}}"
-                                                   Text="clear new"
+                                <telerik:RadButton Text="clear new"
                                                    Clicked="ClearNewButton_OnClicked"
                                                    CommandParameter="{Binding .}"
                                                    CornerRadius="5" />
@@ -313,19 +175,18 @@
                             </telerik:RadCollectionView.ItemViewStyle>
                             <telerik:RadCollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="models:Breach">
-                                    <telerik:RadBorder Background="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                                    <telerik:RadBorder BackgroundColor="{DynamicResource RadAppSurfaceColor}"
                                                        CornerRadius="2">
                                         <Grid ColumnDefinitions="Auto, *"
                                               RowDefinitions="Auto, *">
                                             <telerik:RadBorder WidthRequest="75"
                                                                HeightRequest="75"
-                                                               CornerRadius="5"
-                                                               Padding="5"
+                                                               CornerRadius="2"
                                                                Margin="5"
-                                                               BackgroundColor="{StaticResource DarkTranslucent}">
+                                                               BackgroundColor="{DynamicResource RadOnAppSurfaceColor}">
                                                 <Image Source="{Binding LogoPath}" />
                                             </telerik:RadBorder>
-                                            <VerticalStackLayout Margin="10,5,10,5"
+                                            <VerticalStackLayout Margin="10,5,5,5"
                                                                  Grid.Column="1">
                                                 <Label Text="{Binding Name}"
                                                        FontAttributes="Bold" />
@@ -335,7 +196,7 @@
                                             </VerticalStackLayout>
 
                                             <Label Text="{x:Static res:IconFont.ExclamationTriangle}"
-                                                   TextColor="{AppThemeBinding Light={StaticResource Complimentary1}, Dark={StaticResource Yellow100Accent}}"
+                                                   TextColor="{DynamicResource RadWarningColor}"
                                                    Style="{StaticResource FontAwesomeLabelStyle}"
                                                    IsVisible="{Binding IsNew}"
                                                    HorizontalOptions="End"
@@ -360,12 +221,12 @@
         </telerik:RadDataGrid>
 
         <!-- Add New Account Overlay -->
-        <Grid BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
+        <Grid BackgroundColor="{DynamicResource RadOnAppSurfaceColorAlpha50}"
               IsVisible="{Binding IsOverlayVisible}">
             <telerik:RadBorder x:Name="OverlayBorder"
                                CornerRadius="5"
-                               BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray900}}"
-                               BorderColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}"
+                               BackgroundColor="{DynamicResource RadAppSurfaceColor}"
+                               BorderColor="{DynamicResource RadPrimaryColor}"
                                Padding="10"
                                Margin="{OnPlatform WinUI='120,40', MacCatalyst='120,40', iOS='40,40', Android='40,40'}"
                                BorderThickness="2">
@@ -376,7 +237,7 @@
                     <Label Text="Add account(s) to monitor:"
                            HorizontalOptions="Start"
                            FontAttributes="Bold"
-                           TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}"
+                           TextColor="{DynamicResource RadPrimaryColor}"
                            Grid.Row="0" />
 
                     <telerik:RadCollectionView x:Name="PendingAccountsView"
@@ -398,7 +259,7 @@
                                       ColumnSpacing="5"
                                       RowSpacing="5"
                                       Padding="4"
-                                      BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                                      BackgroundColor="{DynamicResource RadBaseEmphasisColor}">
                                     <VisualStateManager.VisualStateGroups>
                                         <VisualStateGroupList>
                                             <VisualStateGroup x:Name="CommonStates">
@@ -411,7 +272,7 @@
                                                 <VisualState x:Name="PointerOver">
                                                     <VisualState.Setters>
                                                         <Setter Property="BackgroundColor"
-                                                                Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray600}}" />
+                                                                Value="{DynamicResource RadPrimaryHoverColor}" />
                                                     </VisualState.Setters>
                                                 </VisualState>
                                             </VisualStateGroup>
@@ -421,9 +282,7 @@
                                                       Placeholder="enter email/username/phone..."
                                                       Text="{Binding Address, Mode=TwoWay}"
                                                       HorizontalOptions="Fill"
-                                                      BackgroundColor="{OnPlatform MacCatalyst={AppThemeBinding Light={StaticResource WhiteBrush}, Dark={StaticResource Gray100Brush}}, Default={AppThemeBinding Light={StaticResource WhiteBrush}, Dark={StaticResource BlackBrush}}}"
-                                                      TextColor="{OnPlatform MacCatalyst={AppThemeBinding Light={StaticResource Black}, Dark={StaticResource Black}}, Default={AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}}"
-                                                      PlaceholderColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray300}}"
+                                                      PlaceholderColor="{DynamicResource RadPrimaryOnSubtleColor}"
                                                       commhelpers:FocusElementHelper.IsFocused="{Binding IsFocused, Mode=TwoWay}" />
                                     <telerik:RadButton Text="➖"
                                                        Clicked="RemovePendingItemButton_OnClicked"

@@ -22,7 +22,7 @@
     </views:PageBase.Resources>
 
     <Grid RowDefinitions="Auto,*">
-        <Grid BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource Gray900}}">
+        <Grid BackgroundColor="{DynamicResource RadAppSurfaceColor}">
             <!--<controls:ImageCollage AssociatedAccount="{Binding SelectedAccount}"
                                    Margin="5"/>-->
             
@@ -33,19 +33,19 @@
                        FontAttributes="Bold"
                        HorizontalOptions="Center"
                        FontSize="22"
-                      TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}"/>
+                      TextColor="{DynamicResource RadPrimaryColor}"/>
                 <Label Text="{Binding SelectedAccount.Breaches.Count, StringFormat='Breach Count: {0}'}"
-                      TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}"
+                      TextColor="{DynamicResource RadPrimaryColor}"
                        HorizontalOptions="Center" 
                        FontSize="16"/>
                 <Label Text="{Binding SelectedAccount.LastUpdated, StringFormat='Last Updated: {0:g}'}"
-                      TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray100}}"
+                      TextColor="{DynamicResource RadPrimaryColor}"
                        HorizontalOptions="Center" 
                        FontSize="12"/>
             </VerticalStackLayout>
 
             <Grid IsVisible="{Binding SelectedAccount.IsUpdating}"
-                  BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}">
+                  BackgroundColor="{DynamicResource RadOnAppSurfaceColorAlpha50}">
                 <Label Text="Is Refreshing..."
                        HorizontalTextAlignment="Center"
                        VerticalTextAlignment="Center"
@@ -95,8 +95,8 @@
         <telerik:RadBusyIndicator IsVisible="{Binding SelectedAccount.IsUpdating}"
                                   IsBusy="{Binding SelectedAccount.IsUpdating}"
                                   AnimationType="Animation3"
-                                  BackgroundColor="{AppThemeBinding Light={StaticResource LightTranslucent}, Dark={StaticResource DarkTranslucent}}"
-                                  AnimationContentColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}" 
+                                  BackgroundColor="{DynamicResource RadOnAppSurfaceColorAlpha50}"
+                                  AnimationContentColor="{DynamicResource RadPrimaryColor}" 
                                   Grid.RowSpan="2"/>
     </Grid>
 </views:PageBase>
