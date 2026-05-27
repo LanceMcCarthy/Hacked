@@ -182,17 +182,21 @@
                                             <telerik:RadBorder WidthRequest="75"
                                                                HeightRequest="75"
                                                                CornerRadius="2"
-                                                               Margin="5"
+                                                               Margin="5,10,5,5"
                                                                BackgroundColor="{DynamicResource RadOnAppSurfaceColor}">
                                                 <Image Source="{Binding LogoPath}" />
                                             </telerik:RadBorder>
-                                            <VerticalStackLayout Margin="10,5,5,5"
+                                            <VerticalStackLayout Margin="10,10,5,5"
                                                                  Grid.Column="1">
                                                 <Label Text="{Binding Name}"
-                                                       FontAttributes="Bold" />
-                                                <Label Text="{Binding BreachDate, StringFormat='Breached: {0:d}'}" />
-                                                <Label Text="{Binding PwnCount, StringFormat='Accounts: {0}'}" />
-                                                <Label Text="{Binding DataClasses.Count, StringFormat='Data types: {0}'}" />
+                                                       FontAttributes="Bold" 
+                                                       TextColor="{DynamicResource RadOnAppSurfaceColorAlpha80}"/>
+                                                <Label Text="{Binding BreachDate, StringFormat='Breached: {0:d}'}" 
+                                                       TextColor="{DynamicResource RadOnAppSurfaceColorAlpha50}"/>
+                                                <Label Text="{Binding PwnCount, StringFormat='Accounts: {0}'}" 
+                                                       TextColor="{DynamicResource RadOnAppSurfaceColorAlpha50}"/>
+                                                <Label Text="{Binding DataClasses.Count, StringFormat='Data types: {0}'}" 
+                                                       TextColor="{DynamicResource RadOnAppSurfaceColorAlpha50}"/>
                                             </VerticalStackLayout>
 
                                             <Label Text="{x:Static res:IconFont.ExclamationTriangle}"

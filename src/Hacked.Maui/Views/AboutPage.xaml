@@ -30,7 +30,7 @@
                         <Image.Source>
                             <FontImageSource FontFamily="Font Awesome 6 Free Regular" 
                                              Glyph="{x:Static res:IconFont.Gear}" 
-                                             Color="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray200}}"
+                                             Color="{DynamicResource RadSeriesDColor}"
                                              FontAutoScalingEnabled="True" 
                                              Size="72"/>
                         </Image.Source>
@@ -41,7 +41,7 @@
                         <Image.Source>
                             <FontImageSource FontFamily="Font Awesome 6 Free Regular" 
                                              Glyph="{x:Static res:IconFont.Gear}" 
-                                             Color="{AppThemeBinding Light={StaticResource Complimentary1}, Dark={StaticResource Yellow200Accent}}" 
+                                             Color="{DynamicResource RadSeriesDBoldColor}" 
                                              FontAutoScalingEnabled="True" 
                                              Size="72"/>
                         </Image.Source>
@@ -50,7 +50,7 @@
                         <Image.Source>
                             <FontImageSource FontFamily="Font Awesome 6 Free Regular" 
                                              Glyph="{x:Static res:IconFont.Gear}" 
-                                             Color="{AppThemeBinding Light={StaticResource Complimentary2}, Dark={StaticResource Gray300}}"
+                                             Color="{DynamicResource RadSeriesDBolderColor}"
                                              FontAutoScalingEnabled="True" 
                                              Size="72"/>
                         </Image.Source>
@@ -60,7 +60,8 @@
                        HorizontalOptions="Center"
                        Text="Lancelot Software" 
                        FontFamily="Raleway"
-                       FontAttributes="Bold"/>
+                       FontAttributes="Bold"
+                       TextColor="{DynamicResource RadOnAppSurfaceColorAlpha80}"/>
             </VerticalStackLayout>
         </Grid>
 
@@ -72,15 +73,20 @@
 
             <HorizontalStackLayout Spacing="5">
                 <Label Text="v"
-                       Margin="0,0,-4,0"/>
-                <Label Text="{Binding AppVersion}"/>
-                <Label Text="© 2016-2024 Lancelot Software"/>
+                       Margin="0,0,-4,0"
+                       TextColor="{DynamicResource RadOnAppSurfaceColorAlpha50}"/>
+                <Label Text="{Binding AppVersion}"
+                       TextColor="{DynamicResource RadOnAppSurfaceColorAlpha50}"/>
+                <Label Text="© 2016-2024 Lancelot Software"
+                       TextColor="{DynamicResource RadOnAppSurfaceColorAlpha50}"/>
             </HorizontalStackLayout>
 
             <Label FontAttributes="Bold"
                    Text="Credits" />
-            <Label Text="Json.NET © 2016 Newtonsoft" />
-            <Label Text="Data from Haveibeenpwned by Troy Hunt"/>
+            <Label Text="Json.NET © 2016 Newtonsoft" 
+                   TextColor="{DynamicResource RadOnAppSurfaceColorAlpha30}"/>
+            <Label Text="Data from Haveibeenpwned by Troy Hunt"
+                   TextColor="{DynamicResource RadOnAppSurfaceColorAlpha30}"/>
         </VerticalStackLayout>
 
         <VerticalStackLayout Grid.Row="3"
