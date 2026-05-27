@@ -15,6 +15,13 @@
         </Grid.RowDefinitions>
 
         <VerticalStackLayout Padding="10" Spacing="10">
+            <Label Text="Theme"
+                   FontSize="18"
+                   FontFamily="Raleway" />
+            <Picker Title="Select a theme"
+                    ItemsSource="{Binding ThemeOptions}"
+                    SelectedItem="{Binding SelectedTheme, Mode=TwoWay}" />
+
             <Label Text="Monitored Account Backup"
                    FontSize="18"
                    FontFamily="Raleway" />

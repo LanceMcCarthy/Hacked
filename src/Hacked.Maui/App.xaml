@@ -12,7 +12,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
-                <local:TelerikThemeResources Theme="TelerikTurquoise" />
+                <local:TelerikThemeResources Theme="Default" />
             </ResourceDictionary.MergedDictionaries>
 
             <commhelpconv:StringToUriConverter x:Key="StringToUriConverter" />
