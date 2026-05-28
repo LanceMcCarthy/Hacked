@@ -871,6 +871,27 @@ jobs:
             fi
           }
 
+          release_file_name() {
+            local file_name="$1"
+            local path="release-upload/${file_name}"
+
+            if [[ ! -f "$path" ]]; then
+              echo "Expected release file not found: $path" >&2
+              exit 1
+            fi
+
+            basename "$path"
+          }
+
+          download_row() {
+            local platform="$1"
+            local file_name="$2"
+            local release_file
+
+            release_file="$(release_file_name "$file_name")"
+            printf '| %s | `%s` |\n' "$platform" "$release_file"
+          }
+
           {
             echo "## What's changed"
             if [[ -n "$PREVIOUS_TAG" ]]; then
@@ -890,13 +911,13 @@ jobs:
             echo "## Downloads"
             echo "| Platform | File |"
             echo "|----------|---------|"
-            echo "| Android (sideload) | `.apk` |"
-            echo "| Android (store upload) | `.aab` |"
-            echo "| Windows (installer) | `.msixbundle` |"
-            echo "| Windows (store upload) | `.msixupload` |"
-            echo "| macOS (installer) | `.pkg` |"
-            echo "| iOS (sideload) | `-adhoc.ipa` |"
-            echo "| iOS (store upload) | `-store.ipa` |"
+            download_row "Android (sideload)" "${PREFIX}_android-signed.apk"
+            download_row "Android (store upload)" "${PREFIX}_android-signed.aab"
+            download_row "Windows (installer)" "${PREFIX}_windows.msixbundle"
+            download_row "Windows (store upload)" "${PREFIX}_msstore.msixupload"
+            download_row "macOS (installer)" "${PREFIX}_mac.pkg"
+            download_row "iOS (sideload)" "${PREFIX}_ios-adhoc.ipa"
+            download_row "iOS (store upload)" "${PREFIX}_ios-store.ipa"
           } >> release-notes.md
 
           cat release-notes.md
