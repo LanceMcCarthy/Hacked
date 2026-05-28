@@ -70,6 +70,10 @@
 
   <!-- **************** Windows **************** -->
 
+	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
+		<ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
+	</PropertyGroup>
+
   <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) and '$(Configuration)' == 'Debug'">
     <WindowsPackageType>None</WindowsPackageType>
     <GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>
@@ -78,6 +82,10 @@
 
   <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) and '$(Configuration)' == 'Release'">
     <WindowsPackageType>MSIX</WindowsPackageType>
+		<GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
+		<AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
+		<PackageCertificateThumbprint>6317f13d6d4324b3f956e732255c521558ecb235</PackageCertificateThumbprint>
+		<UapAppxPackageBuildMode>SideloadOnly</UapAppxPackageBuildMode>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x64|arm64</AppxBundlePlatforms>
     <PlatformTarget>AnyCPU</PlatformTarget>
