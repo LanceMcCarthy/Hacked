@@ -822,6 +822,7 @@ jobs:
           set -euo pipefail
 
           VERSION="${{needs.shared-resources.outputs.app_version}}"
+          PREFIX="${{env.APP_NAME}}_v${VERSION}"
           CURRENT_TAG="v${VERSION}"
           PREVIOUS_TAG="$(git for-each-ref --sort=-creatordate --format='%(refname:short)' refs/tags/v* | awk -v current="$CURRENT_TAG" '$0 != current { print; exit }')"
 
