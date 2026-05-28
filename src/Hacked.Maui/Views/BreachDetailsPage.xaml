@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<views:PageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<cm:PageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                xmlns:views="clr-namespace:Hacked.Maui.Views"
+                xmlns:cm="clr-namespace:Hacked.Maui.Common"
                 xmlns:viewModels="clr-namespace:Hacked.Maui.ViewModels"
                 xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
                 x:Class="Hacked.Maui.Views.BreachDetailsPage"
@@ -18,7 +18,7 @@
                            HeightRequest="75"
                            CornerRadius="5"
                            Padding="10"
-                           BackgroundColor="{AppThemeBinding Light={StaticResource DarkTranslucent}, Dark={StaticResource Gray600}}"
+                           BackgroundColor="{DynamicResource RadAppSurfaceColorAlpha16}"
                            Grid.Row="0"
                            Grid.Column="1">
             <Image Source="{Binding SelectedBreach.LogoPath, FallbackValue=''}" />
@@ -30,9 +30,9 @@
                              Grid.Column="1">
             <Label Text="{Binding SelectedBreach.Domain, FallbackValue=''}" />
             <Label Text="{Binding SelectedBreach.PwnCount, StringFormat='Accounts Stolen: {0:N0}', FallbackValue=''}" />
-            <Label Text="{Binding SelectedBreach.BreachDate, StringFormat='Breached: {0:mm dd yy}', FallbackValue=''}" />
-            <Label Text="{Binding SelectedBreach.AddedDate, StringFormat='Added: {0:mm dd yy}', FallbackValue=''}" />
-            <Label Text="{Binding SelectedBreach.ModifiedDate, StringFormat='Modified: {0:mm dd yy}', FallbackValue=''}" />
+            <Label Text="{Binding SelectedBreach.BreachDate, StringFormat='Breached: {0:MMM dd yyyy}', FallbackValue=''}" />
+            <Label Text="{Binding SelectedBreach.AddedDate, StringFormat='Added: {0:MMM dd yyyy}', FallbackValue=''}" />
+            <Label Text="{Binding SelectedBreach.ModifiedDate, StringFormat='Modified: {0:MMM dd yyyy}', FallbackValue=''}" />
 
             <Label Text="New"
                    IsVisible="{Binding SelectedBreach.IsNew, FallbackValue=''}" />
@@ -64,11 +64,11 @@
             <telerik:RadItemsControl.ItemTemplate>
                 <DataTemplate>
                     <telerik:RadBorder Padding="5,2"
-                                       BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}">
+                                       BackgroundColor="{DynamicResource RadSurfaceAltColor}">
                         <Label Text="{Binding}" />
                     </telerik:RadBorder>
                 </DataTemplate>
             </telerik:RadItemsControl.ItemTemplate>
         </telerik:RadItemsControl>
     </Grid>
-</views:PageBase>
+</cm:PageBase>

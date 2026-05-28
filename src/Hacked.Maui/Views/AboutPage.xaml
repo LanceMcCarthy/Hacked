@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<views:PageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<cm:PageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:cm="clr-namespace:Hacked.Maui.Common"
                 x:Class="Hacked.Maui.Views.AboutPage"
                 xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
                 xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
-                xmlns:views="clr-namespace:Hacked.Maui.Views"
                 xmlns:res="using:Hacked.Maui.Resources"
                 x:DataType="vms:AboutViewModel"
                 Title="About">
@@ -99,10 +99,10 @@
                              CornerRadius="5"
                              FontFamily="Raleway"/>
             <telerik:RadButton x:Name="ReviewButton"
-                             Clicked="ReviewButton_OnClickButton_OnClick"
+                             Clicked="ReviewButton_OnClick"
                              Text="rate this app"
                              CornerRadius="5" 
                              FontFamily="Raleway"/>
         </VerticalStackLayout>
     </Grid>
-</views:PageBase>
+</cm:PageBase>

@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<views:PageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<cm:PageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:cm="clr-namespace:Hacked.Maui.Common"
                 x:Class="Hacked.Maui.Views.AccountDetailsPage"
                 xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
                 xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
                 xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
                 xmlns:res="clr-namespace:Hacked.Maui.Resources"
                 xmlns:controls="clr-namespace:Hacked.Maui.Controls"
-                xmlns:views="clr-namespace:Hacked.Maui.Views"
                 x:DataType="vms:AccountDetailsViewModel"
-                Title="Account Details">
+                Title="Account Details" 
+                BackgroundColor="{DynamicResource RadAppSurfaceColor}">
 
-    <views:PageBase.Resources>
+    <cm:PageBase.Resources>
         <telerik:CollectionViewLinearLayout x:Key="MobileLayout"
                                             ItemSpacing="5"/>
 
@@ -19,32 +20,29 @@
                                           SpanCount="3"
                                           HorizontalItemSpacing="5"
                                           VerticalItemSpacing="5" />
-    </views:PageBase.Resources>
+    </cm:PageBase.Resources>
 
-    <Grid RowDefinitions="Auto,*">
-        <Grid BackgroundColor="{DynamicResource RadAppSurfaceColor}">
-            <!--<controls:ImageCollage AssociatedAccount="{Binding SelectedAccount}"
-                                   Margin="5"/>-->
-            
+    <Grid RowDefinitions="Auto,Auto,*">
+        <Grid BackgroundColor="{DynamicResource RadPrimarySubtleActiveColor}">
             <VerticalStackLayout Spacing="5"
                                  Padding="10,5"
                                  HorizontalOptions="Center">
-                <Label Text="{Binding SelectedAccount.Address}"
+                <Label Text="{Binding SelectedAccount.Address, FallbackValue='NULL'}"
                        FontAttributes="Bold"
                        HorizontalOptions="Center"
                        FontSize="22"
-                      TextColor="{DynamicResource RadPrimaryColor}"/>
-                <Label Text="{Binding SelectedAccount.Breaches.Count, StringFormat='Breach Count: {0}'}"
-                      TextColor="{DynamicResource RadPrimaryColor}"
+                       TextColor="{DynamicResource RadOnAppSurfaceBrush}"/>
+                <Label Text="{Binding SelectedAccount.Breaches.Count, StringFormat='Breach Count: {0}', FallbackValue=9999}"
                        HorizontalOptions="Center" 
+                       TextColor="{DynamicResource RadOnAppSurfaceColorAlpha80}"
                        FontSize="16"/>
-                <Label Text="{Binding SelectedAccount.LastUpdated, StringFormat='Last Updated: {0:g}'}"
-                      TextColor="{DynamicResource RadPrimaryColor}"
+                <Label Text="{Binding SelectedAccount.LastUpdated, StringFormat='Last Updated: {0:g}', FallbackValue='1/1/1970'}"
                        HorizontalOptions="Center" 
+                       TextColor="{DynamicResource RadOnAppSurfaceColorAlpha50}"
                        FontSize="12"/>
             </VerticalStackLayout>
 
-            <Grid IsVisible="{Binding SelectedAccount.IsUpdating}"
+            <Grid IsVisible="{Binding SelectedAccount.IsUpdating, FallbackValue=False}"
                   BackgroundColor="{DynamicResource RadOnAppSurfaceColorAlpha50}">
                 <Label Text="Is Refreshing..."
                        HorizontalTextAlignment="Center"
@@ -54,13 +52,13 @@
         </Grid>
 
         <telerik:RadCollectionView x:Name="BreachesListView"
-                                   ItemsSource="{Binding SelectedAccount.Breaches}"
+                                   ItemsSource="{Binding SelectedAccount.Breaches, FallbackValue=null}"
                                    SelectionMode="None"
-                                   Margin="10,0,10,0"
-                                   Grid.Row="1">
+                                   Margin="10,0"
+                                   Grid.Row="2">
             <telerik:RadCollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:Breach">
-                    <controls:BreachItemView MaximumHeightRequest="500" Margin="0,5"/>
+                    <controls:BreachItemView MaximumHeightRequest="500" Margin="0,5" />
                 </DataTemplate>
             </telerik:RadCollectionView.ItemTemplate>
             <telerik:RadCollectionView.ItemsLayout>
@@ -81,22 +79,22 @@
                                Style="{StaticResource FontAwesomeLabelStyle}"
                                Command="{Binding RefreshAccountCommand}"
                                CommandParameter="{Binding SelectedAccount}"
-                               IsEnabled="{Binding SelectedAccount.IsUpdating, Converter={StaticResource InvertBoolConverter}}"
+                               IsEnabled="{Binding SelectedAccount.IsUpdating, Converter={StaticResource InvertBoolConverter}, FallbackValue=False}"
                                Margin="0,0,10,0" />
 
             <telerik:RadButton Text="{x:Static res:IconFont.ExclamationTriangle}"
                                Style="{StaticResource FontAwesomeLabelStyle}"
                                Command="{Binding ClearNewBreachesCommand}"
                                CommandParameter="{Binding SelectedAccount}"
-                               IsVisible="{Binding SelectedAccount.HasNewBreaches}"
+                               IsVisible="{Binding SelectedAccount.HasNewBreaches, FallbackValue=False}"
                                Margin="0,0,10,0" />
         </VerticalStackLayout>
 
-        <telerik:RadBusyIndicator IsVisible="{Binding SelectedAccount.IsUpdating}"
-                                  IsBusy="{Binding SelectedAccount.IsUpdating}"
+        <telerik:RadBusyIndicator IsVisible="{Binding SelectedAccount.IsUpdating, FallbackValue=False}"
+                                  IsBusy="{Binding SelectedAccount.IsUpdating, FallbackValue=False}"
                                   AnimationType="Animation3"
                                   BackgroundColor="{DynamicResource RadOnAppSurfaceColorAlpha50}"
                                   AnimationContentColor="{DynamicResource RadPrimaryColor}" 
                                   Grid.RowSpan="2"/>
     </Grid>
-</views:PageBase>
+</cm:PageBase>

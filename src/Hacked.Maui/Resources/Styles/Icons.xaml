@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    <!-- 
+    Telerik icon font symbols used by the app 
+    Full list here - https://docs.telerik.com/devtools/xamarin/styling-and-appearance/telerik-font-icons 
+    -->
+    <x:String x:Key="StarIcon">&#xE805;</x:String>
+    <x:String x:Key="MenuIcon">&#xE808;</x:String>
+    <x:String x:Key="PlusIcon">&#xF0FE;</x:String>
+    <x:String x:Key="MinusIcon">&#xF146;</x:String>
+    <x:String x:Key="RightArrowEnclosedIcon">&#xF138;</x:String>
+    <x:String x:Key="LeftArrowEnclosedIcon">&#xF137;</x:String>
+    <x:String x:Key="CancelEnclosedIcon">&#xE851;</x:String>
+    <x:String x:Key="InfoEnclosedIcon">&#xE815;</x:String>
+    <x:String x:Key="TrashIcon">&#xE827;</x:String>
+    <x:String x:Key="CheckMarkIcon">&#xE809;</x:String>
+    <x:String x:Key="GearSolidIcon">&#xE80F;</x:String>
+    <x:String x:Key="GearOutlinedIcon">&#xE822;</x:String>
+    <x:String x:Key="StarSolidIcon">&#xE805;</x:String>
+    <x:String x:Key="StarOutlinedIcon">&#xE801;</x:String>
+    <x:String x:Key="DraftIcon">&#xE828;</x:String>
+    <x:String x:Key="GaugeIcon">&#xE84F;</x:String>
+    <x:String x:Key="CancelIcon">&#xE80A;</x:String>
+    <x:String x:Key="ArrowsUpIcon">&#xE800;</x:String>
+    <x:String x:Key="ArrowsDownIcon">&#xE803;</x:String>
+</ResourceDictionary>

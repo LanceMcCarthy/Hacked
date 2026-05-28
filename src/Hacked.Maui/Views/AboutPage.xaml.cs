@@ -1,6 +1,5 @@
 using CommonHelpers.Messaging;
 using CommunityToolkit.Mvvm.Messaging;
-using Hacked.Core.Common;
 using Hacked.Maui.ViewModels;
 
 namespace Hacked.Maui.Views;
@@ -48,7 +47,7 @@ public partial class AboutPage
         }
     }
 
-    private void ReviewButton_OnClickButton_OnClick(object sender, EventArgs e)
+    private void ReviewButton_OnClick(object sender, EventArgs e)
     {
         WeakReferenceMessenger.Default.Send(new MessagingCenterAlert
         {

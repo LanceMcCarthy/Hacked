@@ -2,7 +2,7 @@
 using Hacked.Core.Common;
 using Hacked.Core.Models;
 
-namespace Hacked.Maui.Views;
+namespace Hacked.Maui.Common;
 
 public class PageBase : ContentPage, IQueryAttributable
 {

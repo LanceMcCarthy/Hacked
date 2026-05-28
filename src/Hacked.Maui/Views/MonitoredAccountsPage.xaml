@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<views:PageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<cm:PageBase xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:cm="clr-namespace:Hacked.Maui.Common"
                 x:Class="Hacked.Maui.Views.MonitoredAccountsPage"
                 xmlns:telerik="http://schemas.telerik.com/2022/xaml/maui"
                 xmlns:vms="clr-namespace:Hacked.Maui.ViewModels"
                 xmlns:models="clr-namespace:Hacked.Core.Models;assembly=Hacked.Core"
                 xmlns:commands="clr-namespace:Hacked.Maui.Commands"
                 xmlns:res="clr-namespace:Hacked.Maui.Resources"
-                xmlns:views="clr-namespace:Hacked.Maui.Views"
                 x:DataType="vms:MonitoredAccountsViewModel"
                 Title="Monitored Accounts"
                 xmlns:android="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;assembly=Microsoft.Maui.Controls"
                 xmlns:commhelpers="clr-namespace:CommonHelpers.Maui.Helpers;assembly=CommonHelpers.Maui"
                 android:Application.WindowSoftInputModeAdjust="Resize"
                 x:Name="ThisPage">
-    <views:PageBase.Resources>
+    <cm:PageBase.Resources>
         <Style x:Key="AddOverlayIconButtonStyle"
                TargetType="telerik:RadButton">
             <Setter Property="BorderThickness"
@@ -24,9 +24,9 @@
             <Setter Property="VisualStateManager.VisualStateGroups">
             </Setter>
         </Style>
-    </views:PageBase.Resources>
+    </cm:PageBase.Resources>
 
-    <views:PageBase.ToolbarItems>
+    <cm:PageBase.ToolbarItems>
         <ToolbarItem x:Name="ShowAddAccountOverlay"
                      Text="Add Account"
                      Command="{Binding ToggleOverlayCommand}"
@@ -38,7 +38,7 @@
                                  Color="{DynamicResource RadOnAppSurfaceColor}" />
             </ToolbarItem.IconImageSource>
         </ToolbarItem>
-    </views:PageBase.ToolbarItems>
+    </cm:PageBase.ToolbarItems>
 
     <Grid>
         <telerik:RadDataGrid x:Name="MonitoredAccountDataGrid"
@@ -182,7 +182,8 @@
                                             <telerik:RadBorder WidthRequest="75"
                                                                HeightRequest="75"
                                                                CornerRadius="2"
-                                                               Margin="5,10,5,5"
+                                                               Padding="5"
+                                                               Margin="10,5,0,5"
                                                                BackgroundColor="{DynamicResource RadOnAppSurfaceColor}">
                                                 <Image Source="{Binding LogoPath}" />
                                             </telerik:RadBorder>
@@ -270,7 +271,7 @@
                                                 <VisualState x:Name="Normal">
                                                     <VisualState.Setters>
                                                         <Setter Property="BackgroundColor"
-                                                                Value="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}" />
+                                                                Value="{DynamicResource RadAppSurfaceColorAlpha16}" />
                                                     </VisualState.Setters>
                                                 </VisualState>
                                                 <VisualState x:Name="PointerOver">
@@ -332,4 +333,4 @@
             </telerik:RadBorder>
         </Grid>
     </Grid>
-</views:PageBase>
+</cm:PageBase>
