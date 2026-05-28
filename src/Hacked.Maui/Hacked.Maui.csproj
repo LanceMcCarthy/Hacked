@@ -18,6 +18,7 @@
 		<ApplicationTitle>Hacked?</ApplicationTitle>
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
+    <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
@@ -70,33 +71,35 @@
   <!-- **************** Windows **************** -->
 
   <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) and '$(Configuration)' == 'Debug'">
-    <ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
-    <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
     <WindowsPackageType>None</WindowsPackageType>
     <GenerateAppxPackageOnBuild>false</GenerateAppxPackageOnBuild>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) and '$(Configuration)' == 'Release'">
+    <WindowsPackageType>MSIX</WindowsPackageType>
+    <AppxBundle>Always</AppxBundle>
+    <AppxBundlePlatforms>x64|arm64</AppxBundlePlatforms>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <!-- **************** Android **************** -->
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
 		<ApplicationId>com.lancelotsoftware.hacked</ApplicationId>
-		<ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
 	</PropertyGroup>
 
 	<!-- **************** iOS **************** -->
 
   <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
     <ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
-    <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
   </PropertyGroup>
 
 	<!-- **************** MacCatalyst **************** -->
 
-  <PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst')) and '$(Configuration)' == 'Debug'">
+  <PropertyGroup Condition="$(TargetFramework.Contains('-maccatalyst'))">
     <ApplicationTitle>Hacked</ApplicationTitle>
     <ApplicationId>com.lancelotsoftware.HackedApp</ApplicationId>
-    <ApplicationIdGuid>61717AC6-F401-4830-B715-78DD35E085CC</ApplicationIdGuid>
     <RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
   </PropertyGroup>
 </Project>
