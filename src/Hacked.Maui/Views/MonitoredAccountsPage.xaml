@@ -21,8 +21,6 @@
                 Value="1" />
             <Setter Property="Padding"
                 Value="5" />
-            <Setter Property="VisualStateManager.VisualStateGroups">
-            </Setter>
         </Style>
     </cm:PageBase.Resources>
 
