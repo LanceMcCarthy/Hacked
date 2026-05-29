@@ -274,10 +274,6 @@
       <Project>{da28b98c-48c5-4673-8395-a07712332c53}</Project>
       <Name>Hacked.BackgroundTasks</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Hacked.Core\Hacked.Core.csproj">
-      <Project>{d7b3deda-972e-33d3-6fe3-0e00abc18f05}</Project>
-      <Name>Hacked.Core</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommonHelpers">

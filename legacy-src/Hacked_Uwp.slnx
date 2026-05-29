@@ -5,7 +5,7 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="//Mac/Home/Documents/GitHub/Hacked/src/Hacked.Core/Hacked.Core.csproj" />
+  <Project Path="../src/Hacked.Core/Hacked.Core.csproj" />
   <Project Path="Hacked.BackgroundTasks/Hacked.BackgroundTasks.csproj" Id="da28b98c-48c5-4673-8395-a07712332c53">
     <Platform Solution="*|ARM" Project="ARM" />
     <Platform Solution="*|ARM64" Project="ARM64" />
