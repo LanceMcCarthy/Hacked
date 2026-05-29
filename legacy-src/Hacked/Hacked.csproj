@@ -275,12 +275,8 @@
       <Name>Hacked.BackgroundTasks</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Hacked.Core\Hacked.Core.csproj">
-      <Project>{47433269-3e74-4a03-aeaf-087d1a3765b4}</Project>
+      <Project>{d7b3deda-972e-33d3-6fe3-0e00abc18f05}</Project>
       <Name>Hacked.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Hacked.Services\Hacked.Services.csproj">
-      <Project>{fd0d971c-b401-4b7f-8c7c-067e91b07a77}</Project>
-      <Name>Hacked.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

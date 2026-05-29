@@ -5,15 +5,14 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="Hacked.BackgroundTasks/Hacked.BackgroundTasks.csproj">
+  <Project Path="//Mac/Home/Documents/GitHub/Hacked/src/Hacked.Core/Hacked.Core.csproj" />
+  <Project Path="Hacked.BackgroundTasks/Hacked.BackgroundTasks.csproj" Id="da28b98c-48c5-4673-8395-a07712332c53">
     <Platform Solution="*|ARM" Project="ARM" />
     <Platform Solution="*|ARM64" Project="ARM64" />
     <Platform Solution="*|x64" Project="x64" />
     <Platform Solution="*|x86" Project="x86" />
   </Project>
-  <Project Path="Hacked.Core/Hacked.Core.csproj" />
-  <Project Path="Hacked.Services/Hacked.Services.csproj" />
-  <Project Path="Hacked/Hacked.csproj">
+  <Project Path="Hacked/Hacked.csproj" Id="8c081783-895a-4f1e-9cef-ddd5c15d96ea">
     <Platform Solution="*|ARM" Project="ARM" />
     <Platform Solution="*|ARM64" Project="ARM64" />
     <Platform Solution="*|x64" Project="x64" />
