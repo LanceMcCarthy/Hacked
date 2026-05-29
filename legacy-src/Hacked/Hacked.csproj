@@ -274,7 +274,7 @@
       <Project>{da28b98c-48c5-4673-8395-a07712332c53}</Project>
       <Name>Hacked.BackgroundTasks</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Hacked.Core\Hacked.Core.csproj">
+    <ProjectReference Include="..\..\src\Hacked.Core\Hacked.Core.csproj">
       <Project>{47433269-3e74-4a03-aeaf-087d1a3765b4}</Project>
       <Name>Hacked.Core</Name>
     </ProjectReference>
